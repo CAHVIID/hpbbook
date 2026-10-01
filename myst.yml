@@ -3,6 +3,8 @@ project:
   title: Cookbook for High Performance Buildings
   authors:
     - name: Christian Anker Hviid
+  bibliography:
+    - references.bib
   toc:
     - file: index.md
     - title: Chapters
