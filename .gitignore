@@ -1,0 +1,16 @@
+# MyST / Jupyter Book build output
+_build/
+.myst/
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
