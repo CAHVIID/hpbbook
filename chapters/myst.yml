@@ -10,6 +10,5 @@ project:
         - file: chapters/01-intro.md
         - file: chapters/02-ventilative-cooling.md
         - file: chapters/03-ceiling-fans.md
-        - file: chapters/04-weather-files.md
 site:
   template: book-theme
