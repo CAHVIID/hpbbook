@@ -1,9 +1,5 @@
 # Weather files and future weather
 
-:::{note} Draft
-This chapter is a working draft. Section 3 is written in full. The other sections are the agreed outline and will be filled in next.
-:::
-
 ## Learning objectives
 
 After this chapter you can:
