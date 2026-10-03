@@ -13,5 +13,6 @@ project:
         - file: chapters/02-ventilative-cooling.md
         - file: chapters/03-ceiling-fans.md
         - file: chapters/04-weather-files.md
+        - file: chapters/05-floor-heating.md
 site:
   template: book-theme
