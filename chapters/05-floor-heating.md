@@ -153,6 +153,18 @@ A hydronic floor heating installation. The controller sets the supply temperatur
 
 So the installation has two control levels. The supply temperature is set centrally from the outdoor temperature, and each room switches its own loop on or off. Neither level knows about the sun, and both act on the floor, not on the room. Any delay in the floor therefore appears directly as a delay in the room.
 
+### Several manifolds on one riser
+
+In buildings with several floors or apartments, one riser pump often feeds a manifold on each floor, each through its own shunt ({numref}`fig-riser-shunts`). The shunt pump circulates water through the floor loops. A thermostatic valve on the return limits the supply temperature: when the sensor bulb gets too warm, it throttles the water returned to the riser, so less hot water is drawn in and more return water is mixed back through the bypass. The check valve stops riser water from flowing backwards through the bypass into the return.
+
+:::{figure} figures/ch05/riser-shunts.*
+:label: fig-riser-shunts
+:alt: Schematic of a riser fed by a heat pump and a riser pump. On each of two floors, a branch from the riser supply passes a bypass junction, a shunt pump and a sensor bulb before reaching a supply manifold with three connections. The return manifold has a wax thermostat on each connection. The return passes the bypass junction and a 2-way thermostatic valve, connected to the sensor bulb by a capillary, before rejoining the riser return. The bypass between return and supply has a check valve. One floor loop is drawn in full.
+:width: 100%
+
+A riser with a riser pump feeding two floor heating manifolds, each through a shunt with its own pump, a 2-way thermostatic valve on the return and a check valve in the bypass. Three pumps in total. Only one floor loop per manifold is drawn.
+:::
+
 ## Control of floor heating
 
 Floor heating is controlled on two levels ({numref}`fig-hydronic-schematic`). The supply temperature follows a heating curve, set from the outdoor temperature. Each room then switches its own loop with a wax thermostat, driven by its room temperature sensor.
