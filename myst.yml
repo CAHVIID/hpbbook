@@ -7,13 +7,24 @@ project:
     - references.bib
   toc:
     - file: index.md
-    - title: Chapters
+    - file: chapters/01-intro.md
+    - title: "Part A: Compactness and envelope"
       children:
-        - file: chapters/01-intro.md
-        - file: chapters/02-ventilative-cooling.md
-        - file: chapters/03-ceiling-fans.md
-        - file: chapters/04-weather-files.md
-        - file: chapters/05-floor-heating.md
-        - file: chapters/06-domestic-hot-water.md
+        - file: parts/part-a-compactness-envelope.md
+    - title: "Part B: Ventilation"
+      children:
+        - file: parts/part-b-ventilation.md
+    - title: "Part C: Heating systems and domestic hot water"
+      children:
+        - file: chapters/02-floor-heating.md
+        - file: chapters/03-domestic-hot-water.md
+    - title: "Part D: Cooling"
+      children:
+        - file: chapters/04-ventilative-cooling.md
+        - file: chapters/05-ceiling-fans.md
+        - file: chapters/06-weather-files.md
+    - title: "Part E: Prefabrication of type houses"
+      children:
+        - file: parts/part-e-prefabrication.md
 site:
   template: book-theme
