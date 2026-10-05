@@ -234,6 +234,56 @@ A light floor holds a tenth of that heat, and most of it is released within the 
 :::
 
 
+### The room has a time constant too
+
+The same idea applies to the room or the whole house. The heat store is the heat capacity of air, furniture and internal construction, $C$, and the heat leaves through the envelope and the ventilation, with the heat loss coefficient $UA$ [W/K]. The resistance is $R = 1/UA$, so
+
+$$
+\tau_\text{room} = \frac{C}{UA}, \qquad T(t) = T_\infty + (T_0 - T_\infty)\,e^{-t/\tau_\text{room}}, \qquad T_\infty = T_\text{out} + \frac{\Phi}{UA}
+$$ (eq-tau-room)
+
+where $\Phi$ is a constant heat gain. Without gains the room cools towards the outdoor temperature. With gains it settles $\Phi/UA$ above it.
+
+```{list-table} Time constant of a room and its temperature rise from solar gain (40 W/m² of floor, no venting). Values per m² of floor.
+:header-rows: 1
+:label: tab-room-tau
+
+* - House
+  - $UA$
+  - $C$
+  - $\tau_\text{room}$
+  - Steady rise, $\Phi_\text{sol}/UA$
+  - Rise after 6 h of sun
+* - Older house, light
+  - 2.5 W/(m²·K)
+  - 40 kJ/(m²·K)
+  - 4 h
+  - 16 K
+  - 12 K
+* - Low-energy house, light
+  - 0.6 W/(m²·K)
+  - 40 kJ/(m²·K)
+  - 19 h
+  - 67 K
+  - 18 K
+* - Low-energy house, heavy
+  - 0.6 W/(m²·K)
+  - 150 kJ/(m²·K)
+  - 69 h
+  - 67 K
+  - 6 K
+```
+
+A low-energy house has a small $UA$, so its time constant is long and its steady temperature rise from a given gain is large. The sun would heat the room 67 K above the outdoor temperature if nothing removed the heat. The room is protected only because the sun sets before that happens, and by its heat capacity, which slows the rise. Any heat from the floor comes on top of the solar gain and has nowhere to go but out of the windows.
+
+The app below shows how fast a room cools after the heating stops. Change $UA$ and $\tau$ and compare with the three reference rooms of 20 m² floor.
+
+```{anywidget} code/room-cooldown.mjs
+{}
+```
+
+The same model in Python: {download}`room_cooldown.py <code/room_cooldown.py>`. Run it with `python room_cooldown.py --UA 12 --tau 18` to simulate one room, or without arguments to compare the reference rooms.
+
 ## Control of floor heating
 
 Floor heating is controlled on two levels ({numref}`fig-hydronic-schematic`). The supply temperature follows a heating curve, set from the outdoor temperature. Each room then switches its own loop with a wax thermostat, driven by its room temperature sensor.
