@@ -234,6 +234,56 @@ A light floor holds a tenth of that heat, and most of it is released within the 
 :::
 
 
+### The room has a time constant too
+
+The same idea applies to the room or the whole house. The heat store is the heat capacity of air, furniture and internal construction, $C$, and the heat leaves through the envelope and the ventilation, with the heat loss coefficient $UA$ [W/K]. The resistance is $R = 1/UA$, so
+
+$$
+\tau_\text{room} = \frac{C}{UA}, \qquad T(t) = T_\infty + (T_0 - T_\infty)\,e^{-t/\tau_\text{room}}, \qquad T_\infty = T_\text{out} + \frac{\Phi}{UA}
+$$ (eq-tau-room)
+
+where $\Phi$ is a constant heat gain. Without gains the room cools towards the outdoor temperature. With gains it settles $\Phi/UA$ above it.
+
+```{list-table} Time constant of a room and its temperature rise from solar gain (40 W/m² of floor, no venting). Values per m² of floor.
+:header-rows: 1
+:label: tab-room-tau
+
+* - House
+  - $UA$
+  - $C$
+  - $\tau_\text{room}$
+  - Steady rise, $\Phi_\text{sol}/UA$
+  - Rise after 6 h of sun
+* - Older house, heavy
+  - 2.5 W/(m²·K)
+  - 150 kJ/(m²·K)
+  - 17 h
+  - 16 K
+  - 5 K
+* - Low-energy house, light
+  - 0.6 W/(m²·K)
+  - 40 kJ/(m²·K)
+  - 19 h
+  - 67 K
+  - 18 K
+* - Low-energy house, heavy
+  - 0.6 W/(m²·K)
+  - 150 kJ/(m²·K)
+  - 69 h
+  - 67 K
+  - 6 K
+```
+
+The older heavy house and the light low-energy house have almost the same time constant, 17 and 19 hours. The low-energy house gets its long time constant from a small $UA$, not from mass. Insulation alone makes a light house as slow as an old heavy one. The difference is the steady temperature rise: with a small $UA$ the same gain lifts the room four times as much. The sun would heat the room 67 K above the outdoor temperature if nothing removed the heat. The room is protected only because the sun sets before that happens, and by its heat capacity, which slows the rise. Any heat from the floor comes on top of the solar gain and has nowhere to go but out of the windows.
+
+The app below shows how fast a room cools after the heating stops. Change $UA$ and $\tau$ and compare with the three reference rooms of 20 m² floor.
+
+```{anywidget} code/room-cooldown.mjs
+{}
+```
+
+The same model in Python: {download}`room_cooldown.py <code/room_cooldown.py>`. Run it with `python room_cooldown.py --UA 12 --tau 18` to simulate one room, or without arguments to compare the reference rooms.
+
 ## Control of floor heating
 
 Floor heating is controlled on two levels ({numref}`fig-hydronic-schematic`). The supply temperature follows a heating curve, set from the outdoor temperature. Each room then switches its own loop with a wax thermostat, driven by its room temperature sensor.
@@ -288,8 +338,6 @@ Several strategies reduce the problem, but none of them removes it:
 
 The conclusion is that a heat emitter with a long time lag is a poor match for a house whose heating demand is small and changes within hours. A fast emitter, such as heating through the ventilation air or a small convector, can switch off at the moment the sun starts to heat the room.
 
-(sec-floor-model-theory)=
-
 ### Several manifolds on one riser
 
 In buildings with several floors or apartments, one riser pump often feeds a manifold on each floor, each through its own shunt ({numref}`fig-riser-shunts`). The shunt pump circulates water through the floor loops. A thermostatic valve on the return limits the supply temperature: when the sensor bulb gets too warm, it throttles the water returned to the riser, so less hot water is drawn in and more return water is mixed back through the bypass. The check valve stops riser water from flowing backwards through the bypass into the return.
@@ -302,6 +350,19 @@ In buildings with several floors or apartments, one riser pump often feeds a man
 A riser with a riser pump feeding two floor heating manifolds, each through a shunt with its own pump, a 2-way thermostatic valve on the return and a check valve in the bypass. Three pumps in total. Only one floor loop per manifold is drawn.
 :::
 
+The check valve in the bypass is spring loaded and needs a certain pressure difference to open. This becomes a problem in a low-energy house, where the floor loops need little heat but the riser pump keeps its pressure up ({numref}`fig-riser-pump-curve`). At design load the shunts draw a large flow from the riser, and the riser pump runs at its design point A. In mild weather the thermostatic valves throttle, the flow drawn from the riser becomes small, and a constant-speed riser pump runs up its curve to almost its shut-off head (point B). The riser pressure then pushes against the bypass. Before any water can flow up through the bypass, the thermostatic valve must absorb both the riser pressure and the opening pressure of the check valve. The valve ends up almost closed with a large pressure across it, so it hunts and can be noisy, and until the check valve opens the floor loops get either too little flow or water that is too hot.
+
+A riser pump in proportional-pressure mode lowers its head as the flow falls (point C), which makes the problem much smaller. A check valve with a low opening pressure also helps.
+
+:::{figure} figures/ch05/riser-pump-curve.*
+:label: fig-riser-pump-curve
+:alt: Pump diagram with the flow drawn from the riser on the horizontal axis and differential pressure on the vertical axis. A constant-speed riser pump curve falls slowly from 45 kPa at zero flow. A proportional-pressure curve rises linearly from about 20 kPa to the same design point at 600 litres per hour and 41 kPa. Two system curves are shown, one for design and a steep one for low load. A dashed line 10 kPa above the constant-speed curve marks the pressure the thermostatic valve must absorb before the check valve opens. Point B at low load on the constant-speed curve is at about 45 kPa, and point C on the proportional-pressure curve is at about 23 kPa.
+:width: 90%
+
+Riser pump at design (A) and at low load with constant speed (B) and proportional pressure (C). The shaded band is the opening pressure of the check valve, which the thermostatic valve must absorb on top of the riser pressure before water flows through the bypass. Example values: 45 kPa shut-off head, 600 l/h design flow, 10 kPa opening pressure.
+:::
+
+(sec-floor-model-theory)=
 ## Theory behind the interactive model
 
 ::::{admonition} Show the equations
