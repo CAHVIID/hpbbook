@@ -12,11 +12,22 @@ After this chapter you can:
 
 ## Introduction
 
-Floor heating is the standard heat emitter in new Danish dwellings. It is invisible, it frees wall space, and it works with low supply temperatures, which suits heat pumps and district heating. In an older house with a large heat demand it also gives good comfort, with warm feet and a small vertical temperature gradient.
+Floor heating is the standard heat emitter in neew Danish dwellings. It is invisible, it frees wall space, and it works with low supply temperatures, which suits heat pumps and district heating. In an older house with a large heat demand it also gives good comfort, with warm feet and a small vertical temperature gradient.
 
-A low-energy house is a different case. Its heat loss is small, typically 10–20 W per m² of floor at design conditions and much less on an ordinary spring or autumn day. Its solar and internal gains are large in comparison. On a clear day in April the heating demand at night can turn into a cooling demand by noon. The heat emitter must therefore stop delivering heat within a few hours of being asked to.
+Warm water from a manifold runs through a pipe loop in the floor of each room and returns a few kelvin cooler. The heat first warms the floor, and the floor surface then gives it to the room by radiation and convection ({numref}`fig-floor-principle`).
+
+:::{figure} figures/ch05/floor-heating-principle.*
+:label: fig-floor-principle
+:alt: Two panels. Left, a plan view of a room with a serpentine pipe loop: water leaves a manifold at about 30 °C, runs back and forth across the floor with legs 150–300 mm apart, changing colour from red to blue, and returns at about 25 °C. Right, a section of the same room: pipes cast in a concrete slab on insulation, under a floor covering. Wavy arrows show radiation and dashed arrows show convection from the floor to the room, and sunlight enters through a window onto the floor.
+:width: 100%
+
+Principle of hydronic floor heating. (a) One pipe loop per room, fed from a manifold. (b) Heat passes from the water into the slab, and from the floor surface to the room by radiation and convection. In a low-energy house the floor is only 1–3 K warmer than the room air.
+:::
+
+A low-energy house is a different case. Its heat loss is small, typically 10 W per m² of floor at design conditions and much less on an ordinary spring or autumn day. Solar and internal gains are large in comparison. On a clear day in April the heating demand at night can turn into a cooling demand by noon. The heat emitter must therefore stop delivering heat within a few hours of being asked to.
 
 A floor cannot do that, because heat is stored in the floor before it reaches the room. Water put into the floor at 4 am keeps warming the room after the sun has come out. The heavier the floor, the longer the delay. This chapter shows how large that delay is for a light floor and for a heavy floor, and why it makes floor heating a risky choice in a low-energy house. Control of floor heating, and what it can and cannot fix, is the topic of the later sections.
+
 
 ## Heat transfer from a heated floor
 
