@@ -24,7 +24,7 @@ On a sunny day in April or September, solar and internal gains can lift the temp
 
 Ventilative cooling or venting (udluftning) means using outdoor air to remove heat from a building whenever the outdoor air is cooler than the indoor air.
 
-It is the second step in the cooling hierarchy, after reducing the heat gains (chapter 1) and before ceiling fans (chapter 5) and active cooling.
+It is the second step in the cooling hierarchy, after reducing the heat gains (chapter 1) and before ceiling fans (chapter 6) and active cooling.
 
 The air can be moved in three ways:
 
@@ -87,7 +87,7 @@ The smaller opening dominates. Two openings of 0.5 m² each give an effective ar
 
 The pressure difference has two sources: buoyancy (the stack effect) and wind. Together with the placement of the openings they give the three modes of natural ventilative cooling in {numref}`fig-vc-modes`.
 
-:::{figure} figures/ch04/ventilation-modes.*
+:::{figure} figures/ch05/ventilation-modes.*
 :label: fig-vc-modes
 :alt: Three building sections side by side. (a) A room with one tall window: cool air enters at the bottom of the window and warm air leaves at the top, with the neutral pressure plane halfway up the opening. (b) A room with windows on opposite façades: wind pushes cool air in on the windward side, marked plus, and out on the leeward side, marked minus. (c) A two-storey section with a low window and a roof opening: cool air enters low, rises through the house and leaves through the roof, with the neutral pressure plane between the openings and the height h marked.
 :width: 100%

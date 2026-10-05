@@ -36,7 +36,7 @@ The future files are made in an unusual way. Climate models give only daily temp
 
 {numref}`fig-dry-weather` shows the current and future DRY files, and {numref}`tab-dry-summary` summarises them.
 
-```{figure} figures/ch06/dry-air-temperature.png
+```{figure} figures/ch02/dry-air-temperature.png
 :name: fig-dry-weather
 :width: 100%
 

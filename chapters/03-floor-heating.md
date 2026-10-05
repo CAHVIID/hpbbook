@@ -43,7 +43,7 @@ Floor heating is the standard heat emitter in newer Danish dwellings. It is invi
 
 Warm water from a manifold runs through a pipe loop in the floor of each room and returns a few kelvin cooler. The heat first warms the floor, and the floor surface then gives it to the room by radiation and convection ({numref}`fig-floor-principle`).
 
-:::{figure} figures/ch02/floor-heating-principle.*
+:::{figure} figures/ch03/floor-heating-principle.*
 :label: fig-floor-principle
 :alt: Two panels. Left, a plan view of a room with a serpentine pipe loop: water leaves a manifold at about 30 °C, runs back and forth across the floor with legs 150–300 mm apart, changing colour from red to blue, and returns at about 25 °C. Right, a section of the same room: pipes cast in a concrete slab on insulation, under a floor covering. Wavy arrows show radiation and dashed arrows show convection from the floor to the room, and sunlight enters through a window onto the floor.
 :width: 100%
@@ -99,7 +99,7 @@ Floor covering adds thermal resistance between the pipes and the room. Tiles add
 
 Floor heating constructions are often grouped by how the pipes are embedded, i.e. how much heat capacity sits between the pipes and the room ({numref}`fig-floor-sections`).
 
-:::{figure} figures/ch02/floor-sections.*
+:::{figure} figures/ch03/floor-sections.*
 :label: fig-floor-sections
 :alt: Two cross-sections drawn to the same scale. Left, a light floor: 22 mm floor boards resting on aluminium plates that wrap around the pipes, which sit in grooves in a 30 mm EPS panel on an 18 mm plywood board above insulation and joists. Right, a heavy floor: 14 mm parquet on a 100 mm concrete slab with the pipes in the middle of the slab, above EPS insulation.
 :width: 100%
@@ -124,7 +124,7 @@ In a heavy floor the pipes are cast into cement screed or concrete. A typical sc
 
 {numref}`fig-hydronic-schematic` shows a typical installation. The parts are the same for light and heavy floors.
 
-:::{figure} figures/ch02/hydronic-schematic.*
+:::{figure} figures/ch03/hydronic-schematic.*
 :label: fig-hydronic-schematic
 :alt: Schematic of a hydronic floor heating system. A heat pump or district heating unit supplies water through a three-way mixing valve and a circulation pump to a manifold. The controller sets the mixing valve from an outdoor sensor and a supply temperature sensor. From the manifold, one loop runs to each of three rooms. The controller drives a motorized mixing valve. Each loop has a flow meter on the supply side and a wax thermostat on the return side, switched by a temperature sensor in its room.
 :width: 100%
@@ -215,7 +215,7 @@ In reality a floor has many layers and therefore many time constants. The more d
 
 {numref}`fig-floor-step-response` shows a more detailed calculation with a one-dimensional heat conduction model of both floors. The water is at 30 °C and the room at 20 °C.
 
-:::{figure} figures/ch02/floor-step-response.*
+:::{figure} figures/ch03/floor-step-response.*
 :label: fig-floor-step-response
 :alt: Two line charts of heat output to the room in percent of steady state over 24 hours. Left, after the wax thermostat opens, the light floor reaches 63 % in about half an hour and the heavy floor in about 2 hours. Right, after the wax thermostat closes, the light floor falls to 37 % in about 1 hour, while the heavy floor takes about 12 hours and still delivers about 10 % after 24 hours.
 :width: 100%
@@ -401,7 +401,7 @@ Several strategies reduce the problem, but none of them removes it:
 - **Low supply temperature and self-regulation.** With the supply only a few kelvin above the room, the floor delivers less when the room warms up, even with the valve open.
 - **Heating stop.** Stop heating above an outdoor temperature limit, for example 12–15 °C, and use a deadband between the heating and cooling setpoints.
 - **Anticipating the sun.** Lower the setpoint in the morning on sunny days, using a weather forecast or model predictive control.
-- **Shading and ventilative cooling.** Remove the solar gain or the surplus heat (see chapter 4).
+- **Shading and ventilative cooling.** Remove the solar gain or the surplus heat (see chapter 5).
 - **Floor cooling.** The same pipes can cool by 20–40 W/m², limited by the dew point and a minimum floor surface temperature of about 19–20 °C. But the floor is just as slow when cooling.
 
 The conclusion is that a heat emitter with a long time lag is a poor match for a house whose heating demand is small and changes within hours. A fast emitter, such as heating through the ventilation air or a small convector, can switch off at the moment the sun starts to heat the room.
@@ -410,7 +410,7 @@ The conclusion is that a heat emitter with a long time lag is a poor match for a
 
 In buildings with several floors or apartments, one riser pump often feeds a manifold on each floor, each through its own shunt ({numref}`fig-riser-shunts`). The shunt pump circulates water through the floor loops. A thermostatic valve on the return limits the supply temperature: when the sensor bulb gets too warm, it throttles the water returned to the riser, so less hot water is drawn in and more return water is mixed back through the bypass. The check valve stops riser water from flowing backwards through the bypass into the return.
 
-:::{figure} figures/ch02/riser-shunts.*
+:::{figure} figures/ch03/riser-shunts.*
 :label: fig-riser-shunts
 :alt: Schematic of a riser fed by a heat pump and a riser pump. On each of two floors, a branch from the riser supply passes a bypass junction, a shunt pump and a sensor bulb before reaching a supply manifold with three connections. The return manifold has a wax thermostat on each connection. The return passes the bypass junction and a 2-way thermostatic valve, connected to the sensor bulb by a capillary, before rejoining the riser return. The bypass between return and supply has a check valve. One floor loop is drawn in full.
 :width: 100%
@@ -422,7 +422,7 @@ The check valve in the bypass is spring loaded and needs a certain pressure diff
 
 A riser pump in proportional-pressure mode lowers its head as the flow falls (point C), which makes the problem much smaller. A check valve with a low opening pressure also helps.
 
-:::{figure} figures/ch02/riser-pump-curve.*
+:::{figure} figures/ch03/riser-pump-curve.*
 :label: fig-riser-pump-curve
 :alt: Pump diagram with the flow drawn from the riser on the horizontal axis and differential pressure on the vertical axis. A constant-speed riser pump curve falls slowly from 45 kPa at zero flow. A proportional-pressure curve rises linearly from about 20 kPa to the same design point at 600 litres per hour and 41 kPa. Two system curves are shown, one for design and a steep one for low load. A dashed line 10 kPa above the constant-speed curve marks the pressure the thermostatic valve must absorb before the check valve opens. Point B at low load on the constant-speed curve is at about 45 kPa, and point C on the proportional-pressure curve is at about 23 kPa.
 :width: 90%
@@ -438,7 +438,7 @@ Riser pump at design (A) and at low load with constant speed (B) and proportiona
 
 The model is an RC network ({numref}`fig-rc-network`). The room is one node, and the floor is split into thin layers of about 2 mm, each a node with its own heat capacity. The water reaches the floor at the pipe plane.
 
-:::{figure} figures/ch02/rc-network.*
+:::{figure} figures/ch03/rc-network.*
 :label: fig-rc-network
 :alt: RC network of the model. The room node is connected to the outdoor temperature through the resistance one over H loss, has the heat capacity C r, receives solar and internal gains and loses vented heat. Below it, a chain of resistances and capacitances represents the floor layers from the surface to an adiabatic underside. The two nodes either side of the pipe plane are connected to the supply water temperature through the water conductance g w, which the wax thermostat switches.
 :width: 75%

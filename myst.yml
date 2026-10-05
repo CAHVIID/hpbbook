@@ -8,6 +8,7 @@ project:
   toc:
     - file: index.md
     - file: chapters/01-intro.md
+    - file: chapters/02-weather-files.md
     - title: "Part A: Compactness and envelope"
       children:
         - file: parts/part-a-compactness-envelope.md
@@ -16,13 +17,12 @@ project:
         - file: parts/part-b-ventilation.md
     - title: "Part C: Heating systems and domestic hot water"
       children:
-        - file: chapters/02-floor-heating.md
-        - file: chapters/03-domestic-hot-water.md
+        - file: chapters/03-floor-heating.md
+        - file: chapters/04-domestic-hot-water.md
     - title: "Part D: Cooling"
       children:
-        - file: chapters/04-ventilative-cooling.md
-        - file: chapters/05-ceiling-fans.md
-        - file: chapters/06-weather-files.md
+        - file: chapters/05-ventilative-cooling.md
+        - file: chapters/06-ceiling-fans.md
     - title: "Part E: Prefabrication of type houses"
       children:
         - file: parts/part-e-prefabrication.md

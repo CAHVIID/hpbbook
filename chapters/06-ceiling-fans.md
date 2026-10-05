@@ -17,7 +17,7 @@ Summers are also getting warmer, and heat waves are getting longer and more inte
 
 A ceiling fan does not lower the air temperature. Its motor even adds a little heat to the room. What it does is raise the air speed around the occupants ({numref}`fig-fan-airflow`). Higher air speed increases the heat loss from the skin by convection and evaporation, so people feel cooler at the same temperature. A design air speed of about 0.5 m/s gives a cooling effect of roughly 2 °C {cite:p}`raftery2020`. In other words, a room at 28 °C with a fan running can feel like 26 °C without one.
 
-:::{figure} figures/ch05/ceiling-fan-airflow.png
+:::{figure} figures/ch06/ceiling-fan-airflow.png
 :label: fig-fan-airflow
 :alt: Side view of a room with a ceiling fan blowing a jet of air down to the floor, where it spreads out towards the walls and returns slowly to the ceiling. A seated occupant near the fan is in the moving air.
 :width: 90%
@@ -35,7 +35,7 @@ Two consequences follow:
 Ceiling fans are one step in a cooling hierarchy, where each step is cheaper and simpler than the next:
 
 1. **Reduce the heat gains**: shading, solar-control glazing and sensible window areas (chapter 1).
-2. **Remove heat passively**: ventilative cooling with opening windows and night cooling of the thermal mass (chapter 4).
+2. **Remove heat passively**: ventilative cooling with opening windows and night cooling of the thermal mass (chapter 5).
 3. **Raise the air speed**: ceiling fans let occupants accept a higher temperature (this chapter).
 4. **Cool actively**: mechanical cooling, only for what is left.
 
@@ -232,7 +232,7 @@ where $\Delta t_{eq}$ is the whole-body cooling effect (°C, negative because th
 
 {numref}`fig-ce-distance` shows the cooling effect felt by a seated occupant at different distances from a 1.5 m ceiling fan. The air speeds are measured values (seated average of 0.1, 0.6 and 1.1 m height) from full-scale laboratory tests {cite:p}`raftery2019`, read off Figure 24 in {cite:t}`raftery2020`. The cooling effect is calculated with the SET method of ASHRAE 55 for a warm summer situation: 28 °C air and mean radiant temperature, 50% relative humidity, 1.2 met and 0.5 clo. The half-speed curve assumes that air speeds scale linearly with fan speed, as the measurements showed.
 
-:::{figure} figures/ch05/cooling-effect-distance.png
+:::{figure} figures/ch06/cooling-effect-distance.png
 :label: fig-ce-distance
 :alt: Line chart of cooling effect against horizontal distance from the fan centre for maximum and half fan speed. At maximum speed the cooling effect is about 4.5 °C within 0.6 m of the centre, falls to about 3.5 °C at 1.5 m and 2.7 °C at 6 m. At half speed the values are about 3.6, 2.3 and 1.3 °C.
 :width: 90%
