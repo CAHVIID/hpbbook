@@ -2,6 +2,13 @@
 
 *Draft. The notes for the teacher at the end are not for students.*
 
+this assignment should just read:
+
+Size tank optimally considering lcc, potentially using drain recovery and avoiding peak hours. Test normal tap profile and 'extreme' profile.
+
+
+
+
 ## Goal
 
 You will design the hot water system for a single-family house in Denmark in two steps:
