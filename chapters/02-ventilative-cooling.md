@@ -13,17 +13,34 @@ After this chapter you can:
 
 ## Introduction
 
-High indoor temperatures are now one of the most common indoor climate complaints in new Danish dwellings, and not only in summer. Insulation, airtightness and large windows have made new homes very good at keeping heat in. On a sunny day in April or September, solar and internal gains can lift the temperature well above comfort levels in a home that hardly needs heating. In a warmer climate with longer heat waves the problem grows. A study of Finnish apartment buildings found that openable windows were the most effective passive measure against overheating in the new building, though not enough in the old one {cite:p}`farahani2021`.
+Danish homes are increasingly at risk of overheating. New dwellings are well insulated and airtight, often have large glazed areas, and keep their heat well. That works well in winter, but in summer the same building struggles to get rid of solar and internal gains.
 
-Ventilative cooling means using outdoor air to remove heat from a building whenever the outdoor air is cooler than the indoor air. It is the second step in the cooling hierarchy, after reducing the heat gains (chapter 1) and before ceiling fans (chapter 3) and active cooling. The air can be moved in three ways:
+High indoor temperatures are now one of the most common indoor climate complaints in new Danish dwellings, and not only in summer .
+Insulation, airtightness and large windows have made new homes very good at keeping heat in.
+
+On a sunny day in April or September, solar and internal gains can lift the temperature well above comfort levels in a home that hardly needs heating. In a warmer climate with longer heat waves the problem grows. A study of Finnish apartment buildings found that openable windows were the most effective passive measure against overheating in the new building, though not enough in the old one {cite:p}`farahani2021`.
+
+## Ventilative cooling
+
+Ventilative cooling or venting (udluftning) means using outdoor air to remove heat from a building whenever the outdoor air is cooler than the indoor air.
+
+It is the second step in the cooling hierarchy, after reducing the heat gains (chapter 1) and before ceiling fans (chapter 3) and active cooling.
+
+The air can be moved in three ways:
 
 - **Natural ventilation**: openings only, such as windows, roof windows and venting hatches, driven by wind and stack effect.
+
 - **Mechanical ventilation**: fans only, for example by bypassing the heat recovery unit and boosting the airflow.
+
 - **Hybrid (mixed-mode) ventilation**: a combination of the two. This is the normal solution in Danish dwellings, with mechanical ventilation with heat recovery in winter and openings for cooling in summer.
 
-Ventilative cooling is cheap and uses little or no energy, but it is easy to overestimate. The temperature difference between indoors and outdoors is small exactly when cooling is needed, so large airflows are required. The openings must also actually be open. In a low-energy apartment building in Nordhavn, Copenhagen, the energy calculation assumed a generous venting rate. In practice most of the openings were balcony doors that could only be secured at a 1 cm opening, or were too windy to leave open, and the top-floor flats overheated badly. Openings must be designed so that they can stay open when they are needed: secure, protected from rain, quiet and free of draught.
+Ventilative cooling is cheap and uses little or no energy, but it is easy to overestimate. The temperature difference between indoors and outdoors is small exactly when cooling is needed, so large airflows are required. The openings must also actually be open.
 
-The chapter first explains the physics of airflow through openings and the ventilative cooling strategies available. It then covers the design of venting hatches, opening control and draught. It ends with how to assess overheating, and a worked example from the course row house.
+:::{Practical issue}
+In a low-energy apartment building in Nordhavn, Copenhagen, the energy calculation assumed a generous venting rate. In practice most of the openings were balcony doors that could only be secured at a 1 cm opening, or were too windy to leave open, and the top-floor flats overheated badly. Openings must be designed so that they can stay open when they are needed: secure, protected from rain, quiet and free of draught.
+:::
+
+<!--The chapter first explains the physics of airflow through openings and the ventilative cooling strategies available. It then covers the design of venting hatches, opening control and draught. It ends with how to assess overheating, and a worked example from the course row house.-->
 
 ## The physics of airflow through openings
 
