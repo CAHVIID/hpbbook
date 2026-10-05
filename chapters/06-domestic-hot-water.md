@@ -1,6 +1,6 @@
 # Domestic hot water
 
-## Learning objectives
+<!-- ## Learning objectives
 
 After this chapter you can:
 
@@ -10,10 +10,11 @@ After this chapter you can:
 - read a tapping profile and an hourly electricity price profile, and explain why the two are badly matched
 - size a hot water tank and its heat pump so the tank can be charged in cheap hours, and estimate the saving
 - describe how hygiene (Legionella) and heat pump efficiency limit the tank temperature
+ -->
 
 ## Introduction
 
-For most of the twentieth century, domestic hot water was a small item in the heat budget of a Danish house. A typical older house with energy label D needs around 150 kWh of space heating per m² of floor area per year. Hot water adds 13 kWh/m², less than a tenth of the total, and nobody designs the house around it.
+For most of the twentieth century, domestic hot water was a small item in the heat budget of a Danish house. A typical older house with energy label D needs around 150 kWh of space heating per m² of floor area per year. Hot water adds 13 kWh/m², less than a tenth of the total.
 
 Better houses have changed the picture ({numref}`fig-dhw-share`). Insulation, airtightness and heat recovery ventilation have cut the space heating demand of a passive house to 15 kWh/m², and of a house in the Danish low-energy class to about 10 kWh/m². The hot water demand has not changed, because it depends on the people living in the house and not on its envelope. A family takes the same showers in a passive house as in a house from 1965. In a passive house hot water is therefore close to half of the heat demand, and in a low-energy class house it is more than half.
 
@@ -25,7 +26,20 @@ Better houses have changed the picture ({numref}`fig-dhw-share`). Insulation, ai
 Net heat demand for space heating and domestic hot water in three Danish house standards. The label D value is an estimate for a 150 m² house in the middle of the D band. The hot water demand is the Be18 calculation value of 250 L/m² per year heated from 10 °C to 55 °C {cite:p}`build213`. Losses from the tank and pipes are not included.
 :::
 
-The temperature also matters. A floor heating system in a low-energy house runs at 30–35 °C (Chapter 5). Hot water must be stored at 50–55 °C or more to keep Legionella bacteria from growing. When the same heat pump supplies both, the hot water is the expensive part of its work, because the efficiency of a heat pump falls as the temperature it delivers rises. In an all-electric low-energy house, hot water can easily use as much electricity as space heating.
+:::{admonition} Hot water in Building Code
+:class: dropdown
+The Danish energy frame calculation (Be18) uses a fixed hot water demand of 250 L per m² of heated floor area per year, heated from 10 °C to 55 °C {cite:p}`build213`. With equation {eq}`eq-dhw-energy` and the average properties of water between 10 °C and 55 °C this is
+
+$$
+Q = \bar\rho\,V\,\bar c_p\,(\theta - \theta_c) = \frac{994 \cdot 0.250 \cdot 4.182 \cdot (55 - 10)}{3600} = 13.0 \text{ kWh/(m}^2\,\text{year)}
+$$
+
+For a 150 m² house it amounts to 2000 kWh per year, or about 100 L of 55 °C water per day which is a reasonable figure for a family of three or four.
+
+However, measured hot water use varies by a factor of two or three between households of the same size, and it depends much more on the number of occupants, their age and their habits than on the floor area.
+:::
+
+<!-- The temperature also matters. A floor heating system in a low-energy house runs at 30–35 °C (Chapter 5). Hot water must be stored at 50–55 °C or more to keep Legionella bacteria from growing. When the same heat pump supplies both, the hot water is the expensive part of its work, because the efficiency of a heat pump falls as the temperature it delivers rises. In an all-electric low-energy house, hot water can easily use as much electricity as space heating.
 
 There are two ways to cut the cost of hot water, and this chapter is built around them:
 
@@ -33,8 +47,9 @@ There are two ways to cut the cost of hot water, and this chapter is built aroun
 - **Buy the heat at the right time.** Electricity prices vary over the day, with a peak in the early evening, which is exactly when many families shower. A well-sized hot water tank can be charged in cheap hours and emptied in expensive ones. This is Part B.
 
 The next section sets out how much hot water a dwelling uses and how fast it is drawn, which both parts build on.
+ -->
 
-## How much hot water?
+<!-- ## How much hot water?
 
 ### Energy in a tapping
 
@@ -53,18 +68,10 @@ f_h = \frac{\theta_{mix} - \theta_c}{\theta_h - \theta_c}
 $$ (eq-dhw-mix)
 
 With the tank at 55 °C and cold water at 10 °C, a 40 °C shower is two-thirds hot water and one-third cold. Equation {eq}`eq-dhw-energy` gives the same energy whether it is applied to the mixed water at 40 °C or to the hot water fraction at 55 °C, so either can be used. What matters is to be clear which one a consumption figure refers to. Water use statistics are usually given at the tap, while calculation standards usually give litres at 55 °C or 60 °C.
+ -->
 
-### Energy per year
 
-The Danish energy frame calculation (Be18) uses a fixed hot water demand of 250 L per m² of heated floor area per year, heated from 10 °C to 55 °C {cite:p}`build213`. With equation {eq}`eq-dhw-energy` and the average properties of water between 10 °C and 55 °C this is
-
-$$
-Q = \bar\rho\,V\,\bar c_p\,(\theta - \theta_c) = \frac{994 \cdot 0.250 \cdot 4.182 \cdot (55 - 10)}{3600} = 13.0 \text{ kWh/(m}^2\,\text{year)}
-$$
-
-For a 150 m² house the calculation value is about 2000 kWh per year, or about 100 L of 55 °C water per day. That is a reasonable figure for a family of three or four. It is a calculation value, though, set per m² so that the energy frame does not depend on who moves in. Measured hot water use varies by a factor of two or three between households of the same size, and it depends much more on the number of occupants, their age and their habits than on the floor area.
-
-### Power at the tap
+### Power when tapping
 
 The energy per day is modest. The power during a tapping is not. The heat flow needed to warm water flowing at a volume flow $\dot V$ is
 
@@ -86,13 +93,13 @@ $$ (eq-dhw-power)
 | Bath | 12 | 40 | 120 | 4.2 | 24.9 |
 :::
 
-These powers are far larger than anything else in the heating system of a low-energy house. The whole house may need only 3–5 kW of space heating on the coldest day, and a heat pump sized for that cannot heat a shower as it runs. There are two ways out:
+These powers are far larger than anything else in the heating system of a low-energy house. The whole house may need only 2–3 kW of space heating on the coldest day, and a heat pump sized for that cannot heat a shower as it runs. There are two ways out:
 
 - **Instantaneous heating.** District heating can deliver 30–40 kW through a heat exchanger in a flat station, so the water is heated as it is used and nothing is stored.
 - **Storage.** A heat pump or a small boiler heats a tank slowly, over hours, and the tank delivers the high power during the tapping. The tank decouples the power the heat source must deliver from the power the user draws.
 
-Storage is what makes it possible to choose *when* the heat source runs, which is the topic of Part B. Showers are what make drain water heat recovery worthwhile, which is the topic of Part A. They are the largest single hot water use in most homes, and they are the one use where the warm waste water flows to the drain at the same moment as the cold water comes in.
-
+<!-- Storage is what makes it possible to choose *when* the heat source runs, which is the topic of Part B. Showers are what make drain water heat recovery worthwhile, which is the topic of Part A. They are the largest single hot water use in most homes, and they are the one use where the warm waste water flows to the drain at the same moment as the cold water comes in.
+ -->
 :::{admonition} Rules of thumb
 :class: tip
 

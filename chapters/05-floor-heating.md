@@ -60,7 +60,7 @@ Heavy floors cannot do that, because heat is stored in the floor before it reach
 <!-- This chapter shows how large that delay is for a light floor and for a heavy floor, and why it makes floor heating a risky choice in a low-energy house. Control of floor heating, and what it can and cannot fix, is the topic of the later sections.
  -->
 
-## Heat transfer
+## Heat transfer of floors
 
 A heated floor gives off heat to the room by radiation to the other surfaces and by natural convection to the air. Added together they give a heat transfer coefficient of about 11 W/(m²·K).
 

@@ -9,3 +9,4 @@ Course textbook for High Performance Buildings (41463).
 3. [Ceiling fans](chapters/03-ceiling-fans.md)
 4. [Weather](chapters/04-weather-files.md)
 5. [Floor heating](chapters/05-floor-heating.md)
+6. [Domestic hot water](chapters/06-domestic-hot-water.md)
