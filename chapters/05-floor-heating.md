@@ -1,6 +1,7 @@
 # Floor heating
 
-## Learning objectives
+
+<!-- ## Learning objectives
 
 After this chapter you can:
 
@@ -8,11 +9,37 @@ After this chapter you can:
 - compare light and heavy floor heating constructions by heat capacity and time constant
 - estimate the time constant of a floor and the heat it keeps delivering after the loop closes
 - describe the parts of a hydronic floor heating installation and what each one controls
-- explain why floor heating is a poor match for low-energy houses, where heating demand at night turns into cooling demand during the day
+- explain why floor heating is a poor match for low-energy houses, where heating demand at night turns into cooling demand during the day -->
+
+%+++
+%edwdds
+%#dwd 
+%sdas
+%+++
+
+
+
+<!-- possible classes:
+
+ note, important, seealso: blue 
+ tip, hint: green
+ warning, caution, attention: orange
+ danger, error: red
+ 
+ :::{Tip} This is the tip of the day
+ And here goes the tip
+ :::
+
+ :::{admonition} Tips of the day
+ class: dropdown
+ This is the tip
+ :::
+ 
+  -->
 
 ## Introduction
 
-Floor heating is the standard heat emitter in neew Danish dwellings. It is invisible, it frees wall space, and it works with low supply temperatures, which suits heat pumps and district heating. In an older house with a large heat demand it also gives good comfort, with warm feet and a small vertical temperature gradient.
+Floor heating is the standard heat emitter in newer Danish dwellings. It is invisible, it frees wall space, and it potentially works with very low supply temperatures, which suits heat pumps and district heating very well.
 
 Warm water from a manifold runs through a pipe loop in the floor of each room and returns a few kelvin cooler. The heat first warms the floor, and the floor surface then gives it to the room by radiation and convection ({numref}`fig-floor-principle`).
 
@@ -24,31 +51,53 @@ Warm water from a manifold runs through a pipe loop in the floor of each room an
 Principle of hydronic floor heating. (a) One pipe loop per room, fed from a manifold. (b) Heat passes from the water into the slab, and from the floor surface to the room by radiation and convection. In a low-energy house the floor is only 1–3 K warmer than the room air.
 :::
 
-A low-energy house is a different case. Its heat loss is small, typically 10 W per m² of floor at design conditions and much less on an ordinary spring or autumn day. Solar and internal gains are large in comparison. On a clear day in April the heating demand at night can turn into a cooling demand by noon. The heat emitter must therefore stop delivering heat within a few hours of being asked to.
+In older house with a large heat demand it gives good comfort, with warm feet and a small vertical temperature gradient.
 
-A floor cannot do that, because heat is stored in the floor before it reaches the room. Water put into the floor at 4 am keeps warming the room after the sun has come out. The heavier the floor, the longer the delay. This chapter shows how large that delay is for a light floor and for a heavy floor, and why it makes floor heating a risky choice in a low-energy house. Control of floor heating, and what it can and cannot fix, is the topic of the later sections.
+A low-energy house is a different case. Heat loss is small, **only 10 W per m² of floor** at design conditions and much less on an ordinary spring or autumn day. Solar and internal gains are large in comparison. On a clear day in April the heating demand at night can easily turn into a cooling demand by noon. The floor system must therefore stop delivering heat hours before being asked to.
 
+Heavy floors cannot do that, because heat is stored in the floor before it reaches the room. Water put into the floor at 4:00 keeps warming the room after the sun has come out and heat demand has long gone. The heavier the floor, the longer the delay.
 
-## Heat transfer from a heated floor
+<!-- This chapter shows how large that delay is for a light floor and for a heavy floor, and why it makes floor heating a risky choice in a low-energy house. Control of floor heating, and what it can and cannot fix, is the topic of the later sections.
+ -->
 
-A heated floor gives off heat to the room by radiation to the other surfaces and by natural convection to the air. Together they give a heat transfer coefficient of about 11 W/(m²·K). EN 1264 gives the heat flux $q$ from the mean floor surface temperature $\theta_F$ and the room temperature $\theta_i$ {cite:p}`en1264`:
+## Heat transfer
+
+A heated floor gives off heat to the room by radiation to the other surfaces and by natural convection to the air. Added together they give a heat transfer coefficient of about 11 W/(m²·K).
+
+:::{admonition} Heat transfer surface coefficients
+:class: dropdown
+- **Radiation** Between surfaces in a thermal space, radiative exchange is approx. 5.0 W/m2K, and is pretty much fixed.
+- **Convection** Convective heat transfer from a heated floor depends strongly on surface type, air speed, and forced or natural convection, but can be assumed to be approx. 6.0 W/m2K
+:::
+
+EN 1264 gives the heat flux $q$ from the mean floor surface temperature $\theta_F$ and the room temperature $\theta_i$ {cite:p}`en1264`:
 
 $$
 q = 8.92\,(\theta_F - \theta_i)^{1.1} \quad \text{W/m}^2
 $$ (eq-floor-flux)
 
-For comfort, the mean floor surface temperature is limited to 29 °C in occupied zones, 33 °C in bathrooms and 35 °C in perimeter zones. At 29 °C and a room at 20 °C, equation {eq}`eq-floor-flux` gives about 100 W/m², which is far more than a low-energy house needs.
+For comfort, the mean floor surface temperature is limited to:
+- 29 °C in occupied zones
+- 33 °C in bathrooms
+- 35 °C in perimeter zones
 
-Two consequences matter for the rest of the chapter:
+At 29 °C and a room at 20 °C, equation {eq}`eq-floor-flux` gives about 100 W/m², which is far more than a low-energy house needs.
 
-- **The floor is barely warm.** A heat demand of 15 W/m² needs a floor surface only 1.6 K above the room temperature. The occupants will not feel a "warm floor".
-- **The output regulates itself, but slowly.** Because the temperature difference is small, a small rise in room temperature removes much of the output. If the floor is at 23 °C, the output falls from 30 W/m² to 9 W/m² when the room rises from 20 °C to 22 °C. This self-regulation is real, but it only acts after the room has already become warmer.
+Floor covering adds thermal resistance between the pipes and the room. Tiles add little, while wood and carpet add a lot, so a wooden floor needs a higher water temperature for the same output.
 
-A floor covering adds thermal resistance between the pipes and the room. Tiles add little, while wood and carpet add a lot, so a wooden floor needs a higher water temperature for the same output. EN 1264 limits the covering resistance to 0.15 m²·K/W.
+%EN 1264 limits the covering resistance to 0.15 m²·K/W.
 
-## Light and heavy floor constructions
+:::{admonition} Self-regulation
+:class: dropdown
+- **Barely warm** A heat demand of 10 W/m² needs a floor surface **only 1.1 K above** the room temperature. In low energy houses, the occupants will never feel a "warm floor".
+- **Self-regulation** The small temperature difference between floor surface and room means that a small rise in room temperature removes much of the output. If the floor is at 23 °C, the output falls from 30 W/m² to 9 W/m² when the room rises from 20 °C to 22 °C.
+- **TABS** Self-regulation is real and exploitable, potentially removing the need for control systems. In practice, it is often seen in thermo-active building systems, where the pipes are deeply embedded into the core of concrete slabs, making them act as heating or cooling "batteries" for basic loads.
+:::
 
-Floor heating constructions are often grouped by how the pipes are embedded. For this chapter the useful distinction is how much heat capacity sits between the pipes and the room ({numref}`fig-floor-sections`).
+
+## Build-up
+
+Floor heating constructions are often grouped by how the pipes are embedded, i.e. how much heat capacity sits between the pipes and the room ({numref}`fig-floor-sections`).
 
 :::{figure} figures/ch05/floor-sections.*
 :label: fig-floor-sections
@@ -60,7 +109,7 @@ Light and heavy floor heating constructions, drawn to the same scale. The heat c
 
 ### Light floors
 
-In a light (dry) floor the pipes lie in grooves in an insulation panel, usually EPS. Aluminium heat-diffusion plates wrap around the pipes and spread the heat sideways under the floor covering. The EPS panels rest on a plywood board on the joists, and the covering is laid directly on the plates, typically 22 mm floor boards, a floating wooden floor or gypsum fibre boards. Pipe spacing is 150–300 mm.
+In a light (dry) floor the pipes lie in grooves in an insulation panel, usually EPS. Aluminium heat-diffusion plates wrap around the pipes and spread the heat sideways under the floor covering. The EPS panels rest on a plywood board on the joists, and the covering is laid directly on the plates, typically 22 mm floor boards, a floating wooden floor or gypsum fibre boards. Pipe spacing is anything between 150–300 mm, depending on pipe diameter and system.
 
 Light floors are used on timber joists and battens, in renovation, and wherever build height and weight must be kept low. The whole construction above the insulation is 25–50 mm thick and weighs 10–30 kg/m². Its heat capacity above the pipes is about 15–30 kJ/(m²·K), so there is little heat to store.
 
@@ -68,17 +117,56 @@ Light floors are used on timber joists and battens, in renovation, and wherever 
 
 In a heavy floor the pipes are cast into cement screed or concrete. A typical screed system has 45–65 mm of screed above the pipes. In Danish slab-on-ground houses the pipes are often tied to the reinforcement in the middle of a 100 mm concrete slab, with the floor covering laid directly on the slab. The slab weighs around 230 kg/m² and has a heat capacity of 100–250 kJ/(m²·K), and all of it is heated by the pipes.
 
-Heavy floors are cheap to build in new houses, robust, and good at evening out short peaks in demand. That is a strength in an old, poorly insulated house. In a low-energy house it is the problem.
+%Heavy floors are cheap to build in new houses, robust, and good at evening out short peaks in demand. That is a strength in an old, poorly insulated house. In a low-energy house it is the problem.
 
-### The time constant of a floor
+
+## Hydronic installation
+
+{numref}`fig-hydronic-schematic` shows a typical installation. The parts are the same for light and heavy floors.
+
+:::{figure} figures/ch05/hydronic-schematic.*
+:label: fig-hydronic-schematic
+:alt: Schematic of a hydronic floor heating system. A heat pump or district heating unit supplies water through a three-way mixing valve and a circulation pump to a manifold. The controller sets the mixing valve from an outdoor sensor and a supply temperature sensor. From the manifold, one loop runs to each of three rooms. The controller drives a motorized mixing valve. Each loop has a flow meter on the supply side and a wax thermostat on the return side, switched by a temperature sensor in its room.
+:width: 100%
+
+A hydronic floor heating installation. The controller sets the supply temperature from the outdoor temperature (heating curve). The room temperature sensor in each room opens and closes the wax thermostat on its own loop.
+:::
+
+- **Heat source.** A heat pump or district heating. Floor heating needs a low supply temperature, typically 30–35 °C in a low-energy house, with 3–5 K between supply and return.
+- **Mixing shunt.** A motorized three-way mixing valve and a circulation pump. The valve mixes return water into the supply to reach the temperature set by the controller. The controller follows a heating curve, which raises the supply temperature as the outdoor temperature falls.
+- **Manifold.** Distributes water to one loop per room, or several loops in large rooms. Each loop should be at most 80–100 m long to keep the pressure drop reasonable. Flow meters or balancing valves on the supply side set the design flow in each loop, so that every room gets its share (hydronic balancing).
+- **Wax thermostats and room temperature sensors.** Each loop has a valve on the return side, opened and closed by a wax thermostat, an electrically heated wax actuator. The room temperature sensor switches it on and off, either directly or by pulse-width modulation (PWM). The valve only opens or closes the loop. It cannot change the water temperature.
+
+:::{admonition} Control
+:class: dropdown
+The installation has **two control levels**.
+
+The supply temperature is set centrally from the outdoor temperature, and each room switches its own loop on or off.
+
+Lower supply temperature will keep the loops more on, and vice versa.
+
+Low supply temperature also increases the level of self-regulation.
+:::
+
+
+## Time constant of floor heating
 
 When the water flow in a loop starts or stops, the heat output to the room does not change at once. For a first-order system, the output approaches its new value exponentially:
+
+%:::{admonition} First-order
+%:class: drop
+%The term "first-order" means the most direct, basic, or linear effect, without complex loops or higher powers of ^2 or ^3 
+%:::
 
 $$
 q(t) = q_\infty + (q_0 - q_\infty)\,e^{-t/\tau}
 $$ (eq-first-order)
 
-where $\tau$ is the time constant. After one time constant, 63 % of the change has happened. After three time constants, 95 % has. The time constant is the product of a heat capacity and a thermal resistance:
+where $\tau$ is the time constant.
+
+Time constant is defined as the time where 63 % of the change has happened. After three time constants, 95 % has.
+
+The time constant is the product of a heat capacity and a thermal resistance:
 
 $$
 \tau = R\,C
@@ -145,36 +233,6 @@ A light floor holds a tenth of that heat, and most of it is released within the 
 - A floor with a time constant longer than a few hours cannot follow a heating demand that changes within the day.
 :::
 
-## The hydronic installation
-
-{numref}`fig-hydronic-schematic` shows a typical installation. The parts are the same for light and heavy floors.
-
-:::{figure} figures/ch05/hydronic-schematic.*
-:label: fig-hydronic-schematic
-:alt: Schematic of a hydronic floor heating system. A heat pump or district heating unit supplies water through a three-way mixing valve and a circulation pump to a manifold. The controller sets the mixing valve from an outdoor sensor and a supply temperature sensor. From the manifold, one loop runs to each of three rooms. The controller drives a motorized mixing valve. Each loop has a flow meter on the supply side and a wax thermostat on the return side, switched by a temperature sensor in its room.
-:width: 100%
-
-A hydronic floor heating installation. The controller sets the supply temperature from the outdoor temperature (heating curve). The room temperature sensor in each room opens and closes the wax thermostat on its own loop.
-:::
-
-- **Heat source.** A heat pump or district heating. Floor heating needs a low supply temperature, typically 30–35 °C in a low-energy house, with 3–5 K between supply and return.
-- **Mixing shunt.** A motorized three-way mixing valve and a circulation pump. The valve mixes return water into the supply to reach the temperature set by the controller. The controller follows a heating curve, which raises the supply temperature as the outdoor temperature falls.
-- **Manifold.** Distributes water to one loop per room, or several loops in large rooms. Each loop should be at most 80–100 m long to keep the pressure drop reasonable. Flow meters or balancing valves on the supply side set the design flow in each loop, so that every room gets its share (hydronic balancing).
-- **Wax thermostats and room temperature sensors.** Each loop has a valve on the return side, opened and closed by a wax thermostat, an electrically heated wax actuator. The room temperature sensor switches it on and off, either directly or by pulse-width modulation (PWM). The valve only opens or closes the loop. It cannot change the water temperature.
-
-So the installation has two control levels. The supply temperature is set centrally from the outdoor temperature, and each room switches its own loop on or off. Neither level knows about the sun, and both act on the floor, not on the room. Any delay in the floor therefore appears directly as a delay in the room.
-
-### Several manifolds on one riser
-
-In buildings with several floors or apartments, one riser pump often feeds a manifold on each floor, each through its own shunt ({numref}`fig-riser-shunts`). The shunt pump circulates water through the floor loops. A thermostatic valve on the return limits the supply temperature: when the sensor bulb gets too warm, it throttles the water returned to the riser, so less hot water is drawn in and more return water is mixed back through the bypass. The check valve stops riser water from flowing backwards through the bypass into the return.
-
-:::{figure} figures/ch05/riser-shunts.*
-:label: fig-riser-shunts
-:alt: Schematic of a riser fed by a heat pump and a riser pump. On each of two floors, a branch from the riser supply passes a bypass junction, a shunt pump and a sensor bulb before reaching a supply manifold with three connections. The return manifold has a wax thermostat on each connection. The return passes the bypass junction and a 2-way thermostatic valve, connected to the sensor bulb by a capillary, before rejoining the riser return. The bypass between return and supply has a check valve. One floor loop is drawn in full.
-:width: 100%
-
-A riser with a riser pump feeding two floor heating manifolds, each through a shunt with its own pump, a 2-way thermostatic valve on the return and a check valve in the bypass. Three pumps in total. Only one floor loop per manifold is drawn.
-:::
 
 ## Control of floor heating
 
@@ -231,6 +289,19 @@ Several strategies reduce the problem, but none of them removes it:
 The conclusion is that a heat emitter with a long time lag is a poor match for a house whose heating demand is small and changes within hours. A fast emitter, such as heating through the ventilation air or a small convector, can switch off at the moment the sun starts to heat the room.
 
 (sec-floor-model-theory)=
+
+### Several manifolds on one riser
+
+In buildings with several floors or apartments, one riser pump often feeds a manifold on each floor, each through its own shunt ({numref}`fig-riser-shunts`). The shunt pump circulates water through the floor loops. A thermostatic valve on the return limits the supply temperature: when the sensor bulb gets too warm, it throttles the water returned to the riser, so less hot water is drawn in and more return water is mixed back through the bypass. The check valve stops riser water from flowing backwards through the bypass into the return.
+
+:::{figure} figures/ch05/riser-shunts.*
+:label: fig-riser-shunts
+:alt: Schematic of a riser fed by a heat pump and a riser pump. On each of two floors, a branch from the riser supply passes a bypass junction, a shunt pump and a sensor bulb before reaching a supply manifold with three connections. The return manifold has a wax thermostat on each connection. The return passes the bypass junction and a 2-way thermostatic valve, connected to the sensor bulb by a capillary, before rejoining the riser return. The bypass between return and supply has a check valve. One floor loop is drawn in full.
+:width: 100%
+
+A riser with a riser pump feeding two floor heating manifolds, each through a shunt with its own pump, a 2-way thermostatic valve on the return and a check valve in the bypass. Three pumps in total. Only one floor loop per manifold is drawn.
+:::
+
 ## Theory behind the interactive model
 
 ::::{admonition} Show the equations
