@@ -36,7 +36,7 @@ The future files are made in an unusual way. Climate models give only daily temp
 
 {numref}`fig-dry-weather` shows the current and future DRY files, and {numref}`tab-dry-summary` summarises them.
 
-```{figure} figures/ch04/dry-air-temperature.png
+```{figure} figures/ch02/dry-air-temperature.png
 :name: fig-dry-weather
 :width: 100%
 
@@ -123,9 +123,32 @@ Four things stand out:
 
 *Outline:* climate models (GCM, RCM), downscaling, emission scenarios (RCP, SSP); morphing a present-day year (CCWorldWeatherGen) versus bias-corrected regional model output; the Annex 80 TMY files for 2001–2020, 2041–2060 and 2081–2100; uncertainty.
 
-## 5. Heat waves
+## 5. Extremes
+
+### Heat waves
 
 *Outline:* definitions (days above 25 °C, tropical nights above 20 °C); health effects; the three Annex 80 Copenhagen heat-wave files for 2041–2060 (longest, most intense and most severe); why warm nights defeat night ventilation.
+
+### Urban heat island
+
+The urban heat island intensity is the air temperature difference $\Delta T_\mathrm{UHI} = T_\mathrm{urban} - T_\mathrm{rural}$. It is mainly a night-time effect and peaks a few hours before sunrise on calm, clear summer nights. The causes:
+
+- **Heat storage:** brick, concrete and asphalt store solar heat during the day and release it at night.
+- **Low sky view factor:** street canyons see little of the cold night sky, so long-wave cooling is reduced.
+- **Little evaporation:** sealed surfaces drain rain away instead of evaporating it.
+- **Low wind speed:** buildings reduce convective cooling and mixing.
+- **Waste heat:** traffic, buildings and air-conditioning condensers.
+
+In Denmark the effect is modest but not negligible. On warm nights central Copenhagen is typically about 2 K warmer than the open land around it, and the effect is strongest on the warmest days of the year {cite}`sorup2026`. In four Finnish cities the mean intensity is 0.5–1.2 K, peaking at about 1.5 K around 05:00 in Helsinki {cite}`taylor2025`.
+
+The Danish reference years are measured at Sjælsmark, a rural station, so they contain no heat island. The heat island acts exactly when night ventilation works. {numref}`fig-vc-uhi` colours every hour by the temperature difference available for ventilative cooling, $\Delta T = T_\mathrm{in} - T_\mathrm{out}$, with $T_\mathrm{in} = 24$ °C. Adding a 2 K night-time heat island lowers the mean night-time $\Delta T$ from May to September from 10.7 K to 8.8 K, and the number of night hours with less than 3 K rises from 20 to 77. In the RCP4.5 2080–2099 file with a heat island, the mean drops to 7.9 K and 161 night hours have less than 3 K.
+
+```{figure} figures/ch02/vc-potential-uhi.*
+:name: fig-vc-uhi
+:width: 100%
+
+Hourly ventilative cooling potential $\Delta T = T_\mathrm{in} - T_\mathrm{out}$ for the rural reference year at Sjælsmark, the same year with a 2 K night-time urban heat island (tapering to 0 K in the afternoon), and RCP4.5 2080–2099 with the heat island. Grey: heating days, with a daily mean below 12 °C.
+```
 
 ## 6. Overheating indicators and design consequences
 

@@ -18,7 +18,7 @@ For most of the twentieth century, domestic hot water was a small item in the he
 
 Better houses have changed the picture ({numref}`fig-dhw-share`). Insulation, airtightness and heat recovery ventilation have cut the space heating demand of a passive house to 15 kWh/m², and of a house in the Danish low-energy class to about 10 kWh/m². The hot water demand has not changed, because it depends on the people living in the house and not on its envelope. A family takes the same showers in a passive house as in a house from 1965. In a passive house hot water is therefore close to half of the heat demand, and in a low-energy class house it is more than half.
 
-:::{figure} figures/ch06/dhw-share.*
+:::{figure} figures/ch04/dhw-share.*
 :label: fig-dhw-share
 :alt: Horizontal stacked bar chart of net heat demand per m² floor area per year. A house with energy label D has 150 kWh/m² of space heating and 13 kWh/m² of hot water, so hot water is 8 %. A passive house has 15 kWh/m² of space heating, so hot water is 46 %. A house in the Danish low-energy class has 10 kWh/m² of space heating, so hot water is 57 %.
 :width: 100%
@@ -39,7 +39,7 @@ For a 150 m² house it amounts to 2000 kWh per year, or about 100 L of 55 °C wa
 However, measured hot water use varies by a factor of two or three between households of the same size, and it depends much more on the number of occupants, their age and their habits than on the floor area.
 :::
 
-<!-- The temperature also matters. A floor heating system in a low-energy house runs at 30–35 °C (Chapter 5). Hot water must be stored at 50–55 °C or more to keep Legionella bacteria from growing. When the same heat pump supplies both, the hot water is the expensive part of its work, because the efficiency of a heat pump falls as the temperature it delivers rises. In an all-electric low-energy house, hot water can easily use as much electricity as space heating.
+<!-- The temperature also matters. A floor heating system in a low-energy house runs at 30–35 °C (Chapter 3). Hot water must be stored at 50–55 °C or more to keep Legionella bacteria from growing. When the same heat pump supplies both, the hot water is the expensive part of its work, because the efficiency of a heat pump falls as the temperature it delivers rises. In an all-electric low-energy house, hot water can easily use as much electricity as space heating.
 
 There are two ways to cut the cost of hot water, and this chapter is built around them:
 
@@ -165,7 +165,7 @@ A family of four uses the profile "Family of 4, morning and evening" from the si
 
 **Step 3.** {numref}`fig-dhw-tank-sizing` shows the cumulative curves. With night charging, the tank receives all of the day's heat by 06:00, before any hot water has been used. The gap is largest at 06:00, just before the morning showers: $Q_{store} = 6.49$ kWh. With uniform charging, the charge curve has to be lifted by 1.34 kWh so that it stays above the demand after the morning showers, where the two curves touch at 08:00. The gap is largest at 06:00, just before the two morning showers: $Q_{store} = 2.77$ kWh. With one shower in the evening, the morning peak is now the one that sets the size.
 
-:::{figure} figures/ch06/tank-sizing-curves.*
+:::{figure} figures/ch04/tank-sizing-curves.*
 :label: fig-dhw-tank-sizing
 :alt: Two plots of cumulative heat over a day. In both, the orange demand curve is nearly flat except for a large step at 06–07 (two showers) and a smaller step at 20–21 (one shower). Left, uniform charging: the blue charge curve is a straight line lifted to touch the demand curve at about 08:00, and the largest gap, 2.8 kWh or about 63 L, is at 06:00. Right, night charging: the blue curve rises steeply from 0 to 6.7 kWh between 00 and 06 and is flat after that; the largest gap, 6.5 kWh or about 147 L, is at 06:00.
 
