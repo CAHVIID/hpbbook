@@ -151,33 +151,67 @@ Low supply temperature also increases the level of self-regulation.
 
 ## Time constant of floor heating
 
-When the water flow in a loop starts or stops, the heat output to the room does not change at once. For a first-order system, the output approaches its new value exponentially:
+When the water flow in a loop starts or stops, the heat output to the room does not change at once. This section explains why, and what the delay means for a low-energy house.
+
+### Where the exponential comes from
+
+Think of the floor above the insulation as one lump with heat capacity $C$ [J/(m²·K)] and a single temperature $T_f$. When the loop closes, the only way out for the stored heat is through the floor covering and the floor surface, a total resistance $R$ [m²·K/W], to the room at $T_r$. The heat balance of the lump is then
+
+$$
+C\,\frac{\mathrm{d}T_f}{\mathrm{d}t} = -\frac{T_f - T_r}{R}
+$$ (eq-lump)
+
+The rate at which the floor cools is proportional to how much warmer it is than the room. The solution is an exponential decay,
+
+$$
+T_f(t) - T_r = (T_{f,0} - T_r)\,e^{-t/\tau}, \qquad \tau = R\,C
+$$ (eq-tau)
+
+and since the heat output is $q = (T_f - T_r)/R$, the output decays the same way. A system that obeys {eq}`eq-lump` is called first-order: one heat store, one resistance, one time constant. For any step change in the water flow, the output approaches its new value as
+
+$$
+q(t) = q_\infty + (q_0 - q_\infty)\,e^{-t/\tau}
+$$ (eq-first-order)
 
 %:::{admonition} First-order
 %:class: drop
 %The term "first-order" means the most direct, basic, or linear effect, without complex loops or higher powers of ^2 or ^3 
 %:::
 
+The time constant has two useful meanings:
+
+- After $t = \tau$ the factor $e^{-1} = 0.37$ remains, so 63 % of the change has happened. After $3\tau$, 95 % has.
+- If the floor kept losing heat at its initial rate, it would be empty after exactly $\tau$. The initial slope of the curve points at $t = \tau$.
+
+The units confirm it: J/(m²·K) × m²·K/W = J/W = s.
+
+### Switching off: the whole floor discharges through the surface
+
+When the loop closes, all the heat stored above the insulation has to leave through the covering and the surface. $C$ is the heat capacity of the whole floor above the insulation, and $R$ is the covering plus the surface resistance $1/h_s \approx 0.09$ m²·K/W:
+
+- **Light floor:** $C \approx 18$ kJ/(m²·K) for the boards and plates, $R \approx 0.09 + 0.17 = 0.26$ m²·K/W (22 mm boards, λ = 0.13 W/(m·K)), so $\tau \approx 4700$ s, or about 1.3 hours.
+- **Heavy floor:** $C \approx 230$ kJ/(m²·K) for the slab, $R \approx 0.09 + 0.08 + 0.03 = 0.20$ m²·K/W (surface, parquet, upper half of the slab), so $\tau \approx 46\,000$ s, or about 13 hours.
+
+The floor covering matters twice. A thicker covering or a rug raises $R$, which lowers the output *and* makes the floor slower to discharge.
+
+### Switching on: the water holds the pipe plane
+
+When the loop opens, the water forces the pipe plane towards the water temperature. Only the layers above the pipes have to warm up, and they are fed from below through the resistance $R_\text{up}$ between the pipes and the surface, while they lose heat at the top through $1/h_s$. Seen from the stored heat, the two resistances act in parallel, and the time constant becomes
+
 $$
-q(t) = q_\infty + (q_0 - q_\infty)\,e^{-t/\tau}
-$$ (eq-first-order)
+\tau_\text{on} \approx C_\text{above}\,\frac{R_\text{up}\cdot(1/h_s)}{R_\text{up} + 1/h_s}
+$$ (eq-tau-on)
 
-where $\tau$ is the time constant.
+- **Light floor:** $C_\text{above} \approx 18$ kJ/(m²·K), $R_\text{up} \approx 0.17$ m²·K/W, so $\tau_\text{on} \approx 0.3$ h.
+- **Heavy floor:** $C_\text{above} \approx 120$ kJ/(m²·K), $R_\text{up} \approx 0.11$ m²·K/W, so $\tau_\text{on} \approx 1.7$ h.
 
-Time constant is defined as the time where 63 % of the change has happened. After three time constants, 95 % has.
+Switching on is therefore much faster than switching off, by a factor of 4–8. The water drives the floor when the loop is open, but nothing drives the heat out when it closes. This asymmetry is the core of the problem: a floor heats up willingly and cools down reluctantly.
 
-The time constant is the product of a heat capacity and a thermal resistance:
+### Why one time constant is only an approximation
 
-$$
-\tau = R\,C
-$$ (eq-tau)
+The lumped model assumes the floor has one temperature. That is reasonable when the resistance inside the floor is small compared with the resistance at its surface, measured by the Biot number $Bi = h\,L/\lambda$. For the concrete slab $Bi \approx 0.35$, so the slab is close to uniform, and one time constant describes it well. For the light floor the boards themselves are the main resistance ($Bi \approx 2$), but they hold little heat, so the floor still behaves almost as one lump.
 
-When the loop closes, the stored heat can only leave through the floor surface. The resistance is then the floor covering plus the surface resistance, about $1/11 \approx 0.09$ m²·K/W, and the heat capacity is that of the whole floor above the insulation. For the two floors in {numref}`fig-floor-sections`:
-
-- **Light floor:** $C \approx 20$ kJ/(m²·K) for the boards and plates, $R \approx 0.09 + 0.08 = 0.17$ m²·K/W, so $\tau \approx 3400$ s, or about 1 hour. The plywood board under the EPS also stores heat, but the EPS separates it from the pipes, so it only adds a slow tail.
-- **Heavy floor:** $C \approx 230$ kJ/(m²·K), $R \approx 0.09 + 0.08 + 0.03 = 0.20$ m²·K/W, so $\tau \approx 46\,000$ s, or about 13 hours.
-
-When the loop opens, the water forces the pipe plane to its own temperature. Only the layers above the pipes have to warm up, and they are heated from below as well as losing heat at the top. Switching on is therefore faster than switching off.
+In reality a floor has many layers and therefore many time constants. The more detailed model in {numref}`fig-floor-step-response` shows this: the output drops quickly at first while the layers near the surface empty, then follows a long tail as heat comes up from deeper layers. The heavy floor still delivers about 10 % of its output a full day after the loop closed. The single time constant is a good summary, not the whole story.
 
 {numref}`fig-floor-step-response` shows a more detailed calculation with a one-dimensional heat conduction model of both floors. The water is at 30 °C and the room at 20 °C.
 
@@ -233,6 +267,40 @@ A light floor holds a tenth of that heat, and most of it is released within the 
 - A floor with a time constant longer than a few hours cannot follow a heating demand that changes within the day.
 :::
 
+
+### What the time constant means over a day
+
+The heating demand of a low-energy house in spring is not a step. It swings over the day, roughly as a sine with a 24-hour period, from a demand at night to a surplus when the sun shines. A first-order system that is asked to follow such a swing does two things: it lags behind, and it delivers less of the swing than asked. With the angular frequency $\omega = 2\pi/24\,\mathrm{h}$,
+
+$$
+\text{amplitude ratio} = \frac{1}{\sqrt{1 + (\omega\tau)^2}}, \qquad
+\text{time lag} = \frac{\arctan(\omega\tau)}{\omega}
+$$ (eq-sine-response)
+
+```{list-table} Response of a first-order floor to a heating demand that swings over 24 hours
+:header-rows: 1
+:label: tab-floor-daily
+
+* - Time constant $\tau$
+  - Share of the swing delivered
+  - Time lag
+* - 1 h (light floor)
+  - 97 %
+  - 1.0 h
+* - 2 h
+  - 89 %
+  - 1.8 h
+* - 6 h
+  - 54 %
+  - 3.8 h
+* - 12 h (heavy floor)
+  - 30 %
+  - 4.8 h
+```
+
+The light floor follows the daily swing almost fully, one hour late. The heavy floor flattens it to a third and shifts it by nearly five hours. Heat asked for at 04:00, the coldest hour, is delivered around 09:00, just as the sun takes over. A lag of a quarter of the period is the worst case: the floor then heats hardest when the demand is changing from heating to cooling. This is why heating demand at night turns into overheating during the day.
+
+The lag in {numref}`tab-floor-daily` is for the floor alone. The wax thermostat's dead time and stroke, the room's own heat capacity and the controller all add to it, as the section on control shows.
 
 ### The room has a time constant too
 
