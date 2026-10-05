@@ -254,7 +254,7 @@ where $\Phi$ is a constant heat gain. Without gains the room cools towards the o
   - $\tau_\text{room}$
   - Steady rise, $\Phi_\text{sol}/UA$
   - Rise after 6 h of sun
-* - Older house, light
+* - Older house, heavy
   - 2.5 W/(m²·K)
   - 40 kJ/(m²·K)
   - 4 h
