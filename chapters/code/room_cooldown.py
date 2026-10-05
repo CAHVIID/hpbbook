@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 # Default cases for a 20 m2 room. UA and C per m2 of floor times 20 m2.
 CASES = [
     # name,                          UA [W/K],  C [kJ/K]
-    ("Older house, heavy",           2.5 * 20,  40 * 20),
+    ("Older house, heavy",           2.5 * 20, 150 * 20),
     ("Low-energy house, light",      0.6 * 20,  40 * 20),
     ("Low-energy house, heavy",      0.6 * 20, 150 * 20),
 ]

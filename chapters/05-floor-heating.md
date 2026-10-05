@@ -256,10 +256,10 @@ where $\Phi$ is a constant heat gain. Without gains the room cools towards the o
   - Rise after 6 h of sun
 * - Older house, heavy
   - 2.5 W/(m²·K)
-  - 40 kJ/(m²·K)
-  - 4 h
+  - 150 kJ/(m²·K)
+  - 17 h
   - 16 K
-  - 12 K
+  - 5 K
 * - Low-energy house, light
   - 0.6 W/(m²·K)
   - 40 kJ/(m²·K)
@@ -274,7 +274,7 @@ where $\Phi$ is a constant heat gain. Without gains the room cools towards the o
   - 6 K
 ```
 
-A low-energy house has a small $UA$, so its time constant is long and its steady temperature rise from a given gain is large. The sun would heat the room 67 K above the outdoor temperature if nothing removed the heat. The room is protected only because the sun sets before that happens, and by its heat capacity, which slows the rise. Any heat from the floor comes on top of the solar gain and has nowhere to go but out of the windows.
+The older heavy house and the light low-energy house have almost the same time constant, 17 and 19 hours. The low-energy house gets its long time constant from a small $UA$, not from mass. Insulation alone makes a light house as slow as an old heavy one. The difference is the steady temperature rise: with a small $UA$ the same gain lifts the room four times as much. The sun would heat the room 67 K above the outdoor temperature if nothing removed the heat. The room is protected only because the sun sets before that happens, and by its heat capacity, which slows the rise. Any heat from the floor comes on top of the solar gain and has nowhere to go but out of the windows.
 
 The app below shows how fast a room cools after the heating stops. Change $UA$ and $\tau$ and compare with the three reference rooms of 20 m² floor.
 

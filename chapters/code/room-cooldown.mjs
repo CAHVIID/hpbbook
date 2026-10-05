@@ -6,7 +6,7 @@ export const DEFAULTS = { UA: 25, tau: 10, T0: 21, T_out: 0, gains: 0, hours: 48
 
 // Reference rooms of 20 m2 floor (UA and C per m2 of floor times 20), as in room_cooldown.py
 const CASES = [
-  ["Older house, heavy", 2.5 * 20, 40 * 20e3, "#8a8f94"],
+  ["Older house, heavy", 2.5 * 20, 150 * 20e3, "#8a8f94"],
   ["Low-energy house, light", 0.6 * 20, 40 * 20e3, "#d0663a"],
   ["Low-energy house, heavy", 0.6 * 20, 150 * 20e3, "#7b5ea7"],
 ];
