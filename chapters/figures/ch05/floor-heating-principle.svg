@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" width="1000" height="470" font-family="Helvetica, Arial, sans-serif">
+<rect width="1000" height="470" fill="#ffffff"/>
+<defs><pattern id="conc" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#cfcfca"/><circle cx="4" cy="5" r="1.6" fill="#9c9c96"/><circle cx="13" cy="11" r="2.2" fill="#a9a9a3"/><circle cx="7" cy="15" r="1.1" fill="#8f8f89"/></pattern><pattern id="eps" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#eef2f7"/><circle cx="3" cy="3" r="1.4" fill="none" stroke="#c4ccd6" stroke-width="0.8"/><circle cx="8" cy="8" r="1.4" fill="none" stroke="#c4ccd6" stroke-width="0.8"/></pattern><linearGradient id="loop" gradientUnits="userSpaceOnUse" x1="75" y1="0" x2="390" y2="0"><stop offset="0" stop-color="#d0663a"/><stop offset="1" stop-color="#2b7bb9"/></linearGradient><marker id="arR" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#d0663a"/></marker><marker id="arO" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#e39a3b"/></marker><marker id="arB" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#2b7bb9"/></marker></defs>
+<text x="40" y="50" font-size="17" text-anchor="start" font-weight="bold" fill="#222">a) Plan: one pipe loop per room</text>
+<text x="40" y="72" font-size="13" text-anchor="start" font-weight="normal" fill="#555">Water enters warm, gives off heat and returns cooler</text>
+<rect x="40" y="95" width="380" height="300" fill="#d9d6cf" stroke="#555" stroke-width="1.2"/>
+<rect x="55" y="110" width="350" height="270" fill="#fbfaf7" stroke="#555" stroke-width="1"/>
+<rect x="200" y="95" width="100" height="15" fill="#cfe6f5" stroke="#6a9ab8" stroke-width="1"/>
+<path d="M75 405 L75 130 L110 130 L110 355 L145 355 L145 130 L180 130 L180 355 L215 355 L215 130 L250 130 L250 355 L285 355 L285 130 L320 130 L320 355 L355 355 L355 130 L390 130 L390 368" fill="none" stroke="url(#loop)" stroke-width="4" stroke-linejoin="round"/>
+<path d="M390 368 L100 368 L100 405" fill="none" stroke="#2b7bb9" stroke-width="4" stroke-linejoin="round"/>
+<polygon points="67,250 83,250 75,234" fill="#d0663a"/>
+<polygon points="240,360 240,376 224,368" fill="#2b7bb9"/>
+<rect x="60" y="405" width="60" height="20" rx="3" fill="#f4f6f8" stroke="#555" stroke-width="1.2"/>
+<text x="128" y="420" font-size="13" text-anchor="start" font-weight="normal" fill="#222">manifold</text>
+<text x="200" y="420" font-size="13" text-anchor="start" font-weight="normal" fill="#d0663a">supply ≈ 30 °C</text>
+<text x="310" y="420" font-size="13" text-anchor="start" font-weight="normal" fill="#2b7bb9">return ≈ 25 °C</text>
+<text x="40" y="450" font-size="13" text-anchor="start" font-weight="normal" fill="#555">Pipe legs 150–300 mm apart, cast into or laid on the floor</text>
+<text x="520" y="50" font-size="17" text-anchor="start" font-weight="bold" fill="#222">b) Section: from water to room</text>
+<text x="520" y="72" font-size="13" text-anchor="start" font-weight="normal" fill="#555">Heat passes through the floor before it reaches the room</text>
+<rect x="520" y="92" width="440" height="18" fill="#d9d6cf" stroke="#555" stroke-width="1"/>
+<rect x="520" y="110" width="20" height="308" fill="#d9d6cf" stroke="#555" stroke-width="1"/>
+<rect x="940" y="110" width="20" height="60" fill="#d9d6cf" stroke="#555" stroke-width="1"/>
+<rect x="940" y="260" width="20" height="158" fill="#d9d6cf" stroke="#555" stroke-width="1"/>
+<rect x="945" y="170" width="10" height="90" fill="#cfe6f5" stroke="#6a9ab8" stroke-width="1"/>
+<polygon points="945,172 945,258 875,330 770,330" fill="#f7d34a" opacity="0.28"/>
+<circle cx="982" cy="140" r="14" fill="#f7d34a" stroke="#d9a400" stroke-width="1.2"/>
+<text x="930" y="145" font-size="12" text-anchor="end" font-weight="normal" fill="#8a6a00">sun</text>
+<rect x="540" y="330" width="400" height="8" fill="#dcae72" stroke="#8a6232" stroke-width="1"/>
+<rect x="540" y="338" width="400" height="50" fill="url(#conc)" stroke="#888" stroke-width="1"/>
+<rect x="540" y="388" width="400" height="30" fill="url(#eps)" stroke="#9aa5b1" stroke-width="1"/>
+<circle cx="570" cy="363" r="7" fill="#d0663a" stroke="#8c3a17" stroke-width="1.2"/>
+<circle cx="620" cy="363" r="7" fill="#d0663a" stroke="#8c3a17" stroke-width="1.2"/>
+<circle cx="670" cy="363" r="7" fill="#d0663a" stroke="#8c3a17" stroke-width="1.2"/>
+<circle cx="720" cy="363" r="7" fill="#d0663a" stroke="#8c3a17" stroke-width="1.2"/>
+<circle cx="770" cy="363" r="7" fill="#d0663a" stroke="#8c3a17" stroke-width="1.2"/>
+<circle cx="820" cy="363" r="7" fill="#d0663a" stroke="#8c3a17" stroke-width="1.2"/>
+<circle cx="870" cy="363" r="7" fill="#d0663a" stroke="#8c3a17" stroke-width="1.2"/>
+<circle cx="920" cy="363" r="7" fill="#d0663a" stroke="#8c3a17" stroke-width="1.2"/>
+<path d="M690 324 q6 -7 0 -14 q-6 -7 0 -14 q6 -7 0 -14 q-6 -7 0 -14 q6 -7 0 -14 l0 -12" fill="none" stroke="#d0663a" stroke-width="2" marker-end="url(#arR)"/>
+<path d="M740 324 q6 -7 0 -14 q-6 -7 0 -14 q6 -7 0 -14 q-6 -7 0 -14 q6 -7 0 -14 l0 -12" fill="none" stroke="#d0663a" stroke-width="2" marker-end="url(#arR)"/>
+<path d="M790 324 q6 -7 0 -14 q-6 -7 0 -14 q6 -7 0 -14 q-6 -7 0 -14 q6 -7 0 -14 l0 -12" fill="none" stroke="#d0663a" stroke-width="2" marker-end="url(#arR)"/>
+<text x="740" y="210" font-size="12" text-anchor="middle" font-weight="normal" fill="#222">radiation to</text>
+<text x="740" y="225" font-size="12" text-anchor="middle" font-weight="normal" fill="#222">room surfaces</text>
+<path d="M850 324 C 840 295, 862 270, 850 240" fill="none" stroke="#e39a3b" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arO)"/>
+<path d="M890 324 C 880 295, 902 270, 890 240" fill="none" stroke="#e39a3b" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arO)"/>
+<text x="870" y="210" font-size="12" text-anchor="middle" font-weight="normal" fill="#222">convection</text>
+<text x="870" y="225" font-size="12" text-anchor="middle" font-weight="normal" fill="#222">to the air</text>
+<text x="555" y="138" font-size="12" text-anchor="start" font-weight="normal" fill="#555">room air 20–22 °C</text>
+<text x="555" y="322" font-size="12" text-anchor="start" font-weight="normal" fill="#555">floor 1–3 K warmer</text>
+<text x="520" y="450" font-size="13" text-anchor="start" font-weight="normal" fill="#555">Heat is stored in the slab first, so the room responds hours later</text>
+</svg>

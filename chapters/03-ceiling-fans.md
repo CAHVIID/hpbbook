@@ -11,9 +11,7 @@ After this chapter you can:
 
 ## Introduction
 
-Danish homes are increasingly at risk of overheating. New dwellings are well insulated and airtight, often have large glazed areas, and keep their heat well. That works well in winter, but in summer the same building struggles to get rid of solar and internal gains. Summers are also getting warmer, and heat waves are getting longer and more intense. A row house that is comfortable in today's climate may well overheat in the 2050 climate.
-
-The Danish Building Regulations (BR18) limit overheating in new dwellings to 100 hours per year above 27 °C and 25 hours per year above 28 °C. The easy answer to overheating is air-conditioning, but it adds investment, electricity use, refrigerants and maintenance to buildings that previously needed none. This chapter looks at a cheaper and much more energy-efficient alternative: the ceiling fan.
+Summers are also getting warmer, and heat waves are getting longer and more intense. The easy answer to overheating is air-conditioning, but it adds investment, electricity use, refrigerants and maintenance to buildings that previously needed none. This chapter looks at a cheaper and much more energy-efficient alternative: the ceiling fan.
 
 ### Fans cool people, not rooms
 
