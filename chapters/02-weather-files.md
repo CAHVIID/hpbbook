@@ -57,6 +57,10 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - Hours above 26 °C
   - Global radiation (kWh/m²)
   - Mean RH (%)
+  - Mean enthalpy (kJ/kg)
+  - Hours WBGT ≥ 25 °C (outdoors)
+  - Hours UTCI > 26 °C
+  - Hours PET > 29 °C
 * - DRY 2001–2010
   - −15.0
   - 8.1
@@ -65,6 +69,10 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 28
   - 1,038
   - 83
+  - 23.1
+  - 64
+  - 292
+  - 136
 * - DRY 2011–2023 (2025)
   - −7.6
   - 9.6
@@ -73,6 +81,10 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 37
   - 1,023
   - 81
+  - 25.6
+  - 59
+  - 432
+  - 207
 * - RCP4.5, 2035–2054
   - −8.1
   - 9.9
@@ -81,6 +93,10 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 48
   - 1,017
   - 82
+  - 26.4
+  - 128
+  - 546
+  - 236
 * - RCP4.5, 2045–2064
   - −8.1
   - 10.0
@@ -89,6 +105,10 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 80
   - 1,027
   - 82
+  - 26.6
+  - 151
+  - 610
+  - 303
 * - RCP4.5, 2055–2074
   - −8.1
   - 10.3
@@ -97,6 +117,10 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 90
   - 1,030
   - 81
+  - 27.1
+  - 162
+  - 623
+  - 315
 * - RCP4.5, 2080–2099
   - −8.1
   - 10.1
@@ -105,7 +129,35 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 90
   - 1,019
   - 81
+  - 26.6
+  - 162
+  - 627
+  - 310
 ```
+
+Enthalpy is the annual mean total specific enthalpy of the outdoor air per kg dry air, $h = 1.006\,T + x\,(2501 + 1.86\,T)$ in kJ/kg, with the humidity ratio $x$ found from air temperature, relative humidity and pressure.
+
+The wet-bulb globe temperature (WBGT) is a heat-stress index that combines air temperature, humidity, radiation and wind. The outdoor values in the table use the simplified formula of the Australian Bureau of Meteorology, $\mathrm{WBGT} = 0.567\,T + 0.393\,e + 3.94$, where $T$ is air temperature in °C and $e$ is water vapour pressure in hPa. The formula assumes moderate sun and light wind, so it needs only temperature and humidity from the weather file {cite:p}`bom_wbgt`.
+
+The Universal Thermal Climate Index (UTCI) {cite:p}`brode2012` and the Physiological Equivalent Temperature (PET) {cite:p}`hoppe1999` are European heat-balance indices. Both express the outdoor condition as the air temperature of a reference environment that gives the same physiological strain. They use air temperature, humidity, wind and mean radiant temperature. Here the mean radiant temperature is that of a person standing in the open, found from the direct and diffuse solar radiation in the file (the SolarCal method of ASHRAE 55). The thresholds are the start of moderate heat stress: UTCI above 26 °C {cite:p}`brode2012` and PET above 29 °C {cite:p}`matzarakis1999`. Because they include sun and wind, both count far more hours than the simplified WBGT formula, which uses only temperature and humidity.
+
+:::{admonition} UTCI assessment scale
+:class: dropdown
+UTCI is an outdoor index. Its ten stress classes {cite:p}`brode2012` are:
+
+| UTCI (°C) | Stress class |
+|---|---|
+| above 46 | extreme heat stress |
+| 38 to 46 | very strong heat stress |
+| 32 to 38 | strong heat stress |
+| 26 to 32 | moderate heat stress |
+| 9 to 26 | no thermal stress |
+| 0 to 9 | slight cold stress |
+| −13 to 0 | moderate cold stress |
+| −27 to −13 | strong cold stress |
+| −40 to −27 | very strong cold stress |
+| below −40 | extreme cold stress |
+:::
 
 Four things stand out:
 
