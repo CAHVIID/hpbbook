@@ -15,11 +15,11 @@ After this chapter you can:
 
 ## 1. Introduction
 
-Future climate changes and given the life span of buildings, they need to be designed for that. This chapter gives an overview of the challenges.
+Future climate changes and given the life span of buildings, they need to be designed for that. This chapter gives an overview of the climate challenges.
 
 ## 2. What is in a weather file
 
-*Outline:* hourly dry-bulb temperature, humidity, direct normal, diffuse and global horizontal radiation, wind and cloud cover. File formats (EPW, the Danish DRY format, IDA ICE weather files) and where to get them.
+*TBA* hourly dry-bulb temperature, humidity, direct normal, diffuse and global horizontal radiation, wind and cloud cover. File formats (EPW, the Danish DRY format, IDA ICE weather files) and where to get them.
 
 ## 3. The Danish design reference year
 
@@ -32,9 +32,25 @@ Denmark has two generations of design reference year (DRY), both for the DMI sta
 
 ### Future reference years
 
-DMI has also published twelve *climate-projected* reference years: three emission scenarios (RCP2.6, RCP4.5 and RCP8.5) for four periods (2035–2054, 2045–2064, 2055–2074 and 2080–2099). DMI considers RCP4.5 the most likely scenario, as it corresponds to about 2.7 °C of global warming by the end of the century (DMI Report 25-14).
+DMI has also published *climate-projected* reference years for three emission scenarios:
+- RCP2.6
+- RCP4.5
+- RCP8.5
 
-The future files are made in an unusual way. Climate models give only daily temperature and precipitation, not the hourly radiation and humidity a simulation needs. So DMI uses the projected daily values to *choose* months from the measured 2014–2023 record: for each calendar month it picks the measured month whose temperature distribution best matches the projection, with precipitation as the tie-breaker. Every hour in a future file is therefore real, measured weather from the last decade.
+RCP is Representative Concentration Pathway and reflect future greenhouse gas concentrations in the atmosphere: https://en.wikipedia.org/wiki/Representative_Concentration_Pathway
+
+Each RCP scenario was projected for four periods:
+- 2035–2054
+- 2045–2064
+- 2055–2074
+- 2080–2099
+
+**DMI considers RCP4.5 the most likely scenario**, as it corresponds to about 2.7 °C of global warming by the end of the century (DMI Report 25-14).
+
+:::{admonition} Extra
+:class: dropdown
+Climate models give only daily temperature and precipitation, not the hourly radiation and humidity a simulation needs. So DMI used the projected daily values to *choose* months from the measured 2014–2023 record: for each calendar month the measured month whose temperature distribution best matches the projection, is picked, with precipitation as the tie-breaker. Every hour in a future file is therefore real, measured weather from the last decade.
+:::
 
 {numref}`fig-dry-weather` shows the current and future DRY files, and {numref}`tab-dry-summary` summarises them.
 
@@ -107,29 +123,31 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 81
 ```
 
-Four things stand out:
-
-1. **The biggest step has already happened.** Going from the 2001–2010 to the 2011–2023 reference year raises the mean temperature by 1.4 °C and cuts the hours below 0 °C by more than half. Heating plant sized on the old file will tend to be oversized.
+:::{admonition} Take-aways
+:class: dropdown
+Four take-aways:
+1. **A big step has already happened.** Going from the *2001–2010* to the *2011–2023* reference year cuts the hours below 0 °C by more than half, yet [severe freeze temperatures still occurs:](https://www.berlingske.dk/danmark/over-18-frostgrader-goer-natten-til-soendag-til-koldeste-i-fem-aar)
 2. **Summers get warmer, but slowly.** Hours above 26 °C rise from 37 today to 80–90 around mid-century.
 3. **Radiation and humidity hardly change.** Global radiation stays at about 1,020–1,040 kWh/m² and mean relative humidity at 81–83 %. Solar gains in the future files are those of today.
 4. **The projections flatten out.** The 2080–2099 file is no warmer than 2055–2074; the two differ only in January, May and October. Because every future month must be a measured month from 2014–2023, the files can never be hotter than the hottest month of that decade.
+:::
 
-:::{admonition} Rules of thumb
+<!-- :::{admonition} Rules of thumb
 :class: tip
 - Use the current DRY for energy-frame compliance and for sizing heating.
 - Check summer comfort with at least one future file as well, since a 2025 building will meet a 2050 climate.
 - A reference year is built from *typical* months. DMI itself says it is not suited for sizing against extreme events such as overheating. Stress-test the design with a heat-wave file (section 5).
-:::
+::: -->
 
 ## 4. Future weather files beyond the DRY
 
-*Outline:* climate models (GCM, RCM), downscaling, emission scenarios (RCP, SSP); morphing a present-day year (CCWorldWeatherGen) versus bias-corrected regional model output; the Annex 80 TMY files for 2001–2020, 2041–2060 and 2081–2100; uncertainty.
+*TBA:* climate models (GCM, RCM), downscaling, emission scenarios (RCP, SSP); morphing a present-day year (CCWorldWeatherGen) versus bias-corrected regional model output; the Annex 80 TMY files for 2001–2020, 2041–2060 and 2081–2100; uncertainty.
 
 ## 5. Extremes
 
 ### Heat waves
 
-*Outline:* definitions (days above 25 °C, tropical nights above 20 °C); health effects; the three Annex 80 Copenhagen heat-wave files for 2041–2060 (longest, most intense and most severe); why warm nights defeat night ventilation.
+*TBA:* definitions (days above 25 °C, tropical nights above 20 °C); health effects; the three Annex 80 Copenhagen heat-wave files for 2041–2060 (longest, most intense and most severe); why warm nights defeat night ventilation.
 
 ### Urban heat island
 

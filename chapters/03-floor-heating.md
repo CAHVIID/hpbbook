@@ -62,12 +62,13 @@ Heavy floors cannot do that, because heat is stored in the floor before it reach
 
 ## Heat transfer of floors
 
-A heated floor gives off heat to the room by radiation to the other surfaces and by natural convection to the air. Added together they give a heat transfer coefficient of about 11 W/(m²·K).
+A heated floor gives off heat to the room by radiation to the other surfaces and by natural convection to the air. Added together they give a heat transfer coefficient of about 11 W/(m²·K) {cite:p}`rehva2007`:.
 
-:::{admonition} Heat transfer surface coefficients
+:::{admonition} Extra
 :class: dropdown
-- **Radiation** Between surfaces in a thermal space, radiative exchange is approx. 5.0 W/m2K, and is pretty much fixed.
-- **Convection** Convective heat transfer from a heated floor depends strongly on surface type, air speed, and forced or natural convection, but can be assumed to be approx. 6.0 W/m2K
+- **Radiation** Between surfaces in a thermal enclosure, radiative exchange is approx. 5.0 W/(m²·K), and is pretty much fixed.
+- **Convection** Convective heat transfer from a heated floor depends strongly on surface type, air speed, and forced or natural convection, but can be assumed to be approx. 6.0 W/(m²·K)
+- **Total** Convective and radiative heat transfers sums to 11 W/(m²·K). Source: {cite:p}`rehva2007`
 :::
 
 EN 1264 gives the heat flux $q$ from the mean floor surface temperature $\theta_F$ and the room temperature $\theta_i$ {cite:p}`en1264`:
@@ -87,7 +88,7 @@ Floor covering adds thermal resistance between the pipes and the room. Tiles add
 
 %EN 1264 limits the covering resistance to 0.15 m²·K/W.
 
-:::{admonition} Self-regulation
+:::{admonition} Extra
 :class: dropdown
 - **Barely warm** A heat demand of 10 W/m² needs a floor surface **only 1.1 K above** the room temperature. In low energy houses, the occupants will never feel a "warm floor".
 - **Self-regulation** The small temperature difference between floor surface and room means that a small rise in room temperature removes much of the output. If the floor is at 23 °C, the output falls from 30 W/m² to 9 W/m² when the room rises from 20 °C to 22 °C.
@@ -107,6 +108,8 @@ Floor heating constructions are often grouped by how the pipes are embedded, i.e
 Light and heavy floor heating constructions, drawn to the same scale. The heat capacity above the pipes is about seven times larger in the heavy floor. Response times are from the model in {numref}`fig-floor-step-response`.
 :::
 
+:::{admonition} Details
+:class: dropdown
 ### Light floors
 
 In a light (dry) floor the pipes lie in grooves in an insulation panel, usually EPS. Aluminium heat-diffusion plates wrap around the pipes and spread the heat sideways under the floor covering. The EPS panels rest on a plywood board on the joists, and the covering is laid directly on the plates, typically 22 mm floor boards, a floating wooden floor or gypsum fibre boards. Pipe spacing is anything between 150–300 mm, depending on pipe diameter and system.
@@ -118,7 +121,7 @@ Light floors are used on timber joists and battens, in renovation, and wherever 
 In a heavy floor the pipes are cast into cement screed or concrete. A typical screed system has 45–65 mm of screed above the pipes. In Danish slab-on-ground houses the pipes are often tied to the reinforcement in the middle of a 100 mm concrete slab, with the floor covering laid directly on the slab. The slab weighs around 230 kg/m² and has a heat capacity of 100–250 kJ/(m²·K), and all of it is heated by the pipes.
 
 %Heavy floors are cheap to build in new houses, robust, and good at evening out short peaks in demand. That is a strength in an old, poorly insulated house. In a low-energy house it is the problem.
-
+:::
 
 ## Hydronic installation
 
@@ -132,21 +135,103 @@ In a heavy floor the pipes are cast into cement screed or concrete. A typical sc
 A hydronic floor heating installation. The controller sets the supply temperature from the outdoor temperature (heating curve). The room temperature sensor in each room opens and closes the wax thermostat on its own loop.
 :::
 
+:::{admonition} Details
+:class: dropdown
 - **Heat source.** A heat pump or district heating. Floor heating needs a low supply temperature, typically 30–35 °C in a low-energy house, with 3–5 K between supply and return.
 - **Mixing shunt.** A motorized three-way mixing valve and a circulation pump. The valve mixes return water into the supply to reach the temperature set by the controller. The controller follows a heating curve, which raises the supply temperature as the outdoor temperature falls.
 - **Manifold.** Distributes water to one loop per room, or several loops in large rooms. Each loop should be at most 80–100 m long to keep the pressure drop reasonable. Flow meters or balancing valves on the supply side set the design flow in each loop, so that every room gets its share (hydronic balancing).
 - **Wax thermostats and room temperature sensors.** Each loop has a valve on the return side, opened and closed by a wax thermostat, an electrically heated wax actuator. The room temperature sensor switches it on and off, either directly or by pulse-width modulation (PWM). The valve only opens or closes the loop. It cannot change the water temperature.
-
-:::{admonition} Control
-:class: dropdown
-The installation has **two control levels**.
-
-The supply temperature is set centrally from the outdoor temperature, and each room switches its own loop on or off.
-
-Lower supply temperature will keep the loops more on, and vice versa.
-
-Low supply temperature also increases the level of self-regulation.
 :::
+
+
+## Control of floor heating
+
+Floor heating is controlled on two levels ({numref}`fig-hydronic-schematic`). The supply temperature follows a heating curve, set from the outdoor temperature. Each room then switches its own loop with a wax thermostat, driven by its room temperature sensor.
+
+<!-- :::{admonition} Control
+:class: Tip
+The installation has **two levels of control**.
+The supply temperature is set centrally from the outdoor temperature, and each room switches its own loop on or off.
+Lower supply temperature will keep the loops more on, and vice versa.
+Low supply temperature increases self-regulation.
+::: -->
+
+A wax thermostat is an on/off valve. A small heater warms a wax capsule, the wax expands and pushes the valve open. It takes 2–3 min before the valve starts to move and another 3–5 min to open fully, and about the same to close. It cannot hold an intermediate position for long, so the room unit controls it in one of two ways:
+```{caution} Confirmation pending
+- **On/off control.** The loop opens when the room is below the setpoint minus a hysteresis and closes when it is above the setpoint plus the hysteresis. Not used anymore
+- **PWM control.** The room unit runs a PI controller and turns its output into a duty cycle. With a 15–20 min cycle and 40 % output, the valve is open for about 6–8 min of each cycle. On average this behaves like a valve that is 40 % open.
+```
+
+PWM smooths the room temperature, but it does not remove the delay. The sensor measures the room, the valve acts on the water, and the floor lies in between. Whatever the controller decides, the floor delivers it over the next 0.5–1 h (light floor) or many hours (heavy floor). A controller that sees the room warming can close the valve, but it cannot take back the heat already stored in the floor.
+
+The interactive model below shows the consequence. With the default inputs, the choice between on/off and PI changes the result by a few percent. The choice between a light and a heavy floor changes it much more.
+
+The more detailed model in {numref}`fig-floor-step-response` shows this: the output drops quickly at first while the layers near the surface empty, then follows a long tail as heat comes up from deeper layers. The heavy floor still delivers about 10 % of its output a full day after the loop closed. The single time constant is a good summary, not the whole story.
+
+{numref}`fig-floor-step-response` shows a more detailed calculation with a one-dimensional heat conduction model of both floors. The water is at 30 °C and the room at 20 °C.
+
+:::{figure} figures/ch03/floor-step-response.*
+:label: fig-floor-step-response
+:alt: Two line charts of heat output to the room in percent of steady state over 24 hours. Left, after the wax thermostat opens, the light floor reaches 63 % in about half an hour and the heavy floor in about 2 hours. Right, after the wax thermostat closes, the light floor falls to 37 % in about 1 hour, while the heavy floor takes about 12 hours and still delivers about 10 % after 24 hours.
+:width: 100%
+
+Heat output of the two floors in {numref}`fig-floor-sections` after a) the wax thermostat opens and b) the wax thermostat closes. The dashed lines mark 63 % of the change. One-dimensional conduction model, water at 30 °C, room at 20 °C. Wax thermostat delay and the response of the room itself are not included.
+:::
+
+```{list-table} This table title
+:header-rows: 1
+:label: example-table
+
+* - Training
+  - Validation
+* - 0
+  - 5
+* - 13720
+  - 2744
+```
+
+%{numref}`fig-floor-sections`
+```{list-table} Response of the light and heavy floor (one-dimensional model, water at 30 °C, room at 20 °C)
+:header-rows: 1
+:label: tab-floor-response
+
+* - 
+  - Light floor
+  - Heavy floor
+* - Heat capacity above pipes
+  - 18 kJ/(m²·K)
+  - 120 kJ/(m²·K)
+* - Heat capacity, whole floor
+  - 40 kJ/(m²·K)
+  - 230 kJ/(m²·K)
+* - Steady-state output
+  - 27 W/m²
+  - 43 W/m²
+* - 63 % response, loop opens
+  - 0.5 h
+  - 2 h
+* - 63 % response, loop closes
+  - 1 h
+  - 12 h
+* - Heat delivered after the loop closes
+  - 50 Wh/m²
+  - 500 Wh/m²
+* - Same, in hours of full output
+  - 2 h
+  - 12 h
+```
+
+The last two rows are the ones that matter in a low-energy house. When the heavy floor's loop closes, the slab still holds about 500 Wh/m² more heat than at room temperature, and it hands this heat to the room over the next day. If the house needs 10 W/m² on average on a spring day, that is two days' heating stored in the floor. A thermostat that closes the loop when the sun comes out has no influence on this heat. The room overheats, and the heat must be removed again by opening windows or by cooling.
+
+A light floor holds a tenth of that heat, and most of it is released within the first hour. It follows the daily cycle much better, but it still lags behind the demand. The control loop adds more delay, and that is the subject of the section on control.
+
+
+
+
+
+
+
+
 
 
 ## Time constant of floor heating
@@ -156,6 +241,7 @@ When the water flow in a loop starts or stops, the heat output to the room does 
 ### Where the exponential comes from
 
 Think of the floor above the insulation as one lump with heat capacity $C$ [J/(m²·K)] and a single temperature $T_f$. When the loop closes, the only way out for the stored heat is through the floor covering and the floor surface, a total resistance $R$ [m²·K/W], to the room at $T_r$. The heat balance of the lump is then
+
 
 $$
 C\,\frac{\mathrm{d}T_f}{\mathrm{d}t} = -\frac{T_f - T_r}{R}
@@ -211,51 +297,8 @@ Switching on is therefore much faster than switching off, by a factor of 4–8. 
 
 The lumped model assumes the floor has one temperature. That is reasonable when the resistance inside the floor is small compared with the resistance at its surface, measured by the Biot number $Bi = h\,L/\lambda$. For the concrete slab $Bi \approx 0.35$, so the slab is close to uniform, and one time constant describes it well. For the light floor the boards themselves are the main resistance ($Bi \approx 2$), but they hold little heat, so the floor still behaves almost as one lump.
 
-In reality a floor has many layers and therefore many time constants. The more detailed model in {numref}`fig-floor-step-response` shows this: the output drops quickly at first while the layers near the surface empty, then follows a long tail as heat comes up from deeper layers. The heavy floor still delivers about 10 % of its output a full day after the loop closed. The single time constant is a good summary, not the whole story.
+In reality a floor has many layers and therefore many time constants. 
 
-{numref}`fig-floor-step-response` shows a more detailed calculation with a one-dimensional heat conduction model of both floors. The water is at 30 °C and the room at 20 °C.
-
-:::{figure} figures/ch03/floor-step-response.*
-:label: fig-floor-step-response
-:alt: Two line charts of heat output to the room in percent of steady state over 24 hours. Left, after the wax thermostat opens, the light floor reaches 63 % in about half an hour and the heavy floor in about 2 hours. Right, after the wax thermostat closes, the light floor falls to 37 % in about 1 hour, while the heavy floor takes about 12 hours and still delivers about 10 % after 24 hours.
-:width: 100%
-
-Heat output of the two floors in {numref}`fig-floor-sections` after a) the wax thermostat opens and b) the wax thermostat closes. The dashed lines mark 63 % of the change. One-dimensional conduction model, water at 30 °C, room at 20 °C. Wax thermostat delay and the response of the room itself are not included.
-:::
-
-```{list-table} Response of the light and heavy floor in {numref}`fig-floor-sections` (one-dimensional model, water at 30 °C, room at 20 °C)
-:header-rows: 1
-:label: tab-floor-response
-
-* -
-  - Light floor
-  - Heavy floor
-* - Heat capacity above pipes
-  - 18 kJ/(m²·K)
-  - 120 kJ/(m²·K)
-* - Heat capacity, whole floor
-  - 40 kJ/(m²·K)
-  - 230 kJ/(m²·K)
-* - Steady-state output
-  - 27 W/m²
-  - 43 W/m²
-* - 63 % response, loop opens
-  - 0.5 h
-  - 2 h
-* - 63 % response, loop closes
-  - 1 h
-  - 12 h
-* - Heat delivered after the loop closes
-  - 50 Wh/m²
-  - 500 Wh/m²
-* - Same, in hours of full output
-  - 2 h
-  - 12 h
-```
-
-The last two rows are the ones that matter in a low-energy house. When the heavy floor's loop closes, the slab still holds about 500 Wh/m² more heat than at room temperature, and it hands this heat to the room over the next day. If the house needs 10 W/m² on average on a spring day, that is two days' heating stored in the floor. A thermostat that closes the loop when the sun comes out has no influence on this heat. The room overheats, and the heat must be removed again by opening windows or by cooling.
-
-A light floor holds a tenth of that heat, and most of it is released within the first hour. It follows the daily cycle much better, but it still lags behind the demand. The control loop adds more delay, and that is the subject of the section on control.
 
 :::{admonition} Rules of thumb: floor time constants
 :class: tip
@@ -352,18 +395,7 @@ The app below shows how fast a room cools after the heating stops. Change $UA$ a
 
 The same model in Python: {download}`room_cooldown.py <code/room_cooldown.py>`. Run it with `python room_cooldown.py --UA 12 --tau 18` to simulate one room, or without arguments to compare the reference rooms.
 
-## Control of floor heating
 
-Floor heating is controlled on two levels ({numref}`fig-hydronic-schematic`). The supply temperature follows a heating curve, set from the outdoor temperature. Each room then switches its own loop with a wax thermostat, driven by its room temperature sensor.
-
-A wax thermostat is an on/off valve. A small heater warms a wax capsule, the wax expands and pushes the valve open. It takes 2–3 min before the valve starts to move and another 3–5 min to open fully, and about the same to close. It cannot hold an intermediate position for long, so the room unit controls it in one of two ways:
-
-- **On/off control.** The loop opens when the room is below the setpoint minus a hysteresis and closes when it is above the setpoint plus the hysteresis.
-- **PWM control.** The room unit runs a PI controller and turns its output into a duty cycle. With a 15–20 min cycle and 40 % output, the valve is open for about 6–8 min of each cycle. On average this behaves like a valve that is 40 % open.
-
-PWM smooths the room temperature, but it does not remove the delay. The sensor measures the room, the valve acts on the water, and the floor lies in between. Whatever the controller decides, the floor delivers it over the next 0.5–1 h (light floor) or many hours (heavy floor). A controller that sees the room warming can close the valve, but it cannot take back the heat already stored in the floor.
-
-The interactive model below shows the consequence. With the default inputs, the choice between on/off and PI changes the result by a few percent. The choice between a light and a heavy floor changes it much more.
 
 ### Interactive model: control and solar gains
 

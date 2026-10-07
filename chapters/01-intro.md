@@ -12,3 +12,11 @@ But HPBs should ALSO:
 
 Near-zero energy buildings (NZEB) are not difficult to design - we know and have the solutions today. But a near-zero energy building that is cost-optimal, implement robust and resilient solutions, is competitive and appealing to buyers, we named such a building:
 **Optimal near-zero energy buildings: ONZEB**
+
+## Work in progress
+
+Sometimes the reader will see a box like the following. This means that the content is not completely assessed yet and cannot be taken as true!
+
+```{caution} Confirmation pending
+Some text here
+```
