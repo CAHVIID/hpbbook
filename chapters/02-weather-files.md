@@ -45,7 +45,7 @@ The future files are made in an unusual way. Climate models give only daily temp
 Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Danish design reference years at Sjælsmark: the old and new present-day files and the four RCP4.5 projections. The dashed line marks 26 °C.
 ```
 
-```{list-table} Annual indicators of the Danish design reference years, computed from the EPW files. Enthalpy is the annual mean total specific enthalpy of the outdoor air per kg dry air, h = 1.006·T + x·(2501 + 1.86·T), with the humidity ratio x found from air temperature, relative humidity and pressure. WBGT uses the simplified Australian Bureau of Meteorology formula, WBGT = 0.567·T + 0.393·e + 3.94 with vapour pressure e in hPa, which assumes moderate sun and light wind and does not use the radiation or wind data.
+```{list-table} Annual indicators of the Danish design reference years, computed from the EPW files.
 :name: tab-dry-summary
 :header-rows: 1
 
@@ -58,8 +58,7 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - Global radiation (kWh/m²)
   - Mean RH (%)
   - Mean enthalpy (kJ/kg)
-  - Max WBGT (°C)
-  - Hours WBGT ≥ 25 °C
+  - Hours WBGT ≥ 25 °C (outdoors)
 * - DRY 2001–2010
   - −15.0
   - 8.1
@@ -69,7 +68,6 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 1,038
   - 83
   - 23.1
-  - 27.1
   - 64
 * - DRY 2011–2023 (2025)
   - −7.6
@@ -80,7 +78,6 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 1,023
   - 81
   - 25.6
-  - 28.9
   - 59
 * - RCP4.5, 2035–2054
   - −8.1
@@ -91,7 +88,6 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 1,017
   - 82
   - 26.4
-  - 30.5
   - 128
 * - RCP4.5, 2045–2064
   - −8.1
@@ -102,7 +98,6 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 1,027
   - 82
   - 26.6
-  - 30.5
   - 151
 * - RCP4.5, 2055–2074
   - −8.1
@@ -113,7 +108,6 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 1,030
   - 81
   - 27.1
-  - 30.5
   - 162
 * - RCP4.5, 2080–2099
   - −8.1
@@ -124,9 +118,12 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 1,019
   - 81
   - 26.6
-  - 30.5
   - 162
 ```
+
+Enthalpy is the annual mean total specific enthalpy of the outdoor air per kg dry air, $h = 1.006\,T + x\,(2501 + 1.86\,T)$ in kJ/kg, with the humidity ratio $x$ found from air temperature, relative humidity and pressure.
+
+The wet-bulb globe temperature (WBGT) is a heat-stress index that combines air temperature, humidity, radiation and wind. The outdoor values in the table use the simplified formula of the Australian Bureau of Meteorology, $\mathrm{WBGT} = 0.567\,T + 0.393\,e + 3.94$, where $T$ is air temperature in °C and $e$ is water vapour pressure in hPa. The formula assumes moderate sun and light wind, so it needs only temperature and humidity from the weather file {cite:p}`bom_wbgt`.
 
 Four things stand out:
 
