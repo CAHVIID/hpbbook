@@ -141,6 +141,24 @@ The wet-bulb globe temperature (WBGT) is a heat-stress index that combines air t
 
 The Universal Thermal Climate Index (UTCI) {cite:p}`brode2012` and the Physiological Equivalent Temperature (PET) {cite:p}`hoppe1999` are European heat-balance indices. Both express the outdoor condition as the air temperature of a reference environment that gives the same physiological strain. They use air temperature, humidity, wind and mean radiant temperature. Here the mean radiant temperature is that of a person standing in the open, found from the direct and diffuse solar radiation in the file (the SolarCal method of ASHRAE 55). The thresholds are the start of moderate heat stress: UTCI above 26 °C {cite:p}`brode2012` and PET above 29 °C {cite:p}`matzarakis1999`. Because they include sun and wind, both count far more hours than the simplified WBGT formula, which uses only temperature and humidity.
 
+:::{admonition} UTCI assessment scale
+:class: dropdown
+UTCI is an outdoor index. Its ten stress classes {cite:p}`brode2012` are:
+
+| UTCI (°C) | Stress class |
+|---|---|
+| above 46 | extreme heat stress |
+| 38 to 46 | very strong heat stress |
+| 32 to 38 | strong heat stress |
+| 26 to 32 | moderate heat stress |
+| 9 to 26 | no thermal stress |
+| 0 to 9 | slight cold stress |
+| −13 to 0 | moderate cold stress |
+| −27 to −13 | strong cold stress |
+| −40 to −27 | very strong cold stress |
+| below −40 | extreme cold stress |
+:::
+
 Four things stand out:
 
 1. **The biggest step has already happened.** Going from the 2001–2010 to the 2011–2023 reference year raises the mean temperature by 1.4 °C and cuts the hours below 0 °C by more than half. Heating plant sized on the old file will tend to be oversized.
