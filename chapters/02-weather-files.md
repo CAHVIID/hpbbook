@@ -1,5 +1,6 @@
 # Weather files and future weather
 
+<!--
 ## Learning objectives
 
 After this chapter you can:
@@ -10,6 +11,7 @@ After this chapter you can:
 - define a heat wave and use heat-wave weather files to stress-test a design;
 - read an EPW file and compute simple indicators such as hours above 26 °C, hours below 0 °C and degree-hours;
 - judge which design decisions still hold in a 2050 climate.
+-->
 
 ## 1. Introduction
 
