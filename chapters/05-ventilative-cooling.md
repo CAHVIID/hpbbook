@@ -1,5 +1,6 @@
 # Ventilative cooling
 
+<!--
 ## Learning objectives
 
 After this chapter you can:
@@ -10,6 +11,7 @@ After this chapter you can:
 - design a venting hatch that meets the requirements for fire escape, rain, burglary and heat loss
 - set up an opening control that cools without overcooling or draught
 - interpret overheating results against the BR18 and adaptive comfort criteria
+-->
 
 ## Introduction
 
