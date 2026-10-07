@@ -9,14 +9,14 @@ After this chapter you can:
 - compare light and heavy floor heating constructions by heat capacity and time constant
 - estimate the time constant of a floor and the heat it keeps delivering after the loop closes
 - describe the parts of a hydronic floor heating installation and what each one controls
-- explain why floor heating is a poor match for low-energy houses, where heating demand at night turns into cooling demand during the day -->
+- explain why floor heating is a poor match for low-energy houses, where heating demand at night turns into cooling demand during the day 
 
 %+++
 %edwdds
 %#dwd 
 %sdas
 %+++
-
+-->
 
 
 <!-- possible classes:
@@ -43,7 +43,7 @@ Floor heating is the standard heat emitter in newer Danish dwellings. It is invi
 
 Warm water from a manifold runs through a pipe loop in the floor of each room and returns a few kelvin cooler. The heat first warms the floor, and the floor surface then gives it to the room by radiation and convection ({numref}`fig-floor-principle`).
 
-:::{figure} figures/ch05/floor-heating-principle.*
+:::{figure} figures/ch03/floor-heating-principle.*
 :label: fig-floor-principle
 :alt: Two panels. Left, a plan view of a room with a serpentine pipe loop: water leaves a manifold at about 30 °C, runs back and forth across the floor with legs 150–300 mm apart, changing colour from red to blue, and returns at about 25 °C. Right, a section of the same room: pipes cast in a concrete slab on insulation, under a floor covering. Wavy arrows show radiation and dashed arrows show convection from the floor to the room, and sunlight enters through a window onto the floor.
 :width: 100%
@@ -99,7 +99,7 @@ Floor covering adds thermal resistance between the pipes and the room. Tiles add
 
 Floor heating constructions are often grouped by how the pipes are embedded, i.e. how much heat capacity sits between the pipes and the room ({numref}`fig-floor-sections`).
 
-:::{figure} figures/ch05/floor-sections.*
+:::{figure} figures/ch03/floor-sections.*
 :label: fig-floor-sections
 :alt: Two cross-sections drawn to the same scale. Left, a light floor: 22 mm floor boards resting on aluminium plates that wrap around the pipes, which sit in grooves in a 30 mm EPS panel on an 18 mm plywood board above insulation and joists. Right, a heavy floor: 14 mm parquet on a 100 mm concrete slab with the pipes in the middle of the slab, above EPS insulation.
 :width: 100%
@@ -124,7 +124,7 @@ In a heavy floor the pipes are cast into cement screed or concrete. A typical sc
 
 {numref}`fig-hydronic-schematic` shows a typical installation. The parts are the same for light and heavy floors.
 
-:::{figure} figures/ch05/hydronic-schematic.*
+:::{figure} figures/ch03/hydronic-schematic.*
 :label: fig-hydronic-schematic
 :alt: Schematic of a hydronic floor heating system. A heat pump or district heating unit supplies water through a three-way mixing valve and a circulation pump to a manifold. The controller sets the mixing valve from an outdoor sensor and a supply temperature sensor. From the manifold, one loop runs to each of three rooms. The controller drives a motorized mixing valve. Each loop has a flow meter on the supply side and a wax thermostat on the return side, switched by a temperature sensor in its room.
 :width: 100%
@@ -151,37 +151,71 @@ Low supply temperature also increases the level of self-regulation.
 
 ## Time constant of floor heating
 
-When the water flow in a loop starts or stops, the heat output to the room does not change at once. For a first-order system, the output approaches its new value exponentially:
+When the water flow in a loop starts or stops, the heat output to the room does not change at once. This section explains why, and what the delay means for a low-energy house.
+
+### Where the exponential comes from
+
+Think of the floor above the insulation as one lump with heat capacity $C$ [J/(m²·K)] and a single temperature $T_f$. When the loop closes, the only way out for the stored heat is through the floor covering and the floor surface, a total resistance $R$ [m²·K/W], to the room at $T_r$. The heat balance of the lump is then
+
+$$
+C\,\frac{\mathrm{d}T_f}{\mathrm{d}t} = -\frac{T_f - T_r}{R}
+$$ (eq-lump)
+
+The rate at which the floor cools is proportional to how much warmer it is than the room. The solution is an exponential decay,
+
+$$
+T_f(t) - T_r = (T_{f,0} - T_r)\,e^{-t/\tau}, \qquad \tau = R\,C
+$$ (eq-tau)
+
+and since the heat output is $q = (T_f - T_r)/R$, the output decays the same way. A system that obeys {eq}`eq-lump` is called first-order: one heat store, one resistance, one time constant. For any step change in the water flow, the output approaches its new value as
+
+$$
+q(t) = q_\infty + (q_0 - q_\infty)\,e^{-t/\tau}
+$$ (eq-first-order)
 
 %:::{admonition} First-order
 %:class: drop
 %The term "first-order" means the most direct, basic, or linear effect, without complex loops or higher powers of ^2 or ^3 
 %:::
 
+The time constant has two useful meanings:
+
+- After $t = \tau$ the factor $e^{-1} = 0.37$ remains, so 63 % of the change has happened. After $3\tau$, 95 % has.
+- If the floor kept losing heat at its initial rate, it would be empty after exactly $\tau$. The initial slope of the curve points at $t = \tau$.
+
+The units confirm it: J/(m²·K) × m²·K/W = J/W = s.
+
+### Switching off: the whole floor discharges through the surface
+
+When the loop closes, all the heat stored above the insulation has to leave through the covering and the surface. $C$ is the heat capacity of the whole floor above the insulation, and $R$ is the covering plus the surface resistance $1/h_s \approx 0.09$ m²·K/W:
+
+- **Light floor:** $C \approx 18$ kJ/(m²·K) for the boards and plates, $R \approx 0.09 + 0.17 = 0.26$ m²·K/W (22 mm boards, λ = 0.13 W/(m·K)), so $\tau \approx 4700$ s, or about 1.3 hours.
+- **Heavy floor:** $C \approx 230$ kJ/(m²·K) for the slab, $R \approx 0.09 + 0.08 + 0.03 = 0.20$ m²·K/W (surface, parquet, upper half of the slab), so $\tau \approx 46\,000$ s, or about 13 hours.
+
+The floor covering matters twice. A thicker covering or a rug raises $R$, which lowers the output *and* makes the floor slower to discharge.
+
+### Switching on: the water holds the pipe plane
+
+When the loop opens, the water forces the pipe plane towards the water temperature. Only the layers above the pipes have to warm up, and they are fed from below through the resistance $R_\text{up}$ between the pipes and the surface, while they lose heat at the top through $1/h_s$. Seen from the stored heat, the two resistances act in parallel, and the time constant becomes
+
 $$
-q(t) = q_\infty + (q_0 - q_\infty)\,e^{-t/\tau}
-$$ (eq-first-order)
+\tau_\text{on} \approx C_\text{above}\,\frac{R_\text{up}\cdot(1/h_s)}{R_\text{up} + 1/h_s}
+$$ (eq-tau-on)
 
-where $\tau$ is the time constant.
+- **Light floor:** $C_\text{above} \approx 18$ kJ/(m²·K), $R_\text{up} \approx 0.17$ m²·K/W, so $\tau_\text{on} \approx 0.3$ h.
+- **Heavy floor:** $C_\text{above} \approx 120$ kJ/(m²·K), $R_\text{up} \approx 0.11$ m²·K/W, so $\tau_\text{on} \approx 1.7$ h.
 
-Time constant is defined as the time where 63 % of the change has happened. After three time constants, 95 % has.
+Switching on is therefore much faster than switching off, by a factor of 4–8. The water drives the floor when the loop is open, but nothing drives the heat out when it closes. This asymmetry is the core of the problem: a floor heats up willingly and cools down reluctantly.
 
-The time constant is the product of a heat capacity and a thermal resistance:
+### Why one time constant is only an approximation
 
-$$
-\tau = R\,C
-$$ (eq-tau)
+The lumped model assumes the floor has one temperature. That is reasonable when the resistance inside the floor is small compared with the resistance at its surface, measured by the Biot number $Bi = h\,L/\lambda$. For the concrete slab $Bi \approx 0.35$, so the slab is close to uniform, and one time constant describes it well. For the light floor the boards themselves are the main resistance ($Bi \approx 2$), but they hold little heat, so the floor still behaves almost as one lump.
 
-When the loop closes, the stored heat can only leave through the floor surface. The resistance is then the floor covering plus the surface resistance, about $1/11 \approx 0.09$ m²·K/W, and the heat capacity is that of the whole floor above the insulation. For the two floors in {numref}`fig-floor-sections`:
-
-- **Light floor:** $C \approx 20$ kJ/(m²·K) for the boards and plates, $R \approx 0.09 + 0.08 = 0.17$ m²·K/W, so $\tau \approx 3400$ s, or about 1 hour. The plywood board under the EPS also stores heat, but the EPS separates it from the pipes, so it only adds a slow tail.
-- **Heavy floor:** $C \approx 230$ kJ/(m²·K), $R \approx 0.09 + 0.08 + 0.03 = 0.20$ m²·K/W, so $\tau \approx 46\,000$ s, or about 13 hours.
-
-When the loop opens, the water forces the pipe plane to its own temperature. Only the layers above the pipes have to warm up, and they are heated from below as well as losing heat at the top. Switching on is therefore faster than switching off.
+In reality a floor has many layers and therefore many time constants. The more detailed model in {numref}`fig-floor-step-response` shows this: the output drops quickly at first while the layers near the surface empty, then follows a long tail as heat comes up from deeper layers. The heavy floor still delivers about 10 % of its output a full day after the loop closed. The single time constant is a good summary, not the whole story.
 
 {numref}`fig-floor-step-response` shows a more detailed calculation with a one-dimensional heat conduction model of both floors. The water is at 30 °C and the room at 20 °C.
 
-:::{figure} figures/ch05/floor-step-response.*
+:::{figure} figures/ch03/floor-step-response.*
 :label: fig-floor-step-response
 :alt: Two line charts of heat output to the room in percent of steady state over 24 hours. Left, after the wax thermostat opens, the light floor reaches 63 % in about half an hour and the heavy floor in about 2 hours. Right, after the wax thermostat closes, the light floor falls to 37 % in about 1 hour, while the heavy floor takes about 12 hours and still delivers about 10 % after 24 hours.
 :width: 100%
@@ -233,6 +267,40 @@ A light floor holds a tenth of that heat, and most of it is released within the 
 - A floor with a time constant longer than a few hours cannot follow a heating demand that changes within the day.
 :::
 
+
+### What the time constant means over a day
+
+The heating demand of a low-energy house in spring is not a step. It swings over the day, roughly as a sine with a 24-hour period, from a demand at night to a surplus when the sun shines. A first-order system that is asked to follow such a swing does two things: it lags behind, and it delivers less of the swing than asked. With the angular frequency $\omega = 2\pi/24\,\mathrm{h}$,
+
+$$
+\text{amplitude ratio} = \frac{1}{\sqrt{1 + (\omega\tau)^2}}, \qquad
+\text{time lag} = \frac{\arctan(\omega\tau)}{\omega}
+$$ (eq-sine-response)
+
+```{list-table} Response of a first-order floor to a heating demand that swings over 24 hours
+:header-rows: 1
+:label: tab-floor-daily
+
+* - Time constant $\tau$
+  - Share of the swing delivered
+  - Time lag
+* - 1 h (light floor)
+  - 97 %
+  - 1.0 h
+* - 2 h
+  - 89 %
+  - 1.8 h
+* - 6 h
+  - 54 %
+  - 3.8 h
+* - 12 h (heavy floor)
+  - 30 %
+  - 4.8 h
+```
+
+The light floor follows the daily swing almost fully, one hour late. The heavy floor flattens it to a third and shifts it by nearly five hours. Heat asked for at 04:00, the coldest hour, is delivered around 09:00, just as the sun takes over. A lag of a quarter of the period is the worst case: the floor then heats hardest when the demand is changing from heating to cooling. This is why heating demand at night turns into overheating during the day.
+
+The lag in {numref}`tab-floor-daily` is for the floor alone. The wax thermostat's dead time and stroke, the room's own heat capacity and the controller all add to it, as the section on control shows.
 
 ### The room has a time constant too
 
@@ -333,7 +401,7 @@ Several strategies reduce the problem, but none of them removes it:
 - **Low supply temperature and self-regulation.** With the supply only a few kelvin above the room, the floor delivers less when the room warms up, even with the valve open.
 - **Heating stop.** Stop heating above an outdoor temperature limit, for example 12–15 °C, and use a deadband between the heating and cooling setpoints.
 - **Anticipating the sun.** Lower the setpoint in the morning on sunny days, using a weather forecast or model predictive control.
-- **Shading and ventilative cooling.** Remove the solar gain or the surplus heat (see chapter 2).
+- **Shading and ventilative cooling.** Remove the solar gain or the surplus heat (see chapter 5).
 - **Floor cooling.** The same pipes can cool by 20–40 W/m², limited by the dew point and a minimum floor surface temperature of about 19–20 °C. But the floor is just as slow when cooling.
 
 The conclusion is that a heat emitter with a long time lag is a poor match for a house whose heating demand is small and changes within hours. A fast emitter, such as heating through the ventilation air or a small convector, can switch off at the moment the sun starts to heat the room.
@@ -342,7 +410,7 @@ The conclusion is that a heat emitter with a long time lag is a poor match for a
 
 In buildings with several floors or apartments, one riser pump often feeds a manifold on each floor, each through its own shunt ({numref}`fig-riser-shunts`). The shunt pump circulates water through the floor loops. A thermostatic valve on the return limits the supply temperature: when the sensor bulb gets too warm, it throttles the water returned to the riser, so less hot water is drawn in and more return water is mixed back through the bypass. The check valve stops riser water from flowing backwards through the bypass into the return.
 
-:::{figure} figures/ch05/riser-shunts.*
+:::{figure} figures/ch03/riser-shunts.*
 :label: fig-riser-shunts
 :alt: Schematic of a riser fed by a heat pump and a riser pump. On each of two floors, a branch from the riser supply passes a bypass junction, a shunt pump and a sensor bulb before reaching a supply manifold with three connections. The return manifold has a wax thermostat on each connection. The return passes the bypass junction and a 2-way thermostatic valve, connected to the sensor bulb by a capillary, before rejoining the riser return. The bypass between return and supply has a check valve. One floor loop is drawn in full.
 :width: 100%
@@ -354,7 +422,7 @@ The check valve in the bypass is spring loaded and needs a certain pressure diff
 
 A riser pump in proportional-pressure mode lowers its head as the flow falls (point C), which makes the problem much smaller. A check valve with a low opening pressure also helps.
 
-:::{figure} figures/ch05/riser-pump-curve.*
+:::{figure} figures/ch03/riser-pump-curve.*
 :label: fig-riser-pump-curve
 :alt: Pump diagram with the flow drawn from the riser on the horizontal axis and differential pressure on the vertical axis. A constant-speed riser pump curve falls slowly from 45 kPa at zero flow. A proportional-pressure curve rises linearly from about 20 kPa to the same design point at 600 litres per hour and 41 kPa. Two system curves are shown, one for design and a steep one for low load. A dashed line 10 kPa above the constant-speed curve marks the pressure the thermostatic valve must absorb before the check valve opens. Point B at low load on the constant-speed curve is at about 45 kPa, and point C on the proportional-pressure curve is at about 23 kPa.
 :width: 90%
@@ -370,7 +438,7 @@ Riser pump at design (A) and at low load with constant speed (B) and proportiona
 
 The model is an RC network ({numref}`fig-rc-network`). The room is one node, and the floor is split into thin layers of about 2 mm, each a node with its own heat capacity. The water reaches the floor at the pipe plane.
 
-:::{figure} figures/ch05/rc-network.*
+:::{figure} figures/ch03/rc-network.*
 :label: fig-rc-network
 :alt: RC network of the model. The room node is connected to the outdoor temperature through the resistance one over H loss, has the heat capacity C r, receives solar and internal gains and loses vented heat. Below it, a chain of resistances and capacitances represents the floor layers from the surface to an adiabatic underside. The two nodes either side of the pipe plane are connected to the supply water temperature through the water conductance g w, which the wax thermostat switches.
 :width: 75%
