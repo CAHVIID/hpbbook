@@ -45,7 +45,7 @@ The future files are made in an unusual way. Climate models give only daily temp
 Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Danish design reference years at Sjælsmark: the old and new present-day files and the four RCP4.5 projections. The dashed line marks 26 °C.
 ```
 
-```{list-table} Annual indicators of the Danish design reference years, computed from the EPW files.
+```{list-table} Annual indicators of the Danish design reference years, computed from the EPW files. Enthalpy is the annual mean total specific enthalpy of the outdoor air per kg dry air, h = 1.006·T + x·(2501 + 1.86·T), with the humidity ratio x found from air temperature, relative humidity and pressure.
 :name: tab-dry-summary
 :header-rows: 1
 
@@ -57,6 +57,7 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - Hours above 26 °C
   - Global radiation (kWh/m²)
   - Mean RH (%)
+  - Mean enthalpy (kJ/kg)
 * - DRY 2001–2010
   - −15.0
   - 8.1
@@ -65,6 +66,7 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 28
   - 1,038
   - 83
+  - 23.1
 * - DRY 2011–2023 (2025)
   - −7.6
   - 9.6
@@ -73,6 +75,7 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 37
   - 1,023
   - 81
+  - 25.6
 * - RCP4.5, 2035–2054
   - −8.1
   - 9.9
@@ -81,6 +84,7 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 48
   - 1,017
   - 82
+  - 26.4
 * - RCP4.5, 2045–2064
   - −8.1
   - 10.0
@@ -89,6 +93,7 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 80
   - 1,027
   - 82
+  - 26.6
 * - RCP4.5, 2055–2074
   - −8.1
   - 10.3
@@ -97,6 +102,7 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 90
   - 1,030
   - 81
+  - 27.1
 * - RCP4.5, 2080–2099
   - −8.1
   - 10.1
@@ -105,6 +111,7 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
   - 90
   - 1,019
   - 81
+  - 26.6
 ```
 
 Four things stand out:
