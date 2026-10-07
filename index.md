@@ -1,6 +1,14 @@
-# Cookbook for High Performance Buildings
+# High Performance Buildings course
 
-Course textbook for High Performance Buildings (41463).
+Background textbook for High Performance Buildings (41463).
+
+Work in progress.
+
+Separated into Parts that reflects the course assignments.
+
+There are code snippets (apps) embedded into the textbook. The intention of the apps is not to be accurate, but to build virtual experimental tools that are valuable in a learning environment.
+
+**None of the code has been verified, and must be used carefully (2026-10-07)**
 
 ## Contents
 
