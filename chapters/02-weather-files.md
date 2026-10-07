@@ -1,4 +1,4 @@
-# Weather files and future weather
+# Future climate and weather files
 
 <!--
 ## Learning objectives
@@ -15,7 +15,7 @@ After this chapter you can:
 
 ## 1. Introduction
 
-*Outline:* the weather file is the input that decides whether a building passes or fails summer comfort, and buildings designed today will still stand in 2080. The course row house is the running case.
+Future climate changes and given the life span of buildings, they need to be designed for that. This chapter gives an overview of the challenges.
 
 ## 2. What is in a weather file
 
