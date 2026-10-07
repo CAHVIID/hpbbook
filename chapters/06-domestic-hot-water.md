@@ -79,7 +79,7 @@ $$
 \Phi = \rho\,\dot V\,c_p\,(\theta - \theta_c)
 $$ (eq-dhw-power)
 
-{numref}`tab-dhw-tappings` shows the energy and the power for some typical tappings. A shower at 8 L/min needs about 17 kW while it runs, and filling a bath needs about 25 kW.
+{numref}`tab-dhw-tappings` shows the energy and the power for some typical tappings. A shower at 8 L/min needs about 17 kW while it runs, and filling a bathtub needs about 25 kW.
 
 :::{table} Energy and power for typical tappings, with cold water at 10 °C.
 :label: tab-dhw-tappings
@@ -90,10 +90,10 @@ $$ (eq-dhw-power)
 | Washing hands | 5 | 35 | 3 | 0.09 | 8.7 |
 | Washing up by hand | 6 | 45 | 10 | 0.40 | 14.5 |
 | Shower, 8 minutes | 8 | 40 | 64 | 2.2 | 16.6 |
-| Bath | 12 | 40 | 120 | 4.2 | 24.9 |
+| Bathtub | 12 | 40 | 120 | 4.2 | 24.9 |
 :::
 
-These powers are far larger than anything else in the heating system of a low-energy house. The whole house may need only 2–3 kW of space heating on the coldest day, and a heat pump sized for that cannot heat a shower as it runs. There are two ways out:
+These powers are far larger than anything else in the heating system of a low-energy house. The whole house may need only 3-5 kW of space heating on the coldest day, and a heat pump sized for that cannot heat a shower as it runs. There are two ways out:
 
 - **Instantaneous heating.** District heating can deliver 30–40 kW through a heat exchanger in a flat station, so the water is heated as it is used and nothing is stored.
 - **Storage.** A heat pump or a small boiler heats a tank slowly, over hours, and the tank delivers the high power during the tapping. The tank decouples the power the heat source must deliver from the power the user draws.
@@ -109,19 +109,6 @@ These powers are far larger than anything else in the heating system of a low-en
 - The Be18 calculation value is 13 kWh/m² per year, about 2000 kWh per year for a 150 m² house.
 - A shower draws about 15–20 kW while it runs, several times the design heat load of a low-energy house.
 :::
-
-## A stratified tank simulator
-
-A hot water tank is not simply full or empty. Hot water floats on top of cold water, and a well-designed tank keeps the two apart, with a thin mixing zone, the thermocline, between them. Hot water is drawn from the top while cold mains water flows in at the bottom, so the thermocline moves up as the tank is emptied. The app below follows this hour by hour for one day.
-
-The tank is split into horizontal layers. A heat pump charges it through an external heat exchanger: the charging loop takes water from the bottom of the tank and returns it at mid-height, and there is no circulation loop. A thermostat starts the heat pump when the sensor falls below the setpoint, and it can only run in the hours you allow. The tab *Tapping profiles* shows the predefined days of hot water use, with their sources, and lets you import a profile made with DHWcalc.
-
-```{anywidget} code/dhw-tank.mjs
-{}
-```
-
-The app runs in your browser. The same model in Python, with comments on every assumption, can be downloaded here: {download}`dhw_tank.py <code/dhw_tank.py>`. Running it prints the daily heat of each profile and the results for the default inputs.
-
 
 ## Sizing the tank as a thermal battery
 
@@ -201,3 +188,15 @@ In both cases the hand estimate is close: the tank it gives delivers every showe
 - Charging whenever needed, with a thermostat, needs about 20–25 L per person, enough to cover the largest peak.
 - The heat pump must deliver at least the daily heat divided by the number of allowed hours, plus a margin.
 :::
+
+## A stratified tank simulator
+
+A hot water tank is not simply full or empty. Hot water floats on top of cold water, and a well-designed tank keeps the two apart, with a thin mixing zone, the thermocline, between them. Hot water is drawn from the top while cold mains water flows in at the bottom, so the thermocline moves up as the tank is emptied. The app below follows this hour by hour for one day.
+
+The tank is split into horizontal layers. A heat pump charges it through an external heat exchanger: the charging loop takes water from the bottom of the tank and returns it at mid-height, and there is no circulation loop. A thermostat starts the heat pump when the sensor falls below the setpoint, and it can only run in the hours you allow. The tab *Tapping profiles* shows the predefined days of hot water use, with their sources, and lets you import a profile made with DHWcalc.
+
+```{anywidget} code/dhw-tank.mjs
+{}
+```
+
+The app runs in your browser. The same model in Python, with comments on every assumption, can be downloaded here: {download}`dhw_tank.py <code/dhw_tank.py>`. Running it prints the daily heat of each profile and the results for the default inputs.
