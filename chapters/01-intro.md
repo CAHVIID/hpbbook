@@ -15,7 +15,7 @@ Near-zero energy buildings (NZEB) are not difficult to design - we know and have
 
 ## Work in progress
 
-Sometimes the reader will see a box like the following. This means that the content is not completely assessed yet and cannot be taken as true!
+Sometimes the reader will see a box like the following. This means that the content is **not completely assessed yet and cannot be taken as true!**
 
 ```{caution} Confirmation pending
 Some text here
