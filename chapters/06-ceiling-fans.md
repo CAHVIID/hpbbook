@@ -1,5 +1,6 @@
 # Ceiling fans
 
+<!--
 ## Learning objectives
 
 After this chapter you can:
@@ -8,6 +9,7 @@ After this chapter you can:
 - size and place a ceiling fan for a room from a datasheet
 - set up a temperature-stepped control strategy where the fan runs before any active cooling
 - estimate the change in PMV and the fan energy for a room, and compare it with air-conditioning
+-->
 
 ## Introduction
 
