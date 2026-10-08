@@ -1,0 +1,87 @@
+{
+  "materials": {
+    "Concrete": 1.7,
+    "Mineral wool": 0.037
+  },
+  "rectangles": [
+    {
+      "x0": 0.0,
+      "y0": 0.0,
+      "x1": 0.2,
+      "y1": 1.4,
+      "material": "Mineral wool"
+    },
+    {
+      "x0": 0.0,
+      "y0": 0.0,
+      "x1": 1.4,
+      "y1": 0.2,
+      "material": "Mineral wool"
+    },
+    {
+      "x0": 0.2,
+      "y0": 0.2,
+      "x1": 0.4,
+      "y1": 1.4,
+      "material": "Concrete"
+    },
+    {
+      "x0": 0.2,
+      "y0": 0.2,
+      "x1": 1.4,
+      "y1": 0.4,
+      "material": "Concrete"
+    }
+  ],
+  "boundaries": [
+    {
+      "name": "Inside",
+      "kind": "convective",
+      "T": 20.0,
+      "R": 0.13,
+      "q": 0.0
+    },
+    {
+      "name": "Outside",
+      "kind": "convective",
+      "T": 0.0,
+      "R": 0.04,
+      "q": 0.0
+    }
+  ],
+  "edges": [
+    {
+      "boundary": "Outside",
+      "x0": 0,
+      "y0": 0,
+      "x1": 0,
+      "y1": 1.4
+    },
+    {
+      "boundary": "Outside",
+      "x0": 0,
+      "y0": 0,
+      "x1": 1.4,
+      "y1": 0
+    },
+    {
+      "boundary": "Inside",
+      "x0": 0.4,
+      "y0": 0.4,
+      "x1": 0.4,
+      "y1": 1.4
+    },
+    {
+      "boundary": "Inside",
+      "x0": 0.4,
+      "y0": 0.4,
+      "x1": 1.4,
+      "y1": 0.4
+    }
+  ],
+  "mesh": {
+    "h_min": 0.002,
+    "h_max": 0.025,
+    "ratio": 1.3
+  }
+}
