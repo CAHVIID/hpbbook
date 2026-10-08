@@ -77,6 +77,7 @@ function solveModel(model) {
       for (let i = i0; i < nx && xc[i] < r.x1; i++) { owner[j * nx + i] = ri; k[j * nx + i] = r.lambda; }
   });
   Object.assign(res, { dx, dy, xc, yc, owner, k });
+  if (model.meshOnly) return res;
   const act = c => k[c] === k[c];
 
   const ord = new Int32Array(n);
@@ -328,7 +329,6 @@ const CSS = `
 .tb table.flows td.num, .tb table.flows th.num { text-align: right; }
 .tb .balance { font-size: 0.72rem; color: var(--muted); font-family: var(--f-mono); }
 .tb textarea { width: 100%; min-height: 110px; font-family: var(--f-mono); font-size: 0.7rem; background: var(--board); border: 1px solid var(--line); border-radius: 6px; padding: 6px; resize: vertical; }
-.tb details summary { cursor: pointer; font-size: 0.8rem; color: var(--muted); }
 .tb .btns { display: flex; gap: 6px; flex-wrap: wrap; }
 .tb .msg { font-size: 0.78rem; color: var(--muted); }
 .tb .msg.err { color: var(--bad); }
@@ -488,15 +488,6 @@ const MARKUP = `
         <button class="btn" id="open-btn" type="button">Open case file</button>
         <input id="file-in" type="file" accept=".json,application/json" hidden>
       </div>
-      <details>
-        <summary>Show or paste the case as JSON</summary>
-        <div class="btns" style="margin:6px 0">
-          <button class="btn" id="exp-btn" type="button">Show JSON</button>
-          <button class="btn" id="copy-btn" type="button">Copy</button>
-          <button class="btn" id="imp-btn" type="button">Load pasted JSON</button>
-        </div>
-        <textarea id="json" spellcheck="false" aria-label="Case JSON" placeholder="Paste a case here, then Load pasted JSON."></textarea>
-      </details>
       <div class="msg" id="json-msg"></div>
     </section>
   </div>
@@ -577,7 +568,7 @@ function render({ model, el: host, standalone = false }) {
   let S = cornerExample();
   function persist() { /* the book widget keeps no state between visits */ }
 
-  let version = 1, R = null, needSolve = true, needRender = true;
+  let version = 1, R = null, M = null, needSolve = true, needRender = true;
   const matById = id => S.materials.find(m => m.id === id);
   const bcById = id => S.bcTypes.find(b => b.id === id);
   function changed(structure) {
@@ -785,6 +776,12 @@ function render({ model, el: host, standalone = false }) {
   function removeEdge(id) { S.edges = S.edges.filter(e => e.id !== id); if (S.selEdge === id) S.selEdge = null; changed(true); }
   function selectEdge(id) {
     S.selEdge = id; if (id !== null) S.selected = null;
+    const e = S.edges.find(x => x.id === id);
+    if (e && bcById(e.bc) && S.activeBC !== e.bc) {   // highlight the edge's boundary condition
+      S.activeBC = e.bc; buildBCs(); persist();
+      const card = $("bcn-" + e.bc)?.closest(".bc-card");
+      if (card) card.scrollIntoView({ block: "nearest" });
+    }
     buildLayers(); buildEdges(); syncSelected(); syncEdgeFields(); needRender = true; tick();
   }
   function syncEdgeFields() {
@@ -950,32 +947,11 @@ function render({ model, el: host, standalone = false }) {
       activeMat: mats[0]?.id ?? null, activeBC: bcTypes[0].id,
     });
   }
-  $("exp-btn").addEventListener("click", () => { $("json").value = JSON.stringify(toCase(), null, 2); flash("Case shown below."); });
-  $("copy-btn").addEventListener("click", () => {
-    const txt = JSON.stringify(toCase(), null, 2); $("json").value = txt;
-    const fallback = () => { $("json").select(); flash("Select the text below and copy it."); };
-    try { navigator.clipboard.writeText(txt).then(() => flash("Copied to clipboard."), fallback); } catch (e) { fallback(); }
-  });
-  // ---- stand-alone app: one HTML file with this module and the current model inside
-  const appBtn = $("app-btn");
-  if (standalone) appBtn.hidden = true;
-  appBtn.addEventListener("click", async () => {
-    try {
-      const src = await (await fetch(import.meta.url)).text();
-      const blob = new Blob([standaloneHtml(src, JSON.stringify(toCase()))], { type: "text/html" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob); a.download = "thermal-bridge-lab.html";
-      root.append(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-      flashTip("Saved thermal-bridge-lab.html. Double-click it to run the app on its own, also offline.");
-    } catch (e) { flashTip("Could not make the stand-alone file: " + e.message); }
-  });
-
   $("save-btn").addEventListener("click", () => {
     const blob = new Blob([JSON.stringify(toCase(), null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob); a.download = "thermal-bridge-case.json";
-    root.append(a); a.click(); a.remove();
+    document.body.append(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     flash("Saved thermal-bridge-case.json to your downloads.");
   });
@@ -984,15 +960,11 @@ function render({ model, el: host, standalone = false }) {
     const f = $("file-in").files[0]; if (!f) return;
     const rd = new FileReader();
     rd.onload = () => {
-      try { fromCase(JSON.parse(rd.result)); afterLoad(); flash(`Opened ${f.name}.`); $("json").value = ""; }
+      try { fromCase(JSON.parse(rd.result)); afterLoad(); flash(`Opened ${f.name}.`); }
       catch (e) { flash(`Could not open ${f.name}: ${e.message}`, true); }
       $("file-in").value = "";
     };
     rd.readAsText(f);
-  });
-  $("imp-btn").addEventListener("click", () => {
-    try { fromCase(JSON.parse($("json").value)); afterLoad(); flash("Case loaded."); }
-    catch (e) { flash("Could not load: " + e.message, true); }
   });
   function loadExample(fn, msg) {
     const keep = { live: S.live, display: S.display, iso: S.iso };
@@ -1008,15 +980,24 @@ function render({ model, el: host, standalone = false }) {
   }
 
   // ------------------------------------------------------------------ solve + results
-  function runSolve() {
+  function buildModel() {
     const bcIndex = new Map(S.bcTypes.map((b, i) => [b.id, i]));
-    const model = {
+    return {
       rects: S.rects.map(r => ({ x0: r.x0, y0: r.y0, x1: r.x1, y1: r.y1, lambda: matById(r.mat)?.lambda ?? NaN })),
       bcs: S.bcTypes.map(b => ({ kind: b.kind, T: b.T, R: b.R, q: b.q })),
       segs: S.edges.map(e => ({ orient: e.orient, c: e.c, a0: e.a0, a1: e.a1, bc: bcIndex.get(e.bc) ?? -1 })),
       mesh: S.mesh,
     };
-    R = solveModel(model);
+  }
+  // the mesh alone is cheap: show it even when results wait for Solve
+  function runMesh() {
+    M = solveModel({ ...buildModel(), meshOnly: true });
+    M.version = version; M.rectIds = S.rects.map(r => r.id);
+    $("mesh-count").textContent = M.nx ? `${M.nx} × ${M.ny} = ${(M.nx * M.ny).toLocaleString("en")} cells` : "";
+  }
+  const meshNow = () => (R && R.version === version && R.owner) ? R : (M && M.version === version && M.owner) ? M : null;
+  function runSolve() {
+    R = solveModel(buildModel());
     R.version = version; R.rectIds = S.rects.map(r => r.id); R.bcIds = S.bcTypes.map(b => b.id);
     needSolve = false; showResults(); buildEdges(); updateSolveBtn();
   }
@@ -1101,15 +1082,16 @@ function render({ model, el: host, standalone = false }) {
     drawGrid();
     const fresh = R && R.version === version;
     const hasField = fresh && !R.error && R.T;
-    const hasMesh = fresh && R.owner;
+    const hasMesh = !!meshNow();
     const d = S.display;
     if (d === "geometry" || (d === "mesh" && !hasMesh) || ((d === "temperature" || d === "flux") && !hasField)) drawGeometry();
-    else if (d === "mesh") drawMesh();
+    else if (d === "mesh") drawMesh(meshNow());
     else if (d === "temperature") { drawField(R.T, R.Tmin, R.Tmax, CM_T, false); if (S.iso) drawIsotherms(); }
     else { drawField(R.qm, R.qlo, R.qmax, CM_Q, true); drawArrows(); }
     drawOutlines();
     if (fresh && R.faces) drawFreeSurfaces();
     drawEdges();
+    drawOrigin();
     drawDraft();
     drawScaleBar();
     updateStatus(!fresh);
@@ -1134,14 +1116,14 @@ function render({ model, el: host, standalone = false }) {
       ctx.fillStyle = m.color; ctx.fillRect(a, b, Math.max(cx - a, 1), Math.max(cy - b, 1));
     }
   }
-  function screenLines() {
-    const sx = new Float64Array(R.xl.length), sy = new Float64Array(R.yl.length);
-    for (let i = 0; i < sx.length; i++) sx[i] = view.ox + R.xl[i] * view.scale;
-    for (let j = 0; j < sy.length; j++) sy[j] = view.oy - R.yl[j] * view.scale;
+  function screenLines(G) {
+    const sx = new Float64Array(G.xl.length), sy = new Float64Array(G.yl.length);
+    for (let i = 0; i < sx.length; i++) sx[i] = view.ox + G.xl[i] * view.scale;
+    for (let j = 0; j < sy.length; j++) sy[j] = view.oy - G.yl[j] * view.scale;
     return [sx, sy];
   }
-  function cellLoop(fn) {
-    const [sx, sy] = screenLines(), { nx, ny } = R;
+  function cellLoop(fn, G = R) {
+    const [sx, sy] = screenLines(G), { nx, ny } = G;
     for (let j = 0; j < ny; j++) {
       const top = sy[j + 1], bot = sy[j];
       if (bot < 0 || top > view.h) continue;
@@ -1152,11 +1134,11 @@ function render({ model, el: host, standalone = false }) {
       }
     }
   }
-  function drawMesh() {
-    const cols = R.rectIds.map(id => { const r = S.rects.find(x => x.id === id); const m = r && matById(r.mat); return m ? m.color : null; });
-    cellLoop((c, x, y, w, h) => { const o = R.owner[c]; if (o >= 0 && cols[o]) { ctx.fillStyle = cols[o]; ctx.fillRect(x, y, w + 0.5, h + 0.5); } });
+  function drawMesh(G) {
+    const cols = G.rectIds.map(id => { const r = S.rects.find(x => x.id === id); const m = r && matById(r.mat); return m ? m.color : null; });
+    cellLoop((c, x, y, w, h) => { const o = G.owner[c]; if (o >= 0 && cols[o]) { ctx.fillStyle = cols[o]; ctx.fillRect(x, y, w + 0.5, h + 0.5); } }, G);
     ctx.strokeStyle = "rgba(20,25,30,0.45)"; ctx.lineWidth = 0.6; ctx.beginPath();
-    cellLoop((c, x, y, w, h) => { if (R.owner[c] >= 0) ctx.rect(x, y, w, h); });
+    cellLoop((c, x, y, w, h) => { if (G.owner[c] >= 0) ctx.rect(x, y, w, h); }, G);
     ctx.stroke();
   }
   function drawField(arr, lo, hi, cm, log) {
@@ -1309,6 +1291,24 @@ function render({ model, el: host, standalone = false }) {
       chip(`${mm(e.a1 - e.a0)} mm`, (a + c) / 2 + 10, (bb + d) / 2 - 8, b ? b.color : acc, "left");
     }
   }
+  function drawOrigin() {
+    // the point (0,0) with short x and y arrows, so coordinates have a visible reference
+    const [ox, oy] = W2S(0, 0);
+    if (ox < -40 || ox > view.w + 40 || oy < -40 || oy > view.h + 40) return;
+    const ink = cssVar("--accent"), L = 40;
+    ctx.save();
+    ctx.strokeStyle = ink; ctx.fillStyle = ink; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox + L, oy); ctx.moveTo(ox, oy); ctx.lineTo(ox, oy - L); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ox + L + 6, oy); ctx.lineTo(ox + L - 2, oy - 4); ctx.lineTo(ox + L - 2, oy + 4); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(ox, oy - L - 6); ctx.lineTo(ox - 4, oy - L + 2); ctx.lineTo(ox + 4, oy - L + 2); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.arc(ox, oy, 3.5, 0, Math.PI * 2); ctx.fillStyle = cssVar("--board"); ctx.fill(); ctx.stroke();
+    ctx.font = `500 11px ${cssVar("--f-mono")}`; ctx.fillStyle = ink;
+    ctx.fillText("x", ox + L + 9, oy + 4); ctx.fillText("y", ox - 3, oy - L - 10);
+    const t = "(0, 0)", tw = ctx.measureText(t).width;
+    ctx.fillStyle = cssVar("--panel"); ctx.fillRect(ox - tw - 10, oy + 5, tw + 6, 14);
+    ctx.fillStyle = ink; ctx.fillText(t, ox - tw - 7, oy + 16);
+    ctx.restore();
+  }
   function drawScaleBar() {
     const opts = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2];
     const L = opts.find(v => v * view.scale >= 60) || 2, px = L * view.scale;
@@ -1327,7 +1327,8 @@ function render({ model, el: host, standalone = false }) {
   function updateLegend(hasField) {
     const lg = $("legend");
     if (S.display === "mesh") {
-      lg.textContent = R && R.nx && R.version === version ? `Mesh: ${R.nx} × ${R.ny} cells, smallest ${fmt(Math.min(...R.dx, ...R.dy) * 1000, 2)} mm` : "";
+      const G = meshNow();
+      lg.textContent = G ? `Mesh: ${G.nx} × ${G.ny} cells, smallest ${fmt(Math.min(...G.dx, ...G.dy) * 1000, 2)} mm` : "";
       return;
     }
     if (!hasField || S.display === "geometry") { lg.textContent = "Dashed grey surfaces have no boundary drawn and are adiabatic."; return; }
@@ -1395,8 +1396,8 @@ function render({ model, el: host, standalone = false }) {
   }
   // click on a surface: find the straight exposed face under the pointer, corner to corner
   function surfaceRunAt(sx, sy) {
-    if (!R || !R.owner || R.version !== version) return null;
-    const { xl, yl, nx, ny, owner } = R;
+    const G = meshNow(); if (!G) return null;
+    const { xl, yl, nx, ny, owner } = G;
     const solid = (i, j) => i >= 0 && j >= 0 && i < nx && j < ny && owner[j * nx + i] >= 0;
     const [x, y] = S2W(sx, sy), tol = 8 / view.scale;
     let best = null;
@@ -1496,7 +1497,7 @@ function render({ model, el: host, standalone = false }) {
     }
     if (d.type === "edge") {
       drag = d; let e = d.moved ? draftEdge() : surfaceRunAt(d.sx0, d.sy0); drag = null;
-      if (!d.moved && !e) flashTip(R && R.version === version ? "No surface here. Click on the edge between material and empty space." : "Waiting for the mesh. Try again in a moment.");
+      if (!d.moved && !e) flashTip(meshNow() ? "No surface here. Click on the edge between material and empty space." : "Waiting for the mesh. Try again in a moment.");
       if (e) {
         const ne = { id: nid(), bc: S.activeBC, orient: e.orient, c: e.c, a0: e.a0, a1: e.a1 };
         S.edges.push(ne); S.selEdge = ne.id; S.selected = null; changed(true); return;
@@ -1559,6 +1560,7 @@ function render({ model, el: host, standalone = false }) {
     requestAnimationFrame(() => {
       frameQueued = false;
       if (needSolve && S.live) { runSolve(); needRender = true; }
+      else if (!S.live && !(M && M.version === version) && !(R && R.version === version)) { runMesh(); needRender = true; }
       updateSolveBtn();
       if (needRender) render();
     });
