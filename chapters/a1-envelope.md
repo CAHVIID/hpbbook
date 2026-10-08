@@ -129,7 +129,11 @@ The app below runs the calculation in your browser and updates the results while
 6. **Read the results.** Switch between *Geometry*, *Mesh*, *Temperature* and *Heat flux*, and hover over the board to read the temperature and heat flux at any point. The results panel gives the heat flow through each boundary, $L_{2D}$ and $f_{Rsi}$, taken from the warmest boundary condition, and an energy balance that should be close to zero.
 7. **Save your work.** *Save case file* downloads the model as a JSON file and *Open case file* loads one again. The Python script reads the same files.
 
-Press *Full screen* to give the app the whole screen, with the board on the left and the panels on the right; press *Exit full screen* or **Esc** to return to the book. Use the mouse wheel to zoom and drag on empty space to pan. *Delete* removes the selected rectangle or edge. If the app becomes slow on a fine mesh, untick *Live* and press *Solve* after each change.
+Use the mouse wheel to zoom and drag on empty space to pan. *Delete* removes the selected rectangle or edge. If the app becomes slow on a fine mesh, untick *Live* and press *Solve* after each change.
+
+### The stand-alone app
+
+The app also runs on its own, outside the book, as a single HTML file: {download}`thermal-bridge-lab.html <code/thermal-bridge-lab.html>`. Save it anywhere and double-click it. It opens in your web browser with the whole window for the app, needs no installation and works offline. The button *Download stand-alone app* in the app above saves the same file with your current model in it, so you can carry on working outside the book. Save your work with *Save case file*; the stand-alone app does not remember it when you close the window.
 
 ### The Python version
 
