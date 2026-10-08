@@ -310,6 +310,18 @@ const CSS = `
 .tb .msg.err { color: var(--bad); }
 .tb [hidden] { display: none !important; }
 @media (max-width: 600px) { .tb .board { height: 420px; } .tb .tip { display: none; } }
+.tb.full { position: fixed; inset: 0; z-index: 2147483000; background: var(--bg); padding: 12px 16px;
+  display: grid; grid-template-columns: minmax(0, 1fr) 360px; grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 8px 14px; overflow: hidden; }
+.tb.full:fullscreen { width: 100%; height: 100%; }
+.tb.full > .toolbar, .tb.full > .board, .tb.full > .footer-bar { grid-column: 1; }
+.tb.full > .board { height: auto; min-height: 0; }
+.tb.full > .panels { grid-column: 2; grid-row: 1 / -1; grid-template-columns: 1fr; overflow: auto; align-content: start; min-height: 0; }
+.tb #fs-btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+@media (max-width: 900px) {
+  .tb.full { display: flex; flex-direction: column; overflow: auto; }
+  .tb.full > .board { height: 70vh; flex: none; }
+}
 `;
 
 const MARKUP = `
@@ -333,6 +345,7 @@ const MARKUP = `
   <label class="check"><input type="checkbox" id="live" checked> Live</label>
   <button class="btn primary" id="solve-btn" type="button" disabled>Solve</button>
   <button class="btn" id="fit-btn" type="button">Fit view</button>
+  <button class="btn" id="fs-btn" type="button" aria-pressed="false" title="Open the app full screen (Esc to leave)">Full screen</button>
 </div>
 <div class="toolbar">
   <div class="seg" role="group" aria-label="Show">
@@ -862,6 +875,28 @@ function render({ model, el: host }) {
     const fallback = () => { $("json").select(); flash("Select the text below and copy it."); };
     try { navigator.clipboard.writeText(txt).then(() => flash("Copied to clipboard."), fallback); } catch (e) { fallback(); }
   });
+  // ---- full screen: the browser's full screen where allowed, otherwise a full-window overlay
+  const fsBtn = $("fs-btn");
+  const isFull = () => root.classList.contains("full");
+  function setFull(on) {
+    root.classList.toggle("full", on);
+    fsBtn.textContent = on ? "Exit full screen" : "Full screen";
+    fsBtn.setAttribute("aria-pressed", String(on));
+    document.documentElement.style.overflow = on ? "hidden" : "";
+    requestAnimationFrame(() => { resize(); fitView(); needRender = true; tick(); });
+  }
+  fsBtn.addEventListener("click", () => {
+    if (isFull()) {
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => setFull(false));
+      else setFull(false);
+      return;
+    }
+    setFull(true);
+    if (root.requestFullscreen) root.requestFullscreen().catch(() => { /* overlay stays */ });
+  });
+  document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && isFull()) setFull(false); });
+  root.addEventListener("keydown", e => { if (e.key === "Escape" && isFull() && !document.fullscreenElement) setFull(false); });
+
   $("save-btn").addEventListener("click", () => {
     const blob = new Blob([JSON.stringify(toCase(), null, 2)], { type: "application/json" });
     const a = document.createElement("a");
