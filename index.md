@@ -15,7 +15,11 @@ There are code snippets (apps) embedded into the textbook. The intention of the 
 1. [Intro](chapters/01-intro.md)
 2. [Weather](chapters/02-weather-files.md)
 
-**Part A: Compactness and envelope** (not written yet)
+**Part A: Compactness and envelope** (in progress)
+
+- [The building envelope](chapters/a1-envelope.md), with the Thermal Bridge Lab app
+- [Windows](chapters/a2-windows.md)
+- [Glazing](chapters/a3-glazing.md)
 
 **Part B: Ventilation** (not written yet)
 
