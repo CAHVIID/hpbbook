@@ -162,6 +162,16 @@ A wax thermostat is an on/off valve. A small heater warms a wax capsule, the wax
 - **PWM control.** The room unit runs a PI controller and turns its output into a duty cycle. With a 15–20 min cycle and 40 % output, the valve is open for about 6–8 min of each cycle. On average this behaves like a valve that is 40 % open.
 ```
 
+{numref}`fig-pwm-principle` shows how PWM works. The room unit compares the measured room temperature with a triangular signal that sweeps the proportional band once per cycle. The valve is open while the room is colder than the triangle. Below the band the valve stays open the whole cycle, and above the band it stays closed. Inside the band, the colder the room, the longer the valve is open in each cycle.
+
+:::{figure} figures/ch03/pwm-principle.*
+:label: fig-pwm-principle
+:alt: Top, a room temperature curve wanders around a 21 °C setpoint inside a 1 K proportional band, crossed by a triangular signal with a 20 min period. Above the band the valve is always closed, below it always open. Bottom, the resulting valve signal is a series of open pulses whose length in each 20 min cycle varies from 18 % to 77 %, longest when the room is coldest.
+:width: 100%
+
+PWM control of a wax thermostat. The valve is open while the measured room temperature lies below the triangular signal. The dotted lines link one open pulse to the two crossings that start and end it. The percentages give the share of each cycle that the valve is open. Illustration with a 20 min cycle and a 1 K proportional band.
+:::
+
 PWM smooths the room temperature, but it does not remove the delay. The sensor measures the room, the valve acts on the water, and the floor lies in between. Whatever the controller decides, the floor delivers it over the next 0.5–1 h (light floor) or many hours (heavy floor). A controller that sees the room warming can close the valve, but it cannot take back the heat already stored in the floor.
 
 The interactive model below shows the consequence. With the default inputs, the choice between on/off and PI changes the result by a few percent. The choice between a light and a heavy floor changes it much more.
