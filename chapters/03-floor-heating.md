@@ -484,11 +484,17 @@ The same model in Python: {download}`room_cooldown.py <code/room_cooldown.py>`. 
 
 The model below simulates one room in a low-energy house with a light and a heavy floor ({numref}`fig-floor-sections`) over a cloudy spring day followed by a sunny one. The floor is controlled in three ways: an on/off room thermostat, a PI controller whose output is a PWM signal to the wax thermostat, and, for reference, an ideal heater that delivers exactly the heat needed without any delay. Windows are opened when the room gets too warm, and the heat removed this way is counted as heat vented.
 
-```{anywidget} code/floor-control.mjs
-{}
-```
+**[Open the control model in a new tab](code/floor-control.html)**. It runs in your browser and needs no installation. {numref}`fig-floor-control-app` shows it with the default inputs.
 
-The app runs in your browser. The same model in Python, with comments on every assumption, can be downloaded here: {download}`floor_control.py <code/floor_control.py>`. Running it prints the table for the default inputs. The equations are given at the end of the chapter, in {ref}`sec-floor-model-theory`.
+:::{figure} figures/ch03/floor-control-app.*
+:label: fig-floor-control-app
+:alt: Screenshot of the control model. Sliders for room and climate, supply water, room control and wax thermostat at the top. Below, four charts over 48 hours for the light floor: room temperature, heat flux at the floor surface, supply, return and floor surface temperature, and mass flow in the loop, each comparing the ideal heater, the on/off thermostat and the PI controller with PWM. A table at the bottom lists heating energy, heat vented and hours below and above the setpoint for the three controls.
+:width: 100%
+
+The control model with the default inputs, light floor. Open the model to change the inputs and to see the heavy floor.
+:::
+
+The same model in Python, with comments on every assumption, can be downloaded here: {download}`floor_control.py <code/floor_control.py>`. Running it prints the table for the default inputs. The equations are given at the end of the chapter, in {ref}`sec-floor-model-theory`.
 
 :::{admonition} Model assumptions
 :class: note
