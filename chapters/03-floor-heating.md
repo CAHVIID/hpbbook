@@ -83,6 +83,7 @@ For comfort, the mean floor surface temperature is limited to:
 - 35 °C in perimeter zones
 
 At 29 °C and a room at 20 °C, equation {eq}`eq-floor-flux` gives about 100 W/m², which is far more than a low-energy house needs.
+% @claude: add a graph here similar to the one from EN1264. Add EN1264 as source 
 
 Floor covering adds thermal resistance between the pipes and the room. Tiles add little, while wood and carpet add a lot, so a wooden floor needs a higher water temperature for the same output.
 
@@ -146,7 +147,7 @@ A hydronic floor heating installation. The controller sets the supply temperatur
 
 ## Control of floor heating
 
-Floor heating is controlled on two levels ({numref}`fig-hydronic-schematic`). The supply temperature follows a heating curve, set from the outdoor temperature. Each room then switches its own loop with a wax thermostat, driven by its room temperature sensor.
+Floor heating has two levels of control ({numref}`fig-hydronic-schematic`). The supply temperature follows a heating curve, set from the outdoor temperature. Each room then switches its own loop with a wax thermostat, driven by its room temperature sensor.
 
 <!-- :::{admonition} Control
 :class: Tip
@@ -156,13 +157,35 @@ Lower supply temperature will keep the loops more on, and vice versa.
 Low supply temperature increases self-regulation.
 ::: -->
 
-A wax thermostat is an on/off valve. 
 <!-- @claude: add a photo of a was thermostat here. Maybe use the one from the slides. Reference it in the text where appropriate -->
-A small heater warms a wax capsule, the wax expands and pushes the valve open. It takes 2–3 min before the valve starts to move and another 3–5 min to open fully, and about the same to close. It cannot hold an intermediate position for long, so the room unit controls it in one of two ways:
-```{note}
-- **On/off control.** The loop opens when the room is below the setpoint minus a hysteresis and closes when it is above the setpoint plus the hysteresis. Not used anymore
-- **PWM control.** The room unit runs a PI controller with a predefined duty cycle. If 40 % output is required and the cycle is 15 min, the valve is only (fully) open for about 6 min of each cycle. On average this behaves like a valve that is 40 % open.
-```
+A wax thermostat is an on/off valve. A small heater warms a wax capsule, the wax expands and pushes the valve open. It takes 2–3 min before the valve starts to move and another 3–5 min to open fully, and about the same to close.
+
+The wax thermostat cannot hold positions between fully open, and fully closed, so they are  controlled via pulse-width modulation.
+
+### On/off control.
+
+The loop opens when the room is below the setpoint minus a hysteresis and closes when it is above the setpoint plus the hysteresis. The valve response depends on how narrow or wide the proportional band was set by the user. A narrow proportional band causes the valve to respond "a lot" for even small deviations, a band too wide causes the valve to never quite respond as needed to close the deviation.
+
+{numref}`fig-proportional-band` compares three cases:
+- On/off control swings the room between about 20 and 21.3 °C, well outside the ±0.25 K hysteresis, because the floor keeps heating after the valve closes and keeps lagging after it opens
+- A narrow band settles close to the setpoint after a few damped oscillations.
+- A wide band gives a smooth response, but the room settles about 0.7 K below the setpoint.
+
+<!-- In this example the room needs more than 50 % output, and a proportional controller only gives more than 50 % when the room is below the setpoint. This remaining deviation is the offset. The I part of a PI controller removes it. -->
+
+:::{figure} figures/ch03/proportional-band.*
+:label: fig-proportional-band
+:alt: Left, controller output in percent against room temperature. On/off control jumps between 0 and 100 % with a ±0.25 K hysteresis around 21 °C. A 0.5 K proportional band gives a steep line and a 4 K band a shallow line, both passing 50 % at the setpoint. Right, room temperature over 12 hours after a cold start at 18 °C. On/off control cycles between about 20 and 21.3 °C. The narrow band overshoots to the setpoint and settles with small damped oscillations just below it. The wide band rises smoothly and settles at about 20.3 °C, an offset of about 0.7 K below the setpoint.
+:width: 100%
+
+On/off control compared with a proportional controller with a narrow and a wide proportional band. a) Controller output against room temperature. The dashed line is the switching path when the room cools. b) Room temperature after a cold start. Simple room model with a light floor and a 12 min valve delay. The valve follows the controller output directly, so PWM is averaged out.
+:::
+
+
+### PWM control
+
+The room unit runs a PI controller with a predefined duty cycle. If 40 % output is required and the cycle is 15 min, the valve is only (fully) open for about 6 min of each cycle. On average this behaves like a valve that is 40 % open.
+
 
 <!-- > - **On/off control.** The loop opens when the room is below the setpoint minus a hysteresis and closes when it is above the setpoint plus the hysteresis. Not used anymore
 > - **PWM control.** The room unit runs a PI controller and turns its output into a duty cycle. With a 15–20 min cycle and 40 % output, the valve is open for about 6–8 min of each cycle. On average this behaves like a valve that is 40 % open. -->
@@ -179,13 +202,106 @@ A small heater warms a wax capsule, the wax expands and pushes the valve open. I
 PWM control of a wax thermostat. The valve is open while the measured room temperature lies below the triangular signal. The dotted lines link one open pulse to the two crossings that start and end it. The percentages give the share of each cycle that the valve is open. Illustration with a 20 min cycle and a 1 K proportional band.
 :::
 
-PWM smooths the room temperature, but it does not remove the delay. The sensor measures the room, the valve acts on the water, and the floor lies in between. Whatever the controller decides, the floor delivers it over the next 0.5–1 h (light floor) or many hours (heavy floor). A controller that sees the room warming can close the valve, but it cannot take back the heat already stored in the floor.
+PWM smooths the room temperature, but it does not remove the delay: the sensor measures the room, the valve acts on the water, but the thermal mass of the floor lies in between. Whatever the controller decides, the floor delivers it over the next 0.5–1 h (light floor) or many hours (heavy floor). When the room warms, the controller sees that and closes the valve, but it cannot take back the heat already stored in the floor.
 
-The interactive model below shows the consequence. With the default inputs, the choice between on/off and PI changes the result by a few percent. The choice between a light and a heavy floor changes it much more.
+```{admonition} Modeling time constant of floor heating
+:class: note
 
-The more detailed model in {numref}`fig-floor-step-response` shows this: the output drops quickly at first while the layers near the surface empty, then follows a long tail as heat comes up from deeper layers. The heavy floor still delivers about 10 % of its output a full day after the loop closed. The single time constant is a good summary, not the whole story.
+When the water flow in a loop starts or stops, the heat output to the room does not change at once. This section explains why, and what the delay means for a low-energy house.
 
-{numref}`fig-floor-step-response` shows a more detailed calculation with a one-dimensional heat conduction model of both floors. The water is at 30 °C and the room at 20 °C.
+Think of the floor above the insulation as one lump with heat capacity $C$ [J/(m²·K)] and a single temperature $T_f$. When the loop closes, the only way out for the stored heat is through the floor covering and the floor surface, a total resistance $R$ [m²·K/W], to the room at $T_r$.
+
+Conservation of energy across lump boundaries:
+<!-- @claude: add a figure of a heat balance here, that matches the equation below -->
+
+$$
+\dot E_{in} + \dot E_{gen} - \dot E_{out} = \dot E_{stored}
+$$ (eq-energybalance)
+
+When $E_{gen}$ was stoppped and $E_{in}$ is zero, it simplies to:
+
+$$
+\dot E_{stored} = - \dot E_{out} 
+$$ (eq-energybalance)
+
+Think of it as a tank with water, slowly losing heat through the insulated surface. Then the stored energy changes as temperature drops over time:
+
+$$
+\frac{m c_p\, \Delta T_f}{\Delta t} = - U A\, (T_f - T_r)
+$$ (eq-lump)
+
+$$
+C\,\frac{\mathrm{d}T_f}{\mathrm{d}t} = -\frac{T_f - T_r}{R}
+$$ (eq-lump)
+
+The rate at which the floor cools is proportional to how much warmer it is than the room.
+
+The solution to the equation is an exponential decay:
+
+$$
+T_f(t) - T_r = (T_{f,0} - T_r)\,e^{-t/\tau}, \qquad \tau = R\,C
+$$ (eq-tau)
+
+<!-- and since the heat output is $q = (T_f - T_r)/R$, the output decays the same way. A system that obeys {eq}`eq-lump` is called first-order: one heat store, one resistance, one time constant. For any step change in the water flow, the output approaches its new value as
+
+$$
+q(t) = q_\infty + (q_0 - q_\infty)\,e^{-t/\tau}
+$$ (eq-first-order)
+ -->
+
+The time constant $\tau$ has two useful meanings:
+
+- At $t = \tau$ the factor $e^{-1} = 0.37$ remains, so 63 % of the change has happened. After $3\tau$, 95 % has.
+- If the floor kept losing heat at its initial rate, it would be empty after exactly $\tau$. The initial slope of the curve points at $t = \tau$.
+
+%The units confirm it: J/(m²·K) × m²·K/W = J/W = s.
+
+% ### Switching off: the whole floor discharges through the surface
+
+When the loop closes, all the heat stored above the insulation has to leave through the flooring and the surface. $C$ is the heat capacity of the whole floor above the insulation, and $R$ is the flooring plus the surface resistance $1/h_s \approx 0.09$ m²·K/W.
+
+We calculate when 63% of the change has happened, i.e. when the floor temperature has dropped 63% of the way from initial $T_f$ to ambient $T_r$:
+
+- **Light floor:** $C \approx 18$ kJ/(m²·K) for the boards and plates, $R \approx 0.09 + 0.17 = 0.26$ m²·K/W (22 mm boards, λ = 0.13 W/(m·K)), so $\tau \approx 4700$ s, or about **1.3 hours**.
+- **Heavy floor:** $C \approx 230$ kJ/(m²·K) for the slab, $R \approx 0.09 + 0.08 + 0.03 = 0.20$ m²·K/W (surface, parquet, upper half of the slab), so $\tau \approx 46\,000$ s, or about **13 hours**.
+
+The flooring matters. A rug raises $R$, which lowers the output and slows the discharging of the floor.
+
+Because $\tau = R C$, and $R$ between pipes and floor is much smaller than between floor and ambient air, the time to heat up is much lower than to cool off.
+
+
+<!-- 
+### Switching on: the water holds the pipe plane
+
+When the loop opens, the water forces the pipe plane towards the water temperature. Only the layers above the pipes have to warm up, and they are fed from below through the resistance $R_\text{up}$ between the pipes and the surface, while they lose heat at the top through $1/h_s$. Seen from the stored heat, the two resistances act in parallel, and the time constant becomes
+
+$$
+\tau_\text{on} \approx C_\text{above}\,\frac{R_\text{up}\cdot(1/h_s)}{R_\text{up} + 1/h_s}
+$$ (eq-tau-on)
+
+- **Light floor:** $C_\text{above} \approx 18$ kJ/(m²·K), $R_\text{up} \approx 0.17$ m²·K/W, so $\tau_\text{on} \approx 0.3$ h.
+- **Heavy floor:** $C_\text{above} \approx 120$ kJ/(m²·K), $R_\text{up} \approx 0.11$ m²·K/W, so $\tau_\text{on} \approx 1.7$ h.
+
+Switching on is therefore much faster than switching off, by a factor of 4–8. The water drives the floor when the loop is open, but nothing drives the heat out when it closes. This asymmetry is the core of the problem: a floor heats up willingly and cools down reluctantly.
+
+### Why one time constant is only an approximation
+
+The lumped model assumes the floor has one temperature. That is reasonable when the resistance inside the floor is small compared with the resistance at its surface, measured by the Biot number $Bi = h\,L/\lambda$. For the concrete slab $Bi \approx 0.35$, so the slab is close to uniform, and one time constant describes it well. For the light floor the boards themselves are the main resistance ($Bi \approx 2$), but they hold little heat, so the floor still behaves almost as one lump.
+
+In reality a floor has many layers and therefore many time constants.  -->
+```
+
+
+
+
+
+
+
+
+
+<!-- {numref}`fig-floor-step-response` shows this: the output drops quickly at first while the layers near the surface empty, then follows a long tail as heat comes up from deeper layers. The heavy floor still delivers about 10 % of its output a full day after the loop closed. The single time constant is a good summary, not the whole story.
+ -->
+{numref}`fig-floor-step-response` shows the temperature progression of a one-dimensional heat conduction model. The water is at 30 °C and the room at 20 °C.
 
 :::{figure} figures/ch03/floor-step-response.*
 :label: fig-floor-step-response
@@ -195,18 +311,10 @@ The more detailed model in {numref}`fig-floor-step-response` shows this: the out
 Heat output of the two floors in {numref}`fig-floor-sections` after a) the wax thermostat opens and b) the wax thermostat closes. The dashed lines mark 63 % of the change. One-dimensional conduction model, water at 30 °C, room at 20 °C. Wax thermostat delay and the response of the room itself are not included.
 :::
 
-```{list-table} This table title
-:header-rows: 1
-:label: example-table
 
-* - Training
-  - Validation
-* - 0
-  - 5
-* - 13720
-  - 2744
-```
+<!-- The interactive model below shows the consequence. With the default inputs, the choice between on/off and PI changes the result by a few percent. The choice between a light and a heavy floor changes it much more. -->
 
+%@claude: Check that figure 6 and table 1 come from the same model
 %{numref}`fig-floor-sections`
 ```{list-table} Response of the light and heavy floor (one-dimensional model, water at 30 °C, room at 20 °C)
 :header-rows: 1
@@ -218,7 +326,7 @@ Heat output of the two floors in {numref}`fig-floor-sections` after a) the wax t
 * - Heat capacity above pipes
   - 18 kJ/(m²·K)
   - 120 kJ/(m²·K)
-* - Heat capacity, whole floor
+* - Heat capacity, whole floor above insulation
   - 40 kJ/(m²·K)
   - 230 kJ/(m²·K)
 * - Steady-state output
@@ -243,81 +351,7 @@ The last two rows are the ones that matter in a low-energy house. When the heavy
 A light floor holds a tenth of that heat, and most of it is released within the first hour. It follows the daily cycle much better, but it still lags behind the demand. The control loop adds more delay, and that is the subject of the section on control.
 
 
-
-
-
-
-
-
-
-
-## Time constant of floor heating
-
-When the water flow in a loop starts or stops, the heat output to the room does not change at once. This section explains why, and what the delay means for a low-energy house.
-
-### Where the exponential comes from
-
-Think of the floor above the insulation as one lump with heat capacity $C$ [J/(m²·K)] and a single temperature $T_f$. When the loop closes, the only way out for the stored heat is through the floor covering and the floor surface, a total resistance $R$ [m²·K/W], to the room at $T_r$. The heat balance of the lump is then
-
-
-$$
-C\,\frac{\mathrm{d}T_f}{\mathrm{d}t} = -\frac{T_f - T_r}{R}
-$$ (eq-lump)
-
-The rate at which the floor cools is proportional to how much warmer it is than the room. The solution is an exponential decay,
-
-$$
-T_f(t) - T_r = (T_{f,0} - T_r)\,e^{-t/\tau}, \qquad \tau = R\,C
-$$ (eq-tau)
-
-and since the heat output is $q = (T_f - T_r)/R$, the output decays the same way. A system that obeys {eq}`eq-lump` is called first-order: one heat store, one resistance, one time constant. For any step change in the water flow, the output approaches its new value as
-
-$$
-q(t) = q_\infty + (q_0 - q_\infty)\,e^{-t/\tau}
-$$ (eq-first-order)
-
-%:::{admonition} First-order
-%:class: drop
-%The term "first-order" means the most direct, basic, or linear effect, without complex loops or higher powers of ^2 or ^3 
-%:::
-
-The time constant has two useful meanings:
-
-- After $t = \tau$ the factor $e^{-1} = 0.37$ remains, so 63 % of the change has happened. After $3\tau$, 95 % has.
-- If the floor kept losing heat at its initial rate, it would be empty after exactly $\tau$. The initial slope of the curve points at $t = \tau$.
-
-The units confirm it: J/(m²·K) × m²·K/W = J/W = s.
-
-### Switching off: the whole floor discharges through the surface
-
-When the loop closes, all the heat stored above the insulation has to leave through the covering and the surface. $C$ is the heat capacity of the whole floor above the insulation, and $R$ is the covering plus the surface resistance $1/h_s \approx 0.09$ m²·K/W:
-
-- **Light floor:** $C \approx 18$ kJ/(m²·K) for the boards and plates, $R \approx 0.09 + 0.17 = 0.26$ m²·K/W (22 mm boards, λ = 0.13 W/(m·K)), so $\tau \approx 4700$ s, or about 1.3 hours.
-- **Heavy floor:** $C \approx 230$ kJ/(m²·K) for the slab, $R \approx 0.09 + 0.08 + 0.03 = 0.20$ m²·K/W (surface, parquet, upper half of the slab), so $\tau \approx 46\,000$ s, or about 13 hours.
-
-The floor covering matters twice. A thicker covering or a rug raises $R$, which lowers the output *and* makes the floor slower to discharge.
-
-### Switching on: the water holds the pipe plane
-
-When the loop opens, the water forces the pipe plane towards the water temperature. Only the layers above the pipes have to warm up, and they are fed from below through the resistance $R_\text{up}$ between the pipes and the surface, while they lose heat at the top through $1/h_s$. Seen from the stored heat, the two resistances act in parallel, and the time constant becomes
-
-$$
-\tau_\text{on} \approx C_\text{above}\,\frac{R_\text{up}\cdot(1/h_s)}{R_\text{up} + 1/h_s}
-$$ (eq-tau-on)
-
-- **Light floor:** $C_\text{above} \approx 18$ kJ/(m²·K), $R_\text{up} \approx 0.17$ m²·K/W, so $\tau_\text{on} \approx 0.3$ h.
-- **Heavy floor:** $C_\text{above} \approx 120$ kJ/(m²·K), $R_\text{up} \approx 0.11$ m²·K/W, so $\tau_\text{on} \approx 1.7$ h.
-
-Switching on is therefore much faster than switching off, by a factor of 4–8. The water drives the floor when the loop is open, but nothing drives the heat out when it closes. This asymmetry is the core of the problem: a floor heats up willingly and cools down reluctantly.
-
-### Why one time constant is only an approximation
-
-The lumped model assumes the floor has one temperature. That is reasonable when the resistance inside the floor is small compared with the resistance at its surface, measured by the Biot number $Bi = h\,L/\lambda$. For the concrete slab $Bi \approx 0.35$, so the slab is close to uniform, and one time constant describes it well. For the light floor the boards themselves are the main resistance ($Bi \approx 2$), but they hold little heat, so the floor still behaves almost as one lump.
-
-In reality a floor has many layers and therefore many time constants. 
-
-
-:::{admonition} Rules of thumb: floor time constants
+<!-- :::{admonition} Rules of thumb: floor time constants
 :class: tip
 
 - Time constant after the loop closes: $\tau \approx C_\text{floor}\,(R_\text{covering} + 0.09)$.
@@ -325,13 +359,14 @@ In reality a floor has many layers and therefore many time constants.
 - Switching on is faster than switching off, because the water drives the pipe plane but nothing drives the stored heat out.
 - Heat delivered after the loop closes ≈ heat capacity × mean excess temperature of the floor. For a 100 mm slab this is several hundred Wh/m², a day or more of the heating demand of a low-energy house.
 - A floor with a time constant longer than a few hours cannot follow a heating demand that changes within the day.
-:::
+::: -->
 
 
 ### What the time constant means over a day
 
-The heating demand of a low-energy house in spring is not a step. It swings over the day, roughly as a sine with a 24-hour period, from a demand at night to a surplus when the sun shines. A first-order system that is asked to follow such a swing does two things: it lags behind, and it delivers less of the swing than asked. With the angular frequency $\omega = 2\pi/24\,\mathrm{h}$,
+The heating demand of a low-energy house in early spring swings over the day, roughly as a sine with a 24-hour period, from a demand at night to a surplus when the sun shines. A first-order system that is asked to follow such a swing does two things: it lags behind, and it delivers less of the swing than asked. With the angular frequency $\omega = 2\pi/24\,\mathrm{h}$,
 
+%@claude: explain this in more detail
 $$
 \text{amplitude ratio} = \frac{1}{\sqrt{1 + (\omega\tau)^2}}, \qquad
 \text{time lag} = \frac{\arctan(\omega\tau)}{\omega}
@@ -358,10 +393,13 @@ $$ (eq-sine-response)
   - 4.8 h
 ```
 
+%@claude: add a figure here with the initial sine surve and the share of the swing delivered for light floor and heavy floor
 The light floor follows the daily swing almost fully, one hour late. The heavy floor flattens it to a third and shifts it by nearly five hours. Heat asked for at 04:00, the coldest hour, is delivered around 09:00, just as the sun takes over. A lag of a quarter of the period is the worst case: the floor then heats hardest when the demand is changing from heating to cooling. This is why heating demand at night turns into overheating during the day.
 
 The lag in {numref}`tab-floor-daily` is for the floor alone. The wax thermostat's dead time and stroke, the room's own heat capacity and the controller all add to it, as the section on control shows.
 
+:::{admonition} Extra: Time constant of a thermal space
+:class: dropdown
 ### The room has a time constant too
 
 The same idea applies to the room or the whole house. The heat store is the heat capacity of air, furniture and internal construction, $C$, and the heat leaves through the envelope and the ventilation, with the heat loss coefficient $UA$ [W/K]. The resistance is $R = 1/UA$, so
@@ -411,14 +449,12 @@ The app below shows how fast a room cools after the heating stops. Change $UA$ a
 ```
 
 The same model in Python: {download}`room_cooldown.py <code/room_cooldown.py>`. Run it with `python room_cooldown.py --UA 12 --tau 18` to simulate one room, or without arguments to compare the reference rooms.
+:::
 
 
-
-### Interactive model: control and solar gains
+### Control model
 
 The model below simulates one room in a low-energy house with a light and a heavy floor ({numref}`fig-floor-sections`) over a cloudy spring day followed by a sunny one. The floor is controlled in three ways: an on/off room thermostat, a PI controller whose output is a PWM signal to the wax thermostat, and, for reference, an ideal heater that delivers exactly the heat needed without any delay. Windows are opened when the room gets too warm, and the heat removed this way is counted as heat vented.
-
-Use the toggle to switch between the light and the heavy floor, and change the inputs to see how the floor, the controller and the weather interact. Hover over an input name for an explanation. The four graphs show the room temperature, the heat flux from the floor surface to the room, the supply, return and floor surface temperatures, and the mass flow in the loop. The table gives the heating energy and heat vented over the two days, the summed deviation below and above the setpoint in K·h, and the mass-flow-weighted return temperature. The tab *Extra: floor materials* lets you change the layers of both floors.
 
 ```{anywidget} code/floor-control.mjs
 {}
