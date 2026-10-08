@@ -198,6 +198,95 @@ Four things stand out:
 
 *TBA:* climate models (GCM, RCM), downscaling, emission scenarios (RCP, SSP); morphing a present-day year (CCWorldWeatherGen) versus bias-corrected regional model output; the Annex 80 TMY files for 2001–2020, 2041–2060 and 2081–2100; uncertainty.
 
+The IEA EBC Annex 80 project made a second set of Copenhagen files from the MPI-REMO regional climate model (EURO-CORDEX): typical meteorological years (TMY) for 2001–2020, 2041–2060 and 2081–2100, and three heat-wave years picked from 2041–2060 under RCP8.5 and bias-adjusted against observations from 2001–2019. Unlike the DRY files, these are model output, not measured months, so they can be hotter than anything seen so far. {numref}`fig-annex80-weather` shows them and {numref}`tab-annex80-summary` summarises them in the same way as the DRY files.
+
+```{figure} figures/ch02/annex80-weather.*
+:name: fig-annex80-weather
+:width: 100%
+
+Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Annex 80 Copenhagen files: three typical years and three heat-wave years. The dashed line marks 26 °C.
+```
+
+```{list-table} Annual indicators of the IEA EBC Annex 80 weather files for Copenhagen, computed from the EPW files.
+:name: tab-annex80-summary
+:header-rows: 1
+
+* - Weather file
+  - Min (°C)
+  - Mean (°C)
+  - Max (°C)
+  - Hours below 0 °C
+  - Hours above 26 °C
+  - Global radiation (kWh/m²)
+  - Mean RH (%)
+  - Mean enthalpy (kJ/kg)
+  - Hours UTCI > 26 °C
+* - TMY 2001–2020
+  - −9.6
+  - 9.0
+  - 28.3
+  - 818
+  - 20
+  - 1,049
+  - 81
+  - 24.4
+  - 407
+* - TMY 2041–2060
+  - −6.8
+  - 9.7
+  - 30.2
+  - 577
+  - 82
+  - 991
+  - 83
+  - 26.3
+  - 464
+* - TMY 2081–2100
+  - −10.4
+  - 11.2
+  - 29.7
+  - 246
+  - 49
+  - 941
+  - 83
+  - 29.5
+  - 530
+* - Heat wave longest (2045)\*
+  - −11.0
+  - 10.5
+  - 29.8
+  - 530
+  - 78
+  - 1,016\*
+  - 79
+  - 27.1
+  - 537\*
+* - Heat wave most intense (2055)
+  - −8.9
+  - 9.4
+  - 32.8
+  - 1,006
+  - 100
+  - 1,041
+  - 81
+  - 25.5
+  - 620
+* - Heat wave most severe (2054)
+  - −9.4
+  - 10.2
+  - 32.0
+  - 509
+  - 192
+  - 1,044
+  - 81
+  - 26.8
+  - 683
+```
+
+:::{note}
+\*The heat-wave file "longest" (2045) has no solar radiation from 1 to 14 August: global, direct and diffuse radiation are zero in all 336 hours, while temperature and humidity run on normally. The gap lies inside the heat wave the file was made for (15 July to 20 August 2045). Its annual global radiation is therefore about 90 kWh/m² too low, and its UTCI hours are underestimated. Use this file for temperature and humidity only, and the "most intense" or "most severe" file where solar gains matter. The three heat-wave files also contain 4–6 corrupt hours of global and diffuse radiation (values far above 1,400 W/m²); these were removed and interpolated before the table was computed.
+:::
+
 ## 5. Extremes
 
 ### Heat waves
