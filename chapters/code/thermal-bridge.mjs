@@ -331,10 +331,19 @@ const CSS = `
   display: grid; grid-template-columns: minmax(0, 1fr) 360px; grid-template-rows: auto auto minmax(0, 1fr) auto;
   gap: 8px 14px; overflow: hidden; }
 .tb.full > .toolbar, .tb.full > .board, .tb.full > .footer-bar { grid-column: 1; }
+.tb.full > .sa-head { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 6px 16px; flex-wrap: wrap; padding-bottom: 2px; }
+.tb.full:has(> .sa-head) { grid-template-rows: auto auto auto minmax(0, 1fr) auto; }
+.tb.full:has(> .sa-head) > .panels { grid-row: 2 / -1; }
+.tb .sa-head h1 { margin: 0; font-size: 1.6rem; font-weight: 700; letter-spacing: 0.01em; font-stretch: 80%; line-height: 1.2; }
+.tb .sa-head h1 span { color: var(--accent); }
+.tb .sa-head .sub { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.tb .sa-head .keys { margin: 0 0 0 auto; color: var(--muted); font-size: 0.78rem; font-family: var(--f-mono); }
+.tb kbd { font-family: var(--f-mono); font-size: 0.72rem; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; background: var(--panel); color: var(--ink); }
 .tb.full > .board { height: auto; min-height: 0; }
 .tb.full > .panels { grid-column: 2; grid-row: 1 / -1; grid-template-columns: 1fr; overflow: auto; align-content: start; min-height: 0; }
 @media (max-width: 900px) {
   .tb.full { display: flex; flex-direction: column; overflow: auto; }
+  .tb .sa-head .keys { display: none; }
   .tb.full > .board { height: 70vh; flex: none; }
 }
 `;
@@ -486,7 +495,14 @@ function render({ model, el: host, standalone = false }) {
   const style = document.createElement("style"); style.textContent = CSS;
   const root = document.createElement("div"); root.className = "tb"; root.innerHTML = MARKUP;
   host.appendChild(style); host.appendChild(root);
-  if (standalone) root.classList.add("full");
+  if (standalone) {
+    root.classList.add("full");
+    const head = document.createElement("header"); head.className = "sa-head";
+    head.innerHTML = `<h1>Thermal Bridge <span>Lab</span></h1>
+      <p class="sub">Draw a construction from rectangles, mark its surfaces, watch heat find its way through.</p>
+      <p class="keys"><kbd>V</kbd> select · <kbd>R</kbd> rectangle · <kbd>B</kbd> boundary · <kbd>Del</kbd> remove · wheel zoom · drag empty space to pan</p>`;
+    root.prepend(head);
+  }
   const PRESETS = [
     ["Concrete", 1.7, "#a6a49b"], ["Brick", 0.6, "#c06a4f"], ["Aerated concrete", 0.12, "#d7d1c0"],
     ["Mineral wool", 0.037, "#efc451"], ["EPS", 0.035, "#dde6ee"], ["PIR", 0.022, "#e6d48a"],
