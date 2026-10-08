@@ -122,7 +122,7 @@ The app below runs the calculation in your browser and updates the results while
 #### How to use the app
 
 1. **Materials.** Pick a material in the *Materials* list or add one from the library. Edit the name and $\lambda$ directly in the list.
-2. **Draw rectangles.** Choose *Rectangle* (key **R**) and drag on the board. Edges snap to existing edges and to the snap grid. Later rectangles cover earlier ones; change the order in *Layers*. With *Select* (key **V**), drag a rectangle to move it or a corner to resize it, or type exact coordinates in millimetres under *Selected rectangle*.
+2. **Draw rectangles.** Choose *Draw* (key **D**) and drag on the board. Edges snap to existing edges and to the snap grid. Later rectangles cover earlier ones; change the order in *Layers*. With *Select* (key **V**), drag a rectangle to move it or a corner to resize it, or type exact coordinates in millimetres under *Selected rectangle*.
 3. **Boundary conditions.** Each boundary condition has a name, a type and its values: convective (air temperature and surface resistance), surface temperature, heat flux into the construction, or adiabatic. Add as many as the detail needs, for example a separate inside condition with $R_{si} = 0.25$ m²K/W.
 4. **Draw boundary edges.** Pick a boundary condition and choose *Boundary* (key **B**). Click on a surface to assign the whole straight face up to the next corner, or drag along a surface to assign part of it. Surfaces without an edge are shown dashed and are adiabatic. An edge that does not lie on a surface is marked *Not on a surface: no effect*.
 5. **Mesh.** Set the minimum cell size next to the grid lines, the maximum cell size and the growth ratio. Refine until the results stop changing.

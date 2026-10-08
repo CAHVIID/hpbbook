@@ -352,7 +352,7 @@ const MARKUP = `
 <div class="toolbar">
   <div class="seg" role="group" aria-label="Tool">
     <button id="tool-select" type="button" aria-pressed="true" title="Select and move (V)">Select</button>
-    <button id="tool-draw" type="button" aria-pressed="false" title="Draw rectangle (R)">Rectangle</button>
+    <button id="tool-draw" type="button" aria-pressed="false" title="Draw rectangles (D)">Draw</button>
     <button id="tool-edge" type="button" aria-pressed="false" title="Draw boundary (B)">Boundary</button>
   </div>
   <label class="check">Snap
@@ -504,7 +504,7 @@ function render({ model, el: host, standalone = false }) {
     const head = document.createElement("header"); head.className = "sa-head";
     head.innerHTML = `<h1>Thermal Bridge <span>Lab</span></h1>
       <p class="sub">Draw a construction from rectangles, mark its surfaces, watch heat find its way through.</p>
-      <p class="keys"><kbd>V</kbd> select · <kbd>R</kbd> rectangle · <kbd>B</kbd> boundary · <kbd>Del</kbd> remove · wheel zoom · drag empty space to pan</p>`;
+      <p class="keys"><kbd>V</kbd> select · <kbd>D</kbd> draw · <kbd>B</kbd> boundary · <kbd>Del</kbd> remove · wheel zoom · drag empty space to pan</p>`;
     root.prepend(head);
   }
   const PRESETS = [
@@ -1483,12 +1483,18 @@ function render({ model, el: host, standalone = false }) {
     $("readout").textContent = txt;
   }
 
-  root.addEventListener("keydown", e => {
-    const tag = (e.target.tagName || "").toLowerCase();
-    if (tag === "input" || tag === "textarea" || tag === "select") return;
+  let pointerInside = false;
+  root.addEventListener("pointerenter", () => { pointerInside = true; });
+  root.addEventListener("pointerleave", () => { pointerInside = false; });
+  const keysForUs = () => standalone || pointerInside || root.contains(activeEl());
+  document.addEventListener("keydown", e => {
+    if (!keysForUs() || e.ctrlKey || e.metaKey || e.altKey) return;
+    const t = (e.composedPath && e.composedPath()[0]) || e.target;
+    const tag = ((t && t.tagName) || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || tag === "select" || (t && t.isContentEditable)) return;
     if (e.key === " ") { spaceDown = true; e.preventDefault(); }
     else if (e.key === "v" || e.key === "V") setTool("select");
-    else if (e.key === "r" || e.key === "R") setTool("draw");
+    else if (e.key === "r" || e.key === "R" || e.key === "d" || e.key === "D") setTool("draw");
     else if (e.key === "b" || e.key === "B") setTool("edge");
     else if (e.key === "Delete" || e.key === "Backspace") {
       if (S.selEdge) { e.preventDefault(); removeEdge(S.selEdge); }
@@ -1496,7 +1502,7 @@ function render({ model, el: host, standalone = false }) {
     }
     else if (e.key === "Escape") { drag = null; select(null); selectEdge(null); }
   });
-  root.addEventListener("keyup", e => { if (e.key === " ") spaceDown = false; });
+  document.addEventListener("keyup", e => { if (e.key === " ") spaceDown = false; });
 
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { needRender = true; tick(); });
 
