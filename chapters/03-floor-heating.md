@@ -164,8 +164,15 @@ Lower supply temperature will keep the loops more on, and vice versa.
 Low supply temperature increases self-regulation.
 ::: -->
 
-<!-- @claude: add a photo of a was thermostat here. Maybe use the one from the slides. Reference it in the text where appropriate -->
-A wax thermostat is an on/off valve. A small heater warms a wax capsule, the wax expands and pushes the valve open. It takes 2–3 min before the valve starts to move and another 3–5 min to open fully, and about the same to close.
+A wax thermostat is an on/off valve ({numref}`fig-wax-thermostat`). A small heater warms a wax capsule, the wax expands and pushes the valve open. It takes 2–3 min before the valve starts to move and another 3–5 min to open fully, and about the same to close.
+
+:::{figure} figures/ch03/wax-thermostat.jpg
+:label: fig-wax-thermostat
+:alt: Photo of a wax thermostat: a blue cylindrical actuator with a grey threaded base that screws onto the valve on the manifold, and a grey cable for the 24 V supply from the room unit.
+:width: 35%
+
+Wax thermostat (telestat) for mounting on the manifold, 24 V, 2 W, normally closed. Photo: Uponor.
+:::
 
 The wax thermostat cannot hold positions between fully open, and fully closed, so they are  controlled via pulse-width modulation.
 
@@ -236,13 +243,13 @@ When $E_{gen}$ was stoppped and $E_{in}$ is zero, it simplies to:
 
 $$
 \dot E_{stored} = - \dot E_{out} 
-$$ (eq-energybalance)
+$$ (eq-energybalance-closed)
 
 Think of it as a tank with water, slowly losing heat through the insulated surface. Then the stored energy changes as temperature drops over time:
 
 $$
 \frac{m c_p\, \Delta T_f}{\Delta t} = - U A\, (T_f - T_r)
-$$ (eq-lump)
+$$ (eq-lump-tank)
 
 $$
 C\,\frac{\mathrm{d}T_f}{\mathrm{d}t} = -\frac{T_f - T_r}{R}
@@ -313,13 +320,13 @@ In reality a floor has many layers and therefore many time constants.  -->
 
 
 
-<!-- {numref}`fig-floor-step-response` shows this: the output drops quickly at first while the layers near the surface empty, then follows a long tail as heat comes up from deeper layers. The heavy floor still delivers about 10 % of its output a full day after the loop closed. The single time constant is a good summary, not the whole story.
+<!-- {numref}`fig-floor-step-response` shows this: the output drops quickly at first while the layers near the surface empty, then follows a long tail as heat comes up from deeper layers. The heavy floor still delivers about 12 % of its output a full day after the loop closed. The single time constant is a good summary, not the whole story.
  -->
 {numref}`fig-floor-step-response` shows the temperature progression of a one-dimensional heat conduction model. The water is at 30 °C and the room at 20 °C.
 
 :::{figure} figures/ch03/floor-step-response.*
 :label: fig-floor-step-response
-:alt: Two line charts of heat output to the room in percent of steady state over 24 hours. Left, after the wax thermostat opens, the light floor reaches 63 % in about half an hour and the heavy floor in about 2 hours. Right, after the wax thermostat closes, the light floor falls to 37 % in about 1 hour, while the heavy floor takes about 12 hours and still delivers about 10 % after 24 hours.
+:alt: Two line charts of heat output to the room in percent of steady state over 24 hours. Left, after the wax thermostat opens, the light floor reaches 63 % in about half an hour and the heavy floor in about 2 hours. Right, after the wax thermostat closes, the light floor falls to 37 % in about 1 hour, while the heavy floor takes about 12 hours and still delivers about 12 % after 24 hours.
 :width: 100%
 
 Heat output of the two floors in {numref}`fig-floor-sections` after a) the wax thermostat opens and b) the wax thermostat closes. The dashed lines mark 63 % of the change. One-dimensional conduction model, water at 30 °C, room at 20 °C. Wax thermostat delay and the response of the room itself are not included.
@@ -328,7 +335,6 @@ Heat output of the two floors in {numref}`fig-floor-sections` after a) the wax t
 
 <!-- The interactive model below shows the consequence. With the default inputs, the choice between on/off and PI changes the result by a few percent. The choice between a light and a heavy floor changes it much more. -->
 
-%@claude: Check that figure 6 and table 1 come from the same model
 %{numref}`fig-floor-sections`
 ```{list-table} Response of the light and heavy floor (one-dimensional model, water at 30 °C, room at 20 °C)
 :header-rows: 1
@@ -341,7 +347,7 @@ Heat output of the two floors in {numref}`fig-floor-sections` after a) the wax t
   - 18 kJ/(m²·K)
   - 120 kJ/(m²·K)
 * - Heat capacity, whole floor above insulation
-  - 40 kJ/(m²·K)
+  - 33 kJ/(m²·K)
   - 230 kJ/(m²·K)
 * - Steady-state output
   - 27 W/m²
@@ -353,16 +359,16 @@ Heat output of the two floors in {numref}`fig-floor-sections` after a) the wax t
   - 1 h
   - 12 h
 * - Heat delivered after the loop closes
-  - 50 Wh/m²
+  - 70 Wh/m²
   - 500 Wh/m²
 * - Same, in hours of full output
-  - 2 h
+  - 2.5 h
   - 12 h
 ```
 
 The last two rows are the ones that matter in a low-energy house. When the heavy floor's loop closes, the slab still holds about 500 Wh/m² more heat than at room temperature, and it hands this heat to the room over the next day. If the house needs 10 W/m² on average on a spring day, that is two days' heating stored in the floor. A thermostat that closes the loop when the sun comes out has no influence on this heat. The room overheats, and the heat must be removed again by opening windows or by cooling.
 
-A light floor holds a tenth of that heat, and most of it is released within the first hour. It follows the daily cycle much better, but it still lags behind the demand. The control loop adds more delay, and that is the subject of the section on control.
+A light floor holds about an eighth of that heat, and most of it is released within the first hour. It follows the daily cycle much better, but it still lags behind the demand. The control loop adds more delay, and that is the subject of the section on control.
 
 
 <!-- :::{admonition} Rules of thumb: floor time constants
@@ -380,11 +386,12 @@ A light floor holds a tenth of that heat, and most of it is released within the 
 
 The heating demand of a low-energy house in early spring swings over the day, roughly as a sine with a 24-hour period, from a demand at night to a surplus when the sun shines. A first-order system that is asked to follow such a swing does two things: it lags behind, and it delivers less of the swing than asked. With the angular frequency $\omega = 2\pi/24\,\mathrm{h}$,
 
-%@claude: explain this in more detail
 $$
 \text{amplitude ratio} = \frac{1}{\sqrt{1 + (\omega\tau)^2}}, \qquad
 \text{time lag} = \frac{\arctan(\omega\tau)}{\omega}
 $$ (eq-sine-response)
+
+The product $\omega\tau = 2\pi\,\tau/24\,\mathrm{h}$ compares the time constant with the length of the day. If the floor reacts quickly compared with the day ($\omega\tau \ll 1$), it keeps up: the amplitude ratio is close to 1 and the lag close to $\tau$. If it reacts slowly ($\omega\tau \gg 1$), the demand has already turned before the floor has warmed up. It then follows only a small part of the swing, and the lag approaches a quarter of the period, 6 h. For the light floor $\omega\tau = 0.26$; for the heavy floor $\omega\tau = 3.1$. The daily mean is always delivered in full; only the swing around it is damped and delayed.
 
 ```{list-table} Response of a first-order floor to a heating demand that swings over 24 hours
 :header-rows: 1
