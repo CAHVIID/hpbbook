@@ -1,3 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thermal Bridge Lab</title>
+<style>html,body{margin:0;height:100%;background:#fff}@media (prefers-color-scheme: dark){html,body{background:#0d1117}}</style>
+</head><body><div id="app"></div>
+<script type="module">
 // Thermal Bridge Lab: draw a construction from rectangles, draw boundary edges on its surfaces,
 // and see the 2D steady-state temperature field and heat flux (anywidget module for MyST).
 // Same method as thermal_bridge.py, which is the documented reference version; both read the
@@ -1576,3 +1583,7 @@ function render({ model, el: host, standalone = false }) {
 }
 
 export default { render };
+
+const START_CASE = null;
+render({ model: { get: k => (k === "case" ? START_CASE : null), on() {}, set() {} }, el: document.getElementById("app"), standalone: true });
+</script></body></html>
