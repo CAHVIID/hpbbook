@@ -12,6 +12,9 @@ project:
     - title: "Part A: Compactness and envelope"
       children:
         - file: parts/part-a-compactness-envelope.md
+        - file: chapters/a1-envelope.md
+        - file: chapters/a2-windows.md
+        - file: chapters/a3-glazing.md
     - title: "Part B: Ventilation"
       children:
         - file: parts/part-b-ventilation.md

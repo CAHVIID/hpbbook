@@ -1,0 +1,89 @@
+{
+  "materials": {
+    "Gypsum board": 0.25,
+    "Mineral wool": 0.037,
+    "Wood fibre board": 0.05,
+    "Steel": 50.0
+  },
+  "rectangles": [
+    {
+      "x0": 0.0,
+      "y0": 0.0,
+      "x1": 0.013,
+      "y1": 0.6,
+      "material": "Gypsum board"
+    },
+    {
+      "x0": 0.013,
+      "y0": 0.0,
+      "x1": 0.213,
+      "y1": 0.6,
+      "material": "Mineral wool"
+    },
+    {
+      "x0": 0.213,
+      "y0": 0.0,
+      "x1": 0.235,
+      "y1": 0.6,
+      "material": "Wood fibre board"
+    },
+    {
+      "x0": 0.013,
+      "y0": 0.2995,
+      "x1": 0.213,
+      "y1": 0.3005,
+      "material": "Steel"
+    },
+    {
+      "x0": 0.013,
+      "y0": 0.275,
+      "x1": 0.014,
+      "y1": 0.325,
+      "material": "Steel"
+    },
+    {
+      "x0": 0.212,
+      "y0": 0.275,
+      "x1": 0.213,
+      "y1": 0.325,
+      "material": "Steel"
+    }
+  ],
+  "boundaries": [
+    {
+      "name": "Inside",
+      "kind": "convective",
+      "T": 20.0,
+      "R": 0.13,
+      "q": 0.0
+    },
+    {
+      "name": "Outside",
+      "kind": "convective",
+      "T": 0.0,
+      "R": 0.04,
+      "q": 0.0
+    }
+  ],
+  "edges": [
+    {
+      "boundary": "Inside",
+      "x0": 0,
+      "y0": 0,
+      "x1": 0,
+      "y1": 0.6
+    },
+    {
+      "boundary": "Outside",
+      "x0": 0.235,
+      "y0": 0,
+      "x1": 0.235,
+      "y1": 0.6
+    }
+  ],
+  "mesh": {
+    "h_min": 0.0005,
+    "h_max": 0.01,
+    "ratio": 1.25
+  }
+}
