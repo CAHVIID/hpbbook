@@ -412,37 +412,6 @@ const MARKUP = `
       </table>
       <div class="balance" id="balance"></div>
     </section>
-    <section>
-      <h2>Mesh <span class="tail unit" id="mesh-count"></span></h2>
-      <p class="hint">Grid lines follow every rectangle edge and boundary end. Cells start at the minimum size next to each line and grow by the ratio towards the middle, up to the maximum.</p>
-      <div class="grid3">
-        <label class="field">Min. cell [mm]<input id="m-hmin" type="number" step="any" min="0.01"></label>
-        <label class="field">Max. cell [mm]<input id="m-hmax" type="number" step="any" min="0.01"></label>
-        <label class="field">Growth ratio<input id="m-ratio" type="number" step="0.05" min="1"></label>
-      </div>
-    </section>
-    <section>
-      <h2>Examples and case files</h2>
-      <div class="btns">
-        <button class="btn" id="ex-corner" type="button">Wall corner</button>
-        <button class="btn" id="ex-stud" type="button">Steel stud in wall</button>
-      </div>
-      <div class="btns">
-        <button class="btn" id="save-btn" type="button">Save case file</button>
-        <button class="btn" id="open-btn" type="button">Open case file</button>
-        <input id="file-in" type="file" accept=".json,application/json" hidden>
-      </div>
-      <details>
-        <summary>Show or paste the case as JSON</summary>
-        <div class="btns" style="margin:6px 0">
-          <button class="btn" id="exp-btn" type="button">Show JSON</button>
-          <button class="btn" id="copy-btn" type="button">Copy</button>
-          <button class="btn" id="imp-btn" type="button">Load pasted JSON</button>
-        </div>
-        <textarea id="json" spellcheck="false" aria-label="Case JSON" placeholder="Paste a case here, then Load pasted JSON."></textarea>
-      </details>
-      <div class="msg" id="json-msg"></div>
-    </section>
   </div>
   <div class="card">
     <section>
@@ -493,6 +462,41 @@ const MARKUP = `
           <button class="btn" id="sel-del" type="button">Delete</button>
         </div>
       </div>
+    </section>
+  </div>
+  <div class="card">
+    <section>
+      <h2>Mesh <span class="tail unit" id="mesh-count"></span></h2>
+      <p class="hint">Grid lines follow every rectangle edge and boundary end. Cells start at the minimum size next to each line and grow by the ratio towards the middle, up to the maximum.</p>
+      <div class="grid3">
+        <label class="field">Min. cell [mm]<input id="m-hmin" type="number" step="any" min="0.01"></label>
+        <label class="field">Max. cell [mm]<input id="m-hmax" type="number" step="any" min="0.01"></label>
+        <label class="field">Growth ratio<input id="m-ratio" type="number" step="0.05" min="1"></label>
+      </div>
+    </section>
+  </div>
+  <div class="card">
+    <section>
+      <h2>Examples and case files</h2>
+      <div class="btns">
+        <button class="btn" id="ex-corner" type="button">Wall corner</button>
+        <button class="btn" id="ex-stud" type="button">Steel stud in wall</button>
+      </div>
+      <div class="btns">
+        <button class="btn" id="save-btn" type="button">Save case file</button>
+        <button class="btn" id="open-btn" type="button">Open case file</button>
+        <input id="file-in" type="file" accept=".json,application/json" hidden>
+      </div>
+      <details>
+        <summary>Show or paste the case as JSON</summary>
+        <div class="btns" style="margin:6px 0">
+          <button class="btn" id="exp-btn" type="button">Show JSON</button>
+          <button class="btn" id="copy-btn" type="button">Copy</button>
+          <button class="btn" id="imp-btn" type="button">Load pasted JSON</button>
+        </div>
+        <textarea id="json" spellcheck="false" aria-label="Case JSON" placeholder="Paste a case here, then Load pasted JSON."></textarea>
+      </details>
+      <div class="msg" id="json-msg"></div>
     </section>
   </div>
 </div>
