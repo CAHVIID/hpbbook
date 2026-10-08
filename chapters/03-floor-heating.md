@@ -156,11 +156,18 @@ Lower supply temperature will keep the loops more on, and vice versa.
 Low supply temperature increases self-regulation.
 ::: -->
 
-A wax thermostat is an on/off valve. A small heater warms a wax capsule, the wax expands and pushes the valve open. It takes 2–3 min before the valve starts to move and another 3–5 min to open fully, and about the same to close. It cannot hold an intermediate position for long, so the room unit controls it in one of two ways:
-```{caution} Confirmation pending
+A wax thermostat is an on/off valve. 
+<!-- @claude: add a photo of a was thermostat here. Maybe use the one from the slides. Reference it in the text where appropriate -->
+A small heater warms a wax capsule, the wax expands and pushes the valve open. It takes 2–3 min before the valve starts to move and another 3–5 min to open fully, and about the same to close. It cannot hold an intermediate position for long, so the room unit controls it in one of two ways:
+```{note}
 - **On/off control.** The loop opens when the room is below the setpoint minus a hysteresis and closes when it is above the setpoint plus the hysteresis. Not used anymore
-- **PWM control.** The room unit runs a PI controller and turns its output into a duty cycle. With a 15–20 min cycle and 40 % output, the valve is open for about 6–8 min of each cycle. On average this behaves like a valve that is 40 % open.
+- **PWM control.** The room unit runs a PI controller with a predefined duty cycle. If 40 % output is required and the cycle is 15 min, the valve is only (fully) open for about 6 min of each cycle. On average this behaves like a valve that is 40 % open.
 ```
+
+<!-- > - **On/off control.** The loop opens when the room is below the setpoint minus a hysteresis and closes when it is above the setpoint plus the hysteresis. Not used anymore
+> - **PWM control.** The room unit runs a PI controller and turns its output into a duty cycle. With a 15–20 min cycle and 40 % output, the valve is open for about 6–8 min of each cycle. On average this behaves like a valve that is 40 % open. -->
+
+
 
 {numref}`fig-pwm-principle` shows how PWM works. The room unit compares the measured room temperature with a triangular signal that sweeps the proportional band once per cycle. The valve is open while the room is colder than the triangle. Below the band the valve stays open the whole cycle, and above the band it stays closed. Inside the band, the colder the room, the longer the valve is open in each cycle.
 
