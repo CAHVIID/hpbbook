@@ -82,8 +82,15 @@ For comfort, the mean floor surface temperature is limited to:
 - 33 °C in bathrooms
 - 35 °C in perimeter zones
 
-At 29 °C and a room at 20 °C, equation {eq}`eq-floor-flux` gives about 100 W/m², which is far more than a low-energy house needs.
-% @claude: add a graph here similar to the one from EN1264. Add EN1264 as source 
+At 29 °C and a room at 20 °C, equation {eq}`eq-floor-flux` gives about 100 W/m², which is far more than a low-energy house needs ({numref}`fig-en1264-curve`).
+
+:::{figure} figures/ch03/en1264-curve.*
+:label: fig-en1264-curve
+:alt: Line chart of heat flux against the difference between floor surface and room temperature, from 0 to 16 K. The curve rises almost linearly. Marked points: 1.1 K gives 10 W/m² for a low-energy house, 9 K gives 100 W/m² at the limit for occupied zones (29 °C floor, 20 °C room, or 33 °C floor and 24 °C room in bathrooms), and 15 K gives 175 W/m² at the limit for perimeter zones (35 °C floor, 20 °C room).
+:width: 80%
+
+Basic characteristic curve of a heated floor, equation {eq}`eq-floor-flux`, with the floor surface temperature limits. After EN 1264 {cite:p}`en1264`.
+:::
 
 Floor covering adds thermal resistance between the pipes and the room. Tiles add little, while wood and carpet add a lot, so a wooden floor needs a higher water temperature for the same output.
 
@@ -205,14 +212,21 @@ PWM control of a wax thermostat. The valve is open while the measured room tempe
 PWM smooths the room temperature, but it does not remove the delay: the sensor measures the room, the valve acts on the water, but the thermal mass of the floor lies in between. Whatever the controller decides, the floor delivers it over the next 0.5–1 h (light floor) or many hours (heavy floor). When the room warms, the controller sees that and closes the valve, but it cannot take back the heat already stored in the floor.
 
 ```{admonition} Modeling time constant of floor heating
-:class: note
+:class: dropdown
 
 When the water flow in a loop starts or stops, the heat output to the room does not change at once. This section explains why, and what the delay means for a low-energy house.
 
 Think of the floor above the insulation as one lump with heat capacity $C$ [J/(m²·K)] and a single temperature $T_f$. When the loop closes, the only way out for the stored heat is through the floor covering and the floor surface, a total resistance $R$ [m²·K/W], to the room at $T_r$.
 
-Conservation of energy across lump boundaries:
-<!-- @claude: add a figure of a heat balance here, that matches the equation below -->
+Conservation of energy across lump boundaries ({numref}`fig-floor-lump-balance`):
+
+:::{figure} figures/ch03/floor-lump-balance.*
+:label: fig-floor-lump-balance
+:alt: Diagram of the floor above the insulation drawn as one box with heat capacity C and temperature T_f. An arrow from the left brings energy in from the water in the pipes, zero when the loop is closed. An arrow upwards takes energy out to the room at T_r, equal to (T_f minus T_r) divided by R, through the covering and surface. A note on the right says no heat is generated inside the floor. Inside the box, the stored energy rate is C times dT_f/dt. Below the box is adiabatic insulation.
+:width: 75%
+
+Energy balance of the floor as one lump.
+:::
 
 $$
 \dot E_{in} + \dot E_{gen} - \dot E_{out} = \dot E_{stored}
@@ -393,8 +407,15 @@ $$ (eq-sine-response)
   - 4.8 h
 ```
 
-%@claude: add a figure here with the initial sine surve and the share of the swing delivered for light floor and heavy floor
-The light floor follows the daily swing almost fully, one hour late. The heavy floor flattens it to a third and shifts it by nearly five hours. Heat asked for at 04:00, the coldest hour, is delivered around 09:00, just as the sun takes over. A lag of a quarter of the period is the worst case: the floor then heats hardest when the demand is changing from heating to cooling. This is why heating demand at night turns into overheating during the day.
+:::{figure} figures/ch03/floor-daily-swing.*
+:label: fig-floor-daily-swing
+:alt: Line chart over two days of the deviation from the daily mean, in percent of the demand swing. The heating demand is a sine peaking at 04:00 at plus 100 % and bottoming at 16:00 at minus 100 %. The light floor, time constant 1 hour, follows almost the same curve, 97 % of the swing and 1 hour late. The heavy floor, time constant 12 hours, swings only plus/minus 30 % and peaks 4.8 hours late, around 09:00.
+:width: 100%
+
+A first-order floor following a heating demand that swings over 24 hours, equation {eq}`eq-sine-response`. The arrows mark the lag behind the demand peak at 04:00. Only the swing is shown; the daily mean is delivered in full.
+:::
+
+The light floor follows the daily swing almost fully, one hour late ({numref}`fig-floor-daily-swing`). The heavy floor flattens it to a third and shifts it by nearly five hours. Heat asked for at 04:00, the coldest hour, is delivered around 09:00, just as the sun takes over. A lag of a quarter of the period is the worst case: the floor then heats hardest when the demand is changing from heating to cooling. This is why heating demand at night turns into overheating during the day.
 
 The lag in {numref}`tab-floor-daily` is for the floor alone. The wax thermostat's dead time and stroke, the room's own heat capacity and the controller all add to it, as the section on control shows.
 
