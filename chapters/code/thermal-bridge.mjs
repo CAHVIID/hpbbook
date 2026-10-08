@@ -337,6 +337,9 @@ const CSS = `
 .tb .sa-head h1 { margin: 0; font-size: 1.6rem; font-weight: 700; letter-spacing: 0.01em; font-stretch: 80%; line-height: 1.2; }
 .tb .sa-head h1 span { color: var(--accent); }
 .tb .sa-head .sub { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.tb .sa-head .title { display: flex; flex-direction: column; gap: 2px; }
+.tb .sa-head .meta { margin: 0; color: var(--muted); font-size: 0.75rem; }
+.tb .sa-head .meta strong { color: var(--bad); font-weight: 600; }
 .tb .sa-head .keys { margin: 0 0 0 auto; color: var(--muted); font-size: 0.78rem; font-family: var(--f-mono); }
 .tb kbd { font-family: var(--f-mono); font-size: 0.72rem; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; background: var(--panel); color: var(--ink); }
 .tb.full > .board { height: auto; min-height: 0; }
@@ -369,7 +372,6 @@ const MARKUP = `
   <label class="check"><input type="checkbox" id="live" checked> Live</label>
   <button class="btn primary" id="solve-btn" type="button" disabled>Solve</button>
   <button class="btn" id="fit-btn" type="button">Fit view</button>
-  <button class="btn" id="app-btn" type="button" title="Download the app as one HTML file that runs on its own, with the current model">Download stand-alone app</button>
 </div>
 <div class="toolbar">
   <div class="seg" role="group" aria-label="Show">
@@ -494,7 +496,8 @@ function render({ model, el: host, standalone = false }) {
   if (standalone) {
     root.classList.add("full");
     const head = document.createElement("header"); head.className = "sa-head";
-    head.innerHTML = `<h1>Thermal Bridge <span>Lab</span></h1>
+    head.innerHTML = `<div class="title"><h1>Thermal Bridge <span>Lab</span></h1>
+      <p class="meta">Contact: Christian Hviid, cahv@dtu.dk · <strong>Use at own risk. Accuracy not validated.</strong></p></div>
       <p class="sub">Draw a construction from rectangles, mark its surfaces, watch heat find its way through.</p>
       <p class="keys"><kbd>V</kbd> select · <kbd>D</kbd> draw · <kbd>B</kbd> boundary · <kbd>Del</kbd> remove · wheel zoom · drag empty space to pan</p>`;
     root.prepend(head);

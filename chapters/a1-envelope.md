@@ -133,7 +133,7 @@ The small arrows marked (0, 0) show the origin of the coordinates. Use the mouse
 
 ### The stand-alone app
 
-The app also runs on its own, outside the book, as a single HTML file: {download}`thermal-bridge-lab.html <code/thermal-bridge-lab.html>`. Save it anywhere and double-click it. It opens in your web browser with the whole window for the app, needs no installation and works offline. The button *Download stand-alone app* in the app above saves the same file with your current model in it, so you can carry on working outside the book. Save your work with *Save case file*; the stand-alone app does not remember it when you close the window.
+The app also runs on its own, outside the book, as a single HTML file: {download}`thermal-bridge-lab.html <code/thermal-bridge-lab.html>`. Save it anywhere and double-click it. It opens in your web browser with the whole window for the app, needs no installation and works offline. To continue a model from the book in the stand-alone app, save it with *Save case file* and open it there with *Open case file*. Save your work with *Save case file*; the stand-alone app does not remember it when you close the window.
 
 ### The Python version
 
