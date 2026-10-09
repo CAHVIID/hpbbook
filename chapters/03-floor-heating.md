@@ -384,7 +384,11 @@ A light floor holds about an eighth of that heat, and most of it is released wit
 
 ### What the time constant means over a day
 
-The heating demand of a low-energy house in early spring swings over the day, roughly as a sine with a 24-hour period, from a demand at night to a surplus when the sun shines. A first-order system that is asked to follow such a swing does two things: it lags behind, and it delivers less of the swing than asked. With the angular frequency $\omega = 2\pi/24\,\mathrm{h}$,
+The heating demand of a low-energy house in early spring swings over the day, roughly as a sine with a 24-hour period, from a demand at night to a surplus when the sun shines. A first-order system that is asked to follow such a swing does two things: it lags behind, and it delivers less of the swing than asked, because demand starts dropping before the full output is reached. The swing (one complete cycle) corresponds to a rotation of $2 \pi$.
+
+The angular frequency over 24 hours is $\omega = 2\pi/24\,\mathrm{h}$. This means the swing (rotation) is 0.26 radians/hour.
+
+Amplitude ratio is a dimensionless metric that measures how much a system dampens the input signal. Time lag is the phase delay
 
 $$
 \text{amplitude ratio} = \frac{1}{\sqrt{1 + (\omega\tau)^2}}, \qquad
