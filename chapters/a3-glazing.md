@@ -1,15 +1,8 @@
 # Glazing
 
-<!--
-## Learning objectives
-
-After this chapter you can:
-
-- explain how low-emissivity coatings and gas fills lower the U-value of glazing
-- read the U-value, g-value and light transmittance from a glazing datasheet
-- choose between double and triple glazing for a given orientation and use
-- explain the trade-off between solar gains in winter and overheating in summer
--->
+:::{warning} Under revision
+This chapter is being reworked and may change substantially.
+:::
 
 ## Introduction
 

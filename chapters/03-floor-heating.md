@@ -1,16 +1,10 @@
 # Floor heating
 
+:::{warning} Under revision
+This chapter is being reworked and may change substantially.
+:::
 
-<!-- ## Learning objectives
-
-After this chapter you can:
-
-- estimate the heat output of a heated floor from its surface temperature, and explain why the output regulates itself
-- compare light and heavy floor heating constructions by heat capacity and time constant
-- estimate the time constant of a floor and the heat it keeps delivering after the loop closes
-- describe the parts of a hydronic floor heating installation and what each one controls
-- explain why floor heating is a poor match for low-energy houses, where heating demand at night turns into cooling demand during the day 
-
+<!--
 %+++
 %edwdds
 %#dwd 

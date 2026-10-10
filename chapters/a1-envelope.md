@@ -1,16 +1,8 @@
 # The building envelope
 
-<!--
-## Learning objectives
-
-After this chapter you can:
-
-- calculate the transmission heat loss of a building from U-values, areas and line losses
-- explain what a thermal bridge is and why it matters more the better the envelope is insulated
-- calculate the linear thermal transmittance ψ of a detail from a 2D heat flow calculation
-- check a detail for surface condensation and mould risk with the temperature factor fRsi
-- set up a 2D thermal bridge model with correct cut-off planes and surface resistances
--->
+:::{warning} Under revision
+This chapter is being reworked and may change substantially.
+:::
 
 ## Introduction
 

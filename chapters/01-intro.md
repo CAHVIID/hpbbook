@@ -1,5 +1,9 @@
 # Intro
 
+:::{warning} Under revision
+This chapter is being reworked and may change substantially.
+:::
+
 ## Overview
 
 A High Performing Building has nice daylight, good indoor climate, low energy demand, and efficient passive cooling options. 
