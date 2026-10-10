@@ -15,7 +15,7 @@ Better houses have changed the picture ({numref}`fig-dhw-share`). Insulation, ai
 :alt: Horizontal stacked bar chart of net heat demand per m² floor area per year. A house with energy label D has 150 kWh/m² of space heating and 13 kWh/m² of hot water, so hot water is 8 %. A passive house has 15 kWh/m² of space heating, so hot water is 46 %. A house in the Danish low-energy class has 10 kWh/m² of space heating, so hot water is 57 %.
 :width: 100%
 
-Net heat demand for space heating and domestic hot water in three Danish house standards. The label D value is an estimate for a 150 m² house in the middle of the D band. The hot water demand is the Be18 calculation value of 250 L/m² per year heated from 10 °C to 55 °C {cite:p}`build213`. Losses from the tank and pipes are not included.
+Net heat demand for space heating and domestic hot water in three Danish house standards. The label D value is an estimate for a 150 m² house in the middle of the D band. The hot water demand is the Be18 calculation value of 250 L/m² per year heated from 10 °C to 55 °C {cite:p}`build213`. Losses from the tank and pipes are not included. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_share.py)
 :::
 
 :::{admonition} Hot water in Building Code
@@ -119,7 +119,7 @@ When you take a shower, about 8 L of water at 40 °C leaves the shower head ever
 :alt: Two schematic sections. Left, a vertical unit in section: a copper drain pipe with air in the middle, a thin film of warm drain water running down the inside of the wall, and a copper coil with cold water wound around the outside. Drain water enters at the top at 37 °C and leaves at the bottom at 18 °C; cold water enters at the bottom at 10 °C and leaves at the top at 29 °C. Right, a horizontal unit in a shower channel drain, shown along the channel and in a cross-section: shower water falls through the grate and runs along the channel over a row of copper tubes in the channel bottom, in which the cold water flows the opposite way. Drain water leaves at 24 °C, cold water enters at 10 °C and leaves at 24 °C. The cross-section shows the drain water flowing around and over the tubes. A legend gives orange for warm drain water, blue for cold drinking water and brown for the copper walls.
 :width: 100%
 
-A vertical unit (left) and a horizontal unit in a shower channel drain (right). Temperatures are for an 8 L/min shower with equal flow on both sides, an effectiveness of 0.70 for the vertical unit and 0.50 for the horizontal one.
+A vertical unit (left) and a horizontal unit in a shower channel drain (right). Temperatures are for an 8 L/min shower with equal flow on both sides, an effectiveness of 0.70 for the vertical unit and 0.50 for the horizontal one. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dwhr_figures.py)
 :::
 
 Both types must keep the drinking water safe if the wall between the two flows fails. Certified units therefore have a double wall with a vented gap between the drain water and the drinking water, so a leak shows up as water dripping out of the gap rather than as sewage in the drinking water. The drain side gets a film of soap, skin fat and hair over time. A vertical unit is largely self-cleaning, because the falling water scours the wall, while a horizontal unit needs the grate and the channel cleaned as part of normal bathroom cleaning. On the cold side, the unit adds a pressure loss of about 0.1–0.4 bar at shower flow.
@@ -202,7 +202,7 @@ The preheated water can go to three places ({numref}`fig-dwhr-connections`):
 :alt: Three schematics side by side, each with a water heater at 55 °C, a shower mixer at 40 °C, an 8 L/min shower, a drain at 37 °C and a DWHR unit. In connection 1, preheated water (5.1 L/min at 31 °C) goes only to the mixer, and the heat from the water heater is cut by 45 %. In connection 2, preheated water (5.3 L/min at 31 °C) goes only to the water heater, and the heat is cut by 46 %. In connection 3, preheated water (8.0 L/min at 26 °C) goes to both, and the heat is cut by 54 %.
 :width: 100%
 
-The three ways of connecting a drain water heat recovery unit with an effectiveness of 0.60 at 8 L/min. Shower at 40 °C and 8 L/min, drain water at 37 °C, cold water at 10 °C, water heater at 55 °C. Calculated with the model in the dropdown at the end of the section.
+The three ways of connecting a drain water heat recovery unit with an effectiveness of 0.60 at 8 L/min. Shower at 40 °C and 8 L/min, drain water at 37 °C, cold water at 10 °C, water heater at 55 °C. Calculated with the model in the dropdown at the end of the section. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dwhr_figures.py)
 :::
 
 In connection 3 the calculation is simple. All the water the shower uses enters the house at $\theta_p$ instead of $\theta_c$, so the heat needed for the shower falls from $C(\theta_{mix} - \theta_c)$ to $C(\theta_{mix} - \theta_p)$. The fraction of the shower heat that is saved is
@@ -222,7 +222,7 @@ In connections 1 and 2 only part of the shower water passes the unit, about two-
 :alt: Two line charts. Left: effectiveness against shower flow from 4 to 14 L/min for five certified units, each falling with flow and passing through its certified value at 8 L/min: Showersave QB1-21XE 0.77 to 0.64, ACO ShowerDrain X2.2 0.68 to 0.53, Zypho Slim 50 and Zypho PiPe 60 about 0.62 to 0.46, Joulia-Inline 5 0.50 to 0.34. Right: percentage of shower heat saved against certified effectiveness from 0.3 to 0.75 for the three connections; equal flow rises from 27 % to 68 %, the other two from about 23–25 % to 55–57 %, crossing near 0.66.
 :width: 100%
 
-Left: effectiveness at equal flow against shower flow for the five units in {numref}`tab-dwhr-products`, from the certified value at 8 L/min with $UA$ proportional to the square root of the flow. Right: share of the shower heat saved for the three connections, for an 8 L/min shower at 40 °C, drain water at 37 °C and cold water at 10 °C.
+Left: effectiveness at equal flow against shower flow for the five units in {numref}`tab-dwhr-products`, from the certified value at 8 L/min with $UA$ proportional to the square root of the flow. Right: share of the shower heat saved for the three connections, for an 8 L/min shower at 40 °C, drain water at 37 °C and cold water at 10 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dwhr_figures.py)
 :::
 
 ### How much does it save?
@@ -360,7 +360,7 @@ A family of four uses the profile "Family of 4, morning and evening" from the si
 :label: fig-dhw-tank-sizing
 :alt: Two plots of cumulative heat over a day. In both, the orange demand curve is nearly flat except for a large step at 06–07 (two showers) and a smaller step at 20–21 (one shower). Left, uniform charging: the blue charge curve is a straight line lifted to touch the demand curve at about 08:00, and the largest gap, 2.8 kWh or about 63 L, is at 06:00. Right, night charging: the blue curve rises steeply from 0 to 6.7 kWh between 00 and 06 and is flat after that; the largest gap, 6.5 kWh or about 147 L, is at 06:00.
 
-Cumulative charge and cumulative demand for the family of four, with uniform charging (left) and night charging 00–06 (right). The largest vertical gap is the heat the tank must store.
+Cumulative charge and cumulative demand for the family of four, with uniform charging (left) and night charging 00–06 (right). The largest vertical gap is the heat the tank must store. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/tank_sizing_curves.py)
 :::
 
 **Step 4.** With $\eta_{use} = 0.85$ and 1.155 Wh/(L·K):

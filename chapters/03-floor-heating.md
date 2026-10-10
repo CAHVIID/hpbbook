@@ -83,7 +83,7 @@ At 29 °C and a room at 20 °C, equation {eq}`eq-floor-flux` gives about 100 W/m
 :alt: Line chart of heat flux against the difference between floor surface and room temperature, from 0 to 16 K. The curve rises almost linearly. Marked points: 1.1 K gives 10 W/m² for a low-energy house, 9 K gives 100 W/m² at the limit for occupied zones (29 °C floor, 20 °C room, or 33 °C floor and 24 °C room in bathrooms), and 15 K gives 175 W/m² at the limit for perimeter zones (35 °C floor, 20 °C room).
 :width: 80%
 
-Basic characteristic curve of a heated floor, equation {eq}`eq-floor-flux`, with the floor surface temperature limits. After EN 1264 {cite:p}`en1264`.
+Basic characteristic curve of a heated floor, equation {eq}`eq-floor-flux`, with the floor surface temperature limits. After EN 1264 {cite:p}`en1264`. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/ch03_small_figures.py)
 :::
 
 Floor covering adds thermal resistance between the pipes and the room. Tiles add little, while wood and carpet add a lot, so a wooden floor needs a higher water temperature for the same output.
@@ -186,7 +186,7 @@ The loop opens when the room is below the setpoint minus a hysteresis and closes
 :alt: Left, controller output in percent against room temperature. On/off control jumps between 0 and 100 % with a ±0.25 K hysteresis around 21 °C. A 0.5 K proportional band gives a steep line and a 4 K band a shallow line, both passing 50 % at the setpoint. Right, room temperature over 12 hours after a cold start at 18 °C. On/off control cycles between about 20 and 21.3 °C. The narrow band overshoots to the setpoint and settles with small damped oscillations just below it. The wide band rises smoothly and settles at about 20.3 °C, an offset of about 0.7 K below the setpoint.
 :width: 100%
 
-On/off control compared with a proportional controller with a narrow and a wide proportional band. a) Controller output against room temperature. The dashed line is the switching path when the room cools. b) Room temperature after a cold start. Simple room model with a light floor and a 12 min valve delay. The valve follows the controller output directly, so PWM is averaged out.
+On/off control compared with a proportional controller with a narrow and a wide proportional band. a) Controller output against room temperature. The dashed line is the switching path when the room cools. b) Room temperature after a cold start. Simple room model with a light floor and a 12 min valve delay. The valve follows the controller output directly, so PWM is averaged out. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/pband_figure.py)
 :::
 
 
@@ -207,7 +207,7 @@ The room unit runs a PI controller with a predefined duty cycle. If 40 % output 
 :alt: Top, a room temperature curve wanders around a 21 °C setpoint inside a 1 K proportional band, crossed by a triangular signal with a 20 min period. Above the band the valve is always closed, below it always open. Bottom, the resulting valve signal is a series of open pulses whose length in each 20 min cycle varies from 18 % to 77 %, longest when the room is coldest.
 :width: 100%
 
-PWM control of a wax thermostat. The valve is open while the measured room temperature lies below the triangular signal. The dotted lines link one open pulse to the two crossings that start and end it. The percentages give the share of each cycle that the valve is open. Illustration with a 20 min cycle and a 1 K proportional band.
+PWM control of a wax thermostat. The valve is open while the measured room temperature lies below the triangular signal. The dotted lines link one open pulse to the two crossings that start and end it. The percentages give the share of each cycle that the valve is open. Illustration with a 20 min cycle and a 1 K proportional band. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/pwm_figure.py)
 :::
 
 PWM smooths the room temperature, but it does not remove the delay: the sensor measures the room, the valve acts on the water, but the thermal mass of the floor lies in between. Whatever the controller decides, the floor delivers it over the next 0.5–1 h (light floor) or many hours (heavy floor). When the room warms, the controller sees that and closes the valve, but it cannot take back the heat already stored in the floor.
@@ -226,7 +226,7 @@ Conservation of energy across lump boundaries ({numref}`fig-floor-lump-balance`)
 :alt: Diagram of the floor above the insulation drawn as one box with heat capacity C and temperature T_f. An arrow from the left brings energy in from the water in the pipes, zero when the loop is closed. An arrow upwards takes energy out to the room at T_r, equal to (T_f minus T_r) divided by R, through the covering and surface. A note on the right says no heat is generated inside the floor. Inside the box, the stored energy rate is C times dT_f/dt. Below the box is adiabatic insulation.
 :width: 75%
 
-Energy balance of the floor as one lump.
+Energy balance of the floor as one lump. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/ch03_small_figures.py)
 :::
 
 $$
@@ -323,7 +323,7 @@ In reality a floor has many layers and therefore many time constants.  -->
 :alt: Two line charts of heat output to the room in percent of steady state over 24 hours. Left, after the wax thermostat opens, the light floor reaches 63 % in about half an hour and the heavy floor in about 2 hours. Right, after the wax thermostat closes, the light floor falls to 37 % in about 1 hour, while the heavy floor takes about 12 hours and still delivers about 12 % after 24 hours.
 :width: 100%
 
-Heat output of the two floors in {numref}`fig-floor-sections` after a) the wax thermostat opens and b) the wax thermostat closes. The dashed lines mark 63 % of the change. One-dimensional conduction model, water at 30 °C, room at 20 °C. Wax thermostat delay and the response of the room itself are not included.
+Heat output of the two floors in {numref}`fig-floor-sections` after a) the wax thermostat opens and b) the wax thermostat closes. The dashed lines mark 63 % of the change. One-dimensional conduction model, water at 30 °C, room at 20 °C. Wax thermostat delay and the response of the room itself are not included. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/floor_step_response.py)
 :::
 
 
@@ -424,7 +424,7 @@ The product $\omega\tau = 2\pi\,\tau/24\,\mathrm{h}$ compares the time constant 
 :alt: Line chart over two days of the deviation from the daily mean, in percent of the demand swing. The heating demand is a sine peaking at 04:00 at plus 100 % and bottoming at 16:00 at minus 100 %. The light floor, time constant 1 hour, follows almost the same curve, 97 % of the swing and 1 hour late. The heavy floor, time constant 12 hours, swings only plus/minus 30 % and peaks 4.8 hours late, around 09:00.
 :width: 100%
 
-A first-order floor following a heating demand that swings over 24 hours, equation {eq}`eq-sine-response`. The arrows mark the lag behind the demand peak at 04:00. Only the swing is shown; the daily mean is delivered in full.
+A first-order floor following a heating demand that swings over 24 hours, equation {eq}`eq-sine-response`. The arrows mark the lag behind the demand peak at 04:00. Only the swing is shown; the daily mean is delivered in full. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/ch03_small_figures.py)
 :::
 
 The light floor follows the daily swing almost fully, one hour late ({numref}`fig-floor-daily-swing`). The heavy floor flattens it to a third and shifts it by nearly five hours. Heat asked for at 04:00, the coldest hour, is delivered around 09:00, just as the sun takes over. A lag of a quarter of the period is the worst case: the floor then heats hardest when the demand is changing from heating to cooling. This is why heating demand at night turns into overheating during the day.
@@ -551,7 +551,7 @@ A riser pump in proportional-pressure mode lowers its head as the flow falls (po
 :alt: Pump diagram with the flow drawn from the riser on the horizontal axis and differential pressure on the vertical axis. A constant-speed riser pump curve falls slowly from 45 kPa at zero flow. A proportional-pressure curve rises linearly from about 20 kPa to the same design point at 600 litres per hour and 41 kPa. Two system curves are shown, one for design and a steep one for low load. A dashed line 10 kPa above the constant-speed curve marks the pressure the thermostatic valve must absorb before the check valve opens. Point B at low load on the constant-speed curve is at about 45 kPa, and point C on the proportional-pressure curve is at about 23 kPa.
 :width: 90%
 
-Riser pump at design (A) and at low load with constant speed (B) and proportional pressure (C). The shaded band is the opening pressure of the check valve, which the thermostatic valve must absorb on top of the riser pressure before water flows through the bypass. Example values: 45 kPa shut-off head, 600 l/h design flow, 10 kPa opening pressure.
+Riser pump at design (A) and at low load with constant speed (B) and proportional pressure (C). The shaded band is the opening pressure of the check valve, which the thermostatic valve must absorb on top of the riser pressure before water flows through the bypass. Example values: 45 kPa shut-off head, 600 l/h design flow, 10 kPa opening pressure. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/riser_pump_curve.py)
 :::
 
 (sec-floor-model-theory)=
