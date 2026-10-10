@@ -42,5 +42,9 @@ project:
     - title: "Part E: Prefabrication of type houses"
       children:
         - file: parts/part-e-prefabrication.md
+    - title: "Appendices"
+      children:
+        - file: chapters/appendix-heat-pumps.md
+          title: "Heat pump model (under revision)"
 site:
   template: book-theme
