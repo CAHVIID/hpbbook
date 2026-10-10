@@ -147,11 +147,13 @@ Ventilative cooling cannot cool the room below the outdoor temperature. In warm 
 
 Report the fan hours per speed, the fan electricity (kWh), the PMV distribution with and without fans, and the hours above the category II limit with and without fans.
 
-**Q3.5 Cooling COP.** The fan does not remove heat; it lets the occupant accept a room that is CE warmer. An air-conditioner would instead have to lower the room temperature by CE, which in steady state takes Q_eq = H · CE, with H (W/K) the zone's heat loss coefficient (transmission and ventilation). The script sums Q_eq over the fan hours and reports
+**Q3.5 Cooling COP.** The fan does not remove heat; it lets the occupant accept a room that is CE warmer. The equivalent cooling is the heat that would have to be removed to cool the room air by CE, counted once in every fan hour (heat losses through the envelope are neglected):
 
-COP_fan = Q_eq / E_fan
+Q_cool = CE · V · ρ · c_p / 3600 (Wh per fan hour), with V the room volume (m³), ρ = 1.2 kg/m³, c_p = 1005 J/kgK
 
-Find H for each zone from IDA ICE: add an ideal cooler, run with cooling setpoints T_sp and T_sp + 1 K, and divide the difference in cooling energy by 1 K and by the number of hours. Enter H in the script. Compare COP_fan with the SEER of a split air-conditioner (about 5–8). Why is the COP of a fan in a well-insulated house lower than the factor 10–100 often quoted? Comment on primary energy, and on when the fans run compared with the electricity price.
+COP_fan = Σ Q_cool / E_fan
+
+Enter the room volumes in the script, which reports Q_cool and COP_fan per zone and per fan speed. Compare COP_fan with the SEER of a split air-conditioner (about 5–8). Comment on primary energy, and on when the fans run compared with the electricity price.
 
 *Hints*
 - `pip install pythermalcomfort pandas openpyxl`. The results are written to `fan_results.xlsx` (sheets `fan` and `zones`) and to `hourly_results/<zone>.csv` for your own figures.
