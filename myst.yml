@@ -39,6 +39,8 @@ project:
           title: "Ceiling fans (under revision)"
         - file: chapters/07-ceiling-fans_obsolete.md
           title: "Ceiling fans (obsolete)"
+        - file: assignments/cooling/cooling-assignment.md
+          title: "Assignment: Passive cooling (draft)"
     - title: "Part E: Prefabrication of type houses"
       children:
         - file: parts/part-e-prefabrication.md
