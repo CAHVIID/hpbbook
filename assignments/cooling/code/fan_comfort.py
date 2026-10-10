@@ -1,4 +1,4 @@
-"""Ceiling fans in peak periods: thermal comfort, fan energy, and cooling fan efficiency.
+"""Ceiling fans in peak periods: thermal comfort, fan energy, cooling fan efficiency and cooling COP.
 
 Replaces the old pmv_hourly_analysis.py from Assignment 4 (2025).
 
@@ -24,6 +24,10 @@ Method, for each occupied hour in each zone
 
 Fan indicators
   - Cooling fan efficiency, CFE = CE / P_fan (degC per W), ASHRAE 216.
+  - Cooling COP = Q_eq / P_fan. Q_eq is the cooling an air-based air-conditioner would have
+    to deliver to supply the fan's airflow CE colder: Q_eq = q_fan * rho * cp * CE, with q_fan
+    the fan airflow (m3/s). It is a "same comfort" yardstick, not heat removed from the room:
+    the fan itself removes no heat.
 
 Output
   - fan_results.xlsx: sheet "fan" (per speed) and sheet "zones" (per zone summary).
@@ -88,6 +92,7 @@ PMV_TARGET = 0.5                  # lowest speed that reaches this PMV is chosen
 # Reference condition for the fan table (ASHRAE 216 style comparison)
 REF = dict(tdb=28.0, tr=28.0, rh=50.0, met=1.2, clo=0.5)
 
+RHO, CP = 1.2, 1005.0             # air density (kg/m3) and specific heat (J/kgK)
 OUT_FILE = "fan_results.xlsx"
 
 # =============================================================================================
@@ -155,6 +160,11 @@ def period_hours(period):
     return hours[(md >= m0 * 100 + d0) & (md <= m1 * 100 + d1)]
 
 
+def q_eq(q_m3h, ce_k):
+    """Equivalent cooling (W): the fan's airflow supplied CE colder."""
+    return q_m3h / 3600 * RHO * CP * ce_k
+
+
 def fan_table():
     """Air speed, CE and CFE per speed at the reference condition, in the first zone."""
     R, C = ZONES[0][1], ZONES[0][2]
@@ -163,7 +173,8 @@ def fan_table():
         s_f, s_o = air_speed(q, FAN["diameter"], R, C)
         c = float(cooling_effect(vr=s_o, **REF).ce)
         rows.append(dict(speed=name, airflow_m3h=q, power_W=p, S_F=round(s_f, 2), S_O_avg=round(s_o, 2),
-                         CE_K=round(c, 2), CFE_K_per_W=round(c / p, 3)))
+                         CE_K=round(c, 2), CFE_K_per_W=round(c / p, 3),
+                         Q_eq_W=round(q_eq(q, c)), cooling_COP=round(q_eq(q, c) / p)))
     return pd.DataFrame(rows)
 
 
@@ -185,7 +196,7 @@ def run_zone(name, R, C, occ_hours, limit):
     d["pmv_still"] = pmv(d["tdb"], d["tr"], V_STILL, d["rh"], d["clo"])
 
     # Fan control: lowest speed that reaches PMV_TARGET
-    d["speed"], d["v"], d["P_W"] = "off", V_STILL, 0.0
+    d["speed"], d["v"], d["P_W"], d["q_fan_m3h"] = "off", V_STILL, 0.0, 0.0
     d["pmv_fan"], d["CE"] = d["pmv_still"], 0.0
     todo = d["occupied"] & (d["pmv_still"] > PMV_ON)
     for sp, (q, p) in FAN["speeds"].items():
@@ -197,7 +208,7 @@ def run_zone(name, R, C, occ_hours, limit):
         pm = pmv(x["tdb"], x["tr"], v, x["rh"], x["clo"])
         last = sp == list(FAN["speeds"])[-1]
         ok = idx[(pm <= PMV_TARGET) | last]
-        d.loc[ok, ["speed", "v", "P_W"]] = sp, v, p
+        d.loc[ok, ["speed", "v", "P_W", "q_fan_m3h"]] = sp, v, p, q
         d.loc[ok, "pmv_fan"] = pm[(pm <= PMV_TARGET) | last]
         todo.loc[ok] = False
     on = d["speed"] != "off"
@@ -205,15 +216,19 @@ def run_zone(name, R, C, occ_hours, limit):
         x = d.loc[on]
         d.loc[on, "CE"] = ce(x["tdb"], x["tr"], x["v"], x["rh"], x["clo"])
     d["top_eq"] = d["top"] - d["CE"]
+    d["Q_eq_W"] = q_eq(d["q_fan_m3h"], d["CE"])
 
     occ = d[d["occupied"]]
     e_fan = d["P_W"].sum() / 1000
+    e_eq = d["Q_eq_W"].sum() / 1000
     s = dict(zone=name, occupied_h=len(occ), fan_h=int(on.sum()))
     for sp in FAN["speeds"]:
         s[f"fan_h_{sp}"] = int((d["speed"] == sp).sum())
     s.update(fan_kWh=round(e_fan, 2),
              mean_CE_K=round(d.loc[on, "CE"].mean(), 2) if on.any() else 0.0,
              CFE_K_per_W=round((d.loc[on, "CE"] / d.loc[on, "P_W"]).mean(), 3) if on.any() else np.nan,
+             Q_eq_kWh=round(e_eq, 1),
+             cooling_COP=round(e_eq / e_fan) if e_fan > 0 else np.nan,
              max_top=round(occ["top"].max(), 1), max_top_eq=round(occ["top_eq"].max(), 1))
     if limit is not None:
         lim = limit[d.index - 1]
@@ -243,6 +258,7 @@ def main():
         d.round(3).to_csv(os.path.join("hourly_results", f"{name}.csv"), index_label="hour_of_year")
     zones = pd.DataFrame(summaries)
     total = zones.select_dtypes("number").sum()
+    total["cooling_COP"] = round(total["Q_eq_kWh"] / total["fan_kWh"]) if total["fan_kWh"] else np.nan
     for col in ("mean_CE_K", "CFE_K_per_W", "max_top", "max_top_eq"):
         total[col] = np.nan
     zones = pd.concat([zones, total.to_frame().T.assign(zone="TOTAL")], ignore_index=True)

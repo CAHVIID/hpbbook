@@ -5,7 +5,7 @@
 :::{note} Files for this assignment
 All files are in the folder `assignments/cooling/` of the book repository:
 - `weather/5A_Copenhagen_HW_MostSevere_2054_clean.epw`: the heat-wave weather file for part 4.
-- `code/fan_comfort.py`: comfort, fan energy and cooling fan efficiency from IDA ICE results (part 3 and 4).
+- `code/fan_comfort.py`: comfort, fan energy, cooling fan efficiency and cooling COP from IDA ICE results (part 3 and 4).
 - `code/feet_draught.py`: peak draught rate at feet level from an exported air-velocity field (part 2).
 - `code/clean_epw.py`: the script that repaired the weather file.
 :::
@@ -147,14 +147,22 @@ Ventilative cooling cannot cool the room below the outdoor temperature. In warm 
 
 Report the fan hours per speed, the fan electricity (kWh), the PMV distribution with and without fans, and the hours above the category II limit with and without fans.
 
-**Q3.5 Fans versus air-conditioning.** Compare the fan electricity with what an air-conditioner would use in the same hours. Which fan and speed has the best CFE? Comment on primary energy, and on when the fans run compared with the electricity price.
+**Q3.5 Cooling COP.** The fan removes no heat, but it gives the occupant the same comfort as air supplied CE degrees colder. An air-based air-conditioner delivering the fan's airflow q_fan (m³/s) CE colder would have to provide
+
+Q_eq = q_fan · ρ · c_p · CE, with ρ = 1.2 kg/m³ and c_p = 1005 J/kgK
+
+and the fan's cooling COP is
+
+COP_fan = Q_eq / P_fan
+
+The script reports Q_eq and COP_fan per speed and per zone (summed over the fan hours). Compare COP_fan with the SEER of a split air-conditioner (about 5–8). Why is the comparison flattering for the fan? Comment on primary energy, and on when the fans run compared with the electricity price.
 
 *Hints*
 - `pip install pythermalcomfort pandas openpyxl`. The results are written to `fan_results.xlsx` (sheets `fan` and `zones`) and to `hourly_results/<zone>.csv` for your own figures.
 - The fan power only counts in fan hours.
 - Check the clothing, metabolic rate and the PMV threshold in the input section, and argue for your choice.
 
-**Deliverables:** fan datasheet values, table of air speed, CE, power and CFE per speed, fan hours and kWh, hours above category II with and without fans, 5–10 lines comparing fans with air-conditioning.
+**Deliverables:** fan datasheet values, table of air speed, CE, power and CFE per speed, fan hours and kWh, hours above category II with and without fans, COP_fan with the calculation shown, 5–10 lines comparing fans with air-conditioning.
 
 ---
 
@@ -192,7 +200,7 @@ In a four-week heat wave the windows, hatches and fans may not be enough. Extern
 1. Which of the four steps gave the largest reduction in overheating hours per krone? Which was free?
 2. Your window optimisation was done for the 2050 typical year. Would it change for the heat-wave year?
 3. Where in the year does your hatch hit its draught limit, and would occupants close it anyway?
-4. A fan cools the occupant, not the room. When is that not enough?
+4. A fan with a COP of several hundred sounds better than any air-conditioner, yet it removes no heat. When is a fan not enough?
 5. Shutters solve the heat wave but darken the home. How would you hand the shutter decision to the occupants?
 
 ## Sources
