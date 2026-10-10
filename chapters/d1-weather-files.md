@@ -288,7 +288,7 @@ The two file sets disagree on future cloudiness ({numref}`fig-cloud-cover`). The
 :name: fig-cloud-cover
 :width: 100%
 
-(a) Mean total sky cover, May to September, in the DMI DRY files. (b) Monthly global horizontal irradiation in the Annex 80 Copenhagen TMY files, which contain no cloud cover data.
+(a) Mean total sky cover, May to September, in the DMI DRY files. (b) Monthly global horizontal irradiation in the Annex 80 Copenhagen TMY files, which contain no cloud cover data. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_cloud_cover.py)
 ```
 
 ## D1.5 Extremes
