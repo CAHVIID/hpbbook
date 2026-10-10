@@ -8,24 +8,37 @@ project:
   toc:
     - file: index.md
     - file: chapters/01-intro.md
+      title: "Intro (under revision)"
     - file: chapters/02-weather-files.md
+      title: "Future climate and weather files (under revision)"
     - title: "Part A: Compactness and envelope"
       children:
         - file: parts/part-a-compactness-envelope.md
         - file: chapters/a1-envelope.md
+          title: "The building envelope (under revision)"
         - file: chapters/a2-windows.md
+          title: "Windows (under revision)"
         - file: chapters/a3-glazing.md
+          title: "Glazing (under revision)"
     - title: "Part B: Ventilation"
       children:
         - file: parts/part-b-ventilation.md
     - title: "Part C: Heating systems and domestic hot water"
       children:
         - file: chapters/03-floor-heating.md
+          title: "Floor heating (under revision)"
         - file: chapters/04-domestic-hot-water.md
+          title: "Domestic hot water (under revision)"
     - title: "Part D: Cooling"
       children:
-        - file: chapters/05-ventilative-cooling.md
-        - file: chapters/06-ceiling-fans.md
+        - file: chapters/05-cooling-strategy.md
+          title: "Cooling strategy (under revision)"
+        - file: chapters/06-ventilative-cooling.md
+          title: "Ventilative cooling (under revision)"
+        - file: chapters/07-ceiling-fans.md
+          title: "Ceiling fans (under revision)"
+        - file: chapters/07-ceiling-fans_obsolete.md
+          title: "Ceiling fans (obsolete)"
     - title: "Part E: Prefabrication of type houses"
       children:
         - file: parts/part-e-prefabrication.md

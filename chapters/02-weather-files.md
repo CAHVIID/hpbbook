@@ -1,17 +1,8 @@
 # Future climate and weather files
 
-<!--
-## Learning objectives
-
-After this chapter you can:
-
-- explain what a weather file contains and how a reference year is assembled from measured months;
-- tell a design reference year (DRY) from a typical meteorological year (TMY) and choose the right file for sizing, compliance and overheating studies;
-- explain how future weather files are made and what their uncertainty means for design;
-- define a heat wave and use heat-wave weather files to stress-test a design;
-- read an EPW file and compute simple indicators such as hours above 26 °C, hours below 0 °C and degree-hours;
-- judge which design decisions still hold in a 2050 climate.
--->
+:::{warning} Under revision
+This chapter is being reworked and may change substantially.
+:::
 
 ## 1. Introduction
 

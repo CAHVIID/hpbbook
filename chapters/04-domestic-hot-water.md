@@ -1,16 +1,8 @@
 # Domestic hot water
 
-<!-- ## Learning objectives
-
-After this chapter you can:
-
-- estimate the annual hot water heat demand of a dwelling, and explain why it becomes a large share of the heat demand in a low-energy house
-- calculate the energy and the power needed for a tapping, and explain why the power, not the energy, decides how a hot water system is built
-- explain how a drain water heat recovery unit works, calculate its effectiveness and its annual saving, and judge when it pays back
-- read a tapping profile and an hourly electricity price profile, and explain why the two are badly matched
-- size a hot water tank and its heat pump so the tank can be charged in cheap hours, and estimate the saving
-- describe how hygiene (Legionella) and heat pump efficiency limit the tank temperature
- -->
+:::{warning} Under revision
+This chapter is being reworked and may change substantially.
+:::
 
 ## Introduction
 

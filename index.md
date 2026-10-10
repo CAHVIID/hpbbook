@@ -30,7 +30,9 @@ There are code snippets (apps) embedded into the textbook. The intention of the 
 
 **Part D: Cooling**
 
-5. [Ventilative cooling](chapters/05-ventilative-cooling.md)
-6. [Ceiling fans](chapters/06-ceiling-fans.md)
+5. [Cooling strategy](chapters/05-cooling-strategy.md)
+6. [Ventilative cooling](chapters/06-ventilative-cooling.md)
+7. [Ceiling fans](chapters/07-ceiling-fans.md)
+- [Ceiling fans, old version (obsolete)](chapters/07-ceiling-fans_obsolete.md)
 
 **Part E: Prefabrication of type houses** (not written yet)

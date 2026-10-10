@@ -1,15 +1,8 @@
 # Windows
 
-<!--
-## Learning objectives
-
-After this chapter you can:
-
-- calculate the U-value of a window from its glazing, frame and edge seal
-- explain how frame width and spacer type change the window U-value
-- compare windows by their winter energy balance, including solar gains
-- explain how the installation of the window in the wall adds a thermal bridge
--->
+:::{warning} Under revision
+This chapter is being reworked and may change substantially.
+:::
 
 ## Introduction
 

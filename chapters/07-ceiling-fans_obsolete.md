@@ -1,15 +1,8 @@
 # Ceiling fans
 
-<!--
-## Learning objectives
-
-After this chapter you can:
-
-- explain how elevated air speed offsets operative temperature, using PMV/SET and the adaptive comfort model
-- size and place a ceiling fan for a room from a datasheet
-- set up a temperature-stepped control strategy where the fan runs before any active cooling
-- estimate the change in PMV and the fan energy for a room, and compare it with air-conditioning
--->
+:::{danger} Obsolete
+This is the old version of the ceiling fans chapter. It is kept for reference and may be removed. See the new chapters on cooling strategy and ceiling fans.
+:::
 
 ## Introduction
 
@@ -17,10 +10,10 @@ Summers are also getting warmer, and heat waves are getting longer and more inte
 
 ### Fans cool people, not rooms
 
-A ceiling fan does not lower the air temperature. Its motor even adds a little heat to the room. What it does is raise the air speed around the occupants ({numref}`fig-fan-airflow`). Higher air speed increases the heat loss from the skin by convection and evaporation, so people feel cooler at the same temperature. A design air speed of about 0.5 m/s gives a cooling effect of roughly 2 °C {cite:p}`raftery2020`. In other words, a room at 28 °C with a fan running can feel like 26 °C without one.
+A ceiling fan does not lower the air temperature. Its motor even adds a little heat to the room. What it does is raise the air speed around the occupants ({numref}`fig-fan-airflow-old`). Higher air speed increases the heat loss from the skin by convection and evaporation, so people feel cooler at the same temperature. A design air speed of about 0.5 m/s gives a cooling effect of roughly 2 °C {cite:p}`raftery2020`. In other words, a room at 28 °C with a fan running can feel like 26 °C without one.
 
-:::{figure} figures/ch06/ceiling-fan-airflow.png
-:label: fig-fan-airflow
+:::{figure} figures/ch07/ceiling-fan-airflow.png
+:label: fig-fan-airflow-old
 :alt: Side view of a room with a ceiling fan blowing a jet of air down to the floor, where it spreads out towards the walls and returns slowly to the ceiling. A seated occupant near the fan is in the moving air.
 :width: 90%
 
@@ -91,7 +84,7 @@ PMV was developed from climate chamber experiments with people in steady conditi
 The **adaptive model** in EN 16798-1 links the comfortable operative temperature to the running mean outdoor temperature, $\theta_{rm}$:
 
 ```{math}
-:label: eq-adaptive
+:label: eq-adaptive-old
 \theta_{c} = 0.33\,\theta_{rm} + 18.8
 ```
 
@@ -113,7 +106,7 @@ Both are available in the CBE Thermal Comfort Tool.
 The same air movement that cools on a warm day is felt as draught on a cool day. ISO 7730 {cite:p}`iso7730` predicts the percentage of people dissatisfied due to draught, the **draught rate**:
 
 ```{math}
-:label: eq-draught
+:label: eq-draught-old
 DR = (34 - t_a)(v - 0.05)^{0.62}(0.37\,v\,T_u + 3.14)
 ```
 
@@ -125,7 +118,7 @@ Draught does matter when the fan runs while the room is cool, for example in the
 
 ### The fan jet
 
-A ceiling fan draws air from above and pushes it down as a jet. The flow is an example of an **impinging jet** and has three parts ({numref}`fig-fan-airflow`):
+A ceiling fan draws air from above and pushes it down as a jet. The flow is an example of an **impinging jet** and has three parts ({numref}`fig-fan-airflow-old`):
 
 1. **The fan jet.** Just below the blades, the jet narrows to a diameter slightly smaller than the fan itself. It then travels down towards the floor with high air speed, often above 1 m/s directly below the fan.
 2. **The impingement zone.** When the jet hits the floor, it stops at a **stagnation point** under the fan centre and turns sideways. Air speeds right at the stagnation point are low.
@@ -173,7 +166,7 @@ A ceiling fan datasheet usually gives the blade diameter, the number of speeds, 
 For a given fan, the airflow $Q$, the power $P$ and the rotational speed $n$ are linked by the fan laws:
 
 ```{math}
-:label: eq-fan-laws
+:label: eq-fan-laws-old
 \frac{Q_2}{Q_1} = \frac{n_2}{n_1}, \qquad \frac{P_2}{P_1} = \left(\frac{n_2}{n_1}\right)^3
 ```
 
@@ -182,18 +175,18 @@ Halving the speed halves the airflow but cuts the power to one eighth. In practi
 The **efficacy** of a fan is its airflow per watt, here in m³/h per W:
 
 ```{math}
-:label: eq-efficacy
+:label: eq-efficacy-old
 \eta_{fan} = \frac{Q}{P}
 ```
 
-Because power grows faster than airflow, efficacy falls as speed increases. The Fanco Breeze AC 132 in {numref}`tab-fan-data`, for example, moves 375 m³/h per W at low speed, but only 201 m³/h per W at high speed.
+Because power grows faster than airflow, efficacy falls as speed increases. The Fanco Breeze AC 132 in {numref}`tab-fan-data-old`, for example, moves 375 m³/h per W at low speed, but only 201 m³/h per W at high speed.
 
 ### Data from manufacturers
 
-{numref}`tab-fan-data` compares fans from several manufacturers at their highest speed, which is the nominal operating point most datasheets report.
+{numref}`tab-fan-data-old` compares fans from several manufacturers at their highest speed, which is the nominal operating point most datasheets report.
 
 :::{table} Ceiling fan data at the highest speed, from manufacturer datasheets. Airflow in CFM has been converted to m³/h.
-:label: tab-fan-data
+:label: tab-fan-data-old
 :align: center
 
 | Fan | Motor | Diameter (m) | Airflow at max (m³/h) | Power at max (W) | Efficacy at max (m³/h per W) | Power at min (W) | Source |
@@ -224,7 +217,7 @@ Treat manufacturer data with care. US fans are tested to the DOE test procedure 
 The airflow on a datasheet is measured through the fan. It does not say how much air movement an occupant feels. That depends on the fan diameter and speed, the mounting height, the room size and, above all, where the occupant sits relative to the fan. A better measure of what a fan delivers is the **cooling fan efficiency (CFE)**, defined in ASHRAE Standard 216 as the cooling effect divided by the fan power:
 
 ```{math}
-:label: eq-cfe
+:label: eq-cfe-old
 CFE = \frac{\text{cooling effect}}{\text{fan power}} = -\frac{\Delta t_{eq}}{P_f}
 ```
 
@@ -232,10 +225,10 @@ where $\Delta t_{eq}$ is the whole-body cooling effect (°C, negative because th
 
 ### Cooling effect versus distance from the fan
 
-{numref}`fig-ce-distance` shows the cooling effect felt by a seated occupant at different distances from a 1.5 m ceiling fan. The air speeds are measured values (seated average of 0.1, 0.6 and 1.1 m height) from full-scale laboratory tests {cite:p}`raftery2019`, read off Figure 24 in {cite:t}`raftery2020`. The cooling effect is calculated with the SET method of ASHRAE 55 for a warm summer situation: 28 °C air and mean radiant temperature, 50% relative humidity, 1.2 met and 0.5 clo. The half-speed curve assumes that air speeds scale linearly with fan speed, as the measurements showed.
+{numref}`fig-ce-distance-old` shows the cooling effect felt by a seated occupant at different distances from a 1.5 m ceiling fan. The air speeds are measured values (seated average of 0.1, 0.6 and 1.1 m height) from full-scale laboratory tests {cite:p}`raftery2019`, read off Figure 24 in {cite:t}`raftery2020`. The cooling effect is calculated with the SET method of ASHRAE 55 for a warm summer situation: 28 °C air and mean radiant temperature, 50% relative humidity, 1.2 met and 0.5 clo. The half-speed curve assumes that air speeds scale linearly with fan speed, as the measurements showed.
 
-:::{figure} figures/ch06/cooling-effect-distance.png
-:label: fig-ce-distance
+:::{figure} figures/ch07/cooling-effect-distance.png
+:label: fig-ce-distance-old
 :alt: Line chart of cooling effect against horizontal distance from the fan centre for maximum and half fan speed. At maximum speed the cooling effect is about 4.5 °C within 0.6 m of the centre, falls to about 3.5 °C at 1.5 m and 2.7 °C at 6 m. At half speed the values are about 3.6, 2.3 and 1.3 °C.
 :width: 90%
 
@@ -262,23 +255,23 @@ The cooling effect depends on the conditions. For the CBE reference case (24.4 �
 {cite:t}`raftery2019` turned a large set of full-scale laboratory tests into simple regression models for the air speed in a room with a ceiling fan. The models work with dimensionless ratios of fan diameter $D$, room width $R$, ceiling height $C$ and blade height $H$ (all in m). First calculate the fan air speed $S_F$, the average air speed through the area swept by the blades, from the rated airflow $Q$ (m³/s):
 
 ```{math}
-:label: eq-sf
+:label: eq-sf-old
 S_F = \frac{4\,Q}{\pi D^2}
 ```
 
 The room-average air speed for seated occupants is then
 
 ```{math}
-:label: eq-so-avg
+:label: eq-so-avg-old
 S_{O,avg} = S_F \left(0.25 + 0.99\,\frac{D}{R} - 0.06\,\frac{C}{D} + 0.11\,\frac{D}{1.7} + 0.024\right)
 ```
 
 where 1.7 m is the height of the occupied zone and the term 0.024 applies to seated occupants. The model is valid for fans blowing downwards with at least 0.2 D between the blades and the ceiling. For a typical fan in a residential room, the bracket is about 0.5, so the room-average air speed is about half the fan air speed.
 
-{numref}`tab-cfe` applies this model to the fans from {numref}`tab-fan-data` in a 4.5 m × 4.5 m living room with a 2.7 m ceiling and the blades at 2.4 m.
+{numref}`tab-cfe-old` applies this model to the fans from {numref}`tab-fan-data-old` in a 4.5 m × 4.5 m living room with a 2.7 m ceiling and the blades at 2.4 m.
 
 :::{table} Estimated room-average air speed, cooling effect and CFE at maximum speed for a seated occupant in a 4.5 m × 4.5 m room (C = 2.7 m, H = 2.4 m). Cooling effect at 28 °C, 50% RH, 1.2 met, 0.5 clo.
-:label: tab-cfe
+:label: tab-cfe-old
 :align: center
 
 | Fan | Motor | $S_F$ (m/s) | $S_{O,avg}$ (m/s) | Cooling effect (°C) | Power (W) | CFE (°C per W) |

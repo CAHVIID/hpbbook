@@ -1,17 +1,8 @@
 # Ventilative cooling
 
-<!--
-## Learning objectives
-
-After this chapter you can:
-
-- explain why well-insulated, airtight Nordic homes overheat, and where ventilative cooling fits in the cooling strategy
-- estimate the airflow through an opening driven by wind and by stack effect, and the cooling it delivers
-- choose between single-sided, cross and stack ventilation, and mechanical ventilative cooling (bypass, boost and night cooling)
-- design a venting hatch that meets the requirements for fire escape, rain, burglary and heat loss
-- set up an opening control that cools without overcooling or draught
-- interpret overheating results against the BR18 and adaptive comfort criteria
--->
+:::{warning} Under revision
+This chapter is being reworked and may change substantially.
+:::
 
 ## Introduction
 
@@ -26,7 +17,7 @@ On a sunny day in April or September, solar and internal gains can lift the temp
 
 Ventilative cooling or venting (udluftning) means using outdoor air to remove heat from a building whenever the outdoor air is cooler than the indoor air.
 
-It is the second step in the cooling hierarchy, after reducing the heat gains (chapter 1) and before ceiling fans (chapter 6) and active cooling.
+It is the second step in the cooling strategy ([](05-cooling-strategy.md)), after reducing the heat gains and before ceiling fans ([](07-ceiling-fans.md)) and active cooling.
 
 The air can be moved in three ways:
 
@@ -89,7 +80,7 @@ The smaller opening dominates. Two openings of 0.5 m² each give an effective ar
 
 The pressure difference has two sources: buoyancy (the stack effect) and wind. Together with the placement of the openings they give the three modes of natural ventilative cooling in {numref}`fig-vc-modes`.
 
-:::{figure} figures/ch05/ventilation-modes.*
+:::{figure} figures/ch06/ventilation-modes.*
 :label: fig-vc-modes
 :alt: Three building sections side by side. (a) A room with one tall window: cool air enters at the bottom of the window and warm air leaves at the top, with the neutral pressure plane halfway up the opening. (b) A room with windows on opposite façades: wind pushes cool air in on the windward side, marked plus, and out on the leeward side, marked minus. (c) A two-storey section with a low window and a roof opening: cool air enters low, rises through the house and leaves through the roof, with the neutral pressure plane between the openings and the height h marked.
 :width: 100%
