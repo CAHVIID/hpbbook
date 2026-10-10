@@ -1,4 +1,4 @@
-"""Ceiling fans in peak periods: thermal comfort, fan energy, cooling fan efficiency and cooling COP.
+"""Ceiling fans in peak periods: thermal comfort, fan energy, and cooling fan efficiency.
 
 Replaces the old pmv_hourly_analysis.py from Assignment 4 (2025).
 
@@ -24,10 +24,6 @@ Method, for each occupied hour in each zone
 
 Fan indicators
   - Cooling fan efficiency, CFE = CE / P_fan (degC per W), ASHRAE 216.
-  - Cooling COP = Q_cool / E_fan. Q_cool is the equivalent cooling: the heat that must be
-    removed to cool the room air by CE, counted once in every fan hour,
-    Q_cool = CE * V * rho * cp / 3600 (Wh), with V the room volume (m3), rho = 1.2 kg/m3 and
-    cp = 1005 J/kgK. Heat losses through the envelope are neglected.
 
 Output
   - fan_results.xlsx: sheet "fan" (per speed) and sheet "zones" (per zone summary).
@@ -66,16 +62,16 @@ FAN = {
 }
 
 # Zones: folder name in MODEL_DIR, room width R (m), ceiling height C (m), occupied hours
-# (list of clock hours 0-23), and room volume V (m3) for the cooling COP.
+# (list of clock hours 0-23).
 BEDROOM = list(range(22, 24)) + list(range(0, 7))     # 22:00-07:00
 LIVING = list(range(7, 22))                           # 07:00-22:00
 ZONES = [
-    # name,                       R,   C,   occupied, V (m3)   [example values: use your model]
-    ("bedroom_1st_floor",         3.5, 2.5, BEDROOM, 35.0),
-    ("bedroom_2nd_floor",         3.5, 2.5, BEDROOM, 35.0),
-    ("dinning_room",              4.0, 2.5, LIVING,  50.0),
-    ("living_room_2nd_floor",     4.0, 2.5, LIVING,  50.0),
-    ("master_bedroom_2nd_floor2", 4.0, 2.5, BEDROOM, 40.0),
+    # name,                       R,   C,   occupied   [example values: use your model]
+    ("bedroom_1st_floor",         3.5, 2.5, BEDROOM),
+    ("bedroom_2nd_floor",         3.5, 2.5, BEDROOM),
+    ("dinning_room",              4.0, 2.5, LIVING),
+    ("living_room_2nd_floor",     4.0, 2.5, LIVING),
+    ("master_bedroom_2nd_floor2", 4.0, 2.5, BEDROOM),
 ]
 
 # Occupant
@@ -92,8 +88,6 @@ PMV_TARGET = 0.5                  # lowest speed that reaches this PMV is chosen
 # Reference condition for the fan table (ASHRAE 216 style comparison)
 REF = dict(tdb=28.0, tr=28.0, rh=50.0, met=1.2, clo=0.5)
 
-RHO, CP = 1.2, 1005.0             # air density (kg/m3) and specific heat (J/kgK)
-SEER_AC = 6.0                     # seasonal efficiency of a split air-conditioner, for comparison
 OUT_FILE = "fan_results.xlsx"
 
 # =============================================================================================
@@ -161,25 +155,19 @@ def period_hours(period):
     return hours[(md >= m0 * 100 + d0) & (md <= m1 * 100 + d1)]
 
 
-def q_cool(ce_k, volume):
-    """Equivalent cooling (Wh per fan hour): cool the room air by CE once."""
-    return ce_k * volume * RHO * CP / 3600
-
-
 def fan_table():
-    """Air speed, CE, CFE and cooling COP per speed at the reference condition, in the first zone."""
-    R, C, V = ZONES[0][1], ZONES[0][2], ZONES[0][4]
+    """Air speed, CE and CFE per speed at the reference condition, in the first zone."""
+    R, C = ZONES[0][1], ZONES[0][2]
     rows = []
     for name, (q, p) in FAN["speeds"].items():
         s_f, s_o = air_speed(q, FAN["diameter"], R, C)
         c = float(cooling_effect(vr=s_o, **REF).ce)
         rows.append(dict(speed=name, airflow_m3h=q, power_W=p, S_F=round(s_f, 2), S_O_avg=round(s_o, 2),
-                         CE_K=round(c, 2), CFE_K_per_W=round(c / p, 3),
-                         Q_cool_W=round(q_cool(c, V), 1), cooling_COP=round(q_cool(c, V) / p, 2)))
+                         CE_K=round(c, 2), CFE_K_per_W=round(c / p, 3)))
     return pd.DataFrame(rows)
 
 
-def run_zone(name, R, C, occ_hours, V, limit):
+def run_zone(name, R, C, occ_hours, limit):
     folder = os.path.join(MODEL_DIR, name)
     d = read_prn(os.path.join(folder, "TEMPERATURES.prn"),
                  {"tdb": (["tair", "air"], 2), "top": (["top", "oper"], 3)})
@@ -217,20 +205,15 @@ def run_zone(name, R, C, occ_hours, V, limit):
         x = d.loc[on]
         d.loc[on, "CE"] = ce(x["tdb"], x["tr"], x["v"], x["rh"], x["clo"])
     d["top_eq"] = d["top"] - d["CE"]
-    d["Q_cool_Wh"] = q_cool(d["CE"], V)
 
     occ = d[d["occupied"]]
     e_fan = d["P_W"].sum() / 1000
-    q_eq = d["Q_cool_Wh"].sum() / 1000
     s = dict(zone=name, occupied_h=len(occ), fan_h=int(on.sum()))
     for sp in FAN["speeds"]:
         s[f"fan_h_{sp}"] = int((d["speed"] == sp).sum())
     s.update(fan_kWh=round(e_fan, 2),
              mean_CE_K=round(d.loc[on, "CE"].mean(), 2) if on.any() else 0.0,
              CFE_K_per_W=round((d.loc[on, "CE"] / d.loc[on, "P_W"]).mean(), 3) if on.any() else np.nan,
-             Q_cool_kWh=round(q_eq, 2),
-             cooling_COP=round(q_eq / e_fan, 1) if e_fan > 0 else np.nan,
-             AC_kWh_same_comfort=round(q_eq / SEER_AC, 2),
              max_top=round(occ["top"].max(), 1), max_top_eq=round(occ["top_eq"].max(), 1))
     if limit is not None:
         lim = limit[d.index - 1]
@@ -253,14 +236,13 @@ def main():
 
     summaries = []
     os.makedirs("hourly_results", exist_ok=True)
-    for name, R, C, occ, V in ZONES:
+    for name, R, C, occ in ZONES:
         print(f"Zone {name} ...")
-        s, d = run_zone(name, R, C, occ, V, limit)
+        s, d = run_zone(name, R, C, occ, limit)
         summaries.append(s)
         d.round(3).to_csv(os.path.join("hourly_results", f"{name}.csv"), index_label="hour_of_year")
     zones = pd.DataFrame(summaries)
     total = zones.select_dtypes("number").sum()
-    total["cooling_COP"] = round(total["Q_cool_kWh"] / total["fan_kWh"], 1) if total["fan_kWh"] else np.nan
     for col in ("mean_CE_K", "CFE_K_per_W", "max_top", "max_top_eq"):
         total[col] = np.nan
     zones = pd.concat([zones, total.to_frame().T.assign(zone="TOTAL")], ignore_index=True)
