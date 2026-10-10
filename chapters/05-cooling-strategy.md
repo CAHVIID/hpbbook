@@ -4,7 +4,7 @@
 This chapter is being reworked and may change substantially.
 :::
 
-## Why houses overheat
+## Houses overheat
 
 New Danish houses are insulated and airtight to keep heat in during winter. In summer the same envelope keeps the solar and internal gains in. Large glazed areas add to the gains, and a warmer future climate with longer heat waves ([](02-weather-files.md)) makes it worse.
 
