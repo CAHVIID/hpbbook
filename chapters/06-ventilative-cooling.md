@@ -13,6 +13,8 @@ Insulation, airtightness and large windows have made new homes very good at keep
 
 On a sunny day in April or September, solar and internal gains can lift the temperature well above comfort levels in a home that hardly needs heating. In a warmer climate with longer heat waves the problem grows. A study of Finnish apartment buildings found that openable windows were the most effective passive measure against overheating in the new building, though not enough in the old one {cite:p}`farahani2021`.
 
+@claude: could you make a figure that shows how cooling potential increases with outdoor temp and flow rate, but draught risk also depends on those parameters. While cooling potential may be linear, draught rate may be of different order.
+
 ## Ventilative cooling
 
 Ventilative cooling or venting (udluftning) means using outdoor air to remove heat from a building whenever the outdoor air is cooler than the indoor air.
