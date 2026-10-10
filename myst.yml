@@ -56,6 +56,8 @@ project:
           title: "Heat pump model (under revision)"
         - file: chapters/appendix-room-cfd.md
           title: "CFD model (under revision)"
+        - file: chapters/appendix-ac-europe.md
+          title: "Air-conditioning in Europe, summer 2026 (under revision)"
     - file: improvements.md
 site:
   template: book-theme
