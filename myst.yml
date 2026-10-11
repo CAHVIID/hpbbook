@@ -37,6 +37,8 @@ project:
           title: "Façade design (under revision)"
         - file: chapters/06-ventilative-cooling.md
           title: "Ventilative cooling (under revision)"
+        - file: chapters/06b-side-hung-windows.md
+          title: "Side-hung windows (under revision)"
         - file: chapters/07-ceiling-fans.md
           title: "Ceiling fans (under revision)"
         - file: chapters/07-ceiling-fans_obsolete.md
