@@ -48,5 +48,6 @@ project:
       children:
         - file: chapters/appendix-heat-pumps.md
           title: "Heat pump model (under revision)"
+    - file: improvements.md
 site:
   template: book-theme
