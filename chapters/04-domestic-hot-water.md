@@ -20,7 +20,7 @@ Net heat demand for space heating and domestic hot water in three Danish house s
 
 :::{admonition} Hot water in Building Code
 :class: dropdown
-The Danish energy frame calculation (Be18) uses a fixed hot water demand of 250 L per m² of heated floor area per year, heated from 10 °C to 55 °C {cite:p}`build213`. With equation {eq}`eq-dhw-energy` and the average properties of water between 10 °C and 55 °C this is
+The Danish energy frame calculation (Be18) uses a fixed hot water demand of 250 L per m² of heated floor area per year, heated from 10 °C to 55 °C {cite:p}`build213`. With the average properties of water between 10 °C and 55 °C this is
 
 $$
 Q = \bar\rho\,V\,\bar c_p\,(\theta - \theta_c) = \frac{994 \cdot 0.250 \cdot 4.182 \cdot (55 - 10)}{3600} = 13.0 \text{ kWh/(m}^2\,\text{year)}
@@ -330,7 +330,7 @@ Not all of it can be used. Between the hot water at the top and the cold water a
 
 The method compares, hour by hour, the heat the tank has to deliver with the heat the charging strategy puts in. It is the same method used to size water reservoirs, and it needs nothing more than a spreadsheet with one row per hour.
 
-**Step 1. Hourly heat demand.** From the tapping profile, add up the heat drawn in each hour with equation {eq}`eq-dhw-energy`, using the volume and use temperature of each tapping. Add the standing loss of the tank as a constant amount per hour, $\Phi_{loss} = UA\,(\theta_{set} - \theta_{room})$. The sum over the day is the heat the tank must receive, $Q_{day}$.
+**Step 1. Hourly heat demand.** From the tapping profile, add up the heat drawn in each hour, $Q = \rho\,V\,c_p\,(\theta - \theta_c)$, using the volume and use temperature of each tapping. Add the standing loss of the tank as a constant amount per hour, $\Phi_{loss} = UA\,(\theta_{set} - \theta_{room})$. The sum over the day is the heat the tank must receive, $Q_{day}$.
 
 **Step 2. Hourly charging.** Spread $Q_{day}$ evenly over the hours the charging strategy allows. With $N$ allowed hours, the heat source must deliver $\Phi_{ch} = Q_{day}/N$ during those hours. This is the first check of the design: if $\Phi_{ch}$ is larger than the heat output of the heat pump, the strategy cannot work, whatever the tank size.
 
