@@ -1,10 +1,10 @@
-# Ceiling fans
+# D6 Ceiling fans
 
 :::{warning} Under revision
 This chapter is being reworked and may change substantially.
 :::
 
-## Introduction
+## D6.1 Introduction
 
 A ceiling fan does not lower the air temperature. It raises the air speed around the occupants, which increases their convective and evaporative heat loss ({numref}`fig-fan-airflow`). About 0.5 m/s gives a cooling effect of roughly 2 °C {cite:p}`raftery2020`, so a room at 28 °C with the fan running can feel like 26 °C without it. In the cooling strategy ([](d2-cooling-strategy.md)), the fan is the step after reducing gains and venting, and before active cooling.
 
@@ -18,7 +18,7 @@ A ceiling fan seen from the side. The jet hits the floor, spreads towards the wa
 
 Two consequences follow. A fan only helps when someone is in the room. And it removes no heat from the building, so the gains must still be limited and removed by other means.
 
-## Air speed and thermal comfort
+## D6.2 Air speed and thermal comfort
 
 <!-- ### Operative temperature ignores air speed
 
@@ -82,7 +82,7 @@ The cooling effect of elevated air speed may be combined with the adaptive therm
 The category II upper limit is $\theta_c + 3$ °C. With elevated air speed, the limit may be raised by about 1.2 °C at 0.6 m/s up to about 2.2 °C at 1.2 m/s. Use PMV with SET to quantify a specific air speed, and the adaptive model for overheating assessment of free-running homes.
 
 
-## Airflow from a ceiling fan
+## D6.3 Airflow from a ceiling fan
 
 The fan produces an **impinging jet** ({numref}`fig-fan-airflow`). Below the blades the jet narrows and travels down at often more than 1 m/s. At the floor it stops at a stagnation point under the fan centre and turns sideways. It then spreads radially along the floor, slows down, rises along the walls and returns along the ceiling. The cooling is therefore largest under the fan and fades with distance.
 
@@ -92,7 +92,7 @@ Larger fans give a deeper spreading zone and a more uniform air speed in the roo
 
 Fan airflow is turbulent and fluctuates as the blades pass. The comfort models in this chapter use only the mean air speed, averaged over time and over ankle, waist and head height (0.1, 0.6 and 1.1 m for a seated person), and ignore the fluctuations. Laboratory studies suggest that fluctuating air feels cooler than steady air at the same mean speed, so using the mean is likely on the safe side.
 
-## Fan performance
+## D6.4 Fan performance
 
 A datasheet gives the diameter, the speeds, the airflow (usually only at maximum speed) and the electric power. US datasheets give airflow in CFM (1 CFM = 1.699 m³/h), and many EU datasheets in m³/min.
 
@@ -129,7 +129,7 @@ It falls as speed increases. The Fanco Breeze AC 132 moves 375 m³/h per W at lo
 
 DC fans move two to five times more air per watt than AC fans of the same diameter, and draw only 2 to 3 W at minimum speed against about 15 W. Datasheet values come from different test methods (DOE in the US, IEC 60879 in the EU), so check the manufacturer's own datasheet before using a number.
 
-## Cooling effect and cooling fan efficiency
+## D6.5 Cooling effect and cooling fan efficiency
 
 ### Cooling fan efficiency
 
