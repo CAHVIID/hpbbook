@@ -4,6 +4,8 @@
 Writes to ../figures/appendix-cfd/. Each run takes a few minutes on the default mesh:
 
     python cfd_examples.py
+
+Contact: Christian Hviid, cahv@dtu.dk. Use at own risk; see the disclaimer in room_cfd.py.
 """
 from pathlib import Path
 import numpy as np, matplotlib

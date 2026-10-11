@@ -6,6 +6,8 @@ Runs k-epsilon and Chen & Xu and compares u/u0 with the measurements in
 ../background/airflow/nielsen-1990-annex20-2d-measurements.csv. Writes to ../figures/appendix-cfd/.
 
     python cfd_annex20.py [ny]        # ny = 107 (default, about 35 min per run) or 54 (about 5 min)
+
+Contact: Christian Hviid, cahv@dtu.dk. Use at own risk; see the disclaimer in room_cfd.py.
 """
 import sys
 from pathlib import Path

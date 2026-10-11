@@ -28,6 +28,12 @@ Heat sources
   volumetric blocks (people, equipment): W per metre of room width spread over a rectangle
   floor heat flux patches (sun patch): W per metre of room width spread over a floor strip
 
+Contact: Christian Hviid, cahv@dtu.dk
+
+Disclaimer: use at own risk. This is a simplified 2D teaching model for comparing cases and seeing the
+physics. It has been validated only against the isothermal IEA Annex 20 two-dimensional test room
+(Nielsen 1990). It does not give design values, and it is provided as is, without warranty of any kind.
+
 2D caveat: the section represents a room that is W_room wide with openings spanning the
 full width. A 2D (line) jet decays as 1/sqrt(x), slower than a 3D jet (1/x), so speeds far
 from the opening are overestimated compared with a real window.

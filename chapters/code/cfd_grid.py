@@ -2,6 +2,8 @@
 16 °C supply, 6 ACH, gains for a well-mixed 26 °C room, on four grids, k-epsilon with TVD and upwind.
 
     python cfd_grid.py
+
+Contact: Christian Hviid, cahv@dtu.dk. Use at own risk; see the disclaimer in room_cfd.py.
 """
 from room_cfd import Case, Opening, HeatBlock, run, occupied_zone
 

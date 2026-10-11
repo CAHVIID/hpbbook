@@ -458,6 +458,8 @@ const CSS = `
 .rcfd .plate-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
 .rcfd .plate-head .status { font-family: var(--font-data); font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .rcfd canvas { display: block; width: 100%; }
+.rcfd .meta { margin: 10px 2px 0; color: var(--muted); font-size: 12px; }
+.rcfd .meta strong { color: var(--ink); font-weight: 600; }
 .rcfd .readouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
 .rcfd .ro { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; display: grid; gap: 2px; background: var(--panel); }
 .rcfd .ro .k { font-size: 11.5px; color: var(--muted); }
@@ -577,6 +579,7 @@ const MARKUP = `<div class="wrap">
         <p>The occupied zone (dashed) starts 0.6 m from the facade and the back wall and reaches 1.8 m up. ISO 7730 DR uses Tu = 40 %. The ASHRAE 55-2020 ankle draught model (Liu et al. 2017) uses the whole-body thermal sensation TS, here the PMV of the occupied zone at 1.2 met, 0.5 clo, 50 % RH and t<sub>r</sub> = t<sub>a</sub>. Both limits are 20 %.</p>
         <p>Limits: a 2D section treats the opening as running the full room width, and a 2D jet decays more slowly than a real 3D one. The opening is an inlet only, so a large opening does not also let warm air out at the top, as a real window would. Use it to compare cases, not to get design values.</p>
       </details>
+      <p class="meta">Contact: Christian Hviid, cahv@dtu.dk · <strong>Use at own risk.</strong> A simplified 2D teaching model for comparing cases, validated only against the isothermal IEA Annex 20 test room. Not for design values, and provided without warranty.</p>
     </section>
   </div>
 </div>
