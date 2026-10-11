@@ -49,7 +49,7 @@ Climate models give only daily temperature and precipitation, not the hourly rad
 :name: fig-dry-weather
 :width: 100%
 
-Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Danish design reference years at Sjælsmark: the old and new present-day files and the four RCP4.5 projections. The dashed line marks 26 °C.
+Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Danish design reference years at Sjælsmark: the old and new present-day files and the four RCP4.5 projections. The dashed line marks 26 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_dry.py)
 ```
 
 ```{list-table} Annual indicators of the Danish design reference years, computed from the EPW files.
@@ -195,7 +195,7 @@ The IEA EBC Annex 80 project made a second set of Copenhagen files from the MPI-
 :name: fig-annex80-weather
 :width: 100%
 
-Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Annex 80 Copenhagen files: three typical years and three heat-wave years. The dashed line marks 26 °C.
+Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Annex 80 Copenhagen files: three typical years and three heat-wave years. The dashed line marks 26 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_annex80.py)
 ```
 
 ```{list-table} Annual indicators of the IEA EBC Annex 80 weather files for Copenhagen, computed from the EPW files.
@@ -302,7 +302,7 @@ The Danish reference years are measured at Sjælsmark, a rural station, so they 
 :name: fig-vc-uhi
 :width: 100%
 
-Hourly ventilative cooling potential $\Delta T = T_\mathrm{in} - T_\mathrm{out}$ for the rural reference year at Sjælsmark, the same year with a 2 K night-time urban heat island (tapering to 0 K in the afternoon), and RCP4.5 2080–2099 with the heat island. Grey: heating days, with a daily mean below 12 °C.
+Hourly ventilative cooling potential $\Delta T = T_\mathrm{in} - T_\mathrm{out}$ for the rural reference year at Sjælsmark, the same year with a 2 K night-time urban heat island (tapering to 0 K in the afternoon), and RCP4.5 2080–2099 with the heat island. Grey: heating days, with a daily mean below 12 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/vc_potential_uhi.py)
 ```
 
 ## 6. Overheating indicators and design consequences
