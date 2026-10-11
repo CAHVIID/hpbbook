@@ -33,6 +33,8 @@ project:
       children:
         - file: chapters/05-cooling-strategy.md
           title: "Cooling strategy (under revision)"
+        - file: chapters/facade-design.md
+          title: "Façade design (under revision)"
         - file: chapters/06-ventilative-cooling.md
           title: "Ventilative cooling (under revision)"
         - file: chapters/07-ceiling-fans.md
