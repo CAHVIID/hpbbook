@@ -25,6 +25,8 @@ The equation shows the levers. Reduce the gains in the numerator, increase the a
 
 ## The cooling strategy
 
+%@claude: add something here about Potin's results regarding methodology on how to avoid overheating when climate changes
+
 The measures are applied in the order below. The order is cost-effective: each step is cheaper and uses less energy than the next, and each one reduces what the next has to handle. It also matches how severe the heat is. The first steps handle an ordinary Danish summer, and the later ones are added as warm spells turn into heat waves.
 
 1. **Reduce solar gains, keep daylight and view.** Solar-control glazing with a low g-value, sensible window areas and orientations, and fixed or movable external shading that still lets daylight in and gives a view out ([](a3-glazing.md)). External shading stops the sun outside the glass, while internal blinds release most of the heat they absorb into the room.

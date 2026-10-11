@@ -36,3 +36,11 @@ There are code snippets (apps) embedded into the textbook. The intention of the 
 - [Ceiling fans, old version (obsolete)](chapters/07-ceiling-fans_obsolete.md)
 
 **Part E: Prefabrication of type houses** (not written yet)
+
+**Appendices:** (not written yet)
+
+8. [Heat pump](chapters/appendix-heat-pump.md)
+9. [CFD](chapters/appendix-room-cfd.md)
+
+10. [Improvements](improvements.md)
+

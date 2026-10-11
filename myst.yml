@@ -33,8 +33,12 @@ project:
       children:
         - file: chapters/05-cooling-strategy.md
           title: "Cooling strategy (under revision)"
+        - file: chapters/facade-design.md
+          title: "Façade design (under revision)"
         - file: chapters/06-ventilative-cooling.md
           title: "Ventilative cooling (under revision)"
+        - file: chapters/06b-side-hung-windows.md
+          title: "Side-hung windows (under revision)"
         - file: chapters/07-ceiling-fans.md
           title: "Ceiling fans (under revision)"
         - file: chapters/07-ceiling-fans_obsolete.md
@@ -44,9 +48,12 @@ project:
     - title: "Part E: Prefabrication of type houses"
       children:
         - file: parts/part-e-prefabrication.md
-    - file: chapters/appendix-heat-pumps.md
-      title: "Appendix A: Heat pump model (under revision)"
-    - file: chapters/appendix-room-cfd.md
-      title: "Appendix B: Room CFD model (under revision)"
+    - title: "Appendices"
+      children:
+        - file: chapters/appendix-heat-pumps.md
+          title: "Heat pump model (under revision)"
+        - file: chapters/appendix-room-cfd.md
+          title: "CFD model (under revision)"
+    - file: improvements.md
 site:
   template: book-theme

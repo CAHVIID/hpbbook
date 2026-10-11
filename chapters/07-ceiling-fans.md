@@ -20,13 +20,15 @@ Two consequences follow. A fan only helps when someone is in the room. And it re
 
 ## Air speed and thermal comfort
 
-### Operative temperature ignores air speed
+<!-- ### Operative temperature ignores air speed
 
-Thermal comfort depends on metabolic rate, clothing, air temperature, mean radiant temperature, air speed and humidity. The **operative temperature**, the usual design value for overheating, combines only the air and mean radiant temperatures. It is the same with or without a fan, so the effect of a fan needs a comfort model that includes air speed.
+Thermal comfort depends on metabolic rate, clothing, air temperature, mean radiant temperature, air speed and humidity. The **operative temperature**, the usual design value for overheating, combines only the air and mean radiant temperatures. It is the same with or without a fan, so the effect of a fan needs a comfort model that includes air speed. -->
 
 ### PMV, SET and the cooling effect
 
-The **Predicted Mean Vote (PMV)** {cite:p}`iso7730` predicts the mean thermal sensation from −3 (cold) to +3 (hot). EN 16798-1 {cite:p}`en16798` uses it to define comfort categories:
+The **Predicted Mean Vote (PMV)** {cite:p}`iso7730` predicts the mean thermal sensation from −3 (cold) to +3 (hot).
+
+EN 16798-1 {cite:p}`en16798` uses it to define comfort categories:
 
 | Category | PMV range | Typical use |
 | --- | --- | --- |
@@ -36,9 +38,11 @@ The **Predicted Mean Vote (PMV)** {cite:p}`iso7730` predicts the mean thermal se
 
 PMV was fitted to still-air experiments and underestimates the cooling above about 0.2 m/s, mainly because it has no real sweating response. ASHRAE 55 {cite:p}`ashrae55` therefore uses the **Standard Effective Temperature (SET)** from a two-node body model. The **cooling effect** is the drop in air and radiant temperature that gives the same SET in still air as the room has with the fan running. PMV is then calculated at the lowered temperatures. The cooling effect grows quickly at low air speed and levels off at high speed. ASHRAE 55 caps the average air speed at 0.8 m/s unless occupants control the fan.
 
-SET works like the wind chill in a weather forecast: "it is 0 °C, but with the wind it feels like −6 °C." Wind chill is an empirical rule for cold, windy weather. SET does the same job indoors with a model of the body. It converts any combination of air speed, radiation, humidity and clothing into the temperature of a standard still-air room that would put the body in the same state, meaning the same skin temperature and skin wettedness. Skin temperature drives the feeling of warm or cold, and skin wettedness drives the sticky, too-warm discomfort. Two rooms with the same SET therefore feel equally warm, whatever the cause.
+SET works like the wind chill in a weather forecast: "it is 0 °C, but with the wind it feels like −6 °C."
 
-### Worked example: the cooling effect of a fan
+SET does the same job indoors with a model of the body. It converts any combination of air speed, radiation, humidity and clothing into the temperature of a standard still-air room that would put the body in the same state, meaning the same skin temperature and skin wettedness. Skin temperature drives the feeling of warm or cold, and skin wettedness drives the sticky, too-warm discomfort. Two rooms with the same SET therefore feel equally warm, whatever the cause.
+
+### Worked example: the cooling effect of elevated air speed
 
 {numref}`tab-ce-example` follows one seated person (1.2 met, 0.5 clo, 50% RH) through three rooms, calculated with Gagge's two-node model as used in ASHRAE 55 (pythermalcomfort).
 
@@ -46,16 +50,16 @@ SET works like the wind chill in a weather forecast: "it is 0 °C, but with the 
 :label: tab-ce-example
 :align: center
 
-| | Room A | Room B | Room C |
+| | Room A | Room B (+fan) | Room C (cooling effect) |
 | --- | --- | --- | --- |
 | Air and mean radiant temperature | 28 °C | 28 °C | 25.2 °C |
 | Air speed | 0.1 m/s | 0.5 m/s (fan) | 0.1 m/s |
-| Heat lost from the skin (W/m²) | 64 | 64 | 64 |
+| Heat lost from the skin (W/m²) | **64** | **64** | **64** |
 | ...by convection and radiation (W/m²) | 32 | 37 | 43 |
 | ...by evaporation (W/m²) | 32 | 28 | 21 |
 | Skin temperature (°C) | 34.5 | 34.2 | 34.0 |
 | Skin wettedness (–) | 0.27 | 0.16 | 0.16 |
-| SET (°C) | 27.9 | 24.9 | 24.9 |
+| SET (°C) | 27.9 | **24.9** | **24.9** |
 :::
 
 The body must lose about 64 W/m² in all three rooms. In the warm, still room A, little heat leaves by convection, so the body sweats and 27% of the skin is wet, which is felt as too warm and sticky. In room B the fan raises convection and evaporation, and the wettedness drops to 16%. Room C is the still-air room that puts the body in the same state as room B. It is found by lowering the air and radiant temperature until the SET matches, which happens at 25.2 °C. The cooling effect of the fan is therefore 28 − 25.2 = 2.8 °C.
@@ -68,7 +72,7 @@ Try it in the CBE Thermal Comfort Tool (<https://comfort.cbe.berkeley.edu>): 26 
 
 ### The adaptive model
 
-In homes without mechanical cooling, occupants adapt by opening windows and changing clothes, and accept higher temperatures than PMV predicts. The adaptive model in EN 16798-1 links the comfort temperature to the running mean outdoor temperature $\theta_{rm}$:
+The cooling effect of elevated air speed may be combined with the adaptive thermal model. In homes without mechanical cooling, occupants adapt by opening windows and changing clothes, and accept higher temperatures than PMV predicts. The adaptive model in EN 16798-1 links the comfort temperature to the running mean outdoor temperature $\theta_{rm}$:
 
 ```{math}
 :label: eq-adaptive
@@ -77,16 +81,6 @@ In homes without mechanical cooling, occupants adapt by opening windows and chan
 
 The category II upper limit is $\theta_c + 3$ °C. With elevated air speed, the limit may be raised by about 1.2 °C at 0.6 m/s up to about 2.2 °C at 1.2 m/s. Use PMV with SET to quantify a specific air speed, and the adaptive model for overheating assessment of free-running homes.
 
-### Draught
-
-The ISO 7730 draught rate {cite:p}`iso7730` predicts the percentage dissatisfied with draught:
-
-```{math}
-:label: eq-draught
-DR = (34 - t_a)(v - 0.05)^{0.62}(0.37\,v\,T_u + 3.14)
-```
-
-with $t_a$ the air temperature (°C), $v$ the mean air speed (m/s) and $T_u$ the turbulence intensity (%). It was developed for 20 to 26 °C and below 0.5 m/s, and does not apply to a warm person who has turned on a fan. It matters when the fan runs in a cool room, for example after night cooling, which is why the fan needs temperature control and a low minimum speed.
 
 ## Airflow from a ceiling fan
 
