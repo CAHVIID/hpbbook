@@ -11,11 +11,14 @@ Advection scheme (Case.advection), for momentum and temperature:
   "tvd"    : second-order upwind with the van Leer limiter (a TVD scheme). Same as upwind where
              the field has a peak or a step (no wiggles), second order where it is smooth.
 
-Turbulence (eddy viscosity nu_t, turbulent Prandtl number 0.85), two options:
-  "constant" : one nu_t everywhere (Case.nu_t)
-  "chen-xu"  : zero-equation indoor model nu_t = 0.03874 * V * l, with V the local mean
-               speed and l the distance to the nearest wall
-               (Chen, Q. & Xu, W. 1998, Energy and Buildings 28(2), 137-144)
+Turbulence (eddy viscosity nu_t, turbulent Prandtl number 0.85), three options:
+  "constant"  : one nu_t everywhere (Case.nu_t)
+  "chen-xu"   : zero-equation indoor model nu_t = 0.03874 * V * l, with V the local mean
+                speed and l the distance to the nearest wall
+                (Chen, Q. & Xu, W. 1998, Energy and Buildings 28(2), 137-144)
+  "k-epsilon" : standard k-epsilon model (Launder & Spalding 1974), nu_t = 0.09 k^2/eps,
+                with log-law wall functions, buoyancy production of k, and inlet turbulence
+                k = 1.5 (Tu_in U)^2, eps = k^1.5 / (0.1 h_inlet) as in the IEA Annex 20 test case
 
 Boundary conditions
   walls   : no slip, adiabatic
@@ -24,6 +27,12 @@ Boundary conditions
 Heat sources
   volumetric blocks (people, equipment): W per metre of room width spread over a rectangle
   floor heat flux patches (sun patch): W per metre of room width spread over a floor strip
+
+Contact: Christian Hviid, cahv@dtu.dk
+
+Disclaimer: use at own risk. This is a simplified 2D teaching model for comparing cases and seeing the
+physics. It has been validated only against the isothermal IEA Annex 20 two-dimensional test room
+(Nielsen 1990). It does not give design values, and it is provided as is, without warranty of any kind.
 
 2D caveat: the section represents a room that is W_room wide with openings spanning the
 full width. A 2D (line) jet decays as 1/sqrt(x), slower than a 3D jet (1/x), so speeds far
@@ -72,7 +81,8 @@ class Case:
     outlet: Opening = field(default_factory=lambda: Opening("right", 2.20, 2.40))
     heat: list = field(default_factory=list)
     floor_flux: list = field(default_factory=list)
-    turbulence: str = "chen-xu" # "chen-xu" or "constant"
+    turbulence: str = "k-epsilon"  # "k-epsilon" (default), "chen-xu" or "constant"
+    Tu_in: float = 0.04         # inlet turbulence intensity, used by "k-epsilon"
     nu_t: float = 2e-3          # eddy viscosity (m²/s) for "constant", about 130 x molecular
     Pr_t: float = 0.85
     advection: str = "tvd"      # "tvd" (van Leer, default) or "upwind"
@@ -157,6 +167,34 @@ def run(case: Case, verbose=False, live=False, monitor_every=50, live_every=20):
             return np.full((nx, ny), NU_AIR + case.nu_t)
         V = np.hypot(0.5 * (u[1:] + u[:-1]), 0.5 * (v[:, 1:] + v[:, :-1]))
         return NU_AIR + 0.03874 * V * lwall
+    # k-epsilon: constants, inlet values, wall-adjacent cells and their wall distance
+    ke = case.turbulence == "k-epsilon"
+    CMU, C1, C2, SK, SE, KAP, EWF = 0.09, 1.44, 1.92, 1.0, 1.3, 0.41, 9.0
+    k_in = 1.5 * (case.Tu_in * U_in) ** 2
+    e_in = k_in ** 1.5 / (0.1 * h_in)
+    k = np.full((nx, ny), k_in); eps = np.full((nx, ny), e_in)
+    wy = np.zeros((nx, ny), bool); wy[:, 0] = True; wy[:, -1] = bT == WALL
+    wx = np.zeros((nx, ny), bool); wx[0, :] = bL == WALL; wx[-1, :] = bR == WALL
+    wall_cell = wx | wy
+    yp = np.where(wy, dy / 2, np.inf); yp = np.where(wx, np.minimum(yp, dx / 2), yp)
+    walls_k = lambda b: (np.r_[b[0], b] == WALL) & (np.r_[b, b[-1]] == WALL)   # wall at each corner point
+    cT, cL, cR = walls_k(bT), walls_k(bL), walls_k(bR)
+
+    def nu_wall(kw, y):
+        """Effective viscosity tau_w * y / U_p from the log law (laminar below y* = 11.2)."""
+        ys = CMU ** 0.25 * np.sqrt(kw) * y / NU_AIR
+        return np.where(ys > 11.2, KAP * ys * NU_AIR / np.log(EWF * np.maximum(ys, 1.0)), NU_AIR)
+
+    def transport(phi, phi_in, D):
+        """Upwind advection + diffusion of a cell-centred scalar (zero flux at walls, zero gradient at outlets)."""
+        eL = np.where(bL == INLET, phi_in, phi[0]); eR = np.where(bR == INLET, phi_in, phi[-1])
+        Fx = u * _faces(np.vstack([eL, eL, phi, eR, eR]), u, False)
+        Fy = v * _faces(np.hstack([phi[:, :1], phi[:, :1], phi, phi[:, -1:], phi[:, -1:]]).T, v.T, False).T
+        Fy[:, 0] = 0.0
+        Fx[1:-1] -= 0.5 * (D[1:] + D[:-1]) * (phi[1:] - phi[:-1]) / dx
+        Fy[:, 1:-1] -= 0.5 * (D[:, 1:] + D[:, :-1]) * (phi[:, 1:] - phi[:, :-1]) / dy
+        return -((Fx[1:] - Fx[:-1]) / dx + (Fy[:, 1:] - Fy[:, :-1]) / dy)
+
     S = np.zeros((nx, ny))
     for b in case.heat:
         cells = np.outer((xc > b.x0) & (xc < b.x1), (yc > b.y0) & (yc < b.y1))
@@ -171,14 +209,14 @@ def run(case: Case, verbose=False, live=False, monitor_every=50, live_every=20):
     rows, cols, vals = [], [], []
     for i in range(nx):
         for j in range(ny):
-            k = idx(i, j); diag = 0.0
+            kc = idx(i, j); diag = 0.0
             for di, dj, h2, bnd in ((-1, 0, dx * dx, bL[j] if i == 0 else None), (1, 0, dx * dx, bR[j] if i == nx - 1 else None),
                                     (0, -1, dy * dy, WALL if j == 0 else None), (0, 1, dy * dy, bT[i] if j == ny - 1 else None)):
                 if bnd is None:
-                    rows.append(k); cols.append(idx(i + di, j + dj)); vals.append(1.0 / h2); diag -= 1.0 / h2
+                    rows.append(kc); cols.append(idx(i + di, j + dj)); vals.append(1.0 / h2); diag -= 1.0 / h2
                 elif bnd == OUTLET:
                     diag -= 2.0 / h2
-            rows.append(k); cols.append(k); vals.append(diag)
+            rows.append(kc); cols.append(kc); vals.append(diag)
     solve = factorized(sp.csc_matrix((vals, (rows, cols)), shape=(N, N)))
 
     def apply_bc(u, v):
@@ -207,9 +245,16 @@ def run(case: Case, verbose=False, live=False, monitor_every=50, live_every=20):
         mon = n % monitor_every == 0
         if mon:
             u0, v0, T0 = u.copy(), v.copy(), T.copy()
-        nu_c = eddy_viscosity(u, v)                                  # cell centres
+        nu_c = NU_AIR + CMU * k * k / eps if ke else eddy_viscosity(u, v)   # cell centres
         nup = np.pad(nu_c, 1, mode="edge")
         nu_k = 0.25 * (nup[:-1, :-1] + nup[1:, :-1] + nup[:-1, 1:] + nup[1:, 1:])   # cell corners
+        if ke:                                                       # wall shear from the log law
+            kp = np.pad(k, 1, mode="edge")
+            kk = 0.25 * (kp[:-1, :-1] + kp[1:, :-1] + kp[:-1, 1:] + kp[1:, 1:])
+            nu_k[:, 0] = nu_wall(kk[:, 0], dy / 2)
+            nu_k[:, ny] = np.where(cT, nu_wall(kk[:, ny], dy / 2), nu_k[:, ny])
+            nu_k[0, :] = np.where(cL, nu_wall(kk[0, :], dx / 2), nu_k[0, :])
+            nu_k[nx, :] = np.where(cR, nu_wall(kk[nx, :], dx / 2), nu_k[nx, :])
         alpha_c = nu_c / case.Pr_t
         umax = max(np.abs(u).max(), np.abs(v).max(), U_in, 0.05)
         dt = min(cfl * h / umax, 0.2 * h * h / nu_c.max(), 0.5)
@@ -261,18 +306,39 @@ def run(case: Case, verbose=False, live=False, monitor_every=50, live_every=20):
         diffy = np.zeros_like(Fy); diffy[:, 1:-1] = -0.5 * (alpha_c[:, 1:] + alpha_c[:, :-1]) * (T[:, 1:] - T[:, :-1]) / dy
         Fx += diffx; Fy += diffy
         Fy[:, 0] -= qfloor / (RHO * CP)                                   # floor heat flux enters through bottom faces
+        T_old = T
         T = T - dt * ((Fx[1:] - Fx[:-1]) / dx + (Fy[:, 1:] - Fy[:, :-1]) / dy) + dt * S / (RHO * CP)
+
+        # ---- k and epsilon (sink terms implicit, so k and eps stay positive) ----
+        if ke:
+            nut = nu_c - NU_AIR
+            ug = np.pad(u, ((0, 0), (1, 1))); ug[:, 0] = -u[:, 0]; ug[:, -1] = -u[:, -1]
+            vg = np.pad(v, ((1, 1), (0, 0))); vg[0] = -v[0]; vg[-1] = -v[-1]
+            sh = (ug[:, 1:] - ug[:, :-1]) / dy + (vg[1:] - vg[:-1]) / dx               # at corners
+            sh = 0.25 * (sh[:-1, :-1] + sh[1:, :-1] + sh[:-1, 1:] + sh[1:, 1:])
+            P = nut * (2 * (((u[1:] - u[:-1]) / dx) ** 2 + ((v[:, 1:] - v[:, :-1]) / dy) ** 2) + sh ** 2)
+            Up = np.hypot(0.5 * (u[1:] + u[:-1]), 0.5 * (v[:, 1:] + v[:, :-1]))
+            ypw = np.where(wall_cell, yp, 1.0)
+            tau = nu_wall(k, ypw) * Up / ypw                                         # kinematic wall shear
+            P = np.where(wall_cell, tau * CMU ** 0.25 * np.sqrt(k) / (KAP * ypw), P)
+            Gb = -G * beta * nut / case.Pr_t * np.gradient(T_old, dy, axis=1)         # < 0 in stable layers
+            rk = transport(k, k_in, NU_AIR + nut / SK)
+            re = transport(eps, e_in, NU_AIR + nut / SE)
+            k_new = (k + dt * (rk + P + np.maximum(Gb, 0))) / (1 + dt * (eps + np.maximum(-Gb, 0)) / k)
+            e_new = (eps + dt * (re + C1 * eps / k * (P + np.maximum(Gb, 0)))) / (1 + dt * C2 * eps / k)
+            k = np.maximum(k_new, 1e-10); eps = np.maximum(e_new, 1e-12)
+            eps = np.where(wall_cell, CMU ** 0.75 * k ** 1.5 / (KAP * ypw), eps)
 
         if mon:
             rms = lambda a: float(np.sqrt(np.mean(a * a)))
             q_open = (Fx[-1].sum() - Fx[0].sum()) * dy + Fy[:, -1].sum() * dx       # K m²/s per metre width
             T_exh = np.concatenate([T[-1, outR], T[0, outL], T[outT, -1]]).mean()
-            for k, val in (("t", t + dt), ("du", rms(u - u0) / dt), ("dv", rms(v - v0) / dt), ("dT", rms(T - T0) / dt),
+            for key, val in (("t", t + dt), ("du", rms(u - u0) / dt), ("dv", rms(v - v0) / dt), ("dT", rms(T - T0) / dt),
                            ("div", div_max), ("imb", 100 * (RHO * CP * q_open - Q_tot) / max(Q_tot, 1.0)),
                            ("v_floor", float(np.hypot(0.5 * (u[i_mon, j_mon] + u[i_mon + 1, j_mon]),
                                                       0.5 * (v[i_mon, j_mon] + v[i_mon, j_mon + 1])))),
                            ("T_exh", float(T_exh))):
-                hist[k].append(val)
+                hist[key].append(val)
             if view is not None and len(hist["t"]) % live_every == 0:
                 draw_convergence(hist, case, *view)
                 view[0].canvas.flush_events(); plt.pause(0.001)

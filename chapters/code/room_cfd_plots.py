@@ -9,6 +9,8 @@
 Each function takes one result or a dict {label: result} and returns the figure.
 Draught: ISO 7730 draught rate DR (Tu = 40 %, limit 20 %) and, at ankle height, the ASHRAE 55-2020
 ankle draft model PPD_AD (Liu et al. 2017, limit 20 %). No feet factor is applied to DR.
+
+Contact: Christian Hviid, cahv@dtu.dk. Use at own risk; see the disclaimer in room_cfd.py.
 """
 import numpy as np
 import matplotlib.pyplot as plt
