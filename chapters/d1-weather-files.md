@@ -1,20 +1,20 @@
 %@claude:Move this chapter to Part D
-# 4 Future climate and weather files
+# D1 Future climate and weather files
 
 :::{warning} Under revision
 This chapter is being reworked and may change substantially.
 :::
 
-## 4.1 Introduction
+## D1.1 Introduction
 
 Future climate changes and given the life span of buildings, they need to be designed for that. This chapter gives an overview of the climate challenges.
 
-## 4.2 What is in a weather file
+## D1.2 What is in a weather file
 
 %@claude: write this section and keep it short. Include what is DRY, TMY and EPW, keep it to a few lines.  
 *TBA* hourly dry-bulb temperature, humidity, direct normal, diffuse and global horizontal radiation, wind and cloud cover. File formats (EPW, the Danish DRY format, IDA ICE weather files) and where to get them.
 
-## 4.3 The Danish design reference year - DMI
+## D1.3 The Danish design reference year - DMI
 
 A reference year is one artificial year of hourly weather. It is assembled from twelve real calendar months, each picked from a longer measured record as the most typical month of its kind. DMI selects the months with the Finkelstein–Schafer method of ISO 15927-4. The method compares the distribution of daily values in each candidate month with the distribution for all years, using temperature, global radiation and humidity as primary parameters and wind and precipitation as secondary ones.
 
@@ -47,7 +47,7 @@ Climate models give only daily temperature and precipitation, not the hourly rad
 
 {numref}`fig-dry-weather` shows the current and future DRY files, and {numref}`tab-dry-summary` summarises them.
 
-```{figure} figures/ch04/dry-air-temperature.png
+```{figure} figures/d1/dry-air-temperature.png
 :name: fig-dry-weather
 :width: 100%
 
@@ -189,11 +189,11 @@ Four things stand out:
 - A reference year is built from *typical* months. DMI itself says it is not suited for sizing against extreme events such as overheating. Stress-test the design with a heat-wave file (section 5).
 ::: -->
 
-## 4.4 Future weather files - Annex 80
+## D1.4 Future weather files - Annex 80
 
 The IEA EBC Annex 80 project made a second set of Copenhagen files from the MPI-REMO regional climate model (EURO-CORDEX): typical meteorological years (TMY) for 2001–2020, 2041–2060 and 2081–2100, and three heat-wave years picked from 2041–2060 under RCP8.5 and bias-adjusted against observations from 2001–2019. Unlike the DRY files, these are model output, not measured months, so they can be hotter than anything seen so far. {numref}`fig-annex80-weather` shows them and {numref}`tab-annex80-summary` summarises them in the same way as the DRY files.
 
-```{figure} figures/ch04/annex80-weather.*
+```{figure} figures/d1/annex80-weather.*
 :name: fig-annex80-weather
 :width: 100%
 
@@ -280,7 +280,7 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
 \*The heat-wave file "longest" (2045) has no solar radiation from 1 to 14 August: global, direct and diffuse radiation are zero in all 336 hours, while temperature and humidity run on normally. The gap lies inside the heat wave the file was made for (15 July to 20 August 2045). Its annual global radiation is therefore about 90 kWh/m² too low, and its UTCI hours are underestimated. Use this file for temperature and humidity only, and the "most intense" or "most severe" file where solar gains matter. The three heat-wave files also contain 4–6 corrupt hours of global and diffuse radiation (values far above 1,400 W/m²); these were removed and interpolated before the table was computed.
 :::
 
-## 4.5 Extremes
+## D1.5 Extremes
 
 ### Heat waves
 
@@ -300,7 +300,7 @@ In Denmark the effect is modest but not negligible. On warm nights central Copen
 
 The Danish reference years are measured at Sjælsmark, a rural station, so they contain no heat island. The heat island acts exactly when night ventilation works. {numref}`fig-vc-uhi` colours every hour by the temperature difference available for ventilative cooling, $\Delta T = T_\mathrm{in} - T_\mathrm{out}$, with $T_\mathrm{in} = 24$ °C. Adding a 2 K night-time heat island lowers the mean night-time $\Delta T$ from May to September from 10.7 K to 8.8 K, and the number of night hours with less than 3 K rises from 20 to 77. In the RCP4.5 2080–2099 file with a heat island, the mean drops to 7.9 K and 161 night hours have less than 3 K.
 
-```{figure} figures/ch04/vc-potential-uhi.*
+```{figure} figures/d1/vc-potential-uhi.*
 :name: fig-vc-uhi
 :width: 100%
 

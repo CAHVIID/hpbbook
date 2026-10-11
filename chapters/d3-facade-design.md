@@ -19,7 +19,7 @@ After this chapter you can:
 *Outline:*
 
 - Low-energy houses overheat because of solar gains; the row house already has a very low heating demand, and the 2050 climate makes cooling the design problem [Assignment 04, 16.1].
-- Reduce the gains first: the façade decides the gain before any ventilation or fan has to remove it. Step 1 of the cooling strategy ([](05-cooling-strategy.md)), before ventilative cooling ([](07-ventilative-cooling.md)) and ceiling fans ([](09-ceiling-fans.md)).
+- Reduce the gains first: the façade decides the gain before any ventilation or fan has to remove it. Step 1 of the cooling strategy ([](d2-cooling-strategy.md)), before ventilative cooling ([](d4-ventilative-cooling.md)) and ceiling fans ([](d6-ceiling-fans.md)).
 - The conflict: every measure that cuts solar gain also cuts daylight. Since BR18, daylight can be documented with climate-based simulation to EN 17037, which makes the trade-off something you can optimise.
 - The running case: the critical centre zone of the course row house, 4 × 4 × 2.5 m, prefab constructions with U = 0.1 W/m²K, facing north or south.
 - Figure: the four design variables on one façade section and elevation (window height, glazing, overhang, side fins).
@@ -61,7 +61,7 @@ After this chapter you can:
 
 - What "cooling demand" means in the zone model: an ideal cooler at a set point, so the number measures the surplus heat the façade lets in, not a real cooling system.
 - Heating demand as the second objective: less solar gain means more heating.
-- Weather: the 2050 climate file (more critical than 2090), Annex 80 TMY 2041–2060 as in the cooling assignment ([](04-weather-files.md)).
+- Weather: the 2050 climate file (more critical than 2090), Annex 80 TMY 2041–2060 as in the cooling assignment ([](d1-weather-files.md)).
 
 ## Multi-objective optimisation
 
@@ -108,7 +108,7 @@ where $Q_C$ and $Q_H$ are the annual cooling and heating demand (kWh/m²), $h_{I
 
 All four share one dimensionless axis, so they can be read off one figure per orientation ({numref}`fig-facade-guideline`).
 
-```{figure} figures/facade/facade-guideline-schematic.*
+```{figure} figures/d3/facade-guideline-schematic.*
 :name: fig-facade-guideline
 :alt: Two panels, north and south, with window-to-floor ratio from 5 to 35 percent on the x-axis and normalised value on the y-axis. Daylight rises steeply and levels off near 2. Cooling rises almost linearly. Heating is nearly flat, with a shallow minimum towards south. Comfort is zero up to a threshold and then rises steeply. A dashed line at 1 marks the daylight requirement and the reference design. Shaded bands show the spread over solar-control glazing and overhangs. The minimum window-to-floor ratio is marked where daylight crosses 1.
 
@@ -162,7 +162,7 @@ The table holds for this climate file, this room depth and this construction. A 
 *Outline:*
 
 - Carrying the north and south designs back to the full row house; rooms with other depths and uses.
-- What is left for ventilative cooling ([](07-ventilative-cooling.md)) and ceiling fans ([](09-ceiling-fans.md)).
+- What is left for ventilative cooling ([](d4-ventilative-cooling.md)) and ceiling fans ([](d6-ceiling-fans.md)).
 
 ## Guiding questions
 

@@ -37,7 +37,7 @@ Floor heating is the standard heat emitter in newer Danish dwellings. It is invi
 
 Warm water from a manifold runs through a pipe loop in the floor of each room and returns a few kelvin cooler. The heat first warms the floor, and the floor surface then gives it to the room by radiation and convection ({numref}`fig-floor-principle`).
 
-:::{figure} figures/ch02/floor-heating-principle.*
+:::{figure} figures/c1/floor-heating-principle.*
 :label: fig-floor-principle
 :alt: Two panels. Left, a plan view of a room with a serpentine pipe loop: water leaves a manifold at about 30 °C, runs back and forth across the floor with legs 150–300 mm apart, changing colour from red to blue, and returns at about 25 °C. Right, a section of the same room: pipes cast in a concrete slab on insulation, under a floor covering. Wavy arrows show radiation and dashed arrows show convection from the floor to the room, and sunlight enters through a window onto the floor.
 :width: 100%
@@ -78,12 +78,12 @@ For comfort, the mean floor surface temperature is limited to:
 
 At 29 °C and a room at 20 °C, equation {eq}`eq-floor-flux` gives about 100 W/m², which is far more than a low-energy house needs ({numref}`fig-en1264-curve`).
 
-:::{figure} figures/ch02/en1264-curve.*
+:::{figure} figures/c1/en1264-curve.*
 :label: fig-en1264-curve
 :alt: Line chart of heat flux against the difference between floor surface and room temperature, from 0 to 16 K. The curve rises almost linearly. Marked points: 1.1 K gives 10 W/m² for a low-energy house, 9 K gives 100 W/m² at the limit for occupied zones (29 °C floor, 20 °C room, or 33 °C floor and 24 °C room in bathrooms), and 15 K gives 175 W/m² at the limit for perimeter zones (35 °C floor, 20 °C room).
 :width: 80%
 
-Basic characteristic curve of a heated floor, equation {eq}`eq-floor-flux`, with the floor surface temperature limits. After EN 1264 {cite:p}`en1264`. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/ch03_small_figures.py)
+Basic characteristic curve of a heated floor, equation {eq}`eq-floor-flux`, with the floor surface temperature limits. After EN 1264 {cite:p}`en1264`. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/c1_small_figures.py)
 :::
 
 Floor covering adds thermal resistance between the pipes and the room. Tiles add little, while wood and carpet add a lot, so a wooden floor needs a higher water temperature for the same output.
@@ -102,7 +102,7 @@ Floor covering adds thermal resistance between the pipes and the room. Tiles add
 
 Floor heating constructions are often grouped by how the pipes are embedded, i.e. how much heat capacity sits between the pipes and the room ({numref}`fig-floor-sections`).
 
-:::{figure} figures/ch02/floor-sections.*
+:::{figure} figures/c1/floor-sections.*
 :label: fig-floor-sections
 :alt: Two cross-sections drawn to the same scale. Left, a light floor: 22 mm floor boards resting on aluminium plates that wrap around the pipes, which sit in grooves in a 30 mm EPS panel on an 18 mm plywood board above insulation and joists. Right, a heavy floor: 14 mm parquet on a 100 mm concrete slab with the pipes in the middle of the slab, above EPS insulation.
 :width: 100%
@@ -129,7 +129,7 @@ In a heavy floor the pipes are cast into cement screed or concrete. A typical sc
 
 {numref}`fig-hydronic-schematic` shows a typical installation. The parts are the same for light and heavy floors.
 
-:::{figure} figures/ch02/hydronic-schematic.*
+:::{figure} figures/c1/hydronic-schematic.*
 :label: fig-hydronic-schematic
 :alt: Schematic of a hydronic floor heating system. A heat pump or district heating unit supplies water through a three-way mixing valve and a circulation pump to a manifold. The controller sets the mixing valve from an outdoor sensor and a supply temperature sensor. From the manifold, one loop runs to each of three rooms. The controller drives a motorized mixing valve. Each loop has a flow meter on the supply side and a wax thermostat on the return side, switched by a temperature sensor in its room.
 :width: 100%
@@ -160,7 +160,7 @@ Low supply temperature increases self-regulation.
 
 A wax thermostat is an on/off valve ({numref}`fig-wax-thermostat`). A small heater warms a wax capsule, the wax expands and pushes the valve open. It takes 2–3 min before the valve starts to move and another 3–5 min to open fully, and about the same to close.
 
-:::{figure} figures/ch02/wax-thermostat.jpg
+:::{figure} figures/c1/wax-thermostat.jpg
 :label: fig-wax-thermostat
 :alt: Photo of a wax thermostat: a blue cylindrical actuator with a grey threaded base that screws onto the valve on the manifold, and a grey cable for the 24 V supply from the room unit.
 :width: 35%
@@ -181,7 +181,7 @@ The loop opens when the room is below the setpoint minus a hysteresis and closes
 
 <!-- In this example the room needs more than 50 % output, and a proportional controller only gives more than 50 % when the room is below the setpoint. This remaining deviation is the offset. The I part of a PI controller removes it. -->
 
-:::{figure} figures/ch02/proportional-band.*
+:::{figure} figures/c1/proportional-band.*
 :label: fig-proportional-band
 :alt: Left, controller output in percent against room temperature. On/off control jumps between 0 and 100 % with a ±0.25 K hysteresis around 21 °C. A 0.5 K proportional band gives a steep line and a 4 K band a shallow line, both passing 50 % at the setpoint. Right, room temperature over 12 hours after a cold start at 18 °C. On/off control cycles between about 20 and 21.3 °C. The narrow band overshoots to the setpoint and settles with small damped oscillations just below it. The wide band rises smoothly and settles at about 20.3 °C, an offset of about 0.7 K below the setpoint.
 :width: 100%
@@ -202,7 +202,7 @@ The room unit runs a PI controller with a predefined duty cycle. If 40 % output 
 
 {numref}`fig-pwm-principle` shows how PWM works. The room unit compares the measured room temperature with a triangular signal that sweeps the proportional band once per cycle. The valve is open while the room is colder than the triangle. Below the band the valve stays open the whole cycle, and above the band it stays closed. Inside the band, the colder the room, the longer the valve is open in each cycle.
 
-:::{figure} figures/ch02/pwm-principle.*
+:::{figure} figures/c1/pwm-principle.*
 :label: fig-pwm-principle
 :alt: Top, a room temperature curve wanders around a 21 °C setpoint inside a 1 K proportional band, crossed by a triangular signal with a 20 min period. Above the band the valve is always closed, below it always open. Bottom, the resulting valve signal is a series of open pulses whose length in each 20 min cycle varies from 18 % to 77 %, longest when the room is coldest.
 :width: 100%
@@ -221,12 +221,12 @@ Think of the floor above the insulation as one lump with heat capacity $C$ [J/(m
 
 Conservation of energy across lump boundaries ({numref}`fig-floor-lump-balance`):
 
-:::{figure} figures/ch02/floor-lump-balance.*
+:::{figure} figures/c1/floor-lump-balance.*
 :label: fig-floor-lump-balance
 :alt: Diagram of the floor above the insulation drawn as one box with heat capacity C and temperature T_f. An arrow from the left brings energy in from the water in the pipes, zero when the loop is closed. An arrow upwards takes energy out to the room at T_r, equal to (T_f minus T_r) divided by R, through the covering and surface. A note on the right says no heat is generated inside the floor. Inside the box, the stored energy rate is C times dT_f/dt. Below the box is adiabatic insulation.
 :width: 75%
 
-Energy balance of the floor as one lump. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/ch03_small_figures.py)
+Energy balance of the floor as one lump. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/c1_small_figures.py)
 :::
 
 $$
@@ -318,7 +318,7 @@ In reality a floor has many layers and therefore many time constants.  -->
  -->
 {numref}`fig-floor-step-response` shows the temperature progression of a one-dimensional heat conduction model. The water is at 30 °C and the room at 20 °C.
 
-:::{figure} figures/ch02/floor-step-response.*
+:::{figure} figures/c1/floor-step-response.*
 :label: fig-floor-step-response
 :alt: Two line charts of heat output to the room in percent of steady state over 24 hours. Left, after the wax thermostat opens, the light floor reaches 63 % in about half an hour and the heavy floor in about 2 hours. Right, after the wax thermostat closes, the light floor falls to 37 % in about 1 hour, while the heavy floor takes about 12 hours and still delivers about 12 % after 24 hours.
 :width: 100%
@@ -419,12 +419,12 @@ The product $\omega\tau = 2\pi\,\tau/24\,\mathrm{h}$ compares the time constant 
   - 4.8 h
 ```
 
-:::{figure} figures/ch02/floor-daily-swing.*
+:::{figure} figures/c1/floor-daily-swing.*
 :label: fig-floor-daily-swing
 :alt: Line chart over two days of the deviation from the daily mean, in percent of the demand swing. The heating demand is a sine peaking at 04:00 at plus 100 % and bottoming at 16:00 at minus 100 %. The light floor, time constant 1 hour, follows almost the same curve, 97 % of the swing and 1 hour late. The heavy floor, time constant 12 hours, swings only plus/minus 30 % and peaks 4.8 hours late, around 09:00.
 :width: 100%
 
-A first-order floor following a heating demand that swings over 24 hours, equation {eq}`eq-sine-response`. The arrows mark the lag behind the demand peak at 04:00. Only the swing is shown; the daily mean is delivered in full. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/ch03_small_figures.py)
+A first-order floor following a heating demand that swings over 24 hours, equation {eq}`eq-sine-response`. The arrows mark the lag behind the demand peak at 04:00. Only the swing is shown; the daily mean is delivered in full. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/c1_small_figures.py)
 :::
 
 The light floor follows the daily swing almost fully, one hour late ({numref}`fig-floor-daily-swing`). The heavy floor flattens it to a third and shifts it by nearly five hours. Heat asked for at 04:00, the coldest hour, is delivered around 09:00, just as the sun takes over. A lag of a quarter of the period is the worst case: the floor then heats hardest when the demand is changing from heating to cooling. This is why heating demand at night turns into overheating during the day.
@@ -491,7 +491,7 @@ The model below simulates one room in a low-energy house with a light and a heav
 
 **[Open the control model in a new tab](code/floor-control.html)**. It runs in your browser and needs no installation. {numref}`fig-floor-control-app` shows it with the default inputs.
 
-:::{figure} figures/ch02/floor-control-app.*
+:::{figure} figures/c1/floor-control-app.*
 :label: fig-floor-control-app
 :alt: Screenshot of the control model. Sliders for room and climate, supply water, room control and wax thermostat at the top. Below, four charts over 48 hours for the light floor: room temperature, heat flux at the floor surface, supply, return and floor surface temperature, and mass flow in the loop, each comparing the ideal heater, the on/off thermostat and the PI controller with PWM. A table at the bottom lists heating energy, heat vented and hours below and above the setpoint for the three controls.
 :width: 100%
@@ -525,7 +525,7 @@ Several strategies reduce the problem, but none of them removes it:
 - **Low supply temperature and self-regulation.** With the supply only a few kelvin above the room, the floor delivers less when the room warms up, even with the valve open.
 - **Heating stop.** Stop heating above an outdoor temperature limit, for example 12–15 °C, and use a deadband between the heating and cooling setpoints.
 - **Anticipating the sun.** Lower the setpoint in the morning on sunny days, using a weather forecast or model predictive control.
-- **Shading and ventilative cooling.** Remove the solar gain or the surplus heat (see chapter 5).
+- **Shading and ventilative cooling.** Remove the solar gain or the surplus heat (see Part D).
 - **Floor cooling.** The same pipes can cool by 20–40 W/m², limited by the dew point and a minimum floor surface temperature of about 19–20 °C. But the floor is just as slow when cooling.
 
 The conclusion is that a heat emitter with a long time lag is a poor match for a house whose heating demand is small and changes within hours. A fast emitter, such as heating through the ventilation air or a small convector, can switch off at the moment the sun starts to heat the room.
@@ -534,7 +534,7 @@ The conclusion is that a heat emitter with a long time lag is a poor match for a
 
 In buildings with several floors or apartments, one riser pump often feeds a manifold on each floor, each through its own shunt ({numref}`fig-riser-shunts`). The shunt pump circulates water through the floor loops. A thermostatic valve on the return limits the supply temperature: when the sensor bulb gets too warm, it throttles the water returned to the riser, so less hot water is drawn in and more return water is mixed back through the bypass. The check valve stops riser water from flowing backwards through the bypass into the return.
 
-:::{figure} figures/ch02/riser-shunts.*
+:::{figure} figures/c1/riser-shunts.*
 :label: fig-riser-shunts
 :alt: Schematic of a riser fed by a heat pump and a riser pump. On each of two floors, a branch from the riser supply passes a bypass junction, a shunt pump and a sensor bulb before reaching a supply manifold with three connections. The return manifold has a wax thermostat on each connection. The return passes the bypass junction and a 2-way thermostatic valve, connected to the sensor bulb by a capillary, before rejoining the riser return. The bypass between return and supply has a check valve. One floor loop is drawn in full.
 :width: 100%
@@ -546,7 +546,7 @@ The check valve in the bypass is spring loaded and needs a certain pressure diff
 
 A riser pump in proportional-pressure mode lowers its head as the flow falls (point C), which makes the problem much smaller. A check valve with a low opening pressure also helps.
 
-:::{figure} figures/ch02/riser-pump-curve.*
+:::{figure} figures/c1/riser-pump-curve.*
 :label: fig-riser-pump-curve
 :alt: Pump diagram with the flow drawn from the riser on the horizontal axis and differential pressure on the vertical axis. A constant-speed riser pump curve falls slowly from 45 kPa at zero flow. A proportional-pressure curve rises linearly from about 20 kPa to the same design point at 600 litres per hour and 41 kPa. Two system curves are shown, one for design and a steep one for low load. A dashed line 10 kPa above the constant-speed curve marks the pressure the thermostatic valve must absorb before the check valve opens. Point B at low load on the constant-speed curve is at about 45 kPa, and point C on the proportional-pressure curve is at about 23 kPa.
 :width: 90%
@@ -562,7 +562,7 @@ Riser pump at design (A) and at low load with constant speed (B) and proportiona
 
 The model is an RC network ({numref}`fig-rc-network`). The room is one node, and the floor is split into thin layers of about 2 mm, each a node with its own heat capacity. The water reaches the floor at the pipe plane.
 
-:::{figure} figures/ch02/rc-network.*
+:::{figure} figures/c1/rc-network.*
 :label: fig-rc-network
 :alt: RC network of the model. The room node is connected to the outdoor temperature through the resistance one over H loss, has the heat capacity C r, receives solar and internal gains and loses vented heat. Below it, a chain of resistances and capacitances represents the floor layers from the surface to an adiabatic underside. The two nodes either side of the pipe plane are connected to the supply water temperature through the water conductance g w, which the wax thermostat switches.
 :width: 75%

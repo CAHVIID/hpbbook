@@ -1,4 +1,4 @@
-# 7 Ventilative cooling
+# D4 Ventilative cooling
 
 :::{warning} Under revision
 This chapter is being reworked and may change substantially.
@@ -6,9 +6,9 @@ This chapter is being reworked and may change substantially.
 
 Ventilative cooling or venting (udluftning) means using outdoor air to remove heat from a building whenever the outdoor air is cooler than the indoor air.
 
-It is the third step in the cooling strategy ([](05-cooling-strategy.md)), after reducing the solar gains and bypassing the heat recovery, and before ceiling fans ([](09-ceiling-fans.md)), shutters and active cooling. This chapter deals with the building as a whole: how much air is needed and how wind and buoyancy drive it through the house. The openings themselves, and where the air goes once it is inside, are the subject of [](08-window-openings.md).
+It is the third step in the cooling strategy ([](d2-cooling-strategy.md)), after reducing the solar gains and bypassing the heat recovery, and before ceiling fans ([](d6-ceiling-fans.md)), shutters and active cooling. This chapter deals with the building as a whole: how much air is needed and how wind and buoyancy drive it through the house. The openings themselves, and where the air goes once it is inside, are the subject of [](d5-window-openings.md).
 
-## 7.1 Cooling needs large airflows
+## D4.1 Cooling needs large airflows
 
 Outdoor air that enters a room at temperature $T_o$ and leaves at the room temperature $T_i$ removes heat at the rate
 
@@ -27,7 +27,7 @@ Q = \frac{1000}{1.2 \cdot 1005 \cdot 3} = 0.28 \text{ m}^3\text{/s} = 280 \text{
 
 That is about 13 air changes per hour, or 30 times the 9 L/s that the mechanical ventilation supplies to the same room for air quality (0.3 L/s per m²). Airflows like this are only possible through large openings. They also explain why ventilative cooling works much better at night, when the outdoor air is cooler and the temperature difference is larger.
 
-## 7.2 Three ways to move the air
+## D4.2 Three ways to move the air
 
 The air can be moved in three ways:
 
@@ -39,7 +39,7 @@ The air can be moved in three ways:
 
 Ventilative cooling is cheap and uses little or no energy, but it is easy to overestimate. The temperature difference between indoors and outdoors is small exactly when cooling is needed, so large airflows are required. The openings must also actually be open.
 
-## 7.3 The driving forces
+## D4.3 The driving forces
 
 ### Airflow through an opening
 
@@ -65,7 +65,7 @@ The smaller opening dominates. Two openings of 0.5 m² each give an effective ar
 
 The pressure difference has two sources: buoyancy (the stack effect) and wind. Together with the placement of the openings they give the three modes of natural ventilative cooling in {numref}`fig-vc-modes`.
 
-:::{figure} figures/ch07/ventilation-modes.*
+:::{figure} figures/d4/ventilation-modes.*
 :label: fig-vc-modes
 :alt: Three building sections side by side. (a) A room with one tall window: cool air enters at the bottom of the window and warm air leaves at the top, with the neutral pressure plane halfway up the opening. (b) A room with windows on opposite façades: wind pushes cool air in on the windward side, marked plus, and out on the leeward side, marked minus. (c) A two-storey section with a low window and a roof opening: cool air enters low, rises through the house and leaves through the roof, with the neutral pressure plane between the openings and the height h marked.
 :width: 100%
@@ -164,7 +164,7 @@ At that wind speed the airflow almost stops, and the room is not cooled even tho
 
 Building simulation tools such as IDA ICE solve the same problem as an airflow network, where every opening is a flow element and the pressures are balanced in each zone and every time step. Hand calculations like the one above are still essential for checking whether the simulated airflows have the right order of magnitude.
 
-## 7.4 Ventilation strategies
+## D4.4 Ventilation strategies
 
 The three modes in {numref}`fig-vc-modes` are compared here with one worked example each, using the equations above.
 
@@ -237,7 +237,7 @@ Q = 0.65 \cdot 0.42 \cdot \sqrt{\frac{2 \cdot 1.92}{1.2}} = 0.49 \text{ m}^3\tex
 P = 1.2 \cdot 1005 \cdot 0.49 \cdot 5 \approx 3.0 \text{ kW}
 ```
 
-**Result.** Opening a second window on the opposite façade raises the airflow from about 45 L/s to 490 L/s, more than ten times as much. That is about 24 air changes per hour, which removes the 1 kW of heat gains with plenty to spare. In practice the occupants will close the windows partly long before that, because air speeds this high cause draught ([](08-window-openings.md)).
+**Result.** Opening a second window on the opposite façade raises the airflow from about 45 L/s to 490 L/s, more than ten times as much. That is about 24 air changes per hour, which removes the 1 kW of heat gains with plenty to spare. In practice the occupants will close the windows partly long before that, because air speeds this high cause draught ([](d5-window-openings.md)).
 
 The result is sensitive to the assumptions:
 
@@ -296,5 +296,5 @@ For the 30 m² room in the worked examples above, that is 200 L/s, or about 9.5 
 | Assumed in Be18 | 200 | 6.6 |
 | Cross-ventilation, two windows, 2 m/s | 490 | 16 |
 
-The assumed rate is more than four times what one open window delivers. It is only reached with cross or stack ventilation, with the openings actually open and the path through the dwelling open. In the building most openings were balcony doors that could only be secured at a 1 cm opening, or were too windy to leave open. The top-floor flats, with no balcony above to shade them, overheated badly, and solar control films had to be installed afterwards. Openings must be designed so that they can stay open when they are needed: secure, protected from rain, quiet and free of draught ([](08-window-openings.md)).
+The assumed rate is more than four times what one open window delivers. It is only reached with cross or stack ventilation, with the openings actually open and the path through the dwelling open. In the building most openings were balcony doors that could only be secured at a 1 cm opening, or were too windy to leave open. The top-floor flats, with no balcony above to shade them, overheated badly, and solar control films had to be installed afterwards. Openings must be designed so that they can stay open when they are needed: secure, protected from rain, quiet and free of draught ([](d5-window-openings.md)).
 :::

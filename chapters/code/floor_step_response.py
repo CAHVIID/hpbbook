@@ -5,7 +5,7 @@ Prints time constants and heat stored, writes floor-step-response.svg/.png."""
 import numpy as np, matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from pathlib import Path
-OUT = Path(__file__).resolve().parent.parent / "figures" / "ch02"
+OUT = Path(__file__).resolve().parent.parent / "figures" / "c1"
 
 H_SURF, T_ROOM, T_GROUND, T_WATER = 10.8, 20.0, 20.0, 30.0
 # layers top -> bottom: (name, thickness m, lambda, rho, c); 'PIPE' marks the pipe plane

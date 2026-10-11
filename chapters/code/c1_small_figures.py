@@ -4,7 +4,7 @@
 - floor-lump-balance: energy balance of the floor as one lump
 - floor-daily-swing: first-order floor following a heating demand that swings over 24 h
 
-Writes figures/ch02/<name>.svg and .png.
+Writes figures/c1/<name>.svg and .png.
 """
 from pathlib import Path
 
@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
-OUT = Path(__file__).resolve().parent.parent / "figures" / "ch02"
+OUT = Path(__file__).resolve().parent.parent / "figures" / "c1"
 C_LIGHT, C_HEAVY, C_DEMAND = "#2b7bb9", "#d0663a", "#222222"
 
 

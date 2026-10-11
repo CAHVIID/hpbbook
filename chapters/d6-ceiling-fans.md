@@ -6,9 +6,9 @@ This chapter is being reworked and may change substantially.
 
 ## Introduction
 
-A ceiling fan does not lower the air temperature. It raises the air speed around the occupants, which increases their convective and evaporative heat loss ({numref}`fig-fan-airflow`). About 0.5 m/s gives a cooling effect of roughly 2 °C {cite:p}`raftery2020`, so a room at 28 °C with the fan running can feel like 26 °C without it. In the cooling strategy ([](05-cooling-strategy.md)), the fan is the step after reducing gains and venting, and before active cooling.
+A ceiling fan does not lower the air temperature. It raises the air speed around the occupants, which increases their convective and evaporative heat loss ({numref}`fig-fan-airflow`). About 0.5 m/s gives a cooling effect of roughly 2 °C {cite:p}`raftery2020`, so a room at 28 °C with the fan running can feel like 26 °C without it. In the cooling strategy ([](d2-cooling-strategy.md)), the fan is the step after reducing gains and venting, and before active cooling.
 
-:::{figure} figures/ch09/ceiling-fan-airflow.png
+:::{figure} figures/d6/ceiling-fan-airflow.png
 :label: fig-fan-airflow
 :alt: Side view of a room with a ceiling fan blowing a jet of air down to the floor, where it spreads out towards the walls and returns slowly to the ceiling. A seated occupant near the fan is in the moving air.
 :width: 90%
@@ -146,7 +146,7 @@ where $\Delta t_{eq}$ is the whole-body cooling effect (°C, negative) and $P_f$
 
 {numref}`fig-ce-distance` shows the cooling effect for a seated occupant from measured air speeds under a 1.5 m fan {cite:p}`raftery2019`, calculated with the SET method at 28 °C, 50% RH, 1.2 met and 0.5 clo.
 
-:::{figure} figures/ch09/cooling-effect-distance.png
+:::{figure} figures/d6/cooling-effect-distance.png
 :label: fig-ce-distance
 :alt: Line chart of cooling effect against horizontal distance from the fan centre for maximum and half fan speed. At maximum speed the cooling effect is about 4.5 °C within 0.6 m of the centre, falls to about 3.5 °C at 1.5 m and 2.7 °C at 6 m. At half speed the values are about 3.6, 2.3 and 1.3 °C.
 :width: 90%
