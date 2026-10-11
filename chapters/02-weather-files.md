@@ -1,3 +1,4 @@
+%@claude:Move this chapter to Part D
 # Future climate and weather files
 
 :::{warning} Under revision

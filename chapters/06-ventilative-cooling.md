@@ -1,3 +1,4 @@
+
 # Ventilative cooling
 
 :::{warning} Under revision
@@ -265,5 +266,18 @@ The result is sensitive to the assumptions:
 :::
 
 
+### Draught from open windows
+%@claude. integrate this section into the chapter
+
+The ISO 7730 draught rate {cite:p}`iso7730` predicts the percentage dissatisfied with draught:
+
+```{math}
+:label: eq-draught
+DR = (34 - t_a)(v - 0.05)^{0.62}(0.37\,v\,T_u + 3.14)
+```
+
+with $t_a$ the air temperature (°C), $v$ the mean air speed (m/s) and $T_u$ the turbulence intensity (%). 
+
+DR was developed for 20-26 °C and below 0.5 m/s, and does not apply to a warm person who has turned on a fan. DR matters when the fan runs in a cool room, or if intake air happens through open window which is why the fan needs temperature control and a low minimum speed.
 
  

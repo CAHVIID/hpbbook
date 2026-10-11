@@ -1,4 +1,4 @@
-# Side-hung windows for ventilative cooling
+# Window openings for ventilative cooling 
 
 :::{warning} Under revision
 This chapter is being reworked and may change substantially.
@@ -6,11 +6,15 @@ This chapter is being reworked and may change substantially.
 
 ## Introduction
 
-Many new Danish homes have bottom-hung (tilt) windows. They are good for airing in winter: the opening is small, safe and rain-proof, and the sash throws the cold air upwards. In summer they are weak, because the opening area is small and the driving temperature difference is only a few kelvin. Jiang et al. note that bottom-hung windows may not ventilate enough in the warmer months, when the temperature difference is small {cite:p}`jiang2025`.
+Many new Danish homes have bottom-hung (tilt) windows. They are good for airing in winter: the opening is small, safe and rain-proof, and the sash throws the cold air upwards. In summer they are weak, because the opening area is small and the driving temperature difference is only a few Kelvin. Jiang et al. note that bottom-hung windows may not ventilate enough in the warmer months, when the temperature difference is small {cite:p}`jiang2025`.
 
 A side-hung window opens over its full height and, at 60° or more, over its full width. For single-sided ventilation with a small ΔT it gives roughly four to five times the airflow of a tilted sash of the same size. The inflow is slow and drops to the floor, but in summer it is only slightly cooler than the room, so it gives cooling rather than draught.
 
-In short, the bottom-hung window is a winter window and the side-hung window is a summer window. This chapter gives the equations behind that statement and the design consequences. It builds on the orifice and stack equations in [](06-ventilative-cooling.md).
+In short, the bottom-hung window is a winter window and the side-hung window is a summer window.
+
+This chapter gives the equations behind that statement and the design consequences. It builds on the orifice and stack equations in [](06-ventilative-cooling.md).
+
+%@claude: 
 
 ## The free opening area
 
@@ -190,10 +194,10 @@ u = (5\text{–}10) \cdot \frac{0.091}{2} = 0.23\text{–}0.45\ \text{m/s}
 
 The air is at about 24–25 °C after mixing, and the occupants are warm, so in summer this is a gentle cooling stream at the feet rather than draught. With the same window open on a cold night, the same equation gives the draught risk.
 
-## Guiding questions
+<!-- ## Guiding questions
 
 1. A window supplier offers a "tilt-and-turn" window (bottom-hung and side-hung in one sash). Describe how you would tell the occupants to use it in July and in January, and why.
 2. Why does the stack flow through a tilted sash grow less with the sash height than the flow through a side-hung window does? Use {numref}`fig-sh-gaps` in your answer.
 3. Show that Ar in purely stack-driven flow is independent of ΔT. What does that mean for draught from a low window on a windless night?
 4. A side-hung window must be restricted to 10° for safety. How much of the summer airflow is lost, and what other opening could make up for it?
-5. In the worked example the inflow runs along the floor at about 0.2–0.4 m/s. When is this welcome, and when is it draught?
+5. In the worked example the inflow runs along the floor at about 0.2–0.4 m/s. When is this welcome, and when is it draught? -->
