@@ -1,4 +1,4 @@
-# Room CFD model
+# Appendix B: Room CFD model
 
 :::{warning} Under revision
 This appendix is being reworked and may change substantially.
