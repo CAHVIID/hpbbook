@@ -3,7 +3,7 @@
 import numpy as np, matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from pathlib import Path
-OUT = Path(__file__).resolve().parent.parent / "figures" / "ch03"
+OUT = Path(__file__).resolve().parent.parent / "figures" / "ch02"
 plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 10.5})
 INK, GRID, MUTED, RED, BLUE = "#222", "#e4e4e4", "#777", "#c4502a", "#2b7bb9"
 

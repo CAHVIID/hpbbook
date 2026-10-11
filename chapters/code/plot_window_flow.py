@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from window_flow import total_flow, side_hung, bottom_hung
 
 W, H = 0.8, 1.3
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "figures", "ch06b")
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "figures", "ch08")
 cases = [
     ("Side-hung, 90°", side_hung, dict(w=W, h=H, angle_deg=90), "#2a78d6", "-", 0),
     ("Side-hung, 30°", side_hung, dict(w=W, h=H, angle_deg=30), "#2a78d6", "--", 0),

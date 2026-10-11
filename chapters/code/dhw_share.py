@@ -4,7 +4,7 @@ value 250 L/m2 per year heated from 10 to 55 C with mean water properties = 13.0
 import matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from pathlib import Path
-OUT = Path(__file__).resolve().parent.parent / "figures" / "ch04"
+OUT = Path(__file__).resolve().parent.parent / "figures" / "ch03"
 
 RHO, CP = 994.1, 4.182                     # mean density (kg/m3) and cp (kJ/kgK) of water, 10-55 C
 DHW = 0.250 * RHO * CP * (55 - 10) / 3600  # kWh/m2 per year

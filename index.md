@@ -13,7 +13,6 @@ There are code snippets (apps) embedded into the textbook. The intention of the 
 ## Contents
 
 1. [Intro](chapters/01-intro.md)
-2. [Weather](chapters/02-weather-files.md)
 
 **Part A: Compactness and envelope** (in progress)
 
@@ -25,15 +24,19 @@ There are code snippets (apps) embedded into the textbook. The intention of the 
 
 **Part C: Heating systems and domestic hot water**
 
-3. [Floor heating](chapters/03-floor-heating.md)
-4. [Domestic hot water](chapters/04-domestic-hot-water.md)
+2. [Floor heating](chapters/02-floor-heating.md)
+3. [Domestic hot water](chapters/03-domestic-hot-water.md)
 
 **Part D: Cooling**
 
+4. [Future climate and weather files](chapters/04-weather-files.md)
 5. [Cooling strategy](chapters/05-cooling-strategy.md)
-6. [Ventilative cooling](chapters/06-ventilative-cooling.md)
-7. [Ceiling fans](chapters/07-ceiling-fans.md)
-- [Ceiling fans, old version (obsolete)](chapters/07-ceiling-fans_obsolete.md)
+6. [Façade design](chapters/06-facade-design.md)
+7. [Ventilative cooling](chapters/07-ventilative-cooling.md)
+8. [Openings for ventilative cooling](chapters/08-window-openings.md)
+9. [Ceiling fans](chapters/09-ceiling-fans.md)
+- [Ceiling fans, old version (obsolete)](chapters/09-ceiling-fans_obsolete.md)
+10. [Improvements: ideas for cooling](chapters/10-improvements.md)
 
 **Part E: Prefabrication of type houses** (not written yet)
 

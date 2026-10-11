@@ -19,7 +19,7 @@ After this chapter you can:
 *Outline:*
 
 - Low-energy houses overheat because of solar gains; the row house already has a very low heating demand, and the 2050 climate makes cooling the design problem [Assignment 04, 16.1].
-- Reduce the gains first: the façade decides the gain before any ventilation or fan has to remove it. Step 1 of the cooling strategy ([](05-cooling-strategy.md)), before ventilative cooling ([](06-ventilative-cooling.md)) and ceiling fans ([](07-ceiling-fans.md)).
+- Reduce the gains first: the façade decides the gain before any ventilation or fan has to remove it. Step 1 of the cooling strategy ([](05-cooling-strategy.md)), before ventilative cooling ([](07-ventilative-cooling.md)) and ceiling fans ([](09-ceiling-fans.md)).
 - The conflict: every measure that cuts solar gain also cuts daylight. Since BR18, daylight can be documented with climate-based simulation to EN 17037, which makes the trade-off something you can optimise.
 - The running case: the critical centre zone of the course row house, 4 × 4 × 2.5 m, prefab constructions with U = 0.1 W/m²K, facing north or south.
 - Figure: the four design variables on one façade section and elevation (window height, glazing, overhang, side fins).
@@ -61,7 +61,7 @@ After this chapter you can:
 
 - What "cooling demand" means in the zone model: an ideal cooler at a set point, so the number measures the surplus heat the façade lets in, not a real cooling system.
 - Heating demand as the second objective: less solar gain means more heating.
-- Weather: the 2050 climate file (more critical than 2090), Annex 80 TMY 2041–2060 as in the cooling assignment ([](02-weather-files.md)).
+- Weather: the 2050 climate file (more critical than 2090), Annex 80 TMY 2041–2060 as in the cooling assignment ([](04-weather-files.md)).
 
 ## Multi-objective optimisation
 
@@ -162,7 +162,7 @@ The table holds for this climate file, this room depth and this construction. A 
 *Outline:*
 
 - Carrying the north and south designs back to the full row house; rooms with other depths and uses.
-- What is left for ventilative cooling ([](06-ventilative-cooling.md)) and ceiling fans ([](07-ceiling-fans.md)).
+- What is left for ventilative cooling ([](07-ventilative-cooling.md)) and ceiling fans ([](09-ceiling-fans.md)).
 
 ## Guiding questions
 

@@ -1,46 +1,14 @@
-
-# Ventilative cooling
+# 7 Ventilative cooling
 
 :::{warning} Under revision
 This chapter is being reworked and may change substantially.
 :::
 
-## Introduction
-
-Danish homes are increasingly at risk of overheating. New dwellings are well insulated and airtight, often have large glazed areas, and keep their heat well. That works well in winter, but in summer the same building struggles to get rid of solar and internal gains.
-
-High indoor temperatures are now one of the most common indoor climate complaints in new Danish dwellings, and not only in summer .
-Insulation, airtightness and large windows have made new homes very good at keeping heat in.
-
-On a sunny day in April or September, solar and internal gains can lift the temperature well above comfort levels in a home that hardly needs heating. In a warmer climate with longer heat waves the problem grows. A study of Finnish apartment buildings found that openable windows were the most effective passive measure against overheating in the new building, though not enough in the old one {cite:p}`farahani2021`.
-
-@claude: could you make a figure that shows how cooling potential increases with outdoor temp and flow rate, but draught risk also depends on those parameters. While cooling potential may be linear, draught rate may be of different order.
-
-## Ventilative cooling
-
 Ventilative cooling or venting (udluftning) means using outdoor air to remove heat from a building whenever the outdoor air is cooler than the indoor air.
 
-It is the second step in the cooling strategy ([](05-cooling-strategy.md)), after reducing the heat gains and before ceiling fans ([](07-ceiling-fans.md)) and active cooling.
+It is the third step in the cooling strategy ([](05-cooling-strategy.md)), after reducing the solar gains and bypassing the heat recovery, and before ceiling fans ([](09-ceiling-fans.md)), shutters and active cooling. This chapter deals with the building as a whole: how much air is needed and how wind and buoyancy drive it through the house. The openings themselves, and where the air goes once it is inside, are the subject of [](08-window-openings.md).
 
-The air can be moved in three ways:
-
-- **Natural ventilation**: openings only, such as windows, roof windows and venting hatches, driven by wind and stack effect.
-
-- **Mechanical ventilation**: fans only, for example by bypassing the heat recovery unit and boosting the airflow.
-
-- **Hybrid (mixed-mode) ventilation**: a combination of the two. This is the normal solution in Danish dwellings, with mechanical ventilation with heat recovery in winter and openings for cooling in summer.
-
-Ventilative cooling is cheap and uses little or no energy, but it is easy to overestimate. The temperature difference between indoors and outdoors is small exactly when cooling is needed, so large airflows are required. The openings must also actually be open.
-
-:::{Practical issue}
-In a low-energy apartment building in Nordhavn, Copenhagen, the energy calculation assumed a generous venting rate. In practice most of the openings were balcony doors that could only be secured at a 1 cm opening, or were too windy to leave open, and the top-floor flats overheated badly. Openings must be designed so that they can stay open when they are needed: secure, protected from rain, quiet and free of draught.
-:::
-
-<!--The chapter first explains the physics of airflow through openings and the ventilative cooling strategies available. It then covers the design of venting hatches, opening control and draught. It ends with how to assess overheating, and a worked example from the course row house.-->
-
-## The physics of airflow through openings
-
-### Cooling needs large airflows
+## 7.1 Cooling needs large airflows
 
 Outdoor air that enters a room at temperature $T_o$ and leaves at the room temperature $T_i$ removes heat at the rate
 
@@ -58,6 +26,20 @@ Q = \frac{1000}{1.2 \cdot 1005 \cdot 3} = 0.28 \text{ m}^3\text{/s} = 280 \text{
 ```
 
 That is about 13 air changes per hour, or 30 times the 9 L/s that the mechanical ventilation supplies to the same room for air quality (0.3 L/s per m²). Airflows like this are only possible through large openings. They also explain why ventilative cooling works much better at night, when the outdoor air is cooler and the temperature difference is larger.
+
+## 7.2 Three ways to move the air
+
+The air can be moved in three ways:
+
+- **Natural ventilation**: openings only, such as windows, roof windows and venting hatches, driven by wind and stack effect.
+
+- **Mechanical ventilation**: fans only, for example by bypassing the heat recovery unit and boosting the airflow.
+
+- **Hybrid (mixed-mode) ventilation**: a combination of the two. This is the normal solution in Danish dwellings, with mechanical ventilation with heat recovery in winter and openings for cooling in summer.
+
+Ventilative cooling is cheap and uses little or no energy, but it is easy to overestimate. The temperature difference between indoors and outdoors is small exactly when cooling is needed, so large airflows are required. The openings must also actually be open.
+
+## 7.3 The driving forces
 
 ### Airflow through an opening
 
@@ -83,7 +65,7 @@ The smaller opening dominates. Two openings of 0.5 m² each give an effective ar
 
 The pressure difference has two sources: buoyancy (the stack effect) and wind. Together with the placement of the openings they give the three modes of natural ventilative cooling in {numref}`fig-vc-modes`.
 
-:::{figure} figures/ch06/ventilation-modes.*
+:::{figure} figures/ch07/ventilation-modes.*
 :label: fig-vc-modes
 :alt: Three building sections side by side. (a) A room with one tall window: cool air enters at the bottom of the window and warm air leaves at the top, with the neutral pressure plane halfway up the opening. (b) A room with windows on opposite façades: wind pushes cool air in on the windward side, marked plus, and out on the leeward side, marked minus. (c) A two-storey section with a low window and a roof opening: cool air enters low, rises through the house and leaves through the roof, with the neutral pressure plane between the openings and the height h marked.
 :width: 100%
@@ -182,7 +164,13 @@ At that wind speed the airflow almost stops, and the room is not cooled even tho
 
 Building simulation tools such as IDA ICE solve the same problem as an airflow network, where every opening is a flow element and the pressures are balanced in each zone and every time step. Hand calculations like the one above are still essential for checking whether the simulated airflows have the right order of magnitude.
 
-### Worked example: single-sided ventilation
+## 7.4 Ventilation strategies
+
+The three modes in {numref}`fig-vc-modes` are compared here with one worked example each, using the equations above.
+
+### Single-sided ventilation
+
+**Worked example.**
 
 A 30 m² room with a ceiling height of 2.5 m (75 m³) has one openable window on a single façade. The free opening area is $A = 0.6$ m² and the opening is $H = 1.2$ m tall. The wind speed is $v = 2$ m/s, the room is at 25 °C and the outdoor air at 20 °C, so $\Delta T = 5$ K. What is the airflow through the window?
 
@@ -219,7 +207,9 @@ P = 1.2 \cdot 1005 \cdot 0.044 \cdot 5 \approx 260 \text{ W}
 
 Two lessons follow. At a moderate wind speed of 2 m/s, the stack effect over the height of the window dominates, so a tall window is worth more than a wide one. And even with a 5 K temperature difference, one window removes only about a quarter of the 1 kW of heat gains from the earlier example. Single-sided ventilation can handle a well-shaded room, but a room with large solar gains needs cross or stack ventilation.
 
-### Worked example: cross-ventilation
+### Cross-ventilation
+
+**Worked example.**
 
 Now give the room from the previous example a second, identical window on the opposite façade, so that air can flow straight through. The conditions are the same: $A = 0.6$ m² per window, $v = 2$ m/s and $\Delta T = 5$ K. The windward façade has $C_p = +0.5$ and the leeward façade $C_p = -0.3$. The windows are at the same height, so the stack effect between them is zero and only the wind drives the flow.
 
@@ -247,7 +237,7 @@ Q = 0.65 \cdot 0.42 \cdot \sqrt{\frac{2 \cdot 1.92}{1.2}} = 0.49 \text{ m}^3\tex
 P = 1.2 \cdot 1005 \cdot 0.49 \cdot 5 \approx 3.0 \text{ kW}
 ```
 
-**Result.** Opening a second window on the opposite façade raises the airflow from about 45 L/s to 490 L/s, more than ten times as much. That is about 24 air changes per hour, which removes the 1 kW of heat gains with plenty to spare. In practice the occupants will close the windows partly long before that, because air speeds this high cause draught (see the section on draught).
+**Result.** Opening a second window on the opposite façade raises the airflow from about 45 L/s to 490 L/s, more than ten times as much. That is about 24 air changes per hour, which removes the 1 kW of heat gains with plenty to spare. In practice the occupants will close the windows partly long before that, because air speeds this high cause draught ([](08-window-openings.md)).
 
 The result is sensitive to the assumptions:
 
@@ -255,29 +245,56 @@ The result is sensitive to the assumptions:
 - **Internal doors.** In a dwelling the air must usually pass through an internal door on its way across. An open door of 1.6 m² is a third opening in series and hardly matters: the airflow drops to 480 L/s. A closed door with a 2 cm undercut leaves only about 0.02 m², and the airflow drops to 23 L/s, less than single-sided ventilation through one window. Cross-ventilation only works when the path through the building is open.
 - **Wind speed.** The wind speed in the equation is the local wind at the building, not the meteorological wind measured at 10 m height in open terrain. In a built-up area the local wind is often only half the meteorological value or less.
 
-:::{admonition} Rules of thumb
-:class: tip
+### Stack ventilation
 
-- **Cooling power**: every 100 L/s of outdoor air removes about 120 W per kelvin of temperature difference.
-- **Single-sided ventilation** is effective up to a room depth of about 2.5 times the ceiling height.
-- **Cross-ventilation** is effective up to a building depth of about 5 times the ceiling height.
-- **Stack ventilation** works best with a large height difference between inlet and outlet, and with openings of similar size.
-- **Calm days**: design for the stack effect alone; wind is a bonus.
-:::
+**Worked example.** A two-storey house has an open stair. On the ground floor a window with a free area of $A_1 = 1.0$ m² is open, and at the top of the stair a roof window with $A_2 = 0.6$ m² is open. The height between the centres of the two openings is $h = 5.5$ m. There is no wind. The house is at 25 °C (298 K) and the outdoor air at 22 °C, so $\Delta T = 3$ K. What is the airflow and the cooling power, and what happens on the first floor?
 
-
-### Draught from open windows
-%@claude. integrate this section into the chapter
-
-The ISO 7730 draught rate {cite:p}`iso7730` predicts the percentage dissatisfied with draught:
+**Effective area.** With {eq}`eq-vc-aeff`:
 
 ```{math}
-:label: eq-draught
-DR = (34 - t_a)(v - 0.05)^{0.62}(0.37\,v\,T_u + 3.14)
+A_\text{eff} = \left( \frac{1}{1.0^2} + \frac{1}{0.6^2} \right)^{-1/2} = 0.51 \text{ m}^2
 ```
 
-with $t_a$ the air temperature (°C), $v$ the mean air speed (m/s) and $T_u$ the turbulence intensity (%). 
+**Airflow.** With {eq}`eq-vc-stackflow`:
 
-DR was developed for 20-26 °C and below 0.5 m/s, and does not apply to a warm person who has turned on a fan. DR matters when the fan runs in a cool room, or if intake air happens through open window which is why the fan needs temperature control and a low minimum speed.
+```{math}
+Q = 0.65 \cdot 0.51 \cdot \sqrt{2 \cdot 9.81 \cdot 5.5 \cdot \frac{3}{298}} = 0.35 \text{ m}^3\text{/s} = 350 \text{ L/s}
+```
 
- 
+**Cooling.** With {eq}`eq-vc-cooling`:
+
+```{math}
+P = 1.2 \cdot 1005 \cdot 0.35 \cdot 3 \approx 1.3 \text{ kW}
+```
+
+This is five times the single-sided window above, at a smaller temperature difference and with no wind at all. At night, with the outdoor air at 17 °C ($\Delta T = 8$ K), the airflow rises to 0.57 m³/s and the cooling power to about 5.5 kW.
+
+**Neutral plane.** The same airflow passes both openings, so the pressure difference across each one scales with $1/A^2$. The neutral plane therefore lies at a height above the lower opening of
+
+```{math}
+:label: eq-vc-npl
+h_n = \frac{h}{1 + (A_1/A_2)^2} = \frac{5.5}{1 + (1.0/0.6)^2} = 1.5 \text{ m}
+```
+
+The neutral plane sits low, close to the larger opening. Everything above about 1.5 m is at overpressure, so a bedroom window opened on the first floor lets warm air out instead of letting cool air in. To ventilate the first floor as well, the roof window must be the larger opening. Doubling it to 1.2 m² raises the airflow by 50 % to 0.52 m³/s and lifts the neutral plane to 3.3 m.
+
+### Practical issue: Nordhavn
+
+:::{admonition} Practical issue
+:class: warning
+In a low-energy apartment building in Nordhavn, Copenhagen, the summer comfort check in Be18 used a simple daytime venting rate based on the openable window area as a share of the floor area:
+
+```{math}
+q_\text{vent} = \frac{11\,\%}{1.5\,\%} \cdot 0.9 \ \text{L/s per m}^2 = 6.6 \ \text{L/s per m}^2
+```
+
+For the 30 m² room in the worked examples above, that is 200 L/s, or about 9.5 air changes per hour. Compare it with the examples:
+
+| Strategy | Airflow (L/s) | Per floor area (L/s per m²) |
+|---|---|---|
+| Single-sided, one window, 5 K | 44 | 1.5 |
+| Assumed in Be18 | 200 | 6.6 |
+| Cross-ventilation, two windows, 2 m/s | 490 | 16 |
+
+The assumed rate is more than four times what one open window delivers. It is only reached with cross or stack ventilation, with the openings actually open and the path through the dwelling open. In the building most openings were balcony doors that could only be secured at a 1 cm opening, or were too windy to leave open. The top-floor flats, with no balcony above to shade them, overheated badly, and solar control films had to be installed afterwards. Openings must be designed so that they can stay open when they are needed: secure, protected from rain, quiet and free of draught ([](08-window-openings.md)).
+:::
