@@ -4,14 +4,14 @@ Top: controller output vs. room temperature. Bottom: room temperature after a
 cold start, simulated with a small floor-heating room model. The valve follows
 the controller output after a dead time (a continuous valve, i.e. PWM averaged).
 
-Writes figures/ch03/proportional-band.svg and .png.
+Writes figures/ch02/proportional-band.svg and .png.
 """
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-OUT = Path(__file__).resolve().parent.parent / "figures" / "ch03"
+OUT = Path(__file__).resolve().parent.parent / "figures" / "ch02"
 
 T_SET = 21.0      # setpoint, °C
 HYST = 0.25       # on/off hysteresis, ± K

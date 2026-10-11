@@ -9,7 +9,7 @@ import matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 import dhw_tank as d
 from pathlib import Path
-OUT = Path(__file__).resolve().parent.parent / "figures" / "ch04"
+OUT = Path(__file__).resolve().parent.parent / "figures" / "ch03"
 
 WH = 994 * 4.182 / 3600                # Wh per litre and kelvin, mean properties 10-55 C (1.155)
 T_COLD, T_SET, ETA, LOSS = 10.0, 55.0, 0.85, 0.042   # C, C, usable fraction, kW standing loss

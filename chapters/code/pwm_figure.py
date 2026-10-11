@@ -4,7 +4,7 @@ A triangular carrier spans the proportional band around the setpoint. The
 valve is open whenever the measured room temperature lies below the carrier,
 so the open time in each cycle grows as the room gets colder.
 
-Writes figures/ch03/pwm-principle.svg and .png.
+Writes figures/ch02/pwm-principle.svg and .png.
 """
 from pathlib import Path
 
@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Rectangle
 
-OUT = Path(__file__).resolve().parent.parent / "figures" / "ch03"
+OUT = Path(__file__).resolve().parent.parent / "figures" / "ch02"
 
 T_SET = 21.0        # setpoint, °C
 BAND = 1.0          # proportional band, K
