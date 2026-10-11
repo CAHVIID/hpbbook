@@ -15,7 +15,8 @@ But HPBs should ALSO:
 - move from one-off project-based solutions to product-based solutions that can be repeated thousands of times
 
 Near-zero energy buildings (NZEB) are not difficult to design - we know and have the solutions today. But a near-zero energy building that is cost-optimal, implement robust and resilient solutions, is competitive and appealing to buyers, we named such a building:
-**Optimal near-zero energy buildings: ONZEB**
+
+**Optimal near-zero energy building: ONZEB**
 
 ## Work in progress
 

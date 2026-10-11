@@ -10,9 +10,10 @@ Future climate changes and given the life span of buildings, they need to be des
 
 ## 2. What is in a weather file
 
+%@claude: write this section and keep it short. Include what is DRY, TMY and EPW, keep it to a few lines.  
 *TBA* hourly dry-bulb temperature, humidity, direct normal, diffuse and global horizontal radiation, wind and cloud cover. File formats (EPW, the Danish DRY format, IDA ICE weather files) and where to get them.
 
-## 3. The Danish design reference year
+## 3. The Danish design reference year - DMI
 
 A reference year is one artificial year of hourly weather. It is assembled from twelve real calendar months, each picked from a longer measured record as the most typical month of its kind. DMI selects the months with the Finkelstein–Schafer method of ISO 15927-4. The method compares the distribution of daily values in each candidate month with the distribution for all years, using temperature, global radiation and humidity as primary parameters and wind and precipitation as secondary ones.
 
@@ -52,6 +53,7 @@ Climate models give only daily temperature and precipitation, not the hourly rad
 Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Danish design reference years at Sjælsmark: the old and new present-day files and the four RCP4.5 projections. The dashed line marks 26 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_dry.py)
 ```
 
+%@claude: delete hours WBGT, Hours PET
 ```{list-table} Annual indicators of the Danish design reference years, computed from the EPW files.
 :name: tab-dry-summary
 :header-rows: 1
@@ -148,6 +150,7 @@ Four take-aways:
 1. **A big step has already happened.** Going from the *2001–2010* to the *2011–2023* reference year cuts the hours below 0 °C by more than half, yet [severe freeze temperatures still occurs:](https://www.berlingske.dk/danmark/over-18-frostgrader-goer-natten-til-soendag-til-koldeste-i-fem-aar)
 Enthalpy is the annual mean total specific enthalpy of the outdoor air per kg dry air, $h = 1.006\,T + x\,(2501 + 1.86\,T)$ in kJ/kg, with the humidity ratio $x$ found from air temperature, relative humidity and pressure.
 
+%@claude: add a section about heat stress indices. Focus on UTCI, briefly mention WBGT and PET as alternatives
 The wet-bulb globe temperature (WBGT) is a heat-stress index that combines air temperature, humidity, radiation and wind. The outdoor values in the table use the simplified formula of the Australian Bureau of Meteorology, $\mathrm{WBGT} = 0.567\,T + 0.393\,e + 3.94$, where $T$ is air temperature in °C and $e$ is water vapour pressure in hPa. The formula assumes moderate sun and light wind, so it needs only temperature and humidity from the weather file {cite:p}`bom_wbgt`.
 
 The Universal Thermal Climate Index (UTCI) {cite:p}`brode2012` and the Physiological Equivalent Temperature (PET) {cite:p}`hoppe1999` are European heat-balance indices. Both express the outdoor condition as the air temperature of a reference environment that gives the same physiological strain. They use air temperature, humidity, wind and mean radiant temperature. Here the mean radiant temperature is that of a person standing in the open, found from the direct and diffuse solar radiation in the file (the SolarCal method of ASHRAE 55). The thresholds are the start of moderate heat stress: UTCI above 26 °C {cite:p}`brode2012` and PET above 29 °C {cite:p}`matzarakis1999`. Because they include sun and wind, both count far more hours than the simplified WBGT formula, which uses only temperature and humidity.
@@ -185,9 +188,7 @@ Four things stand out:
 - A reference year is built from *typical* months. DMI itself says it is not suited for sizing against extreme events such as overheating. Stress-test the design with a heat-wave file (section 5).
 ::: -->
 
-## 4. Future weather files beyond the DRY
-
-*TBA:* climate models (GCM, RCM), downscaling, emission scenarios (RCP, SSP); morphing a present-day year (CCWorldWeatherGen) versus bias-corrected regional model output; the Annex 80 TMY files for 2001–2020, 2041–2060 and 2081–2100; uncertainty.
+## 4. Future weather files - Annex 80
 
 The IEA EBC Annex 80 project made a second set of Copenhagen files from the MPI-REMO regional climate model (EURO-CORDEX): typical meteorological years (TMY) for 2001–2020, 2041–2060 and 2081–2100, and three heat-wave years picked from 2041–2060 under RCP8.5 and bias-adjusted against observations from 2001–2019. Unlike the DRY files, these are model output, not measured months, so they can be hotter than anything seen so far. {numref}`fig-annex80-weather` shows them and {numref}`tab-annex80-summary` summarises them in the same way as the DRY files.
 
@@ -282,7 +283,7 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
 
 ### Heat waves
 
-*TBA:* definitions (days above 25 °C, tropical nights above 20 °C); health effects; the three Annex 80 Copenhagen heat-wave files for 2041–2060 (longest, most intense and most severe); why warm nights defeat night ventilation.
+%@clade: write this section about heat waves. Keep it short. Definitions (days above 25 °C, tropical nights above 20 °C); health effects; the three Annex 80 Copenhagen heat-wave files for 2041–2060 (longest, most intense and most severe); why warm nights defeat night ventilation. Integrate Farahani results.
 
 ### Urban heat island
 
@@ -305,20 +306,8 @@ The Danish reference years are measured at Sjælsmark, a rural station, so they 
 Hourly ventilative cooling potential $\Delta T = T_\mathrm{in} - T_\mathrm{out}$ for the rural reference year at Sjælsmark, the same year with a 2 K night-time urban heat island (tapering to 0 K in the afternoon), and RCP4.5 2080–2099 with the heat island. Grey: heating days, with a daily mean below 12 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/vc_potential_uhi.py)
 ```
 
-## 6. Overheating indicators and design consequences
-
-*Outline:* hours above 26/27/28 °C, degree-hours, adaptive comfort categories; results from Farahani et al. (2021) and Potin (2023); overhangs, g-value and window size today versus in the future.
-
-## 7. Worked example
-
-*Outline:* read the DRY, Annex 80 TMY and heat-wave EPW files with a short Python script and compare peak temperature, hours above 26 °C, tropical nights and the longest heat wave.
-
-## 8. Guiding questions
-
-*Outline:* for example, "Which weather file would you use to size a heat pump, and which to check overheating?" and "Why can a design that passes the building regulations overheat in a heat wave?"
-
+%@claude: move potin source below to chapter on cooling strategy. 
 ## Sources
-
 - DMI (2025). *Dansk Referenceår 2025*. DMI Rapport 25-14. Danish Meteorological Institute.
 - Velashjerdi Farahani, A., et al. (2021). Overheating risk and energy demand of Nordic old and new apartment buildings during average and extreme weather conditions under a changing climate. *Applied Sciences*, 11, 3972. doi:10.3390/app11093972
 - Potin, E. (2023). *Methodology to guide designers in conceiving dwellings that reduce overheating risk in the context of climate change*. MSc thesis, DTU / University of Mons.

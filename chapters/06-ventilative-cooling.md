@@ -155,3 +155,6 @@ In reality wind and buoyancy act together. They can reinforce each other or work
 - **Calm days**: design for the stack effect alone; wind is a bonus.
 :::
 
+
+
+ 

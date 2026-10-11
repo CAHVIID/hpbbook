@@ -187,3 +187,6 @@ Infiltration heat loss, the airtight layer and its continuity at joints, blower 
 
 Vapour diffusion and the position of the vapour barrier, surface condensation and mould risk with $f_{Rsi}$ {cite:p}`iso13788`, and drying out of built-in moisture.
 :::
+
+
+>*TBA:* hours above 26/27/28 °C, degree-hours, adaptive comfort categories; results from Farahani et al. (2021) and
