@@ -17,7 +17,7 @@ The model exists in two versions that give the same results:
 {}
 ```
 
-Press *Run* to start. A run simulates 30 minutes of real time and takes about half a minute in a browser. The section view shows the instantaneous field while the simulation runs and the time-averaged field when it finishes. Changing a setting starts a new run.
+Press *Run* to start. A run simulates 30 minutes of real time and takes under a minute in a browser. The section view shows the instantaneous field while the simulation runs and the time-averaged field when it finishes. Changing a setting starts a new run.
 
 The app also runs on its own as a single HTML file: {download}`room-cfd.html <code/room-cfd.html>`. Save it anywhere and double-click it. It opens in a web browser, needs no installation and works offline.
 
@@ -53,9 +53,19 @@ Here $\nu = 1.5 \cdot 10^{-5}$ m²/s is the molecular viscosity of air, $\nu_t$ 
 
 ## Turbulence
 
-The flow in a ventilated room is turbulent, and the model does not resolve the eddies. Instead it adds an eddy viscosity $\nu_t$ that represents the mixing they cause. Two options are available.
+The flow in a ventilated room is turbulent, and the model does not resolve the eddies. Instead it adds an eddy viscosity $\nu_t$ that represents the mixing they cause. Three options are available.
 
-**Chen & Xu (default).** A zero-equation model developed for indoor air {cite:p}`chen1998`:
+**k-ε (default).** The standard two-equation model of {cite:t}`launder1974`. Two extra transport equations carry the turbulent kinetic energy $k$ and its dissipation rate $\varepsilon$ through the room, and the eddy viscosity follows from them:
+
+$$
+\nu_t = C_\mu \frac{k^2}{\varepsilon}, \qquad
+\frac{Dk}{Dt} = \nabla \cdot \left[ \left(\nu + \frac{\nu_t}{\sigma_k}\right) \nabla k \right] + P_k + G_b - \varepsilon, \qquad
+\frac{D\varepsilon}{Dt} = \nabla \cdot \left[ \left(\nu + \frac{\nu_t}{\sigma_\varepsilon}\right) \nabla \varepsilon \right] + C_1 \frac{\varepsilon}{k} \left(P_k + G_b^+\right) - C_2 \frac{\varepsilon^2}{k}
+$$
+
+$P_k = \nu_t \left[ 2 (\partial u / \partial x)^2 + 2 (\partial v / \partial y)^2 + (\partial u / \partial y + \partial v / \partial x)^2 \right]$ is the production by shear and $G_b = -g \beta (\nu_t / Pr_t) \, \partial T / \partial y$ the production by buoyancy, which is negative in a stable layer and damps the turbulence there. The constants are the standard ones: $C_\mu = 0.09$, $C_1 = 1.44$, $C_2 = 1.92$, $\sigma_k = 1.0$ and $\sigma_\varepsilon = 1.3$. The grid is too coarse to resolve the thin layer next to a wall, so the first cell uses wall functions: the wall shear stress follows the logarithmic law of the wall, and $\varepsilon$ in that cell is set from the local equilibrium $\varepsilon = C_\mu^{3/4} k^{3/2} / (\kappa \, y_p)$. The supply air carries $k = 1.5 (Tu_{in} U)^2$ with $Tu_{in} = 4$ % and $\varepsilon = k^{3/2} / (0.1 \, h_{open})$, as in the IEA Annex 20 test case {cite:p}`nielsen1990`. This is the only one of the three models that passes that test (see *Verification*).
+
+**Chen & Xu.** A zero-equation model developed for indoor air {cite:p}`chen1998`:
 
 $$
 \nu_t = 0.03874 \, V \, \ell
@@ -63,7 +73,9 @@ $$
 
 with $V$ the local mean speed and $\ell$ the distance to the nearest wall. It gives little mixing near walls and in still air, and more mixing in the jet.
 
-**Constant.** One eddy viscosity everywhere, by default $\nu_t = 0.002$ m²/s, which is about 130 times the molecular value. It is useful for showing students what the turbulence model does.
+**Constant.** One eddy viscosity everywhere, by default $\nu_t = 0.002$ m²/s, which is about 130 times the molecular value.
+
+Chen & Xu and the constant viscosity are kept for comparison, because they show students what a turbulence model does. Both mix too much in a wall jet and fail the Annex 20 test.
 
 ## Numerical method
 
@@ -75,7 +87,7 @@ with $V$ the local mean speed and $\ell$ the distance to the nearest wall. It gi
 2. Solve a Poisson equation for the pressure, $\nabla^2 p = \rho \, \nabla \cdot \mathbf{u}^* / \Delta t$. The matrix depends only on the grid and the boundary types, so it is factorised once before the run (sparse LU in Python, banded Cholesky in JavaScript), and each step only needs a back-substitution.
 3. Correct the velocity with the pressure gradient, $\mathbf{u}^{n+1} = \mathbf{u}^* - \Delta t \, \nabla p / \rho$. The corrected field satisfies continuity to machine precision.
 
-The temperature is then advanced with the new velocity. The time step is set at every step from the stability limits of the explicit scheme:
+The temperature, and with k-ε also $k$ and $\varepsilon$, are then advanced with the new velocity. The sink terms of $k$ and $\varepsilon$ are treated implicitly so that both stay positive, and $k$ and $\varepsilon$ use upwind advection. The time step is set at every step from the stability limits of the explicit scheme:
 
 $$
 \Delta t = \min \left( C \frac{\Delta x}{|u|_{max}}, \; 0.2 \frac{\Delta x^2}{\nu_{max}}, \; 0.5 \text{ s} \right)
@@ -96,11 +108,11 @@ $$
 
 ## Boundary conditions
 
-| Boundary | Velocity | Pressure | Temperature |
-|---|---|---|---|
-| Walls, floor, ceiling | No slip, $u = v = 0$ | Zero gradient | Adiabatic |
-| Supply opening | Velocity inlet, $U = q_v / (W \, h_{open})$ normal to the wall | Zero gradient | $T_{supply}$ |
-| Exhaust | Zero gradient | Pressure outlet, $p = 0$ | Zero gradient |
+| Boundary | Velocity | Pressure | Temperature | $k$, $\varepsilon$ (k-ε) |
+|---|---|---|---|---|
+| Walls, floor, ceiling | No slip, $u = v = 0$, wall functions with k-ε | Zero gradient | Adiabatic | Zero flux for $k$, $\varepsilon$ from the wall function |
+| Supply opening | Velocity inlet, $U = q_v / (W \, h_{open})$ normal to the wall | Zero gradient | $T_{supply}$ | $Tu_{in} = 4$ %, length scale $0.1 \, h_{open}$ |
+| Exhaust | Zero gradient | Pressure outlet, $p = 0$ | Zero gradient | Zero gradient |
 
 The inlet speed follows from the airflow, the room width and the opening height. A large opening therefore gives a low inlet speed: at 6 air changes per hour a 1.2 m high window gives only 0.02 m/s, and the flow into the room is then driven by buoyancy alone.
 
@@ -130,18 +142,36 @@ $TS$ is the whole-body thermal sensation, taken as the PMV of the occupied zone 
 
 **Continuity.** After the projection, the largest divergence in any cell stays at about $10^{-15}$ s⁻¹, which is rounding error.
 
-**Python and JavaScript.** On the same case the two versions agree to 12 significant digits.
+**Python and JavaScript.** On the same case the two versions agree to 12 significant digits or better, with all three turbulence models.
 
-**Grid dependence.** The highest floor speed for a 0.1 m slot at 2.3–2.4 m (16 °C supply, 6 ACH) on four grids:
+**Grid dependence.** The highest floor speed for a 0.1 m slot at 2.3–2.4 m (16 °C supply, 6 ACH, k-ε) on four grids, from {download}`cfd_grid.py <code/cfd_grid.py>`:
 
 | Grid | Cell size | Upwind | TVD |
 |---|---|---|---|
-| 60 × 30 | 8.3 cm | 0.27 m/s | 0.31 m/s |
-| 100 × 50 | 5.0 cm | 0.31 m/s | 0.35 m/s |
-| 150 × 75 | 3.3 cm | 0.35 m/s | 0.38 m/s |
-| 200 × 100 | 2.5 cm | | 0.39 m/s |
+| 60 × 30 | 8.3 cm | 0.27 m/s | 0.36 m/s |
+| 100 × 50 | 5.0 cm | 0.31 m/s | 0.39 m/s |
+| 150 × 75 | 3.3 cm | 0.34 m/s | 0.41 m/s |
+| 200 × 100 | 2.5 cm | 0.36 m/s | 0.42 m/s |
 
-With TVD the speed converges towards about 0.40 m/s, and the default grid is within about 10 % of that. With upwind it keeps rising, because the numerical diffusion shrinks with the cell size. The app uses a coarser grid than Python to keep runs short, so its floor speeds are somewhat lower.
+With TVD the speed converges towards about 0.42 m/s, and the default grid is within about 7 % of that. With upwind it keeps rising, because the numerical diffusion shrinks with the cell size. The app uses a coarser grid than Python to keep runs short, so its floor speeds are somewhat lower.
+
+**Validation against measurements.** The IEA Annex 20 two-dimensional test case {cite:p}`nielsen1990` is an isothermal room 9 m long and 3 m high. Air enters through a 0.168 m slot under the ceiling at 0.455 m/s (a Reynolds number of 5000 based on the slot height) and leaves through a 0.48 m opening at the floor of the opposite wall. Laser-Doppler measurements of the mean velocity are given on two vertical lines (x = H and x = 2H) and two horizontal lines, h/2 below the ceiling and h/2 above the floor. The report and the data are in the book's `background/airflow` folder, and {download}`cfd_annex20.py <code/cfd_annex20.py>` runs the case on a 321 × 107 grid.
+
+The measured flow is one large eddy that fills the room: the supply air stays on the ceiling as a wall jet almost to the far wall, turns down, and returns along the floor ({numref}`fig-cfd-annex20-fields`). With k-ε the model reproduces this pattern and the measured profiles ({numref}`fig-cfd-annex20`). The root-mean-square difference is 0.05–0.06 $u_0$ on three of the lines and 0.12 $u_0$ on the line under the ceiling, where the model lets the jet turn down slightly early. With Chen & Xu the jet leaves the ceiling about halfway into the room and splits the room into three eddies, and the difference is 0.11–0.41 $u_0$. The measured flow is not perfectly two-dimensional: the net flow through the line at x = 2H is about 37 % below the supply flow, so a difference of a few per cent of $u_0$ is as close as a 2D model can get.
+
+:::{figure} figures/appendix-cfd/annex20-fields.*
+:label: fig-cfd-annex20-fields
+:width: 85%
+
+Annex 20 test room: time-averaged speed and streamlines with k-ε (top) and Chen & Xu (bottom).
+:::
+
+:::{figure} figures/appendix-cfd/annex20-profiles.*
+:label: fig-cfd-annex20
+:width: 100%
+
+Annex 20 test room: horizontal velocity $u/u_0$ on the four measuring lines, model against the laser-Doppler measurements reported by {cite:t}`nielsen1990`.
+:::
 
 **Convergence history.** The run records the rate of change of $u$, $v$ and $T$, the continuity residual, the energy imbalance and two monitor points ({numref}`fig-cfd-convergence`). With `run(case, live=True)` the same four panels are drawn in a window while the run goes on.
 
@@ -149,7 +179,7 @@ With TVD the speed converges towards about 0.40 m/s, and the default grid is wit
 :label: fig-cfd-convergence
 :width: 100%
 
-Convergence of the window case at 16 °C supply. The flow flaps for the first minutes and then settles. Temperature settles last, because the room air takes about two time constants ($2/n$ = 20 minutes at 6 ACH) to reach its final temperature, which is why the average is taken over the last 10 minutes.
+Convergence of the window case at 16 °C supply with k-ε. The flow never becomes steady: the cold stream along the floor pulses with a period of about one minute, so the rates of change level off instead of falling. The exhaust temperature settles after about 20 minutes, two time constants of the room air ($2/n$ at 6 ACH), which is why the comfort values are averaged over the last 10 minutes.
 :::
 
 ## Example: window or balcony door
@@ -163,7 +193,7 @@ Convergence of the window case at 16 °C supply. The flow flaps for the first mi
 Time-averaged temperature and streamlines for a window and a balcony door at 16 °C and 22 °C supply. Yellow and orange contours mark 0.15 and 0.25 m/s. The dotted box holds the heat gains.
 :::
 
-In both cases the cold air falls along the facade and runs along the floor. From the window it falls 0.9 m before it reaches the floor and gains speed on the way, so the floor speed is higher. Through the door it enters at floor level and spreads as a cold layer that is slower but 1.5–2 K colder and reaches further into the room ({numref}`fig-cfd-floor-line`). The draught is worst within 1 m of the facade, where neither the window nor the door meets ISO 7730 at 16 °C supply.
+In both cases the cold air falls along the facade and runs along the floor. From the window it falls 0.9 m before it reaches the floor and gains speed on the way, so the floor speed is higher. Through the door it enters at floor level and spreads as a cold layer that is slower but 1.3–2 K colder and reaches further into the room ({numref}`fig-cfd-floor-line`). The draught is worst within 1 m of the facade, where neither the window nor the door meets ISO 7730 at 16 °C supply.
 
 :::{figure} figures/appendix-cfd/window-vs-door-floor-line.*
 :label: fig-cfd-floor-line
@@ -197,7 +227,8 @@ plots.floor_line(res).savefig("floor.png")
 | `inlet`, `outlet` | 0.1–0.3 m left, 2.2–2.4 m right | `Opening(side, start, end)`, side `"left"`, `"right"` or `"top"` |
 | `heat` | none | List of `HeatBlock(x0, x1, y0, y1, power)`, power in W per metre of width |
 | `floor_flux` | none | List of `FloorFlux(x0, x1, power)`, for a sun patch on the floor |
-| `turbulence` | `"chen-xu"` | or `"constant"` with `nu_t` |
+| `turbulence` | `"k-epsilon"` | or `"chen-xu"`, or `"constant"` with `nu_t` |
+| `Tu_in` | 0.04 | Turbulence intensity of the supply air (k-ε) |
 | `advection` | `"tvd"` | or `"upwind"` |
 | `t_end`, `t_avg` | 900 s, 300 s | Simulated time and averaging window at the end |
 
@@ -207,7 +238,7 @@ plots.floor_line(res).savefig("floor.png")
 
 - **2D.** The opening runs the full width of the room. A jet from a slot decays as $1/\sqrt{x}$, slower than a jet from a real window, which decays as $1/x$, so speeds far from the opening are overestimated.
 - **Inlet only.** The supply opening only lets air in. A real wide-open window also lets warm air out at the top, and that two-way flow is not modelled.
-- **Turbulence.** The zero-equation model is calibrated for typical room flows. It is not reliable for the details of a separating jet or for the turbulence intensity, so ISO 7730 uses a fixed $Tu = 40$ %.
+- **Turbulence.** The standard k-ε model with wall functions reproduces the main flow pattern of a ventilated room, but it is known to be less accurate for flows that separate or are strongly stratified. The comfort indices use a fixed $Tu = 40$ % rather than the modelled turbulence.
 - **No radiation and adiabatic walls.** Surfaces do not exchange heat with the air or with each other, and there is no cold downdraught from glazing.
 
 Use the model to compare openings, temperatures and airflows, and to see why they behave as they do. For design values, use a validated 3D CFD code or measurements.

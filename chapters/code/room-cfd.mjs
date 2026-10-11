@@ -1,6 +1,6 @@
 // Interactive 2D room section CFD (anywidget module for MyST).
 // Same solver as room_cfd.py (the documented reference version): MAC grid, Boussinesq buoyancy,
-// Chorin projection, TVD (van Leer) or upwind advection, Chen & Xu zero-equation turbulence.
+// Chorin projection, TVD (van Leer) or upwind advection, k-epsilon or Chen & Xu zero-equation turbulence.
 // The stand-alone page room-cfd.html is built from this file by build_room_cfd_html.py.
 
 // ---- room CFD solver (port of room_cfd.py) ----
@@ -61,7 +61,7 @@ function bandedCholesky(N, b, entries) {
 }
 
 export function createSim(c) {
-  // c: {L,H,W,nx,ny,ach,T_in,inlet,outlet,heat:[{x0,x1,y0,y1,power}],turbulence,nu_t,Pr_t,advection,t_end,t_avg}
+  // c: {L,H,W,nx,ny,ach,T_in,inlet,outlet,heat:[{x0,x1,y0,y1,power}],turbulence,nu_t,Tu_in,Pr_t,advection,t_end,t_avg}
   const nx = c.nx, ny = c.ny, L = c.L, H = c.H, dx = L / nx, dy = H / ny, h = Math.min(dx, dy);
   const q = c.ach * L * H * c.W / 3600;
   const bL = new Int8Array(ny), bR = new Int8Array(ny);
@@ -122,6 +122,47 @@ export function createSim(c) {
   const iMon = Math.min(Math.floor(1.0 / dx), nx - 1), jMon = Math.min(Math.floor(0.1 / dy), ny - 1);
   const s = { t: 0, n: 0, dt: 0, done: false };
 
+  // k-epsilon: inlet values, wall cells, wall distance, wall corner masks
+  const ke = c.turbulence === "k-epsilon";
+  const CMU = 0.09, C1 = 1.44, C2 = 1.92, SK = 1.0, SE = 1.3, KAP = 0.41, EWF = 9.0, CMU4 = Math.pow(CMU, 0.25), CMU34 = Math.pow(CMU, 0.75);
+  const k_in = 1.5 * ((c.Tu_in ?? 0.04) * U_in) ** 2, e_in = Math.pow(k_in, 1.5) / (0.1 * h_in);
+  let tk = new Float64Array(N).fill(k_in), te = new Float64Array(N).fill(e_in);
+  let tkn = new Float64Array(N), ten = new Float64Array(N);
+  const yp = new Float64Array(N).fill(0);                    // 0 = not a wall cell
+  for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
+    let y = Infinity;
+    if (j === 0 || (j === ny - 1 && bT[i] === WALL)) y = dy / 2;
+    if ((i === 0 && bL[j] === WALL) || (i === nx - 1 && bR[j] === WALL)) y = Math.min(y, dx / 2);
+    if (y < Infinity) yp[C(i, j)] = y;
+  }
+  const cornerWall = (b, n, i) => b[Math.max(i - 1, 0)] === WALL && b[Math.min(i, n - 1)] === WALL;
+  const nuWall = (kw, y) => {                                 // tau_w * y / U_p from the log law
+    const ys = CMU4 * Math.sqrt(kw) * y / NU_AIR;
+    return ys > 11.2 ? KAP * ys * NU_AIR / Math.log(EWF * Math.max(ys, 1)) : NU_AIR;
+  };
+  const Gx = new Float64Array((nx + 1) * ny), Gy = new Float64Array(nx * (ny + 1));
+  const Pk = new Float64Array(N), Gb = new Float64Array(N), Rk = new Float64Array(N), Re = new Float64Array(N);
+  function transport(phi, phiIn, sig, out) {                  // upwind advection + diffusion, returns -div(F)
+    for (let j = 0; j < ny; j++) {
+      const eL = bL[j] === INLET ? phiIn : phi[C(0, j)], eR = bR[j] === INLET ? phiIn : phi[C(nx - 1, j)];
+      for (let i = 0; i <= nx; i++) {
+        const uf = u[U(i, j)];
+        let f = uf * (uf > 0 ? (i > 0 ? phi[C(i - 1, j)] : eL) : (i < nx ? phi[C(i, j)] : eR));
+        if (i > 0 && i < nx) f -= 0.5 * (2 * NU_AIR + (nu_c[C(i, j)] - NU_AIR + nu_c[C(i - 1, j)] - NU_AIR) / sig) * (phi[C(i, j)] - phi[C(i - 1, j)]) / dx;
+        Gx[U(i, j)] = f;
+      }
+    }
+    for (let i = 0; i < nx; i++) for (let j = 0; j <= ny; j++) {
+      const vf = v[V(i, j)];
+      let f = 0;
+      if (j > 0) f = vf * (vf > 0 ? phi[C(i, j - 1)] : phi[C(i, j < ny ? j : ny - 1)]);
+      if (j > 0 && j < ny) f -= 0.5 * (2 * NU_AIR + (nu_c[C(i, j)] - NU_AIR + nu_c[C(i, j - 1)] - NU_AIR) / sig) * (phi[C(i, j)] - phi[C(i, j - 1)]) / dy;
+      Gy[V(i, j)] = f;
+    }
+    for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++)
+      out[C(i, j)] = -((Gx[U(i + 1, j)] - Gx[U(i, j)]) / dx + (Gy[V(i, j + 1)] - Gy[V(i, j)]) / dy);
+  }
+
   const ug = (i, j) => j < 0 ? -u[U(i, 0)] : j >= ny ? -u[U(i, ny - 1)] : u[U(i, j)];
   const vg = (i, j) => i < 0 ? -v[V(0, j)] : i >= nx ? -v[V(nx - 1, j)] : v[V(i, j)];
   const cl = (a, lo, hi) => a < lo ? lo : a > hi ? hi : a;
@@ -133,13 +174,26 @@ export function createSim(c) {
     for (let k = 0; k < v.length; k++) umax = Math.max(umax, Math.abs(v[k]));
     for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
       let nu;
-      if (c.turbulence === "constant") nu = NU_AIR + c.nu_t;
+      if (ke) nu = NU_AIR + CMU * tk[C(i, j)] * tk[C(i, j)] / te[C(i, j)];
+      else if (c.turbulence === "constant") nu = NU_AIR + c.nu_t;
       else { const a = 0.5 * (u[U(i, j)] + u[U(i + 1, j)]), b2 = 0.5 * (v[V(i, j)] + v[V(i, j + 1)]); nu = NU_AIR + 0.03874 * Math.sqrt(a * a + b2 * b2) * lwall[C(i, j)]; }
       nu_c[C(i, j)] = nu; if (nu > numax) numax = nu;
     }
     for (let i = 0; i <= nx; i++) for (let j = 0; j <= ny; j++) {
       const i0 = cl(i - 1, 0, nx - 1), i1 = cl(i, 0, nx - 1), j0 = cl(j - 1, 0, ny - 1), j1 = cl(j, 0, ny - 1);
       nu_k[i * (ny + 1) + j] = 0.25 * (nu_c[C(i0, j0)] + nu_c[C(i1, j0)] + nu_c[C(i0, j1)] + nu_c[C(i1, j1)]);
+    }
+    if (ke) {                                                // wall shear from the log law at wall corners
+      const kc = (i, j) => { const i0 = cl(i - 1, 0, nx - 1), i1 = cl(i, 0, nx - 1), j0 = cl(j - 1, 0, ny - 1), j1 = cl(j, 0, ny - 1);
+        return 0.25 * (tk[C(i0, j0)] + tk[C(i1, j0)] + tk[C(i0, j1)] + tk[C(i1, j1)]); };
+      for (let i = 0; i <= nx; i++) {
+        nu_k[i * (ny + 1)] = nuWall(kc(i, 0), dy / 2);
+        if (cornerWall(bT, nx, i)) nu_k[i * (ny + 1) + ny] = nuWall(kc(i, ny), dy / 2);
+      }
+      for (let j = 0; j <= ny; j++) {
+        if (cornerWall(bL, ny, j)) nu_k[j] = nuWall(kc(0, j), dx / 2);
+        if (cornerWall(bR, ny, j)) nu_k[nx * (ny + 1) + j] = nuWall(kc(nx, j), dx / 2);
+      }
     }
     const dt = Math.min(cfl * h / umax, 0.2 * h * h / numax, 0.5);
     const NK = (i, j) => nu_k[i * (ny + 1) + j];
@@ -237,6 +291,34 @@ export function createSim(c) {
       hist.div.push(divMax); hist.imb.push(100 * (RHO * CP * qo - Q_tot) / Math.max(Q_tot, 1));
       hist.v_floor.push(Math.hypot(0.5 * (u[U(iMon, jMon)] + u[U(iMon + 1, jMon)]), 0.5 * (v[V(iMon, jMon)] + v[V(iMon, jMon + 1)])));
       hist.T_exh.push(te / ne);
+    }
+    // k and epsilon (sink terms implicit, so both stay positive); Tn holds T before this step
+    if (ke) {
+      for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
+        const k = C(i, j), nut = nu_c[k] - NU_AIR;
+        let sh = 0;
+        for (const [a, b] of [[i, j], [i + 1, j], [i, j + 1], [i + 1, j + 1]]) sh += (ug(a, b) - ug(a, b - 1)) / dy + (vg(a, b) - vg(a - 1, b)) / dx;
+        sh *= 0.25;
+        const sxx = (u[U(i + 1, j)] - u[U(i, j)]) / dx, syy = (v[V(i, j + 1)] - v[V(i, j)]) / dy;
+        let P = nut * (2 * (sxx * sxx + syy * syy) + sh * sh);
+        if (yp[k] > 0) {
+          const a = 0.5 * (u[U(i, j)] + u[U(i + 1, j)]), b = 0.5 * (v[V(i, j)] + v[V(i, j + 1)]);
+          const tau = nuWall(tk[k], yp[k]) * Math.sqrt(a * a + b * b) / yp[k];
+          P = tau * CMU4 * Math.sqrt(tk[k]) / (KAP * yp[k]);
+        }
+        Pk[k] = P;
+        const dTdy = ny === 1 ? 0 : j === 0 ? (Tn[k + 1] - Tn[k]) / dy : j === ny - 1 ? (Tn[k] - Tn[k - 1]) / dy : (Tn[k + 1] - Tn[k - 1]) / (2 * dy);
+        Gb[k] = -G * beta * nut / c.Pr_t * dTdy;
+      }
+      transport(tk, k_in, SK, Rk); transport(te, e_in, SE, Re);
+      for (let k = 0; k < N; k++) {
+        const kk = tk[k], ee = te[k], gp = Math.max(Gb[k], 0), gm = Math.max(-Gb[k], 0);
+        const kn = (kk + dt * (Rk[k] + Pk[k] + gp)) / (1 + dt * (ee + gm) / kk);
+        const en = (ee + dt * (Re[k] + C1 * ee / kk * (Pk[k] + gp))) / (1 + dt * C2 * ee / kk);
+        tkn[k] = Math.max(kn, 1e-10); ten[k] = Math.max(en, 1e-12);
+        if (yp[k] > 0) ten[k] = CMU34 * Math.pow(tkn[k], 1.5) / (KAP * yp[k]);
+      }
+      [tk, tkn] = [tkn, tk]; [te, ten] = [ten, te];
     }
     s.t += dt; s.n++; s.dt = dt;
     if (s.t >= c.t_end - c.t_avg) {
@@ -422,7 +504,8 @@ const MARKUP = `<div class="wrap">
           </div></div>
         <div class="group"><span style="font-size:13px">Turbulence</span>
           <div class="seg" id="turb" role="group" aria-label="Turbulence model">
-            <button type="button" data-v="chen-xu" aria-pressed="true">Chen &amp; Xu</button>
+            <button type="button" data-v="k-epsilon" aria-pressed="true">k-ε</button>
+            <button type="button" data-v="chen-xu" aria-pressed="false">Chen &amp; Xu</button>
             <button type="button" data-v="constant" aria-pressed="false">Constant ν<sub>t</sub></button>
           </div></div>
       </div>
@@ -472,7 +555,7 @@ const MARKUP = `<div class="wrap">
 
       <details class="panel">
         <summary>About the model</summary>
-        <p>The solver is the same as room_cfd.py from the course. It solves the incompressible Navier–Stokes equations with Boussinesq buoyancy and an energy equation, on a staggered grid, marching in time with a pressure projection. Turbulence is an eddy viscosity: Chen &amp; Xu (1998) ν<sub>t</sub> = 0.03874·V·ℓ, or a constant 0.002 m²/s. The heat gains sit in the dotted block and are set so the well-mixed room reaches the chosen temperature.</p>
+        <p>The solver is the same as room_cfd.py from the course. It solves the incompressible Navier–Stokes equations with Boussinesq buoyancy and an energy equation, on a staggered grid, marching in time with a pressure projection. Turbulence is an eddy viscosity: the standard k-ε model with wall functions (default), Chen &amp; Xu (1998) ν<sub>t</sub> = 0.03874·V·ℓ, or a constant 0.002 m²/s. Only k-ε reproduces the IEA Annex 20 test room. The heat gains sit in the dotted block and are set so the well-mixed room reaches the chosen temperature.</p>
         <p>The occupied zone (dashed) starts 0.6 m from the facade and the back wall and reaches 1.8 m up. ISO 7730 DR uses Tu = 40 %. The ASHRAE 55-2020 ankle draught model (Liu et al. 2017) uses the whole-body thermal sensation TS, here the PMV of the occupied zone at 1.2 met, 0.5 clo, 50 % RH and t<sub>r</sub> = t<sub>a</sub>. Both limits are 20 %.</p>
         <p>Limits: a 2D section treats the opening as running the full room width, and a 2D jet decays more slowly than a real 3D one. The opening is an inlet only, so a large opening does not also let warm air out at the top, as a real window would. Use it to compare cases, not to get design values.</p>
       </details>
@@ -485,7 +568,7 @@ const MARKUP = `<div class="wrap">
 function app(root, autoRun) {
   const $ = id => root.querySelector("#" + id);
   const PRESETS = { window: [0.9, 2.1], door: [0, 2.1], hatch: [2.2, 2.4], low: [0.2, 0.3] };
-  const state = { preset: "window", lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, mesh: 60, adv: "tvd", turb: "chen-xu", field: "T" };
+  const state = { preset: "window", lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, mesh: 60, adv: "tvd", turb: "k-epsilon", field: "T" };
   let sim = null, running = false, rafId = 0, lastDraw = 0;
 
   const css = name => getComputedStyle(root).getPropertyValue(name).trim();
@@ -506,7 +589,7 @@ function app(root, autoRun) {
     const Q = Math.max(1.2 * 1005 * q * (state.troom - state.tin), 0);
     return { L: 5, H: 2.5, W: 4, nx: state.mesh, ny: state.mesh / 2, ach: state.ach, T_in: state.tin,
       inlet: { side: "left", start: state.lo, end: state.hi }, outlet: { side: "right", start: 2.3, end: 2.4 },
-      heat: [{ x0: 2.3, x1: 2.7, y0: 0, y1: 1.2, power: Q / 4 }], turbulence: state.turb, nu_t: 2e-3, Pr_t: 0.85,
+      heat: [{ x0: 2.3, x1: 2.7, y0: 0, y1: 1.2, power: Q / 4 }], turbulence: state.turb, nu_t: 2e-3, Tu_in: 0.04, Pr_t: 0.85,
       advection: state.adv, t_end: 1800, t_avg: 600 };
   }
 
