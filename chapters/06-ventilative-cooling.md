@@ -143,7 +143,116 @@ Cross-ventilation therefore gives much more airflow than single-sided ventilatio
 
 ### Combined wind and stack effect
 
-In reality wind and buoyancy act together. They can reinforce each other or work against each other, depending on where the openings are. Building simulation tools such as IDA ICE solve this as an airflow network, where every opening is a flow element and the pressures are balanced in each zone and every time step. Hand calculations with {eq}`eq-vc-stackflow` and {eq}`eq-vc-cross` are still useful to check the order of magnitude of the simulated airflows.
+In reality wind and buoyancy act at the same time. For two openings, the hand calculation follows directly from the equations above, because the two pressure differences add up across the openings:
+
+1. **Stack pressure.** Find the height difference $h$ between the openings and calculate $\Delta p_\text{stack}$ with {eq}`eq-vc-stack`.
+2. **Wind pressure.** Look up $C_p$ for the façade or roof surface of each opening and calculate $\Delta p_\text{wind}$ with {eq}`eq-vc-cross`.
+3. **Assisting or opposing?** The stack effect always pushes air in at the bottom and out at the top. If the wind pushes in the same direction (the lower opening has the higher $C_p$), the pressures add. If not, they work against each other:
+
+   ```{math}
+   :label: eq-vc-combined
+   \Delta p = \Delta p_\text{stack} \pm \Delta p_\text{wind}
+   ```
+
+4. **Effective area.** Combine the openings with {eq}`eq-vc-aeff`.
+5. **Airflow.** Insert $\Delta p$ and $A_\text{eff}$ in the orifice equation {eq}`eq-vc-orifice`.
+6. **Cooling.** Calculate the cooling power with {eq}`eq-vc-cooling`.
+
+When the pressures assist each other, step 5 is the same as adding the two airflows in quadrature, $Q = \sqrt{Q_\text{stack}^2 + Q_\text{wind}^2}$. The combined airflow is therefore always smaller than the sum of the two airflows calculated separately.
+
+Take the house from the stack example: a 0.5 m² window low on the windward façade ($C_p = +0.5$) and a 0.5 m² roof window 5 m higher on the roof ($C_p = -0.3$), with a 3 K temperature difference and a wind speed of 3 m/s.
+
+- Stack pressure: $\Delta p_\text{stack} = 1.2 \cdot 9.81 \cdot 5 \cdot 3/298 = 0.59$ Pa.
+- Wind pressure: $\Delta p_\text{wind} = (0.5 - (-0.3)) \cdot \tfrac{1}{2} \cdot 1.2 \cdot 3^2 = 4.32$ Pa.
+- The windward window is the lower opening, and the roof has suction, so the pressures assist: $\Delta p = 0.59 + 4.32 = 4.91$ Pa.
+- Effective area: $A_\text{eff} = 0.35$ m².
+- Airflow: $Q = 0.65 \cdot 0.35 \cdot \sqrt{2 \cdot 4.91/1.2} = 0.66$ m³/s.
+- Cooling: $P = 1.2 \cdot 1005 \cdot 0.66 \cdot 3 \approx 2.4$ kW.
+
+At 3 m/s the wind dominates, and the combined airflow is only 7 % higher than with wind alone. On a calm day with 1 m/s wind, $\Delta p_\text{wind}$ falls to 0.48 Pa. The two pressures are then about equal, and the airflow is 0.31 m³/s, or 1.1 kW of cooling.
+
+Now turn the wind around so that the roof window is on the windward side and the low window on the leeward side. The wind then pushes air in at the top and the stack effect pushes it out at the top. The pressures cancel at a wind speed of only
+
+```{math}
+v = \sqrt{\frac{\Delta p_\text{stack}}{(C_{p,1} - C_{p,2}) \, \tfrac{1}{2} \, \rho}} = \sqrt{\frac{0.59}{0.8 \cdot 0.6}} = 1.1 \text{ m/s}
+```
+
+At that wind speed the airflow almost stops, and the room is not cooled even though both openings are wide open. At higher wind speeds the flow reverses, and the warm air from the room is pushed down through the house. Place inlets low on the façade facing the prevailing summer wind, and outlets high where there is suction: on the roof or on the leeward façade.
+
+Building simulation tools such as IDA ICE solve the same problem as an airflow network, where every opening is a flow element and the pressures are balanced in each zone and every time step. Hand calculations like the one above are still essential for checking whether the simulated airflows have the right order of magnitude.
+
+### Worked example: single-sided ventilation
+
+A 30 m² room with a ceiling height of 2.5 m (75 m³) has one openable window on a single façade. The free opening area is $A = 0.6$ m² and the opening is $H = 1.2$ m tall. The wind speed is $v = 2$ m/s, the room is at 25 °C and the outdoor air at 20 °C, so $\Delta T = 5$ K. What is the airflow through the window?
+
+**Stack effect alone.** With {eq}`eq-vc-single`:
+
+```{math}
+Q_\text{stack} = \frac{0.65 \cdot 0.6}{3} \sqrt{9.81 \cdot 1.2 \cdot \frac{5}{298}} = 0.13 \cdot 0.44 = 0.058 \text{ m}^3\text{/s} = 58 \text{ L/s}
+```
+
+**Wind alone.** With a single opening there is no pressure difference across the room, so {eq}`eq-vc-cross` does not apply. The wind still drives some exchange through turbulence and pulsating flow at the opening. A simple empirical estimate by Warren and Parkins is $Q_\text{wind} = 0.025 \, A \, v$:
+
+```{math}
+Q_\text{wind} = 0.025 \cdot 0.6 \cdot 2 = 0.030 \text{ m}^3\text{/s} = 30 \text{ L/s}
+```
+
+**Wind and stack combined.** The two drivers do not simply add up. EN 16798-7 uses an empirical expression for single-sided ventilation through an open window, based on measurements by de Gids and Phaff, where the larger of the two drivers decides:
+
+```{math}
+:label: eq-vc-en16798
+Q = 0.5 \, A \sqrt{\max\left(C_\text{wnd} \, v^2 \, ; \; C_\text{st} \, H \, \Delta T\right)}
+```
+
+with $C_\text{wnd} = 0.001$ (1/(m/s)) and $C_\text{st} = 0.0035$ ((m/s)/(m·K)). The wind term is $0.001 \cdot 2^2 = 0.004$ and the stack term is $0.0035 \cdot 1.2 \cdot 5 = 0.021$. The stack term is larger, so
+
+```{math}
+Q = 0.5 \cdot 0.6 \cdot \sqrt{0.021} = 0.044 \text{ m}^3\text{/s} = 44 \text{ L/s}
+```
+
+**Result.** The window gives about 45 to 60 L/s, or 2 to 3 air changes per hour. With {eq}`eq-vc-cooling` this removes
+
+```{math}
+P = 1.2 \cdot 1005 \cdot 0.044 \cdot 5 \approx 260 \text{ W}
+```
+
+Two lessons follow. At a moderate wind speed of 2 m/s, the stack effect over the height of the window dominates, so a tall window is worth more than a wide one. And even with a 5 K temperature difference, one window removes only about a quarter of the 1 kW of heat gains from the earlier example. Single-sided ventilation can handle a well-shaded room, but a room with large solar gains needs cross or stack ventilation.
+
+### Worked example: cross-ventilation
+
+Now give the room from the previous example a second, identical window on the opposite façade, so that air can flow straight through. The conditions are the same: $A = 0.6$ m² per window, $v = 2$ m/s and $\Delta T = 5$ K. The windward façade has $C_p = +0.5$ and the leeward façade $C_p = -0.3$. The windows are at the same height, so the stack effect between them is zero and only the wind drives the flow.
+
+**Wind pressure.** With {eq}`eq-vc-cross`:
+
+```{math}
+\Delta p = (0.5 - (-0.3)) \cdot \tfrac{1}{2} \cdot 1.2 \cdot 2^2 = 1.92 \text{ Pa}
+```
+
+**Effective area.** The two windows are in series, so with {eq}`eq-vc-aeff`:
+
+```{math}
+A_\text{eff} = \left( \frac{1}{0.6^2} + \frac{1}{0.6^2} \right)^{-1/2} = 0.42 \text{ m}^2
+```
+
+**Airflow.** With the orifice equation {eq}`eq-vc-orifice`:
+
+```{math}
+Q = 0.65 \cdot 0.42 \cdot \sqrt{\frac{2 \cdot 1.92}{1.2}} = 0.49 \text{ m}^3\text{/s} = 490 \text{ L/s}
+```
+
+**Cooling.** With {eq}`eq-vc-cooling`:
+
+```{math}
+P = 1.2 \cdot 1005 \cdot 0.49 \cdot 5 \approx 3.0 \text{ kW}
+```
+
+**Result.** Opening a second window on the opposite façade raises the airflow from about 45 L/s to 490 L/s, more than ten times as much. That is about 24 air changes per hour, which removes the 1 kW of heat gains with plenty to spare. In practice the occupants will close the windows partly long before that, because air speeds this high cause draught (see the section on draught).
+
+The result is sensitive to the assumptions:
+
+- **Sheltered site.** In a dense urban area the $C_p$ difference may be only 0.3 instead of 0.8. Since the airflow scales with the square root of the pressure difference, it falls to $490 \cdot \sqrt{0.3/0.8} = 300$ L/s.
+- **Internal doors.** In a dwelling the air must usually pass through an internal door on its way across. An open door of 1.6 m² is a third opening in series and hardly matters: the airflow drops to 480 L/s. A closed door with a 2 cm undercut leaves only about 0.02 m², and the airflow drops to 23 L/s, less than single-sided ventilation through one window. Cross-ventilation only works when the path through the building is open.
+- **Wind speed.** The wind speed in the equation is the local wind at the building, not the meteorological wind measured at 10 m height in open terrain. In a built-up area the local wind is often only half the meteorological value or less.
 
 :::{admonition} Rules of thumb
 :class: tip
