@@ -627,7 +627,10 @@ function app(root, autoRun) {
 
   // ---------- section plot ----------
   function sizeCanvas(cv, hFit) {
-    const r = window.devicePixelRatio || 1, w = cv.clientWidth, h = hFit ? Math.min(+cv.getAttribute("height"), hFit(w)) : +cv.getAttribute("height");
+    // the CSS height comes from the markup's height attribute, kept in data-h because setting cv.height
+    // (the pixel buffer) overwrites that attribute; reading it back would grow the canvas by devicePixelRatio per draw
+    if (!cv.dataset.h) cv.dataset.h = cv.getAttribute("height");
+    const r = window.devicePixelRatio || 1, w = cv.clientWidth, h0 = +cv.dataset.h, h = hFit ? Math.min(h0, hFit(w)) : h0;
     if (cv.width !== Math.round(w * r) || cv.height !== Math.round(h * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); }
     cv.style.height = h + "px";
     const g = cv.getContext("2d"); g.setTransform(r, 0, 0, r, 0, 0); return [g, w, h];
