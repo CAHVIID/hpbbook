@@ -1,20 +1,10 @@
-# Façade design for daylight and low cooling demand
+# D3 Façade design for daylight and low cooling demand
 
 :::{warning} Under revision
 This chapter is being reworked and may change substantially. Sections marked *Outline* are not yet written.
 :::
 
-## Learning objectives
-
-After this chapter you can:
-- explain why the façade is the first place to cut cooling demand, and why that conflicts with daylight;
-- describe glazing by U-value, g-value, light transmittance and selectivity, and choose a solar-control glazing that keeps enough light;
-- size an overhang and side fins from the sun's position, and explain why overhangs work towards south and fins towards east and west;
-- state the daylight requirement in BR18 / EN 17037 (sDA300,50% > 50 %) and what drives it;
-- set up a multi-objective parametric study in IDA ICE with constraints and objectives, and read the result as a Pareto front;
-- choose a façade design for north and south that meets sDA300 at the lowest cooling demand, and judge its heating penalty and robustness in future weather.
-
-## Introduction
+## D3.1 Introduction
 
 *Outline:*
 
@@ -24,7 +14,7 @@ After this chapter you can:
 - The running case: the critical centre zone of the course row house, 4 × 4 × 2.5 m, prefab constructions with U = 0.1 W/m²K, facing north or south.
 - Figure: the four design variables on one façade section and elevation (window height, glazing, overhang, side fins).
 
-## Solar gains through the façade
+## D3.2 Solar gains through the façade
 
 *Outline:*
 
@@ -34,7 +24,7 @@ After this chapter you can:
 - Figure: incident radiation by orientation and month; g against LT for the candidate glazings, with lines of constant selectivity.
 - Rules-of-thumb box: g-value, selectivity limits (about 2 for double/triple coatings), what LT does to sDA.
 
-## Fixed shading: overhangs and side fins
+## D3.3 Fixed shading: overhangs and side fins
 
 *Outline:*
 
@@ -45,7 +35,7 @@ After this chapter you can:
 - Figure: section and plan showing profile angle, overhang and fins against the sun path for June, March/September and December.
 - Rules-of-thumb box: overhang depth for a given window height towards south.
 
-## Daylight: sDA300 and what drives it
+## D3.4 Daylight: sDA300 and what drives it
 
 *Outline:*
 
@@ -55,7 +45,7 @@ After this chapter you can:
 - Why "just enough" daylight: sDA far above 50 % means solar gain you pay for in cooling (Potin: sDA300 > 50 % in bedrooms, sDA500 > 50 % in living rooms, but not much more).
 - Figure: sDA300 and cooling demand against window height for the reference glazing, north and south.
 
-## Cooling demand as the objective
+## D3.5 Cooling demand as the objective
 
 *Outline:*
 
@@ -63,7 +53,7 @@ After this chapter you can:
 - Heating demand as the second objective: less solar gain means more heating.
 - Weather: the 2050 climate file (more critical than 2090), Annex 80 TMY 2041–2060 as in the cooling assignment ([](d1-weather-files.md)).
 
-## Multi-objective optimisation
+## D3.6 Multi-objective optimisation
 
 *Outline:*
 
@@ -73,7 +63,7 @@ After this chapter you can:
 - How IDA ICE concentrates runs near the interesting region when roles are set; sampling versus a full grid.
 - Figure: a Pareto front of cooling against heating demand, coloured by sDA, with the feasible region marked.
 
-## A façade guideline from a brute-force sweep
+## D3.7 A façade guideline from a brute-force sweep
 
 An optimisation such as AutoMOO returns one design for one room. The design is good, but the reason for it is hidden: you do not see how close the neighbouring designs are, or which variable did the work. A brute-force sweep over a coarse grid shows the trends instead. Plotted against one variable, it becomes a guideline you can reuse for the next room, the next house and the next project without simulating again.
 
@@ -138,7 +128,7 @@ The result of the sweep is a short table per orientation:
 
 The table holds for this climate file, this room depth and this construction. A deeper room needs a larger WFR for the same sDA, and a future climate file moves the comfort threshold to the left.
 
-## Running the study in IDA ICE
+## D3.8 Running the study in IDA ICE
 
 *Outline:*
 
@@ -147,7 +137,7 @@ The table holds for this climate file, this room depth and this construction. A 
 - Reading the Explore view (parallel coordinates) and exporting results.
 - Pitfalls box: physically impossible parameter combinations, too fine steps, results from earlier runs mixed in, sDA computed on the wrong plane.
 
-## Worked example: the row house centre zone
+## D3.9 Worked example: the row house centre zone
 
 *Outline:*
 
@@ -157,14 +147,14 @@ The table holds for this climate file, this room depth and this construction. A 
 - Heating penalty, and the same designs under today's and the future weather and a heat-wave year.
 - Table plus the Pareto figure from section 6.
 
-## From one zone to the whole house
+## D3.10 From one zone to the whole house
 
 *Outline:*
 
 - Carrying the north and south designs back to the full row house; rooms with other depths and uses.
 - What is left for ventilative cooling ([](d4-ventilative-cooling.md)) and ceiling fans ([](d6-ceiling-fans.md)).
 
-## Guiding questions
+## D3.11 Guiding questions
 
 *TBA*
 
