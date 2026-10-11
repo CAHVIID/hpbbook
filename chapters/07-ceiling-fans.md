@@ -117,7 +117,7 @@ Small motors have losses that do not follow the cube law, so the real power at l
 ```
 
 It falls as speed increases. The Fanco Breeze AC 132 moves 375 m³/h per W at low speed and 201 m³/h per W at high speed ({numref}`tab-fan-data`).
-
+@claude: in the table below, throw out all fans, but keep the Franco 132
 :::{table} Ceiling fan data at the highest speed, from manufacturer datasheets. Airflow in CFM has been converted to m³/h.
 :label: tab-fan-data
 :align: center
