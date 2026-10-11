@@ -9,17 +9,23 @@ This appendix documents a small 2D computational fluid dynamics (CFD) model of a
 The model exists in two versions that give the same results:
 
 - {download}`room_cfd.py <code/room_cfd.py>` is the reference version in Python, with plotting functions in {download}`room_cfd_plots.py <code/room_cfd_plots.py>` and the figures of this appendix in {download}`cfd_examples.py <code/cfd_examples.py>`.
-- {download}`room-cfd.mjs <code/room-cfd.mjs>` is the same solver in JavaScript, which runs as the app below.
+- {download}`room-cfd.mjs <code/room-cfd.mjs>` is the same solver in JavaScript, which runs as the app.
 
 ## The app
 
-```{anywidget} code/room-cfd.mjs
-{}
-```
+**[Open the room CFD app in a new tab](code/room-cfd.html)**. It runs in your browser and needs no installation. {numref}`fig-room-cfd-app` shows it after a run with the default inputs.
 
-Press *Run* to start. A run simulates 30 minutes of real time and takes under a minute in a browser. The section view shows the instantaneous field while the simulation runs and the time-averaged field when it finishes. Changing a setting starts a new run.
+:::{figure} figures/appendix-cfd/room-cfd-app.*
+:label: fig-room-cfd-app
+:alt: Screenshot of the room CFD app. Inputs for the supply opening, supply temperature, air change rate, room temperature, mesh, advection scheme and turbulence model on the left. On the right, the temperature field and velocity arrows in the 5 m deep room section, key results for floor speed, ISO 7730 draught rate, PMV, ankle draught and exhaust temperature, and charts of the conditions at ankle height and of the convergence.
+:width: 100%
 
-The app also runs on its own as a single HTML file: {download}`room-cfd.html <code/room-cfd.html>`. Save it anywhere and double-click it. It opens in a web browser, needs no installation and works offline.
+The room CFD app after a run with the default inputs: a window from 0.9 to 2.1 m, 16 °C supply air and 6 air changes per hour. Open the app to change the inputs.
+:::
+
+The app starts a run when it opens. A run simulates 30 minutes of real time and takes under a minute in a browser. The section view shows the instantaneous field while the simulation runs and the time-averaged field when it finishes. Changing a setting starts a new run.
+
+The app is a single HTML file, {download}`room-cfd.html <code/room-cfd.html>`. Save it anywhere and double-click it to use it offline.
 
 ## The room and the cases
 
