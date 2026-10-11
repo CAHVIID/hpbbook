@@ -43,15 +43,6 @@ Tilt fittings limit s to about 100–150 mm.
 
 **Top-hung** (hinge at the top, opening outwards at the bottom): the same geometry turned upside down, so A = s(w + h) as well. The widest gap is now at the bottom, where the inflow enters, and the outflow must pass through the narrow slivers at the top.
 
-**Horizontal pivot** (centre-hung, as most roof windows): the sash rotates about a horizontal axis at mid-height, so one edge moves out and the other moves in, each by s. The free area is two slots and four triangles:
-
-```{math}
-:label: eq-sh-pivot
-A = 2\,s\,w + 4 \cdot \tfrac{1}{2}\,s\,\tfrac{h}{2} = s\,(2w + h)
-```
-
-The two slots are a separate inlet and outlet a full sash height apart, which suits single-sided stack flow. On a roof, the pivot window is usually the high outlet of stack ventilation ([](d4-ventilative-cooling.md)).
-
 **Venting hatches** are openings made only for ventilation, usually without glass. They are treated in a section of their own below.
 
 <!-- Photos of the opening types will be added here (Christian). -->
@@ -65,7 +56,6 @@ For a 0.8 × 1.3 m sash:
 | Side-hung | 10° | 0.18 m² |
 | Bottom-hung | s = 120 mm | 0.25 m² |
 | Top-hung | s = 120 mm | 0.25 m² |
-| Horizontal pivot | s = 120 mm | 0.35 m² |
 
 ## D5.3 Airflow at small ΔT
 
