@@ -16,34 +16,34 @@ There are code snippets (apps) embedded into the textbook. The intention of the 
 
 **Part A: Compactness and envelope** (in progress)
 
-- [The building envelope](chapters/a1-envelope.md), with the Thermal Bridge Lab app
-- [Windows](chapters/a2-windows.md)
-- [Glazing](chapters/a3-glazing.md)
+- A1 [The building envelope](chapters/a1-envelope.md), with the Thermal Bridge Lab app
+- A2 [Windows](chapters/a2-windows.md)
+- A3 [Glazing](chapters/a3-glazing.md)
 
 **Part B: Ventilation** (not written yet)
 
 **Part C: Heating systems and domestic hot water**
 
-2. [Floor heating](chapters/02-floor-heating.md)
-3. [Domestic hot water](chapters/03-domestic-hot-water.md)
+- C1 [Floor heating](chapters/c1-floor-heating.md)
+- C2 [Domestic hot water](chapters/c2-domestic-hot-water.md)
 
 **Part D: Cooling**
 
-4. [Future climate and weather files](chapters/04-weather-files.md)
-5. [Cooling strategy](chapters/05-cooling-strategy.md)
-6. [Façade design](chapters/06-facade-design.md)
-7. [Ventilative cooling](chapters/07-ventilative-cooling.md)
-8. [Openings for ventilative cooling](chapters/08-window-openings.md)
-9. [Ceiling fans](chapters/09-ceiling-fans.md)
-- [Ceiling fans, old version (obsolete)](chapters/09-ceiling-fans_obsolete.md)
-10. [Improvements: ideas for cooling](chapters/10-improvements.md)
+- D1 [Future climate and weather files](chapters/d1-weather-files.md)
+- D2 [Cooling strategy](chapters/d2-cooling-strategy.md)
+- D3 [Façade design](chapters/d3-facade-design.md)
+- D4 [Ventilative cooling](chapters/d4-ventilative-cooling.md)
+- D5 [Openings for ventilative cooling](chapters/d5-window-openings.md)
+- D6 [Ceiling fans](chapters/d6-ceiling-fans.md)
+- D6 [Ceiling fans, old version (obsolete)](chapters/d6-ceiling-fans_obsolete.md)
+- D7 [Improvements: ideas for cooling](chapters/d7-improvements.md)
 
 **Part E: Prefabrication of type houses** (not written yet)
 
 **Appendices:** (not written yet)
 
-8. [Heat pump](chapters/appendix-heat-pump.md)
-9. [CFD](chapters/appendix-room-cfd.md)
+- Appendix A [Heat pump](chapters/appendix-heat-pumps.md)
+- Appendix B [CFD](chapters/appendix-room-cfd.md)
 
-10. [Improvements](improvements.md)
+- [Improvements](improvements.md)
 

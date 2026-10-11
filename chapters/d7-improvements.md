@@ -1,26 +1,26 @@
-# 10 Improvements: ideas for cooling
+# D7 Improvements: ideas for cooling
 
 :::{note} Ideas
 This chapter collects ideas that may grow into real chapters and sections later. Each section says what it would cover. Draft text, where it exists, is kept out of view until the section is written.
 :::
 
-## 10.1 Cooling potential against draught risk
+## D7.1 Cooling potential against draught risk
 
-A figure showing how the cooling power of ventilative cooling grows linearly with the airflow and the temperature difference, while the draught risk grows faster with the air speed and with colder inflow. Belongs in chapter 7.
+A figure showing how the cooling power of ventilative cooling grows linearly with the airflow and the temperature difference, while the draught risk grows faster with the air speed and with colder inflow. Belongs in chapter D4.
 
 <!-- @claude: could you make a figure that shows how cooling potential increases with outdoor temp and flow rate, but draught risk also depends on those parameters. While cooling potential may be linear, draught rate may be of different order. -->
 
-## 10.2 Control of openings
+## D7.2 Control of openings
 
-Opening setpoints, heating locked off while venting, closing in rain and strong wind, where the temperature sensor sits (the row-house skylight case from lecture 18.2), and opening schedules for the shoulder seasons. Belongs in chapter 7.
+Opening setpoints, heating locked off while venting, closing in rain and strong wind, where the temperature sensor sits (the row-house skylight case from lecture 18.2), and opening schedules for the shoulder seasons. Belongs in chapter D4.
 
-## 10.3 Night cooling of the thermal mass
+## D7.3 Night cooling of the thermal mass
 
-How much heat a concrete slab or heavy wall stores per kelvin of temperature swing, the night airflow needed to discharge it, and why lightweight timber houses gain little. Belongs in chapter 7.
+How much heat a concrete slab or heavy wall stores per kelvin of temperature swing, the night airflow needed to discharge it, and why lightweight timber houses gain little. Belongs in chapter D4.
 
-## 10.4 Field evidence: tilt windows in an office
+## D7.4 Field evidence: tilt windows in an office
 
-The measurements of Fitzner and Finke in a Berlin office with tilted windows: the inflow falls to the floor, the tilt-window flow scales with the sash height to the power 1.5, and the floor stream sets the comfort limit. Belongs in chapter 8.
+The measurements of Fitzner and Finke in a Berlin office with tilted windows: the inflow falls to the floor, the tilt-window flow scales with the sash height to the power 1.5, and the floor stream sets the comfort limit. Belongs in chapter D5.
 
 <!--
 Fitzner and Finke measured winter window ventilation in an 80 m² office in Berlin with six tilted sashes (0.71 × 1.48 m), and compared the results with earlier laboratory studies {cite:p}`fitzner2012`. Four findings bear directly on this chapter.
@@ -41,14 +41,14 @@ with q in m³/h, the stroke k and the sash height H in m. For the sash in the wo
 **The window types have different jobs.** In winter only tilted windows, with the largest opening at the top, are suitable; side-hung and sliding windows are not. This agrees with Heiselberg et al. {cite:p}`heiselberg2001`. The side-hung window gives a very large opening. It is used for short, full airing in winter, and for continuous ventilation on windless summer days, when the outdoor temperature is in the comfort range. The authors note that natural ventilation is most difficult with no wind and almost no temperature difference, which calls for the largest possible window openings.
 -->
 
-## 10.5 Window openings: design consequences and worked example
+## D7.5 Window openings: design consequences and worked example
 
-Design rules for summer cooling, night cooling and winter airing, rules of thumb, a worked example comparing a side-hung and a bottom-hung window on a summer evening, and guiding questions. Belongs in chapter 8.
+Design rules for summer cooling, night cooling and winter airing, rules of thumb, a worked example comparing a side-hung and a bottom-hung window on a summer evening, and guiding questions. Belongs in chapter D5.
 
 <!--
 ## Design consequences
 
-- **Summer cooling (ΔT < 5 K):** use side-hung windows that can open 60–90°. The cooling power scales with A√h, so tall sashes help. The inflow drops and spreads along the floor as a slow stream at close to room temperature, which is acceptable or even welcome when the occupants are warm (see [](09-ceiling-fans.md)).
+- **Summer cooling (ΔT < 5 K):** use side-hung windows that can open 60–90°. The cooling power scales with A√h, so tall sashes help. The inflow drops and spreads along the floor as a slow stream at close to room temperature, which is acceptable or even welcome when the occupants are warm (see [](d6-ceiling-fans.md)).
 - **Night cooling (ΔT 5–10 K):** the side-hung window still gives the most air, but the floor stream is colder and faster. This matters little in a bedroom with the occupants in bed, but matters at a desk near the window.
 - **Winter airing (ΔT > 15 K):** use bottom-hung windows or hatches placed high, so that the cold air attaches to the ceiling and mixes before it reaches people. Keep the opening small, because a large flow or a large ΔT makes the jet drop.
 - **Safety and rain:** a side-hung window open 90° is not burglar-proof or rain-proof. It needs a restrictor, a fixed guard rail or a protected position (balcony, deep reveal) so it can stay open when it is needed.

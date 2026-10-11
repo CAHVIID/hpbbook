@@ -6,7 +6,7 @@ matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle, FancyArrowPatch, Polygon
 import dwhr_model as m
 from pathlib import Path
-OUT = Path(__file__).resolve().parent.parent / "figures" / "ch03"
+OUT = Path(__file__).resolve().parent.parent / "figures" / "c2"
 
 BLUE, ORANGE, INK, MUTED, GRID = "#2a78d6", "#eb6834", "#1f1f1e", "#6b6a63", "#e4e3dc"
 GREEN, PURPLE, RED = "#2f9e6e", "#7b5cc4", "#c8423b"

@@ -10,7 +10,7 @@ For most of the twentieth century, domestic hot water was a small item in the he
 
 Better houses have changed the picture ({numref}`fig-dhw-share`). Insulation, airtightness and heat recovery ventilation have cut the space heating demand of a passive house to 15 kWh/m², and of a house in the Danish low-energy class to about 10 kWh/m². The hot water demand has not changed, because it depends on the people living in the house and not on its envelope. A family takes the same showers in a passive house as in a house from 1965. In a passive house hot water is therefore close to half of the heat demand, and in a low-energy class house it is more than half.
 
-:::{figure} figures/ch03/dhw-share.*
+:::{figure} figures/c2/dhw-share.*
 :label: fig-dhw-share
 :alt: Horizontal stacked bar chart of net heat demand per m² floor area per year. A house with energy label D has 150 kWh/m² of space heating and 13 kWh/m² of hot water, so hot water is 8 %. A passive house has 15 kWh/m² of space heating, so hot water is 46 %. A house in the Danish low-energy class has 10 kWh/m² of space heating, so hot water is 57 %.
 :width: 100%
@@ -31,7 +31,7 @@ For a 150 m² house it amounts to 2000 kWh per year, or about 100 L of 55 °C wa
 However, measured hot water use varies by a factor of two or three between households of the same size, and it depends much more on the number of occupants, their age and their habits than on the floor area.
 :::
 
-<!-- The temperature also matters. A floor heating system in a low-energy house runs at 30–35 °C (Chapter 2). Hot water must be stored at 50–55 °C or more to keep Legionella bacteria from growing. When the same heat pump supplies both, the hot water is the expensive part of its work, because the efficiency of a heat pump falls as the temperature it delivers rises. In an all-electric low-energy house, hot water can easily use as much electricity as space heating.
+<!-- The temperature also matters. A floor heating system in a low-energy house runs at 30–35 °C (Chapter C1). Hot water must be stored at 50–55 °C or more to keep Legionella bacteria from growing. When the same heat pump supplies both, the hot water is the expensive part of its work, because the efficiency of a heat pump falls as the temperature it delivers rises. In an all-electric low-energy house, hot water can easily use as much electricity as space heating.
 
 There are two ways to cut the cost of hot water, and this chapter is built around them:
 
@@ -114,7 +114,7 @@ When you take a shower, about 8 L of water at 40 °C leaves the shower head ever
 
 **Horizontal units** sit in the floor, under a shower tray or in a channel drain. They fit a slab-on-ground house and a bathroom renovation. In a channel drain, the heat exchanger is a row of copper tubes along the bottom of the channel, with the cold water flowing inside them against the direction of the drain water. The drain water flows around and over the tubes in a shallow layer. The unit is short, typically 0.7–0.9 m, and the water in the channel moves slowly, so it has less length and less turbulence to give off its heat than the falling film in a vertical pipe. Some manufacturers add turbulators between the tubes to stir the flow. The lower the shower flow, the thinner the water layer around the tubes and the higher the effectiveness. The better horizontal units still reach about 60 %.
 
-:::{figure} figures/ch03/dwhr-units.png
+:::{figure} figures/c2/dwhr-units.png
 :label: fig-dwhr-units
 :alt: Two schematic sections. Left, a vertical unit in section: a copper drain pipe with air in the middle, a thin film of warm drain water running down the inside of the wall, and a copper coil with cold water wound around the outside. Drain water enters at the top at 37 °C and leaves at the bottom at 18 °C; cold water enters at the bottom at 10 °C and leaves at the top at 29 °C. Right, a horizontal unit in a shower channel drain, shown along the channel and in a cross-section: shower water falls through the grate and runs along the channel over a row of copper tubes in the channel bottom, in which the cold water flows the opposite way. Drain water leaves at 24 °C, cold water enters at 10 °C and leaves at 24 °C. The cross-section shows the drain water flowing around and over the tubes. A legend gives orange for warm drain water, blue for cold drinking water and brown for the copper walls.
 :width: 100%
@@ -197,7 +197,7 @@ The preheated water can go to three places ({numref}`fig-dwhr-connections`):
 2. **To the water heater only.** The shower mixer is still fed with cold mains water.
 3. **To both.** All the water that ends up in the shower has passed through the unit, so the flow on the cold side equals the flow down the drain. This is called *equal flow* or *balanced* connection.
 
-:::{figure} figures/ch03/dwhr-connections.png
+:::{figure} figures/c2/dwhr-connections.png
 :label: fig-dwhr-connections
 :alt: Three schematics side by side, each with a water heater at 55 °C, a shower mixer at 40 °C, an 8 L/min shower, a drain at 37 °C and a DWHR unit. In connection 1, preheated water (5.1 L/min at 31 °C) goes only to the mixer, and the heat from the water heater is cut by 45 %. In connection 2, preheated water (5.3 L/min at 31 °C) goes only to the water heater, and the heat is cut by 46 %. In connection 3, preheated water (8.0 L/min at 26 °C) goes to both, and the heat is cut by 54 %.
 :width: 100%
@@ -217,7 +217,7 @@ In connections 1 and 2 only part of the shower water passes the unit, about two-
 
 {numref}`fig-dwhr-effectiveness` (right) shows the saving for all three connections over the range of certified effectiveness. The balanced connection is always best. For units with a low effectiveness, connection 2 (to the water heater) is slightly better than connection 1; for the best units it is the other way round. In practice the choice is often made by the pipe layout. Connection 1 needs only a short pipe from the unit to the shower mixer, and connection 2 needs a pipe from the unit to the water heater, which may be far away. Connection 3 needs both, and it is the one to aim for in a new building.
 
-:::{figure} figures/ch03/dwhr-effectiveness.png
+:::{figure} figures/c2/dwhr-effectiveness.png
 :label: fig-dwhr-effectiveness
 :alt: Two line charts. Left: effectiveness against shower flow from 4 to 14 L/min for five certified units, each falling with flow and passing through its certified value at 8 L/min: Showersave QB1-21XE 0.77 to 0.64, ACO ShowerDrain X2.2 0.68 to 0.53, Zypho Slim 50 and Zypho PiPe 60 about 0.62 to 0.46, Joulia-Inline 5 0.50 to 0.34. Right: percentage of shower heat saved against certified effectiveness from 0.3 to 0.75 for the three connections; equal flow rises from 27 % to 68 %, the other two from about 23–25 % to 55–57 %, crossing near 0.66.
 :width: 100%
@@ -356,7 +356,7 @@ A family of four uses the profile "Family of 4, morning and evening" from the si
 
 **Step 3.** {numref}`fig-dhw-tank-sizing` shows the cumulative curves. With night charging, the tank receives all of the day's heat by 06:00, before any hot water has been used. The gap is largest at 06:00, just before the morning showers: $Q_{store} = 6.49$ kWh. With uniform charging, the charge curve has to be lifted by 1.34 kWh so that it stays above the demand after the morning showers, where the two curves touch at 08:00. The gap is largest at 06:00, just before the two morning showers: $Q_{store} = 2.77$ kWh. With one shower in the evening, the morning peak is now the one that sets the size.
 
-:::{figure} figures/ch03/tank-sizing-curves.*
+:::{figure} figures/c2/tank-sizing-curves.*
 :label: fig-dhw-tank-sizing
 :alt: Two plots of cumulative heat over a day. In both, the orange demand curve is nearly flat except for a large step at 06–07 (two showers) and a smaller step at 20–21 (one shower). Left, uniform charging: the blue charge curve is a straight line lifted to touch the demand curve at about 08:00, and the largest gap, 2.8 kWh or about 63 L, is at 06:00. Right, night charging: the blue curve rises steeply from 0 to 6.7 kWh between 00 and 06 and is flat after that; the largest gap, 6.5 kWh or about 147 L, is at 06:00.
 

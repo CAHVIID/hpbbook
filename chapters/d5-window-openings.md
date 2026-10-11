@@ -1,10 +1,10 @@
-# 8 Openings for ventilative cooling
+# D5 Openings for ventilative cooling
 
 :::{warning} Under revision
 This chapter is being reworked and may change substantially.
 :::
 
-## 8.1 Introduction
+## D5.1 Introduction
 
 Many new Danish homes have bottom-hung (tilt) windows. They are good for airing in winter: the opening is small, safe and rain-proof, and the sash throws the cold air upwards. In summer they are weak, because the opening area is small and the driving temperature difference is only a few Kelvin. Jiang et al. note that bottom-hung windows may not ventilate enough in the warmer months, when the temperature difference is small {cite:p}`jiang2025`.
 
@@ -12,13 +12,13 @@ A side-hung window opens over its full height and, at 60° or more, over its ful
 
 In short, the bottom-hung window is a winter window and the side-hung window is a summer window.
 
-This chapter gives the equations behind that statement. It covers the free area of the common opening types, the airflow through them at a small temperature difference, where the inflow goes, the draught it can cause, and venting hatches. It builds on the orifice and stack equations in [](07-ventilative-cooling.md).
+This chapter gives the equations behind that statement. It covers the free area of the common opening types, the airflow through them at a small temperature difference, where the inflow goes, the draught it can cause, and venting hatches. It builds on the orifice and stack equations in [](d4-ventilative-cooling.md).
 
-## 8.2 Opening types and their free area
+## D5.2 Opening types and their free area
 
 The airflow is set by the smallest cross-section the air must pass through, the *free opening area*, not by the glass area.
 
-:::{figure} figures/ch08/window-gaps.*
+:::{figure} figures/d5/window-gaps.*
 :label: fig-sh-gaps
 Free opening of (a) a side-hung window opened 30° and (b) a bottom-hung window tilted 120 mm, for the same 0.8 × 1.3 m sash. Blue: inflow below the neutral plane. Orange: outflow above it. The gaps of the bottom-hung window are exaggerated for clarity.
 :::
@@ -50,7 +50,7 @@ Tilt fittings limit s to about 100–150 mm.
 A = 2\,s\,w + 4 \cdot \tfrac{1}{2}\,s\,\tfrac{h}{2} = s\,(2w + h)
 ```
 
-The two slots are a separate inlet and outlet a full sash height apart, which suits single-sided stack flow. On a roof, the pivot window is usually the high outlet of stack ventilation ([](07-ventilative-cooling.md)).
+The two slots are a separate inlet and outlet a full sash height apart, which suits single-sided stack flow. On a roof, the pivot window is usually the high outlet of stack ventilation ([](d4-ventilative-cooling.md)).
 
 **Venting hatches** are openings made only for ventilation, usually without glass. They are treated in a section of their own below.
 
@@ -67,11 +67,11 @@ For a 0.8 × 1.3 m sash:
 | Top-hung | s = 120 mm | 0.25 m² |
 | Horizontal pivot | s = 120 mm | 0.35 m² |
 
-## 8.3 Airflow at small ΔT
+## D5.3 Airflow at small ΔT
 
 ### Stack effect: the shape of the gap matters
 
-For a single opening, warm room air leaves through the top and cool outdoor air enters through the bottom. The pressure difference grows linearly with the distance from the neutral plane, so the orifice equation is integrated over the height of the gap. For a gap of constant width, such as the side-hung window, this gives the result already used for a single window in [](07-ventilative-cooling.md), with the neutral plane at mid-height:
+For a single opening, warm room air leaves through the top and cool outdoor air enters through the bottom. The pressure difference grows linearly with the distance from the neutral plane, so the orifice equation is integrated over the height of the gap. For a gap of constant width, such as the side-hung window, this gives the result already used for a single window in [](d4-ventilative-cooling.md), with the neutral plane at mid-height:
 
 ```{math}
 :label: eq-sh-stack
@@ -80,7 +80,7 @@ Q_{st} = \frac{C_d A}{3}\sqrt{\frac{g\,h\,\Delta T}{T}}
 
 For the bottom-hung window the integral must be done numerically, because the gap width varies with height ([script](code/window_flow.py)). Most of the free area sits high up in the top slot and the upper parts of the triangles. The neutral plane moves up to about 1.1 m of the 1.3 m sash, and all the inflow must pass through the narrow lower slivers. The result is less flow per square metre of opening than for the side-hung window.
 
-:::{figure} figures/ch08/window-flow-dt.*
+:::{figure} figures/d5/window-flow-dt.*
 :label: fig-sh-flow
 Stack-driven airflow through a 0.8 × 1.3 m sash with no wind, for C_d = 0.6. In summer conditions (ΔT < 5 K) the fully open side-hung window delivers 4–5 times more air than the tilted sash.
 :::
@@ -100,7 +100,7 @@ with v the wind speed at roof height. It scales with the area only, so it also f
 
 Many models exist for single-sided flow. In a test of twelve of them against tracer-gas measurements on bottom-hung windows, most underestimated the airflow. The EN 16798-7 model was off by −82 % on average {cite:p}`jiang2025`. Treat the numbers in this chapter as estimates good to about a factor of 1.5.
 
-## 8.4 Where the air goes
+## D5.4 Where the air goes
 
 The airflow rate decides the cooling power. The flow pattern decides whether the air is felt as a pleasant breeze, as draught at the ankles or not at all. Heiselberg, Svidt and Nielsen showed in laboratory tests that the flow from an open window can be described with jet theory and stratified-flow theory. They developed simple *flow-element* models for the velocities in the occupied zone {cite:p}`heiselberg2001`.
 
@@ -113,7 +113,7 @@ Ar = \frac{g\,\Delta T\,\sqrt{a_0}}{T\,U_0^2}
 
 where a₀ is the effective inflow area (C_d times the inflow part of A) and U₀ = q₀/a₀ is the inflow velocity. A small Ar gives a jet that keeps its direction. A large Ar gives cold air that falls.
 
-:::{figure} figures/ch08/window-jets.*
+:::{figure} figures/d5/window-jets.*
 :label: fig-sh-jets
 Flow patterns from the two window types. (a) A side-hung window opens over the full height; the slow inflow in the lower half drops and spreads along the floor. (b) A bottom-hung window placed high throws the air up to the ceiling, where it attaches as a wall jet. (c) At large ΔT or large flow, the ceiling jet separates at the penetration depth x_s and drops to the floor.
 :::
@@ -138,7 +138,7 @@ The jet entrains warm room air along the ceiling, so it is mixed and warmed befo
 
 **(c) Bottom-hung, cold: the jet drops.** A cold jet stays attached to the ceiling only up to a penetration depth x_s, which shrinks as Ar grows. Beyond x_s it separates and falls into the occupied zone. With a large ΔT and a small driving pressure (0.2–0.4 Pa), it drops close to the window and runs along the floor {cite:p}`heiselberg2006`. For a slot at the ceiling of a 3 m high room, model tests show that the cold jet leaves the ceiling before it reaches the end wall once Ar = βghΔT₀/u₀² ≥ 0.02, with h the slot height. In that geometry this is a supply temperature only 0.7 K below the return {cite:p}`nielsen1990`. The bottom-hung window therefore needs a small opening in cold weather, so that the flow stays on the ceiling.
 
-## 8.5 Draught at the feet
+## D5.5 Draught at the feet
 
 The floor stream from a low or full-height opening ({numref}`fig-sh-jets`a) arrives at the ankles. Whether it is felt as cooling or as draught depends on its speed, its temperature and how warm the occupant is. Two models are in use.
 
@@ -149,7 +149,7 @@ The floor stream from a low or full-height opening ({numref}`fig-sh-jets`a) arri
 DR = (34 - t_a)(v - 0.05)^{0.62}(0.37\,v\,T_u + 3.14)
 ```
 
-with $t_a$ the local air temperature (°C), $v$ the mean air speed (m/s) and $T_u$ the turbulence intensity (%). The usual limit is DR < 20 %. The model was developed for people at a neutral thermal sensation, with air at 20–26 °C and below 0.5 m/s at the neck. At the feet it is therefore conservative, and it does not apply to a warm person who welcomes air movement ([](09-ceiling-fans.md)).
+with $t_a$ the local air temperature (°C), $v$ the mean air speed (m/s) and $T_u$ the turbulence intensity (%). The usual limit is DR < 20 %. The model was developed for people at a neutral thermal sensation, with air at 20–26 °C and below 0.5 m/s at the neck. At the feet it is therefore conservative, and it does not apply to a warm person who welcomes air movement ([](d6-ceiling-fans.md)).
 
 **ASHRAE 55 ankle draught.** Liu et al. measured the response to air at the ankles and included the whole-body thermal sensation TS (−3 to +3) {cite:p}`liu2017`. The model, adopted in ASHRAE 55, gives
 
@@ -164,9 +164,9 @@ with $v_{ankle}$ the air speed at 0.1 m. The limit $PPD_{AD}$ < 20 % corresponds
 
 **Design consequence.** In summer a floor stream of 0.2–0.4 m/s that is only a few kelvin below room temperature passes the ankle model for warm occupants, even though it fails ISO 7730. In cold weather the same stream is draught by both models. Low and full-height openings must therefore be restricted when it is cold, and winter airing should use high openings ({numref}`fig-sh-jets`b).
 
-## 8.6 Venting hatches
+## D5.6 Venting hatches
 
-A venting hatch is an opening made only for ventilation, usually an insulated panel beside a fixed window. Fixed frameless glazing is cheaper, slimmer and more airtight than an openable window, and the hatch gives an opening that can stay open: secure against burglary, protected from rain, fitted with an insect net and damped against noise. This is what failed in the Nordhavn case ([](07-ventilative-cooling.md)).
+A venting hatch is an opening made only for ventilation, usually an insulated panel beside a fixed window. Fixed frameless glazing is cheaper, slimmer and more airtight than an openable window, and the hatch gives an opening that can stay open: secure against burglary, protected from rain, fitted with an insect net and damped against noise. This is what failed in the Nordhavn case ([](d4-ventilative-cooling.md)).
 
 **Escape.** If the hatch is also the escape route from the room, BR18 requires a clear opening at least 0.5 m wide and 0.6 m high, with width plus height at least 1.5 m, a sill no more than 1.2 m above the floor, and opening from the inside without tools.
 
