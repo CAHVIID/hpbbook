@@ -7,6 +7,7 @@ This appendix was not verified, needs rework and will change substantially.
 This appendix documents a small 2D computational fluid dynamics (CFD) model of a room section. It is used in Part D to show how the placement of an opening, the supply temperature and the airflow decide whether ventilative cooling gives draught at the feet. The model is made for comparing cases and seeing the physics. It does not give design values.
 
 The model exists in two versions that give the same results:
+%@claude: When inlet airflow has higher temperature than well-mixed, the  
 
 - {download}`room_cfd.py <code/room_cfd.py>` is the reference version in Python, with plotting functions in {download}`room_cfd_plots.py <code/room_cfd_plots.py>` and the figures of this appendix in {download}`cfd_examples.py <code/cfd_examples.py>`.
 - {download}`room-cfd.mjs <code/room-cfd.mjs>` is the same solver in JavaScript, which runs as the app.

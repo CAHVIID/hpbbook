@@ -104,7 +104,7 @@ The app and the Python script below solve two-dimensional, steady-state heat con
 For a plane wall the method gives exactly the 1D result $U = 1/(R_{si} + \sum d/\lambda + R_{se})$ on any mesh, which is the first check of the code.
 
 ### Thermal Bridge Lab
-
+%@claude: Replace app with a fixed screenshot and provide a link to open app in new window
 The app below runs the calculation in your browser and updates the results while you draw. It opens with the external wall corner from the worked example.
 
 ```{anywidget} code/thermal-bridge.mjs
