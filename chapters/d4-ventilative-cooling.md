@@ -17,7 +17,7 @@ Outdoor air that enters a room at temperature $T_o$ and leaves at the room tempe
 P = \rho \, c_p \, q_V \, (T_i - T_o)
 ```
 
-where $P$ is the cooling power (W), $\rho \approx 1.2$ kg/m³ the air density, $c_p \approx 1005$ J/(kg·K) the specific heat capacity of air and $Q$ the airflow (m³/s).
+where $P$ is the cooling power (W), $\rho \approx 1.2$ kg/m³ the air density, $c_p \approx 1005$ J/(kg·K) the specific heat capacity of air and $q_V$ the airflow (m³/s).
 
 The temperature difference is the weak point. On a warm afternoon the outdoor air may be only 2 to 4 K cooler than the room. To remove 1 kW of solar and internal gains from a 30 m² living room with a 3 K temperature difference, {eq}`eq-vc-cooling` gives
 
