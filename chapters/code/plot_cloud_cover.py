@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import sys
 from pathlib import Path
 DATA = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(".")  # folder with the EPW files
-OUT = Path(__file__).resolve().parent.parent / "figures" / "ch02"
+OUT = Path(__file__).resolve().parent.parent / "figures" / "d1"
 def load(f):
     return list(csv.reader(open(DATA / f, encoding="latin-1")))[8:]
 months = [5, 6, 7, 8, 9]; mlab = ["May", "Jun", "Jul", "Aug", "Sep"]

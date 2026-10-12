@@ -1,5 +1,5 @@
 (app-ac-europe)=
-# Appendix: Air-conditioning in Europe, summer 2026
+# Appendix C: Air-conditioning in Europe, summer 2026
 
 :::{warning} Under revision
 This appendix is being reworked and may change substantially.
