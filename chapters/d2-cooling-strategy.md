@@ -10,12 +10,9 @@ New Danish houses are insulated and airtight to keep heat in during winter. In s
 
 A study of Finnish apartment buildings found that openable windows were the most effective passive measure against overheating in the new building, though not enough in the old one {cite:p}`farahani2021`.
 
-<<<<<<< HEAD
-=======
 > The solution is *not* to reduce insulation, as we need it to solve the winter situation, but to apply a sound cooling strategy for the summer situation and the shoulder seasons, where heating and cooling demand alternate within the same 24 h cycle.
 
 The steady-state balance between heat gains and heat removal is treated in [](a1-envelope.md).
->>>>>>> 99cad68283d0b46343aeefd56f3d9863ceffba25
 
 ## D2.2 Judging overheating
 
