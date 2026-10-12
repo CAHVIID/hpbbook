@@ -10,24 +10,12 @@ New Danish houses are insulated and airtight to keep heat in during winter. In s
 
 A study of Finnish apartment buildings found that openable windows were the most effective passive measure against overheating in the new building, though not enough in the old one {cite:p}`farahani2021`.
 
-In steady state, with all heat removed by transmission and ventilation, the indoor temperature rises above the outdoor temperature by
-
-```{math}
-:label: eq-overtemperature
-\theta_i - \theta_e = \frac{\Phi_{sol} + \Phi_{int}}{H_{tr} + \rho c_p q_v}
-```
-
-where $\Phi_{sol}$ and $\Phi_{int}$ are the solar and internal gains (W), $H_{tr}$ the transmission heat loss coefficient (W/K), and $\rho c_p q_v$ the ventilation heat loss coefficient (W/K), about 0.34 W/K per m³/h of airflow. In a low-energy house $H_{tr}$ is small, so the ventilation term dominates. With heat recovery running, only the unrecovered fraction of $q_v$ counts. To remove 1,000 W of solar gain with only 3 K between inside and outside takes about 1,000 m³/h. That is about six times the BR18 minimum ventilation rate of a 150 m² house (0.3 L/s per m², about 160 m³/h).
-
-The equation shows the levers. Reduce the gains in the numerator, increase the airflow in the denominator, and only then deal with what is left.
 
 ## D2.2 Judging overheating
 
-:::{note} BR18 overheating limits
-BR18 limits overheating in dwellings to 100 hours above 27 °C and 25 hours above 28 °C operative temperature in a year. These limits are tailored to the thermal model used for BR18 compliance, with its fixed assumptions on weather, internal gains, occupancy and venting. Use them only with that model. Hours from a detailed dynamic simulation, another weather file or measurements in a real house are not directly comparable, and should not be judged against 100 and 25 hours as if they were.
-:::
-
-For a detailed simulation of a dwelling without mechanical cooling, use the adaptive comfort model of EN 16798-1 {cite:p}`en16798`. Occupants who can open windows and change clothing accept higher temperatures after a warm spell. The upper limit of the operative temperature for category II is
+For a detailed simulation of a dwelling without mechanical cooling, use the adaptive comfort model of EN 16798-1 {cite:p}`en16798`.
+%@claude: add figure from the standard or other source
+Occupants who can open windows and change clothing accept higher temperatures after a warm spell. The upper limit of the operative temperature for category II is
 
 ```{math}
 :label: eq-adaptive-upper
@@ -38,7 +26,11 @@ where $\theta_{rm}$ is the running mean outdoor temperature (°C), a weighted me
 
 The result depends as much on the weather file as on the building, so check a design against the reference year, a future year and a heat wave ([](d1-weather-files.md)).
 
-## D2.3 The ordered strategy
+:::{note} BR18 overheating limits
+BR18 limits overheating in dwellings to 100 hours above 27 °C and 25 hours above 28 °C operative temperature in a year. These limits are tailored to the thermal model used for BR18 compliance, with its fixed assumptions on weather, internal gains, occupancy and venting. Use them only with that model. Hours from a detailed dynamic simulation, another weather file or measurements in a real house are not directly comparable, and should not be judged against 100 and 25 hours as if they were.
+:::
+
+## D2.3 Cooling strategy
 
 The measures are applied in the order below. The order is cost-effective: each step is cheaper and uses less energy than the next, and each one reduces what the next has to handle. It also matches how severe the heat is. The first steps handle an ordinary Danish summer, and the later ones are added as warm spells turn into heat waves.
 

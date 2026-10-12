@@ -48,8 +48,9 @@ Each RCP scenario was projected for four periods:
 
 :::{admonition} Extra
 :class: dropdown
-Climate models give only daily temperature and precipitation, not the hourly radiation and humidity a simulation needs. So DMI used the projected daily values to *choose* months from the measured 2014–2023 record: for each calendar month the measured month whose temperature distribution best matches the projection, is picked, with precipitation as the tie-breaker. Every hour in a future file is therefore real, measured weather from the last decade.
+Climate models give only daily temperature and precipitation, not the hourly radiation and humidity a simulation needs. So DMI used the projected daily values to *choose* months from the measured 2014–2023 record: for each calendar month the measured month whose temperature distribution best matches the projection, is picked, with precipitation as the tie-breaker.  Every hour in a future file is therefore real, measured weather from the last decade.
 :::
+%@claude: too popular to use the word tie-breaker. Rephrase 
 
 {numref}`fig-dry-weather` shows the current and future DRY files, and {numref}`tab-dry-summary` summarises them.
 
@@ -59,6 +60,8 @@ Climate models give only daily temperature and precipitation, not the hourly rad
 
 Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Danish design reference years at Sjælsmark: the old and new present-day files and the four RCP4.5 projections. The dashed line marks 26 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_dry.py)
 ```
+
+%@claude: do a box plot of air temperatures here from DMI data. Separate datasets into winter (oct-mar) and summer (apr-sep) first, so we see how the season progress across climate files. In total 12 boxes.
 
 ```{list-table} Annual indicators of the Danish design reference years, computed from the EPW files.
 :name: tab-dry-summary
@@ -138,8 +141,7 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
 
 Enthalpy is the annual mean total specific enthalpy of the outdoor air per kg dry air, $h = 1.006\,T + x\,(2501 + 1.86\,T)$ in kJ/kg, with the humidity ratio $x$ found from air temperature, relative humidity and pressure.
 
-Enthalpy expresses the total energy content of the atmosphere (latent and sensible heat). In a building context, it indicates the cooling demand of a chiller  
-
+Enthalpy expresses the total energy content of the atmosphere (latent and sensible heat). In a building context, it indicates the increased work load on a chiller that needs to both cool the air, as well as shed the water content. 
 
 The UTCI column is explained in the section on heat stress indices below.
 
@@ -153,7 +155,7 @@ Four take-aways:
 4. **The projections flatten out.** The 2080–2099 file is no warmer than 2055–2074; the two differ only in January, May and October. Because every future month must be a measured month from 2014–2023, the files can never be hotter than the hottest month of that decade.
 :::
 
-### Heat stress indices
+### Heat stress index UTCI
 
 Air temperature alone does not tell how hot it feels outdoors. Sun, wind and humidity matter as much, and a heat stress index combines them into one number.
 
@@ -191,7 +193,15 @@ Two alternatives are common:
 
 ## D1.4 Future weather files - Annex 80
 
-The IEA EBC Annex 80 project made a second set of Copenhagen files from the MPI-REMO regional climate model (EURO-CORDEX): typical meteorological years (TMY) for 2001–2020, 2041–2060 and 2081–2100, and three heat-wave years picked from 2041–2060 under RCP8.5 and bias-adjusted against observations from 2001–2019. Unlike the DRY files, these are model output, not measured months, so they can be hotter than anything seen so far. {numref}`fig-annex80-weather` shows them and {numref}`tab-annex80-summary` summarises them in the same way as the DRY files.
+The IEA EBC Annex 80 project made a set of Copenhagen files from the MPI-REMO regional climate model (EURO-CORDEX): typical meteorological years (TMY) for:
+
+- 2001–2020 (representing 2010)
+- 2041–2060 (representing 2050)
+- 2081–2100 (representing 2090)
+
+and three heat-wave years picked from 2041–2060 under RCP8.5 and bias-adjusted against observations from 2001–2019. 
+
+Unlike the DRY files, these are model output, not measured months, so they can be hotter than anything seen so far. {numref}`fig-annex80-weather` shows them and {numref}`tab-annex80-summary` summarises them in the same way as the DRY files.
 
 ```{figure} figures/d1/annex80-weather.*
 :name: fig-annex80-weather
@@ -199,6 +209,7 @@ The IEA EBC Annex 80 project made a second set of Copenhagen files from the MPI-
 
 Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Annex 80 Copenhagen files: three typical years and three heat-wave years. The dashed line marks 26 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_annex80.py)
 ```
+%@claude: do a box plot of air temperatures here from Annex 80 data. Separate datasets into winter (oct-mar) and summer (apr-sep) first, so we see how the season progress across climate files. In total 12 boxes.
 
 ```{list-table} Annual indicators of the IEA EBC Annex 80 weather files for Copenhagen, computed from the EPW files.
 :name: tab-annex80-summary
@@ -287,6 +298,7 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
 A heat wave is a run of hot days. A simple definition, used here, is a period of days with a maximum temperature above 25 °C. A *tropical night* is a night where the temperature does not fall below 20 °C {cite:p}`farahani2021`.
 
 Heat waves raise mortality, mainly through cardiovascular and respiratory strain, and the old and the sick are most at risk. The hot summer of 2018 caused about 380 additional deaths in Finland, and the heat-related mortality risk in Helsinki was about 2.5 times that of the surrounding rural areas {cite:p}`farahani2021`.
+%@claude: can you find similar data from the 2026 summer in France, Spain and UK? Preferable from renowed journal publications, otherwise flag for review by me
 
 A reference year holds typical months, so it has no real heat wave. The Annex 80 heat-wave files fill the gap. They are the three years of 2041–2060 with the longest, the most intense (hottest) and the most severe (longest and hottest combined) heat wave. {numref}`tab-heat-waves` compares them with the typical years.
 
@@ -333,7 +345,9 @@ A reference year holds typical months, so it has no real heat wave. The Annex 80
 
 Warm nights are the real problem. Night ventilation removes heat in proportion to the airflow times the temperature difference between indoor and outdoor air ([](d4-ventilative-cooling.md)). When the night stays above 20 °C, that difference is only a few kelvin, so the thermal mass is not emptied and the next day starts warmer. After a few such days the building has no reserve left.
 
-Simulations of Finnish apartment buildings without cooling show the result {cite:p}`farahani2021`. The heat wave of 2018 had 24 days above 25 °C and five tropical nights, and gave about 10,000 degree-hours above 27 °C indoors. The same heat wave moved to the climate of 2050 has 15 tropical nights and gives about 14,000 degree-hours above 27 °C, and the degree-hours above 32 °C, a health risk threshold, triple from about 1,000 to 3,000. Openable windows were the most effective passive measure, but only a cooling unit removed the overheating completely.
+Simulations of Finnish apartment buildings without cooling show the result {cite:p}`farahani2021`. The heat wave of 2018 had 24 days above 25 °C and 5 tropical nights, and gave about 10,000 degree-hours above 27 °C indoors.
+
+The same heat wave moved to the climate of 2050 has 15 tropical nights and gives about 14,000 degree-hours above 27 °C, and the degree-hours above 32 °C, a health risk threshold, triple from about 1,000 to 3,000. Openable windows were the most effective passive measure, but only a cooling unit removed the overheating completely.
 
 ### Urban heat island
 
@@ -346,6 +360,7 @@ The urban heat island intensity is the air temperature difference $\Delta T_\mat
 - **Waste heat:** traffic, buildings and air-conditioning condensers.
 
 In Denmark the effect is modest but not negligible. {numref}`fig-uhi-denmark` shows it for the four largest Danish cities. On the 3 % warmest days of the year, Copenhagen is on average 1.5–2 K warmer than its rural surroundings at night, and on some nights close to 3 K. The difference almost disappears around 09:00. The other three cities stay at about 1 K {cite:p}`sorup2026`. In four Finnish cities the mean intensity is 0.5–1.2 K, peaking at about 1.5 K around 05:00 in Helsinki {cite:p}`taylor2025`.
+%@claude: add a reference to Lauwaet et al. (2024), Urban Climate 54, 101850 (100 European cities), which is valuable for European context.
 
 ```{figure} figures/d1/urbansci-10-00171-g003.png
 :name: fig-uhi-denmark
@@ -354,9 +369,12 @@ In Denmark the effect is modest but not negligible. {numref}`fig-uhi-denmark` sh
 Urban heat island intensity (°C) over the day in Copenhagen, Odense, Aarhus and Aalborg, for the 3 % warmest days, summer, winter and the 3 % coldest days. Lines are the average and bands the spread, for a machine-learning downscaled temperature product (C4C, blue) and the DANRA reanalysis (orange). Reproduced unchanged from Figure 3 of Sørup et al. {cite:p}`sorup2026`, © the authors, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 ```
 
-% Sources considered for this section: Lauwaet et al. (2024), Urban Climate 54, 101850 (100 European cities) is worth citing for European context once the numbers are checked in the paper. Wang et al. (2023), Urban Climate 49, 101531 (Stockholm) is a model sensitivity study and adds little here.
 
-The Danish reference years are measured at Sjælsmark, a rural station, so they contain no heat island. The heat island acts exactly when night ventilation works. {numref}`fig-vc-uhi` colours every hour by the temperature difference available for ventilative cooling, $\Delta T = T_\mathrm{in} - T_\mathrm{out}$, with $T_\mathrm{in} = 24$ °C. The heat island is set to 2 K at night, the upper end of the Copenhagen averages. In the present reference year it lowers the mean night-time $\Delta T$ from May to September from 10.7 K to 8.8 K, and the number of night hours with less than 3 K rises from 20 to 77. The RCP4.5 2080–2099 file gives 9.9 K and 59 hours without the heat island, and 7.9 K and 161 hours with it. The heat island therefore costs more night cooling than the climate projection does.
+%Wang et al. (2023), Urban Climate 49, 101531 (Stockholm) is a model sensitivity study and adds little here.
+
+The heat island acts exactly when night ventilation works. {numref}`fig-vc-uhi` colours every hour by the temperature difference available for ventilative cooling, $\Delta T = T_\mathrm{in} - T_\mathrm{out}$, with $T_\mathrm{in} = 24$ °C. The heat island is set to 2 K at night, the upper end of the Copenhagen averages.
+
+The effect of urban heat islands is more pronounced with future climate, but the magnitude will probably remain the same or even decrease a little as global radiation drops, and mitigating actions are implemented like more green areas in the built environment.
 
 ```{figure} figures/d1/vc-potential-uhi.*
 :name: fig-vc-uhi

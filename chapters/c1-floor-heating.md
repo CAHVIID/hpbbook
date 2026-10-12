@@ -4,14 +4,6 @@
 This chapter is being reworked and may change substantially.
 :::
 
-<!--
-%+++
-%edwdds
-%#dwd 
-%sdas
-%+++
--->
-
 
 <!-- possible classes:
 
