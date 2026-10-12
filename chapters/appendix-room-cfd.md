@@ -1,7 +1,7 @@
 # Appendix B: Room CFD model
 
 :::{warning} Under revision
-This appendix is being reworked and may change substantially.
+This appendix was not verified, needs rework and will change substantially.
 :::
 
 This appendix documents a small 2D computational fluid dynamics (CFD) model of a room section. It is used in Part D to show how the placement of an opening, the supply temperature and the airflow decide whether ventilative cooling gives draught at the feet. The model is made for comparing cases and seeing the physics. It does not give design values.
