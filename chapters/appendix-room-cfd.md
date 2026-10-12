@@ -70,7 +70,7 @@ $$
 \frac{D\varepsilon}{Dt} = \nabla \cdot \left[ \left(\nu + \frac{\nu_t}{\sigma_\varepsilon}\right) \nabla \varepsilon \right] + C_1 \frac{\varepsilon}{k} \left(P_k + G_b^+\right) - C_2 \frac{\varepsilon^2}{k}
 $$
 
-$P_k = \nu_t \left[ 2 (\partial u / \partial x)^2 + 2 (\partial v / \partial y)^2 + (\partial u / \partial y + \partial v / \partial x)^2 \right]$ is the production by shear and $G_b = -g \beta (\nu_t / Pr_t) \, \partial T / \partial y$ the production by buoyancy, which is negative in a stable layer and damps the turbulence there. The constants are the standard ones: $C_\mu = 0.09$, $C_1 = 1.44$, $C_2 = 1.92$, $\sigma_k = 1.0$ and $\sigma_\varepsilon = 1.3$. The grid is too coarse to resolve the thin layer next to a wall, so the first cell uses wall functions: the wall shear stress follows the logarithmic law of the wall, and $\varepsilon$ in that cell is set from the local equilibrium $\varepsilon = C_\mu^{3/4} k^{3/2} / (\kappa \, y_p)$. The supply air carries $k = 1.5 (Tu_{in} U)^2$ with $Tu_{in} = 4$ % and $\varepsilon = k^{3/2} / (0.1 \, h_{open})$, as in the IEA Annex 20 test case {cite:p}`nielsen1990`. This is the only one of the three models that passes that test (see *Verification*).
+$P_k = \nu_t \left[ 2 (\partial u / \partial x)^2 + 2 (\partial v / \partial y)^2 + (\partial u / \partial y + \partial v / \partial x)^2 \right]$ is the production by shear and $G_b = -g \beta (\nu_t / Pr_t) \, \partial T / \partial y$ the production by buoyancy, which is negative in a stable layer and damps the turbulence there. The constants are the standard ones: $C_\mu = 0.09$, $C_1 = 1.44$, $C_2 = 1.92$, $\sigma_k = 1.0$ and $\sigma_\varepsilon = 1.3$. The grid is too coarse to resolve the thin layer next to a wall, so the first cell uses wall functions: the wall shear stress follows the logarithmic law of the wall, and $\varepsilon$ in that cell is set from the local equilibrium $\varepsilon = C_\mu^{3/4} k^{3/2} / (\kappa \, y_p)$. The supply air carries $k = 1.5 (Tu_{in} U)^2$ with $Tu_{in} = 4$ % and $\varepsilon = k^{3/2} / (0.1 \, h_{open})$, as in the IEA Annex 20 test case {cite:p}`nielsen1990`. This turbulence model is the only one of the three implemented models that passes that test (see *Verification*).
 
 **Chen & Xu.** A zero-equation model developed for indoor air {cite:p}`chen1998`:
 
@@ -82,7 +82,7 @@ with $V$ the local mean speed and $\ell$ the distance to the nearest wall. It gi
 
 **Constant.** One eddy viscosity everywhere, by default $\nu_t = 0.002$ m²/s, which is about 130 times the molecular value.
 
-Chen & Xu and the constant viscosity are kept for comparison, because they show students what a turbulence model does. Both mix too much in a wall jet and fail the Annex 20 test.
+Chen & Xu and the constant viscosity models are implemented for comparison, because they show what a turbulence model do.
 
 ## Numerical method
 
@@ -94,7 +94,7 @@ Chen & Xu and the constant viscosity are kept for comparison, because they show 
 2. Solve a Poisson equation for the pressure, $\nabla^2 p = \rho \, \nabla \cdot \mathbf{u}^* / \Delta t$. The matrix depends only on the grid and the boundary types, so it is factorised once before the run (sparse LU in Python, banded Cholesky in JavaScript), and each step only needs a back-substitution.
 3. Correct the velocity with the pressure gradient, $\mathbf{u}^{n+1} = \mathbf{u}^* - \Delta t \, \nabla p / \rho$. The corrected field satisfies continuity to machine precision.
 
-The temperature, and with k-ε also $k$ and $\varepsilon$, are then advanced with the new velocity. The sink terms of $k$ and $\varepsilon$ are treated implicitly so that both stay positive, and $k$ and $\varepsilon$ use upwind advection. The time step is set at every step from the stability limits of the explicit scheme:
+The temperature, and with k-ε model also $k$ and $\varepsilon$, are then advanced with the new velocity. The sink terms of $k$ and $\varepsilon$ are treated implicitly so that both stay positive, and $k$ and $\varepsilon$ use upwind advection. The time step is set at every step from the stability limits of the explicit scheme:
 
 $$
 \Delta t = \min \left( C \frac{\Delta x}{|u|_{max}}, \; 0.2 \frac{\Delta x^2}{\nu_{max}}, \; 0.5 \text{ s} \right)
@@ -115,7 +115,7 @@ $$
 
 ## Boundary conditions
 
-| Boundary | Velocity | Pressure | Temperature | $k$, $\varepsilon$ (k-ε) |
+| Boundary | Velocity | Pressure | Temp. | $k$, $\varepsilon$ (k-ε) |
 |---|---|---|---|---|
 | Walls, floor, ceiling | No slip, $u = v = 0$, wall functions with k-ε | Zero gradient | Adiabatic | Zero flux for $k$, $\varepsilon$ from the wall function |
 | Supply opening | Velocity inlet, $U = q_v / (W \, h_{open})$ normal to the wall | Zero gradient | $T_{supply}$ | $Tu_{in} = 4$ %, length scale $0.1 \, h_{open}$ |
