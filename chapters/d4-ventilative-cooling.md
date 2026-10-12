@@ -19,13 +19,15 @@ P = \rho \, c_p \, q_V \, (T_i - T_o)
 
 where $P$ is the cooling power (W), $\rho \approx 1.2$ kg/m³ the air density, $c_p \approx 1005$ J/(kg·K) the specific heat capacity of air and $q_V$ the airflow (m³/s).
 
-In the context of ventilative cooling, the temperature difference is the weak point. On a warm afternoon the outdoor air may be only 2 to 4 K cooler than the room. To remove 1 kW of solar and internal gains from a 30 m² living room with a 3 K temperature difference, {eq}`eq-vc-cooling` gives
+In the context of ventilative cooling, the temperature difference is the weak point. On a warm afternoon the outdoor air may be only 2 to 4 K cooler than the room. To remove 1 kW of solar and internal gains from a 30 m² living room $(33.3 W/m^2)$ with a 3 K temperature difference, {eq}`eq-vc-cooling` gives
 
 ```{math}
 q_V = \frac{1000}{1.2 \cdot 1005 \cdot 3} = 0.28 \text{ m}^3\text{/s} = 280 \text{ L/s}
 ```
 
-That is about 13 air changes per hour, or 30 times the 9 L/s that the mechanical ventilation supplies to the same room for air quality (0.3 L/s per m²). Airflows like this are only possible through large openings. They also explain why ventilative cooling works much better at night, when the outdoor air is cooler and the temperature difference is larger.
+That is about 13 air changes per hour, or 30 times the 9 L/s that the mechanical ventilation supplies to the same room for air quality (0.3 L/s per m²).
+
+Airflows like this are only possible through large openings. They also explain why ventilative cooling works best at night, when the outdoor air is cooler and the temperature difference is larger.
 
 ## D4.2 Three ways to move the air
 
@@ -51,6 +53,7 @@ Q = C_d \, A \, \sqrt{\frac{2 \, \Delta p}{\rho}}
 ```
 
 where $C_d$ is the discharge coefficient (–), $A$ the free opening area (m²) and $\Delta p$ the pressure difference (Pa). The discharge coefficient accounts for the contraction of the air jet through the opening. It is about 0.6 to 0.65 for a sharp-edged opening; IDA ICE uses 0.65. Grilles, insect nets and louvres lower it considerably, so always use the free area and the discharge coefficient of the actual product.
+%@claude: check for Cd in Bugenings work. If available, insert example value here with reference link.
 
 Because the airflow only grows with the square root of the pressure difference, doubling the driving pressure gives just 40 % more airflow. Doubling the opening area doubles it.
 
