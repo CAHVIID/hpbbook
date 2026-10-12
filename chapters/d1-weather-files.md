@@ -280,6 +280,17 @@ Hourly air temperature and daily mean (blue), daily global horizontal radiation 
 \*The heat-wave file "longest" (2045) has no solar radiation from 1 to 14 August: global, direct and diffuse radiation are zero in all 336 hours, while temperature and humidity run on normally. The gap lies inside the heat wave the file was made for (15 July to 20 August 2045). Its annual global radiation is therefore about 90 kWh/m² too low, and its UTCI hours are underestimated. Use this file for temperature and humidity only, and the "most intense" or "most severe" file where solar gains matter. The three heat-wave files also contain 4–6 corrupt hours of global and diffuse radiation (values far above 1,400 W/m²); these were removed and interpolated before the table was computed.
 :::
 
+### Future cloud cover and solar irradiation
+
+The two file sets disagree on future cloudiness ({numref}`fig-cloud-cover`). The future DRY files show no trend in summer cloud cover, but they cannot: they are built from measured months chosen to match projected temperatures. The Annex 80 files, which are climate model output, have 6% less summer solar irradiation in 2041–2060 and 12% less in 2081–2100 than in 2001–2020, which means less PV output in the cooling season, when AC demand already peaks after sunset ([](#app-ac-europe)).
+
+```{figure} figures/d1/cloud-cover.*
+:name: fig-cloud-cover
+:width: 100%
+
+(a) Mean total sky cover, May to September, in the DMI DRY files. (b) Monthly global horizontal irradiation in the Annex 80 Copenhagen TMY files, which contain no cloud cover data. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_cloud_cover.py)
+```
+
 ## D1.5 Extremes
 
 ### Heat waves
