@@ -300,20 +300,6 @@ The model is a steady state shower at flow $\dot V$ and mixed temperature $\thet
 The saving fraction is one minus the heat needed with the unit, divided by $C(\theta_{mix} - \theta_c)$. The model keeps $UA$ independent of the cold-side flow, so it slightly flatters the two unbalanced connections: in a real unit, a smaller cold-side flow also gives a lower heat transfer coefficient on that side. The same model in Python can be downloaded here: {download}`dwhr_model.py <code/dwhr_model.py>`.
 :::
 
-
-## A stratified tank simulator
-
-A hot water tank is not simply full or empty. Hot water floats on top of cold water, and a well-designed tank keeps the two apart, with a thin mixing zone, the thermocline, between them. Hot water is drawn from the top while cold mains water flows in at the bottom, so the thermocline moves up as the tank is emptied. The app below follows this hour by hour for one day.
-
-The tank is split into horizontal layers. A heat pump charges it through an external heat exchanger: the charging loop takes water from the bottom of the tank and returns it at mid-height, and there is no circulation loop. A thermostat starts the heat pump when the sensor falls below the setpoint, and it can only run in the hours you allow. The tab *Tapping profiles* shows the predefined days of hot water use, with their sources, and lets you import a profile made with DHWcalc.
-
-```{anywidget} code/dhw-tank.mjs
-{}
-```
-
-The app runs in your browser. The same model in Python, with comments on every assumption, can be downloaded here: {download}`dhw_tank.py <code/dhw_tank.py>`. Running it prints the daily heat of each profile and the results for the default inputs.
-
-
 ## Sizing the tank as a thermal battery
 
 A hot water tank is a battery for heat. When it is charged, the heat source runs. When hot water is drawn, the tank delivers. If the tank is big enough, the two no longer have to happen at the same time, and the heat pump can run in the hours when electricity is cheap or has a low primary energy factor. The question is how big "big enough" is.
@@ -344,11 +330,11 @@ $$ (eq-dhw-volume)
 
 Round up to the next standard tank size.
 
-The method is a first estimate. It assumes the tank is either hot or cold, with a fixed usable fraction, and that the heat source charges evenly over its allowed hours. In a real tank, the thermocline grows while the tank sits, the heat pump is switched by a thermostat at a sensor partway up the tank, and the standing loss depends on how much of the tank is hot. The simulator handles all of this, so the hand estimate should always be checked there.
+The method is a first estimate. It assumes the tank is either hot or cold, with a fixed usable fraction, and that the heat source charges evenly over its allowed hours. In a real tank, the thermocline grows while the tank sits, the heat pump is switched by a thermostat at a sensor partway up the tank, and the standing loss depends on how much of the tank is hot. The tank simulator in [](appendix-dhw-tank.md) handles all of this, so the hand estimate should always be checked there.
 
 ### Worked example: night charging for a family of four
 
-A family of four uses the profile "Family of 4, morning and evening" from the simulator: two showers at 06:30–07:00, one at 20:00, and small tappings during the day. Three showers a day, rather than one per person, matches the Be18 calculation value for a 150 m² house; measured Danish households shower even less {cite:p}`marszal2021`. The tank is kept at 55 °C, the cold water is 10 °C, and the tank has $UA = 1.2$ W/K in a room at 20 °C. How large a tank is needed if the heat pump may run only between 00:00 and 06:00? How large is it with uniform charging over the whole day?
+A family of four uses the profile "Family of 4, morning and evening" from the tank simulator ([](appendix-dhw-tank.md)): two showers at 06:30–07:00, one at 20:00, and small tappings during the day. Three showers a day, rather than one per person, matches the Be18 calculation value for a 150 m² house; measured Danish households shower even less {cite:p}`marszal2021`. The tank is kept at 55 °C, the cold water is 10 °C, and the tank has $UA = 1.2$ W/K in a room at 20 °C. How large a tank is needed if the heat pump may run only between 00:00 and 06:00? How large is it with uniform charging over the whole day?
 
 **Step 1.** The tappings add up to 5.73 kWh per day. Of that, 2.91 kWh is drawn between 06:00 and 07:00 and 1.45 kWh between 20:00 and 21:00. The standing loss is $1.2 \cdot (55 - 20) = 42$ W, or 1.01 kWh per day. So $Q_{day} = 6.74$ kWh.
 

@@ -120,12 +120,15 @@ The app and the Python script below solve two-dimensional, steady-state heat con
 For a plane wall the method gives exactly the 1D result $U = 1/(R_{si} + \sum d/\lambda + R_{se})$ on any mesh, which is the first check of the code.
 
 ### Thermal Bridge Lab
-%@claude: Replace app with a fixed screenshot and provide a link to open app in new window
-The app below runs the calculation in your browser and updates the results while you draw. It opens with the external wall corner from the worked example.
+**[Open the Thermal Bridge Lab in a new tab](code/thermal-bridge-lab.html)**. The app runs the calculation in your browser, updates the results while you draw and needs no installation. It opens with the external wall corner from the worked example ({numref}`fig-thermal-bridge-app`).
 
-```{anywidget} code/thermal-bridge.mjs
-{}
-```
+:::{figure} figures/a1/thermal-bridge-lab-app.*
+:label: fig-thermal-bridge-app
+:alt: Screenshot of the Thermal Bridge Lab. On the left, the drawing board with an L-shaped external wall corner coloured by temperature from blue outside to red inside, with isotherms and labelled inside and outside boundary edges. On the right, the results panel with heat flow, L2D, minimum inside surface temperature and fRsi, followed by the lists of boundary conditions, boundary edges and materials.
+:width: 100%
+
+The Thermal Bridge Lab with the external wall corner from the worked example, showing the temperature field. Open the app to draw your own detail.
+:::
 
 #### How to use the app
 
@@ -141,7 +144,7 @@ The small arrows marked (0, 0) show the origin of the coordinates. Use the mouse
 
 ### The stand-alone app
 
-The app also runs on its own, outside the book, as a single HTML file: {download}`thermal-bridge-lab.html <code/thermal-bridge-lab.html>`. Save it anywhere and double-click it. It opens in your web browser with the whole window for the app, needs no installation and works offline. To continue a model from the book in the stand-alone app, save it with *Save case file* and open it there with *Open case file*. Save your work with *Save case file*; the stand-alone app does not remember it when you close the window.
+The app is a single HTML file: {download}`thermal-bridge-lab.html <code/thermal-bridge-lab.html>`. Save it anywhere and double-click it to use it offline. Save your work with *Save case file*; the app does not remember it when you close the window.
 
 ### The Python version
 

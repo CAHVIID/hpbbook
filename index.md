@@ -45,6 +45,8 @@ There are code snippets (apps) embedded into the textbook. The intention of the 
 
 - Appendix A [Heat pump](chapters/appendix-heat-pumps.md)
 - Appendix B [CFD](chapters/appendix-room-cfd.md)
+- Appendix C [Air-conditioning in Europe, summer 2026](chapters/appendix-ac-europe.md)
+- Appendix D [Stratified tank simulator](chapters/appendix-dhw-tank.md)
 
 - [Improvements](improvements.md)
 

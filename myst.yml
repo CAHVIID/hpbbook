@@ -60,6 +60,8 @@ project:
           title: "CFD model (under revision)"
         - file: chapters/appendix-ac-europe.md
           title: "Air-conditioning in Europe, summer 2026 (under revision)"
+        - file: chapters/appendix-dhw-tank.md
+          title: "Stratified tank simulator (under revision)"
     - file: improvements.md
 site:
   template: book-theme

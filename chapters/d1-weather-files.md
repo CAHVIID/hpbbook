@@ -12,11 +12,10 @@ Future climate changes and given the life span of buildings, they need to be des
 
 A weather file holds one year of hourly outdoor conditions for one location: dry-bulb temperature, humidity, direct normal, diffuse and global horizontal radiation, wind speed and direction, and cloud cover. Three abbreviations recur:
 
-- **TMY**, typical meteorological year: one artificial year assembled from twelve typical months taken from many years of data. It represents average weather, not extremes.
-- **DRY**, design reference year: the Danish typical year, published by DMI (section D1.3).
-%@claude: constrast DRY more to TMY 
+- **TMY**, typical meteorological year: the general term for one artificial year assembled from twelve typical months taken from many years of data. It represents average weather, not extremes. The data behind it can be measurements or, as in the Annex 80 files (section D1.4), climate model output.
+- **DRY**, design reference year: the Danish national typical year, published by DMI (section D1.3). It is assembled in the same way, but only from months measured at one station and selected with the method of ISO 15927-4, and it is the year used to show compliance with the Danish building regulations. A TMY from another source for the same location therefore differs from the DRY in both the data and the selection method.
 
-Weather files come in many different file formats. The most know is EPW, EnergyPlus weather file whhich is a text format with 8 header lines followed by 8,760 hourly rows. Most building simulation tools read it.
+Weather files come in many different file formats. The best known is EPW, the EnergyPlus weather file, which is a text format with 8 header lines followed by 8,760 hourly rows. Most building simulation tools read it.
 
 The DRY files can be downloaded as EPW or CSV from [DMI](https://www.dmi.dk/publikationer).
 
@@ -48,9 +47,8 @@ Each RCP scenario was projected for four periods:
 
 :::{admonition} Extra
 :class: dropdown
-Climate models give only daily temperature and precipitation, not the hourly radiation and humidity a simulation needs. So DMI used the projected daily values to *choose* months from the measured 2014–2023 record: for each calendar month the measured month whose temperature distribution best matches the projection, is picked, with precipitation as the tie-breaker.  Every hour in a future file is therefore real, measured weather from the last decade.
+Climate models give only daily temperature and precipitation, not the hourly radiation and humidity a simulation needs. So DMI used the projected daily values to *choose* months from the measured 2014–2023 record: for each calendar month the measured month whose temperature distribution best matches the projection is picked. Where two months match equally well, the one that also matches the projected precipitation best is chosen. Every hour in a future file is therefore real, measured weather from the last decade.
 :::
-%@claude: too popular to use the word tie-breaker. Rephrase 
 
 {numref}`fig-dry-weather` shows the current and future DRY files, and {numref}`tab-dry-summary` summarises them.
 
@@ -61,7 +59,14 @@ Climate models give only daily temperature and precipitation, not the hourly rad
 Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Danish design reference years at Sjælsmark: the old and new present-day files and the four RCP4.5 projections. The dashed line marks 26 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_dry.py)
 ```
 
-%@claude: do a box plot of air temperatures here from DMI data. Separate datasets into winter (oct-mar) and summer (apr-sep) first, so we see how the season progress across climate files. In total 12 boxes.
+{numref}`fig-dry-boxes` splits the hourly temperatures of each file into a winter and a summer half-year. The winter median jumps from 1.7 °C to 4.5 °C between the two present-day files and then hardly moves. The summer median rises steadily, from 14.0 °C to 15.4 °C, and the highest temperature from 27.7 °C to about 31 °C.
+
+```{figure} figures/d1/dry-temperature-boxes.*
+:name: fig-dry-boxes
+:width: 100%
+
+Hourly air temperature in the Danish design reference years, split into winter (October to March) and summer (April to September). Boxes show the quartiles and the median (number above), whiskers the lowest and highest hour. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_temperature_boxes.py)
+```
 
 ```{list-table} Annual indicators of the Danish design reference years, computed from the EPW files.
 :name: tab-dry-summary
@@ -193,7 +198,7 @@ Two alternatives are common:
 
 ## D1.4 Future weather files - Annex 80
 
-The IEA EBC Annex 80 project made a set of Copenhagen files from the MPI-REMO regional climate model (EURO-CORDEX): typical meteorological years (TMY) for:
+The IEA EBC Annex 80 project made a set of Copenhagen files {cite:p}`machard2024` from the MPI-REMO regional climate model (EURO-CORDEX): typical meteorological years (TMY) for:
 
 - 2001–2020 (representing 2010)
 - 2041–2060 (representing 2050)
@@ -209,7 +214,15 @@ Unlike the DRY files, these are model output, not measured months, so they can b
 
 Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Annex 80 Copenhagen files: three typical years and three heat-wave years. The dashed line marks 26 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_annex80.py)
 ```
-%@claude: do a box plot of air temperatures here from Annex 80 data. Separate datasets into winter (oct-mar) and summer (apr-sep) first, so we see how the season progress across climate files. In total 12 boxes.
+
+In the typical years the Annex 80 files warm in both seasons ({numref}`fig-annex80-boxes`): the winter median rises from 4.2 °C to 6.2 °C and the summer median from 14.1 °C to 15.8 °C. The heat-wave years differ from the typical year of the same period mainly in the upper part of the summer range, not in the median.
+
+```{figure} figures/d1/annex80-temperature-boxes.*
+:name: fig-annex80-boxes
+:width: 100%
+
+Hourly air temperature in the Annex 80 Copenhagen files, split into winter (October to March) and summer (April to September). Boxes show the quartiles and the median (number above), whiskers the lowest and highest hour. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_temperature_boxes.py)
+```
 
 ```{list-table} Annual indicators of the IEA EBC Annex 80 weather files for Copenhagen, computed from the EPW files.
 :name: tab-annex80-summary
@@ -309,7 +322,10 @@ The two file sets disagree on future cloudiness ({numref}`fig-cloud-cover`). The
 A heat wave is a run of hot days. A simple definition, used here, is a period of days with a maximum temperature above 25 °C. A *tropical night* is a night where the temperature does not fall below 20 °C {cite:p}`farahani2021`.
 
 Heat waves raise mortality, mainly through cardiovascular and respiratory strain, and the old and the sick are most at risk. The hot summer of 2018 caused about 380 additional deaths in Finland, and the heat-related mortality risk in Helsinki was about 2.5 times that of the surrounding rural areas {cite:p}`farahani2021`.
-%@claude: can you find similar data from the 2026 summer in France, Spain and UK? Preferable from renowed journal publications, otherwise flag for review by me
+
+The summer of 2026 gave similar numbers in western Europe. All three are provisional estimates from the national health agencies. In France, 5,764 more people than expected died during the heat wave of 17 June to 2 July, an excess of 36 % {cite:p}`spf2026heat`. In England, 2,877 deaths were associated with two hot spells in May and June {cite:p}`ukhsa2026heat`. In Spain, more than 5,200 deaths were attributed to heat between May and August, the highest number since monitoring began in 2015 {cite:p}`meteored2026momo`.
+
+% REVIEW: the three 2026 figures above are provisional agency estimates, not journal publications. France (Santé publique France, 22 July 2026) is all-cause excess mortality; England (UKHSA interim report, 30 July 2026) is modelled heat-associated deaths; Spain is the MoMo estimate of Instituto de Salud Carlos III as reported by Meteored, a secondary source. Final figures are expected late 2026 (France, Spain) and early 2027 (England).
 
 A reference year holds typical months, so it has no real heat wave. The Annex 80 heat-wave files fill the gap. They are the three years of 2041–2060 with the longest, the most intense (hottest) and the most severe (longest and hottest combined) heat wave. {numref}`tab-heat-waves` compares them with the typical years.
 
@@ -371,7 +387,8 @@ The urban heat island intensity is the air temperature difference $\Delta T_\mat
 - **Waste heat:** traffic, buildings and air-conditioning condensers.
 
 In Denmark the effect is modest but not negligible. {numref}`fig-uhi-denmark` shows it for the four largest Danish cities. On the 3 % warmest days of the year, Copenhagen is on average 1.5–2 K warmer than its rural surroundings at night, and on some nights close to 3 K. The difference almost disappears around 09:00. The other three cities stay at about 1 K {cite:p}`sorup2026`. In four Finnish cities the mean intensity is 0.5–1.2 K, peaking at about 1.5 K around 05:00 in Helsinki {cite:p}`taylor2025`.
-%@claude: add a reference to Lauwaet et al. (2024), Urban Climate 54, 101850 (100 European cities), which is valuable for European context.
+
+For comparison, a model study of 100 European cities at 100 m resolution for 2008–2017 finds an average heat island indicator of 1.43 °C. Green areas and unsealed soil already lower it by 0.45 °C on average, and more of both could lower it by about another 0.5 °C {cite:p}`lauwaet2024`.
 
 ```{figure} figures/d1/urbansci-10-00171-g003.png
 :name: fig-uhi-denmark

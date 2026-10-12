@@ -111,21 +111,22 @@ Small motors have losses that do not follow the cube law, so the real power at l
 ```
 
 It falls as speed increases. The Fanco Breeze AC 132 moves 375 m³/h per W at low speed and 201 m³/h per W at high speed ({numref}`tab-fan-data`).
-@claude: in the table below, make all entries invisible to reader, but keep the Franco 132 visible
 :::{table} Ceiling fan data at the highest speed, from manufacturer datasheets. Airflow in CFM has been converted to m³/h.
 :label: tab-fan-data
 :align: center
 
 | Fan | Motor | Diameter (m) | Airflow at max (m³/h) | Power at max (W) | Efficacy at max (m³/h per W) | Power at min (W) | Source |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Westinghouse Contractor's Choice 7303800 | AC | 1.32 | 7,260 | 65 | 112 | – | Datasheet in lecture 17.1 |
-| Minka Aire Light Wave F844 | AC | 1.32 | 7,720 | 67.5 | 114 | – | [Modern Fan Outlet](https://www.modernfanoutlet.com/minkaaire-wave-f844-sl.html) |
 | Fanco Breeze AC 132 | AC | 1.32 | 9,030 | 45 | 201 | 15 | [Universal Fans](https://universalfans.com.au/online/fanco-breeze-ac-ceiling-fan-with-wall-control-black-52/) |
-| Fanco Breeze AC 122 | AC | 1.22 | 9,940 | 44 | 226 | 16.5 | Lecture 17.1, worked example |
-| Hunter Erling 52850 | DC | 1.32 | 8,680 | 23.6 | 368 | 1.7 | [Hunter](https://www.hunterfan.com/products/ceiling-fans-erling-energy-star-with-led-light-52-inch-1001569), [ENERGY STAR](https://www.energystar.gov/productfinder/product/certified-ceiling-fans/details/3530991) |
-| CasaFan Eco Genuino 122 | DC | 1.22 | 6,630 | 11.3 | 587 | 3.2 | [CasaFan](https://www.casafan.de/deckenventilator-eco-genuino/x312223) |
-| CasaFan Eco Genuino 152 | DC | 1.52 | 9,220 | 16.6 | 555 | 3.3 | [ventilator.de](https://www.ventilator.de/deckenventilatoren/casafan/eco-genuino/eco-genuino-152/315229-eco-genuino-152-mw-ms) |
 :::
+
+% Rows hidden from the reader. Move a row back into the table above to show it.
+% | Westinghouse Contractor's Choice 7303800 | AC | 1.32 | 7,260 | 65 | 112 | – | Datasheet in lecture 17.1 |
+% | Minka Aire Light Wave F844 | AC | 1.32 | 7,720 | 67.5 | 114 | – | [Modern Fan Outlet](https://www.modernfanoutlet.com/minkaaire-wave-f844-sl.html) |
+% | Fanco Breeze AC 122 | AC | 1.22 | 9,940 | 44 | 226 | 16.5 | Lecture 17.1, worked example |
+% | Hunter Erling 52850 | DC | 1.32 | 8,680 | 23.6 | 368 | 1.7 | [Hunter](https://www.hunterfan.com/products/ceiling-fans-erling-energy-star-with-led-light-52-inch-1001569), [ENERGY STAR](https://www.energystar.gov/productfinder/product/certified-ceiling-fans/details/3530991) |
+% | CasaFan Eco Genuino 122 | DC | 1.22 | 6,630 | 11.3 | 587 | 3.2 | [CasaFan](https://www.casafan.de/deckenventilator-eco-genuino/x312223) |
+% | CasaFan Eco Genuino 152 | DC | 1.52 | 9,220 | 16.6 | 555 | 3.3 | [ventilator.de](https://www.ventilator.de/deckenventilatoren/casafan/eco-genuino/eco-genuino-152/315229-eco-genuino-152-mw-ms) |
 
 DC fans move two to five times more air per watt than AC fans of the same diameter, and draw only 2 to 3 W at minimum speed against about 15 W. Datasheet values come from different test methods (DOE in the US, IEC 60879 in the EU), so check the manufacturer's own datasheet before using a number.
 
