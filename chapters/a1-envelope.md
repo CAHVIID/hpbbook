@@ -18,6 +18,22 @@ In a well-insulated building, the plane parts of the envelope are rarely the wea
 Transmission heat loss $H_T = \sum U_i A_i + \sum \psi_j l_j + \sum \chi_k$. U-values of layered constructions with surface resistances {cite:p}`iso6946`. Design heat loss and the share of thermal bridges in a low-energy house.
 :::
 
+### Heat gains and overheating
+
+:::{admonition} For review
+:class: warning
+This subsection was moved here from the cooling strategy chapter and has not been reviewed yet.
+:::
+
+In steady state, with all heat removed by transmission and ventilation, the indoor temperature rises above the outdoor temperature by
+
+```{math}
+:label: eq-overtemperature
+\theta_i - \theta_e = \frac{\Phi_{sol} + \Phi_{int}}{H_{tr} + H_v}, \qquad H_v = \rho c_p q_v (1 - \mu)
+```
+
+where $\Phi_{sol}$ and $\Phi_{int}$ are the solar and internal gains (W), $H_{tr}$ the transmission heat loss coefficient (W/K) and $H_v$ the ventilation heat loss coefficient (W/K). $H_v$ is the airflow $q_v$ times $\rho c_p$, about 0.34 W/K per m³/h, reduced by the temperature efficiency $\mu$ of the heat recovery. With the heat recovery running ($\mu$ = 0.85–0.9), only 10–15% of the airflow removes heat; with the bypass open, $\mu$ = 0. In a low-energy house $H_{tr}$ is small, so $H_v$ dominates. To remove 1,000 W of solar gain with only 3 K between inside and outside takes $H_v$ ≈ 330 W/K, or about 1,000 m³/h with the bypass open. That is about six times the BR18 minimum ventilation rate of a 150 m² house (0.3 L/s per m², about 160 m³/h).
+
 (sec-thermal-bridges)=
 ## Thermal bridges
 
