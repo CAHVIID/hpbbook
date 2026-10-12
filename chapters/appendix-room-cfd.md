@@ -133,7 +133,7 @@ $$
 DR = (34 - t_a)(v - 0.05)^{0.62}(0.37 \, v \, Tu + 3.14)
 $$
 
-The model was derived from sensations at the back of the neck, so it is conservative at the feet. No correction factor is applied. A "feet factor" of 0.82 is found in some sources, but in {cite:t}`fanger1988` 0.82 is the correlation coefficient between predicted and measured dissatisfaction at the feet, not a scaling factor.
+The model was derived from sensations at the back of the neck, so it is conservative at the feet.
 
 **ASHRAE 55 ankle draught** {cite:p}`ashrae55`, from {cite:t}`liu2017`, which also depends on how warm the person feels overall:
 
@@ -190,6 +190,7 @@ Convergence of the window case at 16 °C supply with k-ε. The flow never become
 :::
 
 ## Example: window or balcony door
+%@claude: redo the comparison in this section between a window at 0.9 m sill height and top-hatch. Check the setpoint where windows open that is being used in general across the course - if its 26C, keep 26C as well-mixed temperature, if its 25C, or 24C, redo with that as new well-mixed temperature. Use supply temperature 10 C below well-mixed temperature.
 
 {numref}`fig-cfd-window-door` compares a normal window (sill at 0.9 m, head at 2.1 m) with a balcony door (floor to 2.1 m), both fully open, at 6 air changes per hour and with gains set for a well-mixed 26 °C.
 
