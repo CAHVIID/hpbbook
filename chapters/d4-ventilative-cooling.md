@@ -14,7 +14,7 @@ Outdoor air that enters a room at temperature $T_o$ and leaves at the room tempe
 
 ```{math}
 :label: eq-vc-cooling
-P = \rho \, c_p \, Q \, (T_i - T_o)
+P = \rho \, c_p \, q_V \, (T_i - T_o)
 ```
 
 where $P$ is the cooling power (W), $\rho \approx 1.2$ kg/m³ the air density, $c_p \approx 1005$ J/(kg·K) the specific heat capacity of air and $Q$ the airflow (m³/s).
