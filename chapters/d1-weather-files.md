@@ -58,14 +58,13 @@ Climate models give only daily temperature and precipitation, not the hourly rad
 
 Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Danish design reference years at Sjælsmark: the old and new present-day files and the four RCP4.5 projections. The dashed line marks 26 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_dry.py)
 ```
+{numref}`fig-dry-ridges` shows how the hourly temperatures of each file are distributed in the winter and the summer half-year. The winter curve moves to the right between the two present-day files, with the median jumping from 1.7 °C to 4.5 °C, and then hardly moves. The cold tail below −8 °C is gone after 2001–2010. The summer curve moves steadily, with the median rising from 14.0 °C to 15.4 °C, and its warm tail grows past 26 °C.
 
-{numref}`fig-dry-boxes` splits the hourly temperatures of each file into a winter and a summer half-year. The winter median jumps from 1.7 °C to 4.5 °C between the two present-day files and then hardly moves. The summer median rises steadily, from 14.0 °C to 15.4 °C, and the highest temperature from 27.7 °C to about 31 °C.
-
-```{figure} figures/d1/dry-temperature-boxes.*
-:name: fig-dry-boxes
+```{figure} figures/d1/dry-temperature-ridges.*
+:name: fig-dry-ridges
 :width: 100%
 
-Hourly air temperature in the Danish design reference years, split into winter (October to March) and summer (April to September). Boxes show the quartiles and the median (number above), whiskers the lowest and highest hour. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_temperature_boxes.py)
+Distribution of the hourly air temperature in the Danish design reference years, in winter (October to March) and summer (April to September). The area under every curve is the same. The number under each curve is the median, and the dotted lines mark 0 °C and 26 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_temperature_ridges.py)
 ```
 
 ```{list-table} Annual indicators of the Danish design reference years, computed from the EPW files.
