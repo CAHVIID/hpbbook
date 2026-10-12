@@ -23,6 +23,8 @@ project:
         - file: parts/part-b-ventilation.md
     - title: "Part C: Heating systems and domestic hot water"
       children:
+        - file: chapters/c0-air-heating.md
+          title: "Air heating (under revision)"
         - file: chapters/c1-floor-heating.md
           title: "Floor heating (under revision)"
         - file: chapters/c2-domestic-hot-water.md

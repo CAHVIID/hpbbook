@@ -24,6 +24,7 @@ There are code snippets (apps) embedded into the textbook. The intention of the 
 
 **Part C: Heating systems and domestic hot water**
 
+- C0 [Air heating](chapters/c0-air-heating.md)
 - C1 [Floor heating](chapters/c1-floor-heating.md)
 - C2 [Domestic hot water](chapters/c2-domestic-hot-water.md)
 
