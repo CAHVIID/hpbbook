@@ -82,7 +82,7 @@ $$ (eq-dhw-power)
 | Washing hands | 5 | 35 | 3 | 0.09 | 8.7 |
 | Washing up by hand | 6 | 45 | 10 | 0.40 | 14.5 |
 | Shower, 8 minutes | 8 | 40 | 64 | 2.2 | 16.6 |
-| Bath | 12 | 40 | 120 | 4.2 | 24.9 |
+| Bathtub | 12 | 40 | 120 | 4.2 | 24.9 |
 :::
 
 These powers are far larger than anything else in the heating system of a low-energy house. The whole house may need only 2–3 kW of space heating on the coldest day, and a heat pump sized for that cannot heat a shower as it runs. There are two ways out:
