@@ -41,7 +41,7 @@ There are two ways to cut the cost of hot water, and this chapter is built aroun
 The next section sets out how much hot water a dwelling uses and how fast it is drawn, which both parts build on.
  -->
 
-<!-- ## How much hot water?
+## How much hot water?
 
 ### Energy in a tapping
 
@@ -53,6 +53,7 @@ $$ (eq-dhw-energy)
 
 where $m = \rho\,V$. Both the density $\rho$ and the specific heat capacity $c_p$ of water vary with temperature. Between 10 °C and 55 °C the density falls from 999.7 to 985.7 kg/m³, while $c_p$ stays close to 4.18 kJ/(kg·K). For hot water calculations we use the averages over that range, $\bar\rho = 994$ kg/m³ and $\bar c_p = 4.182$ kJ/(kg·K). One litre of water warmed by 1 K then takes 4.16 kJ, or 1.15 Wh. The cold water from Danish waterworks is about 8–10 °C as a yearly average, with a seasonal swing from around 5 °C in late winter to 15 °C in late summer.
 
+
 At the tap, the user mixes hot water from the tank with cold water to get the temperature they want, typically 38–40 °C for a shower and 45 °C for washing up. The fraction of hot water in the mix follows from an energy balance:
 
 $$
@@ -60,8 +61,6 @@ f_h = \frac{\theta_{mix} - \theta_c}{\theta_h - \theta_c}
 $$ (eq-dhw-mix)
 
 With the tank at 55 °C and cold water at 10 °C, a 40 °C shower is two-thirds hot water and one-third cold. Equation {eq}`eq-dhw-energy` gives the same energy whether it is applied to the mixed water at 40 °C or to the hot water fraction at 55 °C, so either can be used. What matters is to be clear which one a consumption figure refers to. Water use statistics are usually given at the tap, while calculation standards usually give litres at 55 °C or 60 °C.
- -->
-
 
 ### Power when tapping
 
