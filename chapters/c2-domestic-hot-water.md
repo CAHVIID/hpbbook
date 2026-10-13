@@ -94,7 +94,7 @@ These powers are far larger than anything else in the heating system of a low-en
  -->
 :::{admonition} Rules of thumb
 :class: tip
-
+- The cold water temperature is on average 10 C, which is ok for most calculations, but actually fluctuates between 8-17 C throughout the year.
 - 1 L of water warmed by 1 K takes about 1.15 Wh. 100 L warmed by 45 K takes about 5 kWh.
 - One 8-minute shower uses about 60 L of 40 °C water, which is 40 L of 55 °C water and about 2 kWh of heat.
 - Hot water use is about 30–40 L of 55 °C water per person per day, or about 550–750 kWh per person per year before losses.
