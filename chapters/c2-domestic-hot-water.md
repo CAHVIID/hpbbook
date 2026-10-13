@@ -140,7 +140,7 @@ A family of four uses the profile "Family of 4, morning and evening" from the ta
 
 **Step 1.** The tappings add up to 5.73 kWh per day. Of that, 2.91 kWh is drawn between 06:00 and 07:00 and 1.45 kWh between 20:00 and 21:00. The standing loss is $1.2 \cdot (55 - 20) = 42$ W, or 1.01 kWh per day. So $Q_{day} = 6.74$ kWh.
 
-**Step 2.** With night charging, $N = 6$ h and $\Phi_{ch} = 6.74/6 = 1.12$ kW. With uniform charging, $\Phi_{ch} = 6.74/24 = 0.28$ kW. Both are well within the 3 kW of a small heat pump.
+**Step 2.** With night charging, $N = 6$ h and $\Phi_{ch} = 6.74/6 = 1.12$ kW. With uniform charging, $\Phi_{ch} = 6.74/24 = 0.28$ kW. Both are well within the 3 kW of a small heat pump - as long as the heatpump is not tasked with space heating also.
 
 **Step 3.** {numref}`fig-dhw-tank-sizing` shows the cumulative curves. With night charging, the tank receives all of the day's heat by 06:00, before any hot water has been used. The gap is largest at 06:00, just before the morning showers: $Q_{store} = 6.49$ kWh. With uniform charging, the charge curve has to be lifted by 1.34 kWh so that it stays above the demand after the morning showers, where the two curves touch at 08:00. The gap is largest at 06:00, just before the two morning showers: $Q_{store} = 2.77$ kWh. With one shower in the evening, the morning peak is now the one that sets the size.
 
@@ -161,7 +161,7 @@ Night charging needs a tank more than twice as large, because the tank has to ca
 
 **Check in the simulator.** With the default 3 kW heat pump and a sensor at 60 % of the tank height, the simulator gives:
 
-| Strategy | Tank | Unmet hot water | Standing loss |
+| Charging strategy | Tank size | Unmet hot water demand | Standing loss |
 |---|---|---|---|
 | Night 00–06 | 120 L | 0.36 kWh: the evening shower runs cold | 0.30 kWh/day |
 | Night 00–06 | 147 L | 0.02 kWh: the kitchen tap at 22:00 is slightly below 45 °C | 0.40 kWh/day |
