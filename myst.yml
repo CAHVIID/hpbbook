@@ -29,6 +29,8 @@ project:
           title: "Floor heating (under revision)"
         - file: chapters/c2-domestic-hot-water.md
           title: "Domestic hot water (under revision)"
+        - file: chapters/c3-drain-water-heat-recovery.md
+          title: "Drain water heat recovery (under revision)"
     - title: "Part D: Cooling"
       children:
         - file: chapters/d1-weather-files.md
