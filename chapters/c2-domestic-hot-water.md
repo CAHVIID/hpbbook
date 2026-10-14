@@ -101,6 +101,61 @@ These powers are far larger than anything else in the heating system of a low-en
 - A shower draws about 15–20 kW while it runs, several times the design heat load of a low-energy house.
 :::
 
+## Electricity prices over the day
+
+A household on an hourly contract pays the spot price of the hour plus a set of fixed and time-dependent charges. In eastern Denmark (DK2) in 2026, the price per kWh is
+
+$$
+p(t) = \big(p_{spot}(t) + p_{net}(t) + p_{TSO} + p_{tax}\big)\,(1 + 0.25)
+$$ (eq-dhw-price)
+
+where $p_{spot}$ is the day-ahead price of the hour, $p_{net}$ the network tariff of the local grid company, $p_{TSO}$ Energinet's system and network tariffs (7.2 + 4.3 øre/kWh {cite:p}`energinet2026tariffs`), $p_{tax}$ the electricity tax and 0.25 the VAT. The electricity tax was 72.7 øre/kWh until 2025. In 2026 and 2027 it is cut to the EU minimum of 0.8 øre/kWh {cite:p}`skm2025elafgift`, which makes the hourly part of the price far more important than before.
+
+Two of the terms change over the day ({numref}`fig-dhw-price-day`):
+
+- **The spot price** follows the balance between demand and wind and solar production. On a typical weekday it has one peak in the morning and a higher one at 17–20, when people come home and cook and solar production falls away. It is lowest at night and, on sunny days, at midday.
+- **The network tariff** is a fixed time-of-use tariff. Radius charges, in winter (October to March), 11 øre/kWh at 00–06, 32 øre/kWh at 06–17 and 21–24, and 96 øre/kWh at the peak 17–21. In summer, the peak tariff is less than half of that {cite:p}`bolius2026tariffs`.
+
+The two peaks coincide. On the day in {numref}`fig-dhw-price-day`, the consumer price runs from 1.17 DKK/kWh at 03:00 to 4.68 DKK/kWh at 19:00, a factor of four. The family of four draws 57 % of its hot water heat at 06–08 and 37 % at 17–21, in the most expensive hours of the day. Heated as it is used, its hot water costs on average 2.38 DKK/kWh of electricity. Heated at night, 00–06, it costs 1.22 DKK/kWh, half as much.
+
+:::{figure} figures/c2/dhw-price-day.*
+:label: fig-dhw-price-day
+:alt: Two bar charts sharing an hourly axis from 0 to 24. Top: consumer electricity price per hour, stacked from spot price, network tariff, Energinet tariffs and tax, and VAT. It is about 1.2 DKK/kWh at night, peaks at 2.8 DKK/kWh at 07–08, is about 1.4 DKK/kWh at midday, and peaks at 4.7 DKK/kWh at 19–20. Bottom: hot water heat for the family of four, with 2.9 kWh at 06–07, 1.45 kWh at 20–21 and small amounts in other hours.
+
+Top: consumer price of electricity in DK2 over one day, from the spot price of 30 September 2025, the Radius winter tariff and the charges and taxes of 2026. Bottom: hot water heat drawn by the family of four in the tank sizing example, per hour. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_price_day.py)
+:::
+
+The saving from charging at night depends on the heat source. With an electric water heater, the family uses 5.7 kWh of electricity a day for hot water, and charging at 00–06 instead of at the time of use reduces the cost by 6.6 DKK on this day. With a heat pump at a COP of 2.5, the reduction is 2.6 DKK a day. Both values are upper limits, since they are based on a single day with a large price spread, neglect the standing loss, and assume a heat source that can deliver the shower power directly. Over a year, the saving is of the order of a few thousand DKK with a resistance heater and about a thousand DKK with a heat pump.
+
+### The primary energy factor and CO₂ over the day
+
+The Danish energy frame (BR18) uses one fixed primary energy factor for electricity, 1.9. The real factor changes from hour to hour with the production mix. Each source $i$ gets a non-renewable primary energy factor, and the factor of the mix in hour $t$ is
+
+$$
+f_{P,nren}(t) = \frac{\sum_i E_i(t)\, f_{P,nren,i}}{\sum_i E_i(t)}
+$$ (eq-dhw-pef)
+
+where $E_i(t)$ is the electricity from source $i$ in hour $t$. Wind and solar have a non-renewable factor of zero. Fossil plants have a factor close to $1/\eta$. The CO₂ intensity behaves the same way, and for this reason it serves as a proxy for CO₂ in this book.
+
+Danish electricity emitted on average 124 g CO₂-eq/kWh in 2025, counted on consumption and including imports. Single hours ranged from 36 to 363 g/kWh. In winter, the average day goes from 130 g/kWh at 01:00 to 166 g/kWh at 16:00, and in summer from 81 to 100 g/kWh {cite:p}`electricitymaps2025dk`. Price and CO₂ often point the same way, because the expensive evening hours are also the hours with more fossil production and imports. But they are not the same signal. A windy afternoon can be cheap and clean while the night after it is calm and dirty. A charging strategy that follows the price is therefore not automatically the one with the lowest CO₂.
+
+For hand calculations, the hourly data can be reduced to a few periods of the day. Scale the BR18 factor by the mean CO₂ intensity $c$ of each period, relative to the daily mean $\bar c$, weighted by the length of each period:
+
+$$
+f_{P}(t) = 1.9\,\frac{c(t)}{\bar c}
+$$ (eq-dhw-pef-co2)
+
+{numref}`fig-dhw-pef-periods` shows the result for Denmark in 2021, in four periods of the day. The night, 22–06, gets a factor of 1.66, the day, 06–17, 2.05, and the evening, 17–22, 1.95. Averaged over the 24 hours, the factor is 1.9. The spread is only about ±10 % around 1.9, much smaller than the spread in price, which is why a charging strategy saves far more money than primary energy.
+
+% REVIEW LATER (Christian, 2026-10-14): the periods 17-22 and 22-24 do not match the Radius tariff periods 17-21 and 21-24. Regroup when the hourly 2021 DeclarationEmissionHour data is available.
+
+:::{figure} figures/c2/dhw-pef-periods.*
+:label: fig-dhw-pef-periods
+:alt: Bar chart of the primary energy factor of electricity over the day, with bar widths equal to the length of each period. 00–06: 1.66 (99 g CO₂/kWh). 06–17: 2.05 (122 g/kWh). 17–22: 1.95 (116 g/kWh). 22–24: 1.67 (100 g/kWh). A dashed line marks the fixed BR18 factor of 1.9.
+
+Time-varying primary energy factors for electricity, from the mean CO₂ emission intensity of Danish electricity (DK1 and DK2) in four periods of the day in 2021 {cite:p}`eds-declarationemissionhour`, scaled so that the factor averaged over the 24 hours equals the BR18 factor of 1.9 (daily mean 113 g/kWh). [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_pef_periods.py)
+:::
+
 ## Sizing the tank as a thermal battery
 
 A hot water tank is a battery for heat. When it is charged, the heat source runs. When hot water is drawn, the tank delivers. If the tank is big enough, the two no longer have to happen at the same time, and the heat pump can run in the hours when electricity is cheap or has a low primary energy factor. The question is how big "big enough" is.
