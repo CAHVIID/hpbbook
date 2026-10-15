@@ -33,6 +33,9 @@ for v, c, lab in [(SPOT, BLUE, "Spot price (DK2)"), (TARIFF, TEAL, "Network tari
     a1.bar(x, v, 0.85, bottom=b, color=c, label=lab, linewidth=0); b += v
 a1.axhline(PRICE.mean(), color=INK, ls="--", lw=1)
 a1.text(13.5, PRICE.mean() + 0.08, f"daily average {PRICE.mean():.2f} DKK/kWh", ha="center", fontsize=9, color=INK)
+NIGHT = PRICE[:6].mean()
+a1.plot([0, 6], [NIGHT, NIGHT], color=INK, ls=":", lw=1.5)
+a1.text(3, NIGHT + 0.12, f"night average 00–06\n{NIGHT:.2f} DKK/kWh", ha="center", fontsize=9, color=INK, linespacing=1.1)
 a1.set_ylabel("DKK per kWh", fontsize=10, color=INK)
 a1.legend(frameon=False, fontsize=8.5, loc="upper left")
 a2.bar(x, h, 0.85, color=ORANGE, linewidth=0)
