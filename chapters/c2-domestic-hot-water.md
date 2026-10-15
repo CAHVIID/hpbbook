@@ -101,42 +101,6 @@ These powers are far larger than anything else in the heating system of a low-en
 - A shower draws about 15–20 kW while it runs, several times the design heat load of a low-energy house.
 :::
 
-## Hot water in apartment buildings
-
-In an apartment building, hot water is produced centrally, in a district heating substation with a tank or a plate heat exchanger, and distributed to the flats through risers. Without circulation, the water in a riser cools between tappings, and the user has to run the tap until hot water arrives. A circulation loop prevents this. A pump keeps the hot water moving through the supply pipes and back to the substation, so that the whole network stays hot at all hours. The return of the loop is kept above 50 °C to limit the growth of Legionella.
-
-The heat lost from the circulation pipes is
-
-$$
-\Phi_{circ} = \sum_j \frac{L_j\,(\theta_{w,j} - \theta_{a,j})}{R'_j}
-$$ (eq-dhw-circ)
-
-where $L_j$ is the length of pipe section $j$, $\theta_{w,j}$ the water temperature, $\theta_{a,j}$ the surrounding air temperature and $R'_j$ the thermal resistance per metre of insulated pipe. The loss runs 8760 hours a year, whether hot water is used or not.
-
-Measurements show that the loss is large. In Danish apartment buildings, circulation losses were 23–70 % of the heat delivered to the hot water system, and 54–89 % in office buildings {cite:p}`bohm2013`. In 134 Swedish multi-family buildings, the measured loss ranged from 0.5 to 76 kWh per m² of heated floor area per year. The mean was 14 kWh/m² in older buildings and 6 kWh/m² in newer ones, against an assumed 4 kWh/m² {cite:p}`burke2020`. {numref}`fig-dhw-circulation-burke` shows these results together with the earlier Swedish studies that Burke et al. review. All the mean values lie above the design assumption.
-
-% REVIEW LATER (Christian, 2026-10-14): review the content of the Burke figure. It uses the summary values in Burke et al. (2020) and the earlier studies they cite, not per-building data.
-
-:::{figure} figures/c2/dhw-circulation-burke.*
-:label: fig-dhw-circulation-burke
-:alt: Range chart of measured circulation losses in kWh per m² floor area per year, with a dashed line at the design assumption of 4. Burke et al. 2020, 134 buildings: range 0.5 to 76, mean 6 in newer and 14 in older buildings. Bergqvist, 12 buildings: range 2.3 to 28, mean 9.1. Lindencrona and Lindsköld, 540 buildings: mean 17.4. Alros, 2 buildings: 11 and 37.
-:width: 100%
-
-Measured circulation losses in Swedish multi-family buildings. Range and mean values of 134 measurements, and the earlier studies reviewed in the same paper, compared with the 4 kWh/m² per year assumed in design when no calculation is made {cite:p}`burke2020`. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_circulation_burke.py)
-:::
-
-{numref}`fig-dhw-share-circulation` adds these mean losses to {numref}`fig-dhw-share`. In a building of the Danish low-energy class, the circulation loss of 6 kWh/m² is 21 % of the net heat demand and 60 % of the space heating demand. Hot water and circulation together are two-thirds of the heat demand.
-
-:::{figure} figures/c2/dhw-share-circulation.*
-:label: fig-dhw-share-circulation
-:alt: Horizontal stacked bar chart of net heat demand per m² floor area per year, with space heating, domestic hot water and circulation loss. Energy label D: 150 + 13 + 14 kWh/m², hot water 7 % and circulation 8 %. Passive house: 15 + 13 + 6 kWh/m², hot water 38 % and circulation 18 %. Danish low-energy class: 10 + 13 + 6 kWh/m², hot water 45 % and circulation 21 %.
-:width: 100%
-
-Net heat demand for space heating, domestic hot water and circulation loss in apartment buildings of three Danish standards. Space heating and hot water as in {numref}`fig-dhw-share`. The circulation loss is the measured mean for older buildings (14 kWh/m², label D) and newer buildings (6 kWh/m², passive house and low-energy class) in Swedish multi-family buildings {cite:p}`burke2020`. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_share_circulation.py)
-:::
-
-Part of the loss is useful in the heating season, because the pipes run inside the heated building. In summer, it adds to the internal heat gains.
-
 ## Electricity prices over the day
 
 A household on an hourly contract pays the spot price of the hour plus a set of fixed and time-dependent charges. In eastern Denmark (DK2) in 2026, the price per kWh is
@@ -270,3 +234,39 @@ In both cases the hand estimate is close: the tank it gives delivers every showe
 - Charging whenever needed, with a thermostat, needs about 20–25 L per person, enough to cover the largest peak.
 - The heat pump must deliver at least the daily heat divided by the number of allowed hours, plus a margin.
 :::
+
+## Hot water in apartment buildings
+
+In an apartment building, hot water is produced centrally, in a district heating substation with a tank or a plate heat exchanger, and distributed to the flats through risers. Without circulation, the water in a riser cools between tappings, and the user has to run the tap until hot water arrives. A circulation loop prevents this. A pump keeps the hot water moving through the supply pipes and back to the substation, so that the whole network stays hot at all hours. The return of the loop is kept above 50 °C to limit the growth of Legionella.
+
+The heat lost from the circulation pipes is
+
+$$
+\Phi_{circ} = \sum_j \frac{L_j\,(\theta_{w,j} - \theta_{a,j})}{R'_j}
+$$ (eq-dhw-circ)
+
+where $L_j$ is the length of pipe section $j$, $\theta_{w,j}$ the water temperature, $\theta_{a,j}$ the surrounding air temperature and $R'_j$ the thermal resistance per metre of insulated pipe. The loss runs 8760 hours a year, whether hot water is used or not.
+
+Measurements show that the loss is large. In Danish apartment buildings, circulation losses were 23–70 % of the heat delivered to the hot water system, and 54–89 % in office buildings {cite:p}`bohm2013`. In 134 Swedish multi-family buildings, the measured loss ranged from 0.5 to 76 kWh per m² of heated floor area per year. The mean was 14 kWh/m² in older buildings and 6 kWh/m² in newer ones, against an assumed 4 kWh/m² {cite:p}`burke2020`. {numref}`fig-dhw-circulation-burke` shows these results together with the earlier Swedish studies that Burke et al. review. All the mean values lie above the design assumption.
+
+% REVIEW LATER (Christian, 2026-10-14): review the content of the Burke figure. It uses the summary values in Burke et al. (2020) and the earlier studies they cite, not per-building data.
+
+:::{figure} figures/c2/dhw-circulation-burke.*
+:label: fig-dhw-circulation-burke
+:alt: Range chart of measured circulation losses in kWh per m² floor area per year, with a dashed line at the design assumption of 4. Burke et al. 2020, 134 buildings: range 0.5 to 76, mean 6 in newer and 14 in older buildings. Bergqvist, 12 buildings: range 2.3 to 28, mean 9.1. Lindencrona and Lindsköld, 540 buildings: mean 17.4. Alros, 2 buildings: 11 and 37.
+:width: 100%
+
+Measured circulation losses in Swedish multi-family buildings. Range and mean values of 134 measurements, and the earlier studies reviewed in the same paper, compared with the 4 kWh/m² per year assumed in design when no calculation is made {cite:p}`burke2020`. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_circulation_burke.py)
+:::
+
+{numref}`fig-dhw-share-circulation` adds these mean losses to {numref}`fig-dhw-share`. In a building of the Danish low-energy class, the circulation loss of 6 kWh/m² is 21 % of the net heat demand and 60 % of the space heating demand. Hot water and circulation together are two-thirds of the heat demand.
+
+:::{figure} figures/c2/dhw-share-circulation.*
+:label: fig-dhw-share-circulation
+:alt: Horizontal stacked bar chart of net heat demand per m² floor area per year, with space heating, domestic hot water and circulation loss. Energy label D: 150 + 13 + 14 kWh/m², hot water 7 % and circulation 8 %. Passive house: 15 + 13 + 6 kWh/m², hot water 38 % and circulation 18 %. Danish low-energy class: 10 + 13 + 6 kWh/m², hot water 45 % and circulation 21 %.
+:width: 100%
+
+Net heat demand for space heating, domestic hot water and circulation loss in apartment buildings of three Danish standards. Space heating and hot water as in {numref}`fig-dhw-share`. The circulation loss is the measured mean for older buildings (14 kWh/m², label D) and newer buildings (6 kWh/m², passive house and low-energy class) in Swedish multi-family buildings {cite:p}`burke2020`. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_share_circulation.py)
+:::
+
+Part of the loss is useful in the heating season, because the pipes run inside the heated building. In summer, it adds to the internal heat gains.
