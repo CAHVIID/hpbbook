@@ -101,6 +101,97 @@ These powers are far larger than anything else in the heating system of a low-en
 - A shower draws about 15–20 kW while it runs, several times the design heat load of a low-energy house.
 :::
 
+## Hot water in apartment buildings
+
+In an apartment building, hot water is produced centrally, in a district heating substation with a tank or a plate heat exchanger, and distributed to the flats through risers. Without circulation, the water in a riser cools between tappings, and the user has to run the tap until hot water arrives. A circulation loop prevents this. A pump keeps the hot water moving through the supply pipes and back to the substation, so that the whole network stays hot at all hours. The return of the loop is kept above 50 °C to limit the growth of Legionella.
+
+The heat lost from the circulation pipes is
+
+$$
+\Phi_{circ} = \sum_j \frac{L_j\,(\theta_{w,j} - \theta_{a,j})}{R'_j}
+$$ (eq-dhw-circ)
+
+where $L_j$ is the length of pipe section $j$, $\theta_{w,j}$ the water temperature, $\theta_{a,j}$ the surrounding air temperature and $R'_j$ the thermal resistance per metre of insulated pipe. The loss runs 8760 hours a year, whether hot water is used or not.
+
+Measurements show that the loss is large. In Danish apartment buildings, circulation losses were 23–70 % of the heat delivered to the hot water system, and 54–89 % in office buildings {cite:p}`bohm2013`. In 134 Swedish multi-family buildings, the measured loss ranged from 0.5 to 76 kWh per m² of heated floor area per year. The mean was 14 kWh/m² in older buildings and 6 kWh/m² in newer ones, against an assumed 4 kWh/m² {cite:p}`burke2020`. {numref}`fig-dhw-circulation-burke` shows these results together with the earlier Swedish studies that Burke et al. review. All the mean values lie above the design assumption.
+
+% REVIEW LATER (Christian, 2026-10-14): review the content of the Burke figure. It uses the summary values in Burke et al. (2020) and the earlier studies they cite, not per-building data.
+
+:::{figure} figures/c2/dhw-circulation-burke.*
+:label: fig-dhw-circulation-burke
+:alt: Range chart of measured circulation losses in kWh per m² floor area per year, with a dashed line at the design assumption of 4. Burke et al. 2020, 134 buildings: range 0.5 to 76, mean 6 in newer and 14 in older buildings. Bergqvist, 12 buildings: range 2.3 to 28, mean 9.1. Lindencrona and Lindsköld, 540 buildings: mean 17.4. Alros, 2 buildings: 11 and 37.
+:width: 100%
+
+Measured circulation losses in Swedish multi-family buildings. Range and mean values of 134 measurements, and the earlier studies reviewed in the same paper, compared with the 4 kWh/m² per year assumed in design when no calculation is made {cite:p}`burke2020`. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_circulation_burke.py)
+:::
+
+{numref}`fig-dhw-share-circulation` adds these mean losses to {numref}`fig-dhw-share`. In a building of the Danish low-energy class, the circulation loss of 6 kWh/m² is 21 % of the net heat demand and 60 % of the space heating demand. Hot water and circulation together are two-thirds of the heat demand.
+
+:::{figure} figures/c2/dhw-share-circulation.*
+:label: fig-dhw-share-circulation
+:alt: Horizontal stacked bar chart of net heat demand per m² floor area per year, with space heating, domestic hot water and circulation loss. Energy label D: 150 + 13 + 14 kWh/m², hot water 7 % and circulation 8 %. Passive house: 15 + 13 + 6 kWh/m², hot water 38 % and circulation 18 %. Danish low-energy class: 10 + 13 + 6 kWh/m², hot water 45 % and circulation 21 %.
+:width: 100%
+
+Net heat demand for space heating, domestic hot water and circulation loss in apartment buildings of three Danish standards. Space heating and hot water as in {numref}`fig-dhw-share`. The circulation loss is the measured mean for older buildings (14 kWh/m², label D) and newer buildings (6 kWh/m², passive house and low-energy class) in Swedish multi-family buildings {cite:p}`burke2020`. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_share_circulation.py)
+:::
+
+Part of the loss is useful in the heating season, because the pipes run inside the heated building. In summer, it adds to the internal heat gains.
+
+## Electricity prices over the day
+
+A household on an hourly contract pays the spot price of the hour plus a set of fixed and time-dependent charges. In eastern Denmark (DK2) in 2026, the price per kWh is
+
+$$
+p(t) = \big(p_{spot}(t) + p_{net}(t) + p_{TSO} + p_{tax}\big)\,(1 + 0.25)
+$$ (eq-dhw-price)
+
+where $p_{spot}$ is the day-ahead price of the hour, $p_{net}$ the network tariff of the local grid company, $p_{TSO}$ Energinet's system and network tariffs (7.2 + 4.3 øre/kWh {cite:p}`energinet2026tariffs`), $p_{tax}$ the electricity tax and 0.25 the VAT. The electricity tax was 72.7 øre/kWh until 2025. In 2026 and 2027 it is cut to the EU minimum of 0.8 øre/kWh {cite:p}`skm2025elafgift`, which makes the hourly part of the price far more important than before.
+
+Two of the terms change over the day ({numref}`fig-dhw-price-day`):
+
+- **The spot price** follows the balance between demand and wind and solar production. On a typical weekday it has one peak in the morning and a higher one at 17–20, when people come home and cook and solar production falls away. It is lowest at night and, on sunny days, at midday.
+- **The network tariff** is a fixed time-of-use tariff. Radius charges, in winter (October to March), 11 øre/kWh at 00–06, 32 øre/kWh at 06–17 and 21–24, and 96 øre/kWh at the peak 17–21. In summer, the peak tariff is less than half of that {cite:p}`bolius2026tariffs`.
+
+The two peaks coincide. On the day in {numref}`fig-dhw-price-day`, the consumer price runs from 1.17 DKK/kWh at 03:00 to 4.68 DKK/kWh at 19:00, a factor of four. The family of four draws 57 % of its hot water heat at 06–08 and 37 % at 17–21, in the most expensive hours of the day. Heated as it is used, its hot water costs on average 2.38 DKK/kWh of electricity. This is the price weighted by the hot water heat drawn in each hour, and it is higher than the daily average of 1.89 DKK/kWh. Heated at night, 00–06, it costs 1.22 DKK/kWh, half as much.
+
+:::{figure} figures/c2/dhw-price-day.*
+:label: fig-dhw-price-day
+:alt: Two bar charts sharing an hourly axis from 0 to 24. Top: consumer electricity price per hour, stacked from spot price, network tariff, Energinet tariffs and tax, and VAT. It is about 1.2 DKK/kWh at night, peaks at 2.8 DKK/kWh at 07–08, is about 1.4 DKK/kWh at midday, and peaks at 4.7 DKK/kWh at 19–20. A dashed line marks the daily average of 1.89 DKK/kWh, a dotted line the night average 00–06 of 1.22 DKK/kWh and a dash-dotted line the price weighted by hot water use, 2.38 DKK/kWh. Bottom: hot water heat for the family of four, with 2.9 kWh at 06–07, 1.45 kWh at 20–21 and small amounts in other hours.
+
+Top: consumer price of electricity in DK2 over one day, from the spot price of 30 September 2025, the Radius winter tariff and the charges and taxes of 2026. The dashed line is the daily average consumer price, 1.89 DKK/kWh, the dotted line the average at night, 00–06, 1.22 DKK/kWh, and the dash-dotted orange line the price weighted by the hot water heat drawn in each hour, 2.38 DKK/kWh. Bottom: hot water heat drawn by the family of four in the tank sizing example, per hour. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_price_day.py)
+:::
+
+The saving from charging at night depends on the heat source. With an electric water heater, the family uses 5.7 kWh of electricity a day for hot water, and charging at 00–06 instead of at the time of use reduces the cost by 6.6 DKK on this day. With a heat pump at a COP of 2.5, the reduction is 2.6 DKK a day. Both values are upper limits, since they are based on a single day with a large price spread, neglect the standing loss, and assume a heat source that can deliver the shower power directly. Over a year, the saving is of the order of a few thousand DKK with a resistance heater and about a thousand DKK with a heat pump.
+
+### The primary energy factor and CO₂ over the day
+
+The Danish energy frame (BR18) uses one fixed primary energy factor for electricity, 1.9. The real factor changes from hour to hour with the production mix. Each source $i$ gets a non-renewable primary energy factor, and the factor of the mix in hour $t$ is
+
+$$
+f_{P,nren}(t) = \frac{\sum_i E_i(t)\, f_{P,nren,i}}{\sum_i E_i(t)}
+$$ (eq-dhw-pef)
+
+where $E_i(t)$ is the electricity from source $i$ in hour $t$. Wind and solar have a non-renewable factor of zero. Fossil plants have a factor close to $1/\eta$. The CO₂ intensity behaves the same way, and for this reason it serves as a proxy for CO₂ in this book.
+
+Danish electricity emitted on average 124 g CO₂-eq/kWh in 2025, counted on consumption and including imports. Single hours ranged from 36 to 363 g/kWh. In winter, the average day goes from 130 g/kWh at 01:00 to 166 g/kWh at 16:00, and in summer from 81 to 100 g/kWh {cite:p}`electricitymaps2025dk`. Price and CO₂ often point the same way, because the expensive evening hours are also the hours with more fossil production and imports. But they are not the same signal. A windy afternoon can be cheap and clean while the night after it is calm and dirty. A charging strategy that follows the price is therefore not automatically the one with the lowest CO₂.
+
+For hand calculations, the hourly data can be reduced to a few periods of the day. Scale the BR18 factor by the mean CO₂ intensity $c$ of each period, relative to the daily mean $\bar c$, weighted by the length of each period:
+
+$$
+f_{P}(t) = 1.9\,\frac{c(t)}{\bar c}
+$$ (eq-dhw-pef-co2)
+
+{numref}`fig-dhw-pef-periods` shows the result for Denmark in 2021, in four periods of the day. The night, 22–06, gets a factor of 1.66, the day, 06–17, 2.05, and the evening, 17–22, 1.95. Averaged over the 24 hours, the factor is 1.9. The spread is only about ±10 % around 1.9, much smaller than the spread in price, which is why a charging strategy saves far more money than primary energy.
+
+% REVIEW LATER (Christian, 2026-10-14): the periods 17-22 and 22-24 do not match the Radius tariff periods 17-21 and 21-24. Regroup when the hourly 2021 DeclarationEmissionHour data is available.
+
+:::{figure} figures/c2/dhw-pef-periods.*
+:label: fig-dhw-pef-periods
+:alt: Bar chart of the primary energy factor of electricity over the day, with bar widths equal to the length of each period. 00–06: 1.66 (99 g CO₂/kWh). 06–17: 2.05 (122 g/kWh). 17–22: 1.95 (116 g/kWh). 22–24: 1.67 (100 g/kWh). A dashed line marks the fixed BR18 factor of 1.9.
+
+Time-varying primary energy factors for electricity, from the mean CO₂ emission intensity of Danish electricity (DK1 and DK2) in four periods of the day in 2021 {cite:p}`eds-declarationemissionhour`, scaled so that the factor averaged over the 24 hours equals the BR18 factor of 1.9 (daily mean 113 g/kWh). [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_pef_periods.py)
+:::
+
 ## Sizing the tank as a thermal battery
 
 A hot water tank is a battery for heat. When it is charged, the heat source runs. When hot water is drawn, the tank delivers. If the tank is big enough, the two no longer have to happen at the same time, and the heat pump can run in the hours when electricity is cheap or has a low primary energy factor. The question is how big "big enough" is.
