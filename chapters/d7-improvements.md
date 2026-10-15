@@ -8,7 +8,14 @@ This chapter collects ideas that may grow into real chapters and sections later.
 
 A figure showing how the cooling power of ventilative cooling grows linearly with the airflow and the temperature difference, while the draught risk grows faster with the air speed and with colder inflow. Belongs in chapter D4.
 
-<!-- @claude: could you make a figure that shows how cooling potential increases with outdoor temp and flow rate, but draught risk also depends on those parameters. While cooling potential may be linear, draught rate may be of different order. -->
+{numref}`fig-cooling-vs-draught` is a first version. The cooling power is proportional to the airflow times the temperature difference, so the lines in (a) are straight. The air speed at the ankles is also proportional to the airflow ({eq}`eq-sh-floor`), but the draught rate grows with the speed to a power of about 1.6 ({eq}`eq-draught`), and colder air raises it further. In this example the draught limit is passed at 1 to 2.5 air changes per hour, long before the cooling power is of any use at small ΔT.
+
+:::{figure} figures/d4/cooling-vs-draught.*
+:label: fig-cooling-vs-draught
+:width: 100%
+
+(a) Cooling power and (b) ISO 7730 draught rate at ankle height, 1 m from a low opening, against the air change rate for four outdoor temperatures. Room of 4 × 5 × 2.6 m at 24 °C. Assumptions: floor stream $u = K\,q_0/x$ with $K$ rising from 4.4 m⁻¹ at ΔT = 0 to 10 m⁻¹ at ΔT = 10 K, a stream that has warmed halfway to room temperature, and a turbulence intensity of 40 %. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/cooling_vs_draught.py)
+:::
 
 ## D7.2 Control of openings
 

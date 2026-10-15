@@ -52,8 +52,7 @@ The airflow through an opening is driven by the pressure difference across it. F
 Q = C_d \, A \, \sqrt{\frac{2 \, \Delta p}{\rho}}
 ```
 
-where $C_d$ is the discharge coefficient (–), $A$ the free opening area (m²) and $\Delta p$ the pressure difference (Pa). The discharge coefficient accounts for the contraction of the air jet through the opening. It is about 0.6 to 0.65 for a sharp-edged opening; IDA ICE uses 0.65. Grilles, insect nets and louvres lower it considerably, so always use the free area and the discharge coefficient of the actual product.
-%@claude: check for Cd in Bugenings work. If available, insert example value here with reference link.
+where $C_d$ is the discharge coefficient (–), $A$ the free opening area (m²) and $\Delta p$ the pressure difference (Pa). The discharge coefficient accounts for the contraction of the air jet through the opening. It is about 0.6 to 0.65 for a sharp-edged opening; IDA ICE uses 0.65. Grilles, insect nets and louvres lower it considerably, so always use the free area and the discharge coefficient of the actual product. As an example, the rain-defence louvre tested by Bugenings et al. has a discharge coefficient of only 0.29, rated according to EN 13030 {cite:p}`bugenings2025`.
 
 Because the airflow only grows with the square root of the pressure difference, doubling the driving pressure gives just 40 % more airflow. Doubling the opening area doubles it.
 

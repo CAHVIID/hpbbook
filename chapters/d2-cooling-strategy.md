@@ -16,11 +16,8 @@ The steady-state balance between heat gains and heat removal is treated in [](a1
 
 ## D2.2 Judging overheating
 
-:::{note} BR18 overheating limits
-BR18 limits overheating in dwellings to 100 hours above 27 °C and 25 hours above 28 °C operative temperature in a year. These limits are tailored to the thermal model used for BR18 compliance, with its fixed assumptions on weather, internal gains, occupancy and venting. Use them only with that model. Hours from a detailed dynamic simulation, another weather file or measurements in a real house are not directly comparable, and should not be judged against 100 and 25 hours as if they were.
-:::
-
-For a detailed simulation of a dwelling without mechanical cooling, use the adaptive comfort model of EN 16798-1 {cite:p}`en16798`. Occupants who can open windows and change clothing accept higher temperatures after a warm spell. The upper limit of the operative temperature for category II is
+For a detailed simulation of a dwelling without mechanical cooling, use the adaptive comfort model of EN 16798-1 {cite:p}`en16798`, shown in {numref}`fig-adaptive-comfort`.
+Occupants who can open windows and change clothing accept higher temperatures after a warm spell. The upper limit of the operative temperature for category II is
 
 ```{math}
 :label: eq-adaptive-upper
@@ -29,9 +26,20 @@ For a detailed simulation of a dwelling without mechanical cooling, use the adap
 
 where $\theta_{rm}$ is the running mean outdoor temperature (°C), a weighted mean of the daily mean temperatures of the previous days. The model applies for $\theta_{rm}$ between 10 and 30 °C. After a week at 15 °C the limit is 26.8 °C; after a week at 20 °C it is 28.4 °C. Overheating is then reported as the number of occupied hours above the limit in the critical room.
 
+:::{figure} figures/d2/adaptive-comfort.*
+:label: fig-adaptive-comfort
+:width: 80%
+
+Adaptive comfort limits of the operative temperature for categories I, II and III, drawn from the equations of EN 16798-1. The comfort temperature is $0.33\,\theta_{rm} + 18.8$; the upper limits lie 2, 3 and 4 K above it and the lower limits 3, 4 and 5 K below. The points mark the category II upper limit after a week at 15 °C and at 20 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/adaptive_comfort.py)
+:::
+
 The result depends as much on the weather file as on the building, so check a design against the reference year, a future year and a heat wave ([](d1-weather-files.md)).
 
-## D2.3 The ordered strategy
+:::{note} BR18 overheating limits
+BR18 limits overheating in dwellings to 100 hours above 27 °C and 25 hours above 28 °C operative temperature in a year. These limits are tailored to the thermal model used for BR18 compliance, with its fixed assumptions on weather, internal gains, occupancy and venting. Use them only with that model. Hours from a detailed dynamic simulation, another weather file or measurements in a real house are not directly comparable, and should not be judged against 100 and 25 hours as if they were.
+:::
+
+## D2.3 Cooling strategy
 
 The measures are applied in the order below. The order is cost-effective: each step is cheaper and uses less energy than the next, and each one reduces what the next has to handle. It also matches how severe the heat is. The first steps handle an ordinary Danish summer, and the later ones are added as warm spells turn into heat waves.
 

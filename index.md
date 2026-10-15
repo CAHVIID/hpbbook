@@ -24,6 +24,7 @@ There are code snippets (apps) embedded into the textbook. The intention of the 
 
 **Part C: Heating systems and domestic hot water**
 
+- C0 [Air heating](chapters/c0-air-heating.md)
 - C1 [Floor heating](chapters/c1-floor-heating.md)
 - C2 [Domestic hot water](chapters/c2-domestic-hot-water.md)
 
@@ -44,6 +45,8 @@ There are code snippets (apps) embedded into the textbook. The intention of the 
 
 - Appendix A [Heat pump](chapters/appendix-heat-pumps.md)
 - Appendix B [CFD](chapters/appendix-room-cfd.md)
+- Appendix C [Air-conditioning in Europe, summer 2026](chapters/appendix-ac-europe.md)
+- Appendix D [Stratified tank simulator](chapters/appendix-dhw-tank.md)
 
 - [Improvements](improvements.md)
 

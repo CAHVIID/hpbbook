@@ -18,15 +18,23 @@ project:
           title: "Windows (under revision)"
         - file: chapters/a3-glazing.md
           title: "Glazing (under revision)"
+        - file: chapters/a4-cost-of-conserved-energy.md
+          title: "Cost of conserved energy (under revision)"
     - title: "Part B: Ventilation"
       children:
         - file: parts/part-b-ventilation.md
     - title: "Part C: Heating systems and domestic hot water"
       children:
+        - file: chapters/c0-air-heating.md
+          title: "Air heating (under revision)"
         - file: chapters/c1-floor-heating.md
           title: "Floor heating (under revision)"
         - file: chapters/c2-domestic-hot-water.md
           title: "Domestic hot water (under revision)"
+        - file: chapters/c3-drain-water-heat-recovery.md
+          title: "Drain water heat recovery (under revision)"
+        - file: chapters/c4-recirculating-showers.md
+          title: "Recirculating showers (under revision)"
     - title: "Part D: Cooling"
       children:
         - file: chapters/d1-weather-files.md
@@ -58,6 +66,8 @@ project:
           title: "CFD model (under revision)"
         - file: chapters/appendix-ac-europe.md
           title: "Air-conditioning in Europe, summer 2026 (under revision)"
+        - file: chapters/appendix-dhw-tank.md
+          title: "Stratified tank simulator (under revision)"
     - file: improvements.md
 site:
   template: book-theme

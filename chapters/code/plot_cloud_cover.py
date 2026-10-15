@@ -4,7 +4,7 @@ import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import sys
 from pathlib import Path
-DATA = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(".")  # folder with the EPW files
+DATA = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parent / "weather"  # folder with the EPW files
 OUT = Path(__file__).resolve().parent.parent / "figures" / "d1"
 def load(f):
     return list(csv.reader(open(DATA / f, encoding="latin-1")))[8:]
