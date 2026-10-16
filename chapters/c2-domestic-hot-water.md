@@ -101,6 +101,38 @@ These powers are far larger than anything else in the heating system of a low-en
 - A shower draws about 15–20 kW while it runs, several times the design heat load of a low-energy house.
 :::
 
+## Hot water heaters
+
+Four types of hot water heater are common in Danish single-family houses. They differ in where the heat comes from and in what else the unit does.
+
+**Electric water heater.** A tank with an electric heating element and a thermostat. Each kWh of hot water costs one kWh of electricity, plus the standing loss of the tank, which is set by the insulation and the tank temperature. The electric water heater is the reference for the other solutions in this book.
+
+:::{dropdown} Example: Metro Therm water heaters
+The range runs from 14 to 288 L, insulated with polyurethane foam, with a thermostat that can be set up to about 65 °C {cite:p}`metrotherm-waterheaters`.
+:::
+
+**Hot water heat pump.** A tank with a small air-to-water heat pump on top. The heat pump takes its air through ducts, either outdoor air or exhaust air from the house. The COP at an air temperature of 20 °C is typically around 3 to 4. With outdoor air, the COP falls in winter, when the air is cold. With exhaust air, the heat source is close to room temperature all year, but the air flow is limited by the ventilation.
+
+:::{dropdown} Example: MetroAir Aqua
+The MetroAir Aqua heats a tank of 190 or 260 L with 1.6 kW of heat pump capacity. The COP is 3.7 and 4.1 at an air temperature of 20 °C for the two tank sizes {cite:p}`metrotherm-overview2025`.
+:::
+
+**Heat pump for space heating and hot water.** An air-to-water or ground source heat pump that serves both the floor heating and a hot water tank, often built into the indoor unit. The heat pump switches between floor heating at about 35 °C and charging the tank at 50–55 °C. The COP is lower when it heats hot water than when it heats the floor, because the condensing temperature is higher. The share of the year's heat that goes to hot water grows as the space heating demand falls, so in a low-energy house the COP for hot water matters as much as the SCOP for space heating.
+
+:::{dropdown} Example: Kronoterm Adapt 2
+An air-to-water heat pump with an outdoor unit of 2 to 18 kW and the natural refrigerant R290. The SCOP is up to 6.22 at a flow temperature of 35 °C (EN 14825, average climate), and the flow temperature can reach 75 °C {cite:p}`kronoterm-adapt`. With the HYDRO C2 indoor unit, the hot water tank is built into the indoor unit.
+:::
+
+**Compact unit.** A compact unit combines balanced ventilation with heat recovery, an exhaust-air heat pump and a hot water tank in one cabinet. The heat pump takes heat from the exhaust air after the heat exchanger and uses it for the hot water and, in some units, the supply air. The heat source is limited by the ventilation air flow, so the unit suits houses with a small heating demand, such as passive houses. Because ventilation, heat pump and tank share one cabinet, the parts are harder to reach and replace than in separate units, and a fault in one part can take ventilation and hot water out of service together.
+
+:::{dropdown} Example: Nilan Compact P
+The Compact P has a 180 L tank in a cabinet of 900 × 610 × 2065 mm. The counterflow heat exchanger has a temperature efficiency of up to 95 % {cite:p}`nilan-compactp`. The unit is certified as a Passive House component at air flows of [92 m³/h](https://database.passivehouse.com/en/components/details/heatpump/nilan-as-compact-p-arbeitspunkt-92-m3h-0390ch03) and [172 m³/h](https://database.passivehouse.com/en/components/details/heatpump/nilan-as-compact-p-arbeitspunkt-172-m3h-0391ch03).
+:::
+
+The Danish Energy Agency keeps an official list of heat pumps sold in Denmark, Varmepumpelisten, with the tested efficiency of each product {cite:p}`sparenergi-varmepumpelisten`. It is the place to compare heat pumps of the types above.
+
+% REVIEW LATER (Christian, 2026-10-16): check the note on servicing compact units such as the Nilan Compact P. The MetroAir Aqua data are for the 201 and 301 models; check them against the 202 and 302 in the link.
+
 ## Electricity prices over the day
 
 A household on an hourly contract pays the spot price of the hour plus a set of fixed and time-dependent charges. In eastern Denmark (DK2) in 2026, the price per kWh is
