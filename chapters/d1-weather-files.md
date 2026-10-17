@@ -401,7 +401,7 @@ Urban heat island intensity (°C) over the day in Copenhagen, Odense, Aarhus and
 
 The heat island acts exactly when night ventilation works. {numref}`fig-vc-uhi` colours every hour by the temperature difference available for ventilative cooling, $\Delta T = T_\mathrm{in} - T_\mathrm{out}$, with $T_\mathrm{in} = 24$ °C. The heat island is set to 2 K at night, the upper end of the Copenhagen averages.
 
-The effect of urban heat islands is more pronounced with future climate, but the magnitude will probably remain the same or even decrease a little as global radiation drops, and mitigating actions are implemented like more green areas in the built environment.
+The effect of urban heat islands is more pronounced with future climate, but the magnitude will probably remain the same or even decrease a little as global radiation drops, and mitigating actions are implemented like more green areas in the built environment. Cities are projected to warm by about 1.9 K by 2100 under an intermediate emission scenario {cite:p}`zhao2021`, while in Brussels the summer night-time heat island stays at about 3.1–3.2 K up to the 2060s under both RCP4.5 and RCP8.5 {cite:p}`lauwaet2016`.
 
 ```{figure} figures/d1/vc-potential-uhi.*
 :name: fig-vc-uhi
