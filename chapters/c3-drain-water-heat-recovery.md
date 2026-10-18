@@ -10,25 +10,27 @@ When you take a shower, about 8 L of water at 40 °C leaves the shower head ever
 
 {numref}`fig-dwhr-installed` shows a vertical unit installed in a basement and how it is connected in a house.
 
-::::{figure}
+:::::{figure}
 :label: fig-dwhr-installed
 
-:::{figure} figures/c3/dwhr-vertical-photo.jpg
+::::{grid} 2 2 2 2
+
+```{image} figures/c3/dwhr-vertical-photo.jpg
 :alt: Photo of a vertical drain water heat recovery unit in a basement. A black plastic drain stack comes down from the floor joists, and about 1.5 m of it is replaced by a copper pipe wrapped in a tight copper coil. Two thin copper pipes run from the ends of the coil up to the ceiling: cold water in at the bottom, preheated water out at the top. Below the unit the drain continues into the floor.
-:width: 38%
+:width: 80%
+:align: center
+```
 
-Installed unit
-:::
-
-:::{figure} figures/c3/dwhr-equal-flow-diagram.png
+```{image} figures/c3/dwhr-equal-flow-diagram.png
 :alt: Diagram of a two-storey house. Shower water runs down a black drain pipe through a copper coil in the storey below. Cold water, shown in blue, enters the house at the bottom, flows up through the coil and leaves it as green preheated water. The preheated water goes both to the cold side of the shower mixer and to the water heater, which sends red hot water to the mixer.
-:width: 38%
+:width: 80%
+:align: center
+```
 
-Equal-flow connection
-:::
-
-A vertical drain water heat recovery unit. (a) Installed in a basement: the copper coil around the drain carries the cold water upwards. Photo: Recycle9876, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hot_water_heat_recycling_unit.jpg), public domain. (b) Connected so that the preheated water feeds both the shower and the water heater (equal flow, connection 3 below). Diagram: Ashp uk, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waste_Water_Heat_Recovery_in_the_most_efficient_%27equal_flow%27_configuration.png), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 ::::
+
+A vertical drain water heat recovery unit. Left: installed in a basement; the copper coil around the drain carries the cold water upwards. Photo: Recycle9876, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hot_water_heat_recycling_unit.jpg), public domain. Right: connected so that the preheated water feeds both the shower and the water heater (equal flow, connection 3 below). Diagram: Ashp uk, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waste_Water_Heat_Recovery_in_the_most_efficient_%27equal_flow%27_configuration.png), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+:::::
 
 ## How a unit works
 
