@@ -5,7 +5,7 @@
 This appendix is being reworked and may change substantially.
 :::
 
-A hot water tank is not simply full or empty. Hot water floats on top of cold water, and a well-designed tank keeps the two apart, with a thin mixing zone, the thermocline, between them. Hot water is drawn from the top while cold mains water flows in at the bottom, so the thermocline moves up as the tank is emptied. The simulator in this appendix follows this hour by hour for one day. It is used in [](c2-domestic-hot-water.md) to check the tank sizes found by hand.
+A hot water tank is not simply full or empty. Hot water floats on top of cold water, and a well-designed tank keeps the two apart, with a thin mixing zone, the thermocline, between them. Hot water is drawn from the top while cold mains water flows in at the bottom, so the thermocline moves up as the tank is emptied. The simulator in this appendix follows this hour by hour for one day.
 
 The tank is split into horizontal layers. A heat pump charges it through an external heat exchanger: the charging loop takes water from the bottom of the tank and returns it at mid-height, and there is no circulation loop. A thermostat starts the heat pump when the sensor falls below the setpoint, and it can only run in the hours you allow. The tab *Tapping profiles* shows the predefined days of hot water use, with their sources, and lets you import a profile made with DHWcalc.
 

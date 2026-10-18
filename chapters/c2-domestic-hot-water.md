@@ -41,7 +41,7 @@ There are two ways to cut the cost of hot water, and this chapter is built aroun
 The next section sets out how much hot water a dwelling uses and how fast it is drawn, which both parts build on.
  -->
 
-<!-- ## How much hot water?
+## How much hot water?
 
 ### Energy in a tapping
 
@@ -53,6 +53,7 @@ $$ (eq-dhw-energy)
 
 where $m = \rho\,V$. Both the density $\rho$ and the specific heat capacity $c_p$ of water vary with temperature. Between 10 °C and 55 °C the density falls from 999.7 to 985.7 kg/m³, while $c_p$ stays close to 4.18 kJ/(kg·K). For hot water calculations we use the averages over that range, $\bar\rho = 994$ kg/m³ and $\bar c_p = 4.182$ kJ/(kg·K). One litre of water warmed by 1 K then takes 4.16 kJ, or 1.15 Wh. The cold water from Danish waterworks is about 8–10 °C as a yearly average, with a seasonal swing from around 5 °C in late winter to 15 °C in late summer.
 
+
 At the tap, the user mixes hot water from the tank with cold water to get the temperature they want, typically 38–40 °C for a shower and 45 °C for washing up. The fraction of hot water in the mix follows from an energy balance:
 
 $$
@@ -60,8 +61,6 @@ f_h = \frac{\theta_{mix} - \theta_c}{\theta_h - \theta_c}
 $$ (eq-dhw-mix)
 
 With the tank at 55 °C and cold water at 10 °C, a 40 °C shower is two-thirds hot water and one-third cold. Equation {eq}`eq-dhw-energy` gives the same energy whether it is applied to the mixed water at 40 °C or to the hot water fraction at 55 °C, so either can be used. What matters is to be clear which one a consumption figure refers to. Water use statistics are usually given at the tap, while calculation standards usually give litres at 55 °C or 60 °C.
- -->
-
 
 ### Power when tapping
 
@@ -82,7 +81,7 @@ $$ (eq-dhw-power)
 | Washing hands | 5 | 35 | 3 | 0.09 | 8.7 |
 | Washing up by hand | 6 | 45 | 10 | 0.40 | 14.5 |
 | Shower, 8 minutes | 8 | 40 | 64 | 2.2 | 16.6 |
-| Bath | 12 | 40 | 120 | 4.2 | 24.9 |
+| Bathtub | 12 | 40 | 120 | 4.2 | 24.9 |
 :::
 
 These powers are far larger than anything else in the heating system of a low-energy house. The whole house may need only 2–3 kW of space heating on the coldest day, and a heat pump sized for that cannot heat a shower as it runs. There are two ways out:
@@ -94,7 +93,7 @@ These powers are far larger than anything else in the heating system of a low-en
  -->
 :::{admonition} Rules of thumb
 :class: tip
-
+- The cold water temperature is on average 10 C, which is ok for most calculations, but actually fluctuates between 8-17 C throughout the year.
 - 1 L of water warmed by 1 K takes about 1.15 Wh. 100 L warmed by 45 K takes about 5 kWh.
 - One 8-minute shower uses about 60 L of 40 °C water, which is 40 L of 55 °C water and about 2 kWh of heat.
 - Hot water use is about 30–40 L of 55 °C water per person per day, or about 550–750 kWh per person per year before losses.
@@ -102,202 +101,91 @@ These powers are far larger than anything else in the heating system of a low-en
 - A shower draws about 15–20 kW while it runs, several times the design heat load of a low-energy house.
 :::
 
-## Drain water heat recovery
+## Hot water heaters
 
-When you take a shower, about 8 L of water at 40 °C leaves the shower head every minute. A few seconds later the same water runs down the drain at 35–38 °C, having lost only a few kelvin on its way through the air and over your skin. At the same moment, 8 L of cold water at about 10 °C enters the house to replace it. A drain water heat recovery unit is a heat exchanger between these two flows. It needs no storage, no pump and no control, because the two flows are there at the same time and stop at the same time. It only works for tappings with that property, and in a home that means showers. A bath is filled first and emptied later, and a kitchen sink or a washbasin draws little water at a time.
+Four types of hot water heater are common in Danish single-family houses. They differ in where the heat comes from and in what else the unit does.
 
-### How a unit works
+**Electric water heater.** A tank with an electric heating element and a thermostat. Each kWh of hot water costs one kWh of electricity, plus the standing loss of the tank, which is set by the insulation and the tank temperature. The electric water heater is the reference for the other solutions in this book.
 
-{numref}`fig-dwhr-units` shows the two main types.
-
-**Vertical units** replace about 1.5–2 m of the vertical drain pipe below the shower. The inner pipe is copper. Water falling down a vertical pipe does not fill it, but spreads into a thin film that clings to the wall, so almost all of the copper surface is wetted by a thin, fast-moving layer of warm water. The cold water flows upwards in a coil or a narrow annulus around the pipe, in counterflow to the drain water. This is a good heat exchanger, and the best vertical units recover 70 % of the heat that could at most be recovered. The catch is that a vertical unit needs a storey of straight vertical drain below the shower, which means a basement or a floor below. It suits a house with a basement and an apartment block where the bathrooms are stacked.
-
-**Horizontal units** sit in the floor, under a shower tray or in a channel drain. They fit a slab-on-ground house and a bathroom renovation. In a channel drain, the heat exchanger is a row of copper tubes along the bottom of the channel, with the cold water flowing inside them against the direction of the drain water. The drain water flows around and over the tubes in a shallow layer. The unit is short, typically 0.7–0.9 m, and the water in the channel moves slowly, so it has less length and less turbulence to give off its heat than the falling film in a vertical pipe. Some manufacturers add turbulators between the tubes to stir the flow. The lower the shower flow, the thinner the water layer around the tubes and the higher the effectiveness. The better horizontal units still reach about 60 %.
-
-:::{figure} figures/c2/dwhr-units.png
-:label: fig-dwhr-units
-:alt: Two schematic sections. Left, a vertical unit in section: a copper drain pipe with air in the middle, a thin film of warm drain water running down the inside of the wall, and a copper coil with cold water wound around the outside. Drain water enters at the top at 37 °C and leaves at the bottom at 18 °C; cold water enters at the bottom at 10 °C and leaves at the top at 29 °C. Right, a horizontal unit in a shower channel drain, shown along the channel and in a cross-section: shower water falls through the grate and runs along the channel over a row of copper tubes in the channel bottom, in which the cold water flows the opposite way. Drain water leaves at 24 °C, cold water enters at 10 °C and leaves at 24 °C. The cross-section shows the drain water flowing around and over the tubes. A legend gives orange for warm drain water, blue for cold drinking water and brown for the copper walls.
-:width: 100%
-
-A vertical unit (left) and a horizontal unit in a shower channel drain (right). Temperatures are for an 8 L/min shower with equal flow on both sides, an effectiveness of 0.70 for the vertical unit and 0.50 for the horizontal one. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dwhr_figures.py)
+:::{dropdown} Example: Metro Therm water heaters
+The range runs from 14 to 288 L, insulated with polyurethane foam, with a thermostat that can be set up to about 65 °C {cite:p}`metrotherm-waterheaters`.
 :::
 
-Both types must keep the drinking water safe if the wall between the two flows fails. Certified units therefore have a double wall with a vented gap between the drain water and the drinking water, so a leak shows up as water dripping out of the gap rather than as sewage in the drinking water. The drain side gets a film of soap, skin fat and hair over time. A vertical unit is largely self-cleaning, because the falling water scours the wall, while a horizontal unit needs the grate and the channel cleaned as part of normal bathroom cleaning. On the cold side, the unit adds a pressure loss of about 0.1–0.4 bar at shower flow.
+**Hot water heat pump.** A tank with a small air-to-water heat pump on top. The heat pump takes its air through ducts, either outdoor air or exhaust air from the house. The COP at an air temperature of 20 °C is typically around 3 to 4. With outdoor air, the COP falls in winter, when the air is cold. With exhaust air, the heat source is close to room temperature all year, but the air flow is limited by the ventilation.
 
-### Effectiveness
-
-How good a unit is, is expressed by its *effectiveness*: the heat it actually transfers, divided by the most heat that could be transferred. The most that could be transferred is the heat that would cool the drain water all the way down to the cold water temperature, or warm the cold water all the way up to the drain water temperature, whichever flow has the smaller heat capacity rate $C = \rho\,\dot V\,c_p$. When the two flows are equal, the heat flow transferred is
-
-$$
-\Phi = \varepsilon\, C\,(\theta_d - \theta_c)
-\qquad\text{and}\qquad
-\varepsilon = \frac{\theta_p - \theta_c}{\theta_d - \theta_c}
-$$ (eq-dwhr-eps)
-
-where $\theta_d$ is the drain water temperature entering the unit, $\theta_c$ the cold water temperature and $\theta_p$ the temperature of the preheated cold water leaving it. With drain water at 37 °C, cold water at 10 °C and $\varepsilon = 0.6$, the cold water leaves the unit at $10 + 0.6 \cdot 27 = 26$ °C.
-
-The Passive House Institute certifies drain water heat recovery units at equal flow on both sides, 8 L/min, and sorts them into efficiency classes from phA+ to phC {cite:p}`phi-dwhr`. {numref}`tab-dwhr-products` shows five certified units of different types.
-
-:::{table} Five drain water heat recovery units certified by the Passive House Institute. Effectiveness and pressure loss are the certified values at 8 L/min with equal flow {cite:p}`phi-dwhr`. Prices are unit prices from web shops in October 2026, without installation; no Danish dealer was found.
-:label: tab-dwhr-products
-:align: center
-
-| Unit | Type | PHI class | Effectiveness at 8 L/min | Pressure loss (bar) | Unit price |
-|---|---|---|---|---|---|
-| Showersave QB1-21XE | Vertical, 2.1 m | phA | 0.70 | 0.26 | £662 incl. VAT |
-| ACO ShowerDrain X2.2 PHI | Channel drain | phB | 0.60 | 0.25 | not found |
-| Zypho Slim 50 DW | Under shower tray | phB | 0.54 | 0.38 | £896 incl. VAT |
-| Zypho PiPe 60 DW | Vertical, 1.6 m | phB | 0.53 | 0.07 | €982 |
-| Joulia-Inline 5 | Channel drain | phC | 0.41 | 0.28 | €3,005 incl. VAT |
+:::{dropdown} Example: MetroAir Aqua
+The MetroAir Aqua heats a tank of 190 or 260 L with 1.6 kW of heat pump capacity. The COP is 3.7 and 4.1 at an air temperature of 20 °C for the two tank sizes {cite:p}`metrotherm-overview2025`.
 :::
 
-The table holds two surprises. The type matters less than the individual design: the best channel drain beats the shorter of the two vertical pipes. And price says nothing about performance: the most expensive unit has the lowest effectiveness.
+**Heat pump for space heating and hot water.** An air-to-water or ground source heat pump that serves both the floor heating and a hot water tank, often built into the indoor unit. The heat pump switches between floor heating at about 35 °C and charging the tank at 50–55 °C. The COP is lower when it heats hot water than when it heats the floor, because the condensing temperature is higher. The share of the year's heat that goes to hot water grows as the space heating demand falls, so in a low-energy house the COP for hot water matters as much as the SCOP for space heating.
 
-#### The ε-NTU method
-
-A heat exchanger is described by two numbers. The *heat capacity ratio* compares the two flows,
-
-$$
-C_r = \frac{C_{min}}{C_{max}}, \qquad C = \rho\,\dot V\,c_p
-$$
-
-and the *number of transfer units* compares the heat transfer surface with the smaller flow,
-
-$$
-NTU = \frac{UA}{C_{min}}
-$$
-
-where $UA$ is the overall heat transfer coefficient times the area, in W/K. A large $NTU$ means a large surface for the flow it has to heat. For a counterflow heat exchanger, the effectiveness follows from these two numbers alone:
-
-$$
-\varepsilon = \frac{1 - \exp\left[-NTU\,(1 - C_r)\right]}{1 - C_r\,\exp\left[-NTU\,(1 - C_r)\right]}
-$$ (eq-dwhr-ntu-general)
-
-and the heat transferred is $\Phi = \varepsilon\,C_{min}\,(\theta_d - \theta_c)$. When the flows are equal, $C_r = 1$ and equation {eq}`eq-dwhr-ntu-general` becomes 0/0. Taking the limit $C_r \to 1$ gives the much simpler
-
-$$
-\varepsilon = \frac{NTU}{1 + NTU}
-\qquad\Longleftrightarrow\qquad
-NTU = \frac{\varepsilon}{1 - \varepsilon}
-$$ (eq-dwhr-ntu)
-
-The second form turns a certified effectiveness into the size of the heat exchanger. A unit certified at $\varepsilon = 0.60$ at 8 L/min has $NTU = 0.60/0.40 = 1.5$, so its $UA$ equals the heat capacity rate of 12 L/min of water.
-
-Now feed the same unit with unequal flows: 8 L/min of drain water, but only the 5.33 L/min that goes to the water heater on the cold side (connection 2 below). If $UA$ stays the same, $NTU = 12/5.33 = 2.25$ and $C_r = 5.33/8 = 0.67$, and equation {eq}`eq-dwhr-ntu-general` gives $\varepsilon = 0.77$. The smaller cold flow is heated to $10 + 0.77 \cdot 27 = 30.8$ °C instead of 26.2 °C, but the heat transferred falls from 9.0 kW to 7.7 kW, because less water is heated. A higher effectiveness does not mean more heat recovered: always compare $\Phi$, not $\varepsilon$, when the flows differ.
-
-#### Why effectiveness falls with flow
-
-A unit with $\varepsilon = 0.70$ has $NTU = 0.70/0.30 = 2.3$, and one with $\varepsilon = 0.41$ has $NTU = 0.7$. When the shower flow rises, $C$ rises in proportion. $UA$ also rises, because faster water transfers heat better, but less than in proportion. So $NTU$ falls, and the effectiveness with it. {numref}`fig-dwhr-effectiveness` (left) shows this for the five units of {numref}`tab-dwhr-products`, assuming $UA$ grows with the square root of the flow. A low-flow shower head therefore saves twice: it uses less hot water, and the unit recovers a larger share of the heat in the water that is used.
-
-### Connecting the unit
-
-The preheated water can go to three places ({numref}`fig-dwhr-connections`):
-
-1. **To the cold side of the shower mixer only.** The water heater is still fed with cold mains water.
-2. **To the water heater only.** The shower mixer is still fed with cold mains water.
-3. **To both.** All the water that ends up in the shower has passed through the unit, so the flow on the cold side equals the flow down the drain. This is called *equal flow* or *balanced* connection.
-
-:::{figure} figures/c2/dwhr-connections.png
-:label: fig-dwhr-connections
-:alt: Three schematics side by side, each with a water heater at 55 °C, a shower mixer at 40 °C, an 8 L/min shower, a drain at 37 °C and a DWHR unit. In connection 1, preheated water (5.1 L/min at 31 °C) goes only to the mixer, and the heat from the water heater is cut by 45 %. In connection 2, preheated water (5.3 L/min at 31 °C) goes only to the water heater, and the heat is cut by 46 %. In connection 3, preheated water (8.0 L/min at 26 °C) goes to both, and the heat is cut by 54 %.
-:width: 100%
-
-The three ways of connecting a drain water heat recovery unit with an effectiveness of 0.60 at 8 L/min. Shower at 40 °C and 8 L/min, drain water at 37 °C, cold water at 10 °C, water heater at 55 °C. Calculated with the model in the dropdown at the end of the section. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dwhr_figures.py)
+:::{dropdown} Example: Kronoterm Adapt 2
+An air-to-water heat pump with an outdoor unit of 2 to 18 kW and the natural refrigerant R290. The SCOP is up to 6.22 at a flow temperature of 35 °C (EN 14825, average climate), and the flow temperature can reach 75 °C {cite:p}`kronoterm-adapt`. With the HYDRO C2 indoor unit, the hot water tank is built into the indoor unit.
 :::
 
-In connection 3 the calculation is simple. All the water the shower uses enters the house at $\theta_p$ instead of $\theta_c$, so the heat needed for the shower falls from $C(\theta_{mix} - \theta_c)$ to $C(\theta_{mix} - \theta_p)$. The fraction of the shower heat that is saved is
+**Compact unit.** A compact unit combines balanced ventilation with heat recovery, an exhaust-air heat pump and a hot water tank in one cabinet. The heat pump takes heat from the exhaust air after the heat exchanger and uses it for the hot water and, in some units, the supply air. The heat source is limited by the ventilation air flow, so the unit suits houses with a small heating demand, such as passive houses. Because ventilation, heat pump and tank share one cabinet, the parts are harder to reach and replace than in separate units, and a fault in one part can take ventilation and hot water out of service together.
 
-$$
-s = \frac{\theta_p - \theta_c}{\theta_{mix} - \theta_c} = \varepsilon\,\frac{\theta_d - \theta_c}{\theta_{mix} - \theta_c}
-$$ (eq-dwhr-saving)
-
-With $\theta_{mix} = 40$ °C, $\theta_d = 37$ °C and $\theta_c = 10$ °C, the last fraction is $27/30 = 0.9$, so a balanced unit saves 90 % of its effectiveness: 63 % of the shower heat for the best unit in {numref}`tab-dwhr-products`, 37 % for the poorest.
-
-In connections 1 and 2 only part of the shower water passes the unit, about two-thirds at these temperatures. The flows in the heat exchanger are no longer equal. The smaller cold-side flow is heated to a higher temperature, so the effectiveness defined on the smaller flow goes up, but less water is heated, and the heat recovered goes down. Connection 1 has a further twist. When the mixer gets warmer cold water, the user's thermostatic mixer takes less hot water and more of the preheated water to hold 40 °C, which changes the flow through the unit again. In {numref}`fig-dwhr-connections`, the two unbalanced connections save 45–46 % of the shower heat, against 54 % for the balanced one.
-
-{numref}`fig-dwhr-effectiveness` (right) shows the saving for all three connections over the range of certified effectiveness. The balanced connection is always best. For units with a low effectiveness, connection 2 (to the water heater) is slightly better than connection 1; for the best units it is the other way round. In practice the choice is often made by the pipe layout. Connection 1 needs only a short pipe from the unit to the shower mixer, and connection 2 needs a pipe from the unit to the water heater, which may be far away. Connection 3 needs both, and it is the one to aim for in a new building.
-
-:::{figure} figures/c2/dwhr-effectiveness.png
-:label: fig-dwhr-effectiveness
-:alt: Two line charts. Left: effectiveness against shower flow from 4 to 14 L/min for five certified units, each falling with flow and passing through its certified value at 8 L/min: Showersave QB1-21XE 0.77 to 0.64, ACO ShowerDrain X2.2 0.68 to 0.53, Zypho Slim 50 and Zypho PiPe 60 about 0.62 to 0.46, Joulia-Inline 5 0.50 to 0.34. Right: percentage of shower heat saved against certified effectiveness from 0.3 to 0.75 for the three connections; equal flow rises from 27 % to 68 %, the other two from about 23–25 % to 55–57 %, crossing near 0.66.
-:width: 100%
-
-Left: effectiveness at equal flow against shower flow for the five units in {numref}`tab-dwhr-products`, from the certified value at 8 L/min with $UA$ proportional to the square root of the flow. Right: share of the shower heat saved for the three connections, for an 8 L/min shower at 40 °C, drain water at 37 °C and cold water at 10 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dwhr_figures.py)
+:::{dropdown} Example: Nilan Compact P
+The Compact P has a 180 L tank in a cabinet of 900 × 610 × 2065 mm. The counterflow heat exchanger has a temperature efficiency of up to 95 % {cite:p}`nilan-compactp`. The unit is certified as a Passive House component at air flows of [92 m³/h](https://database.passivehouse.com/en/components/details/heatpump/nilan-as-compact-p-arbeitspunkt-92-m3h-0390ch03) and [172 m³/h](https://database.passivehouse.com/en/components/details/heatpump/nilan-as-compact-p-arbeitspunkt-172-m3h-0391ch03).
 :::
 
-### How much does it save?
+The Danish Energy Agency keeps an official list of heat pumps sold in Denmark, Varmepumpelisten, with the tested efficiency of each product {cite:p}`sparenergi-varmepumpelisten`. It is the place to compare heat pumps of the types above.
 
-The annual saving is the shower heat times the saving fraction:
+% REVIEW LATER (Christian, 2026-10-16): check the note on servicing compact units such as the Nilan Compact P. The MetroAir Aqua data are for the 201 and 301 models; check them against the 202 and 302 in the link.
+
+## Electricity prices over the day
+
+A household on an hourly contract pays the spot price of the hour plus a set of fixed and time-dependent charges. In eastern Denmark (DK2) in 2026, the price per kWh is
 
 $$
-Q_{saved} = s\,Q_{shower}
-$$ (eq-dwhr-annual)
+p(t) = \big(p_{spot}(t) + p_{net}(t) + p_{TSO} + p_{tax}\big)\,(1 + 0.25)
+$$ (eq-dhw-price)
 
-where $Q_{shower}$ is the heat for showers over the year, $Q = \rho\,V\,c_p\,(\theta_{mix} - \theta_c)$ summed over all showers. Showers are the largest single use of hot water in most homes, typically half to two-thirds of the hot water heat. One 8-minute shower at 8 L/min and 40 °C takes 2.2 kWh ({numref}`tab-dhw-tappings`). A person who showers on three days out of four uses about 600 kWh a year for showers, and a balanced unit with $\varepsilon = 0.5$ saves 45 % of that, about 270 kWh per person per year.
+where $p_{spot}$ is the day-ahead price of the hour, $p_{net}$ the network tariff of the local grid company, $p_{TSO}$ Energinet's system and network tariffs (7.2 + 4.3 øre/kWh {cite:p}`energinet2026tariffs`), $p_{tax}$ the electricity tax and 0.25 the VAT. The electricity tax was 72.7 øre/kWh until 2025. In 2026 and 2027 it is cut to the EU minimum of 0.8 øre/kWh {cite:p}`skm2025elafgift`, which makes the hourly part of the price far more important than before.
 
-The saving varies over the year with the cold water temperature. With cold water at 5 °C in late winter, the unit with $\varepsilon = 0.5$ warms it by 16 K; at 15 °C in late summer, by 11 K. The *fraction* saved hardly changes (equation {eq}`eq-dwhr-saving` gives 46 % and 44 %), because the shower also needs more heat in winter.
+Two of the terms change over the day ({numref}`fig-dhw-price-day`):
 
-What the saved heat is worth depends on how the water is heated. With an electric resistance heater, every kWh of heat saved is a kWh of electricity saved. With a heat pump that delivers hot water at a COP of 2.5, it is only 0.4 kWh of electricity. Drain water heat recovery therefore pays back two to three times faster in a house with an electric water heater than in a heat pump house. In a heat pump house, it competes with the heat pump: both are ways of not buying the same kWh of heat.
+- **The spot price** follows the balance between demand and wind and solar production. On a typical weekday it has one peak in the morning and a higher one at 17–20, when people come home and cook and solar production falls away. It is lowest at night and, on sunny days, at midday.
+- **The network tariff** is a fixed time-of-use tariff. Radius charges, in winter (October to March), 11 øre/kWh at 00–06, 32 øre/kWh at 06–17 and 21–24, and 96 øre/kWh at the peak 17–21. In summer, the peak tariff is less than half of that {cite:p}`bolius2026tariffs`.
 
-Drain water heat recovery also helps when the tank is used as a thermal battery, later in this chapter. It cuts the heat drawn from the tank during each shower, by about half with a good balanced unit, so the tank needs to store less heat to cover the evening showers from a charge in cheap hours. A smaller tank also has a smaller standing loss.
+The two peaks coincide. On the day in {numref}`fig-dhw-price-day`, the consumer price runs from 1.17 DKK/kWh at 03:00 to 4.68 DKK/kWh at 19:00, a factor of four. The family of four draws 57 % of its hot water heat at 06–08 and 37 % at 17–21, in the most expensive hours of the day. Heated as it is used, its hot water costs on average 2.38 DKK/kWh of electricity. This is the price weighted by the hot water heat drawn in each hour, and it is higher than the daily average of 1.89 DKK/kWh. Heated at night, 00–06, it costs 1.22 DKK/kWh, half as much.
 
-:::{admonition} Rules of thumb
-:class: tip
+:::{figure} figures/c2/dhw-price-day.*
+:label: fig-dhw-price-day
+:alt: Two bar charts sharing an hourly axis from 0 to 24. Top: consumer electricity price per hour, stacked from spot price, network tariff, Energinet tariffs and tax, and VAT. It is about 1.2 DKK/kWh at night, peaks at 2.8 DKK/kWh at 07–08, is about 1.4 DKK/kWh at midday, and peaks at 4.7 DKK/kWh at 19–20. A dashed line marks the daily average of 1.89 DKK/kWh, a dotted line the night average 00–06 of 1.22 DKK/kWh and a dash-dotted line the price weighted by hot water use, 2.38 DKK/kWh. Bottom: hot water heat for the family of four, with 2.9 kWh at 06–07, 1.45 kWh at 20–21 and small amounts in other hours.
 
-- Certified units have an effectiveness of 0.4–0.7 at 8 L/min. The best vertical and horizontal units are not far apart, but the spread within each type is large.
-- Effectiveness falls as the flow rises: about 0.05 lower at 12 L/min than at 8 L/min.
-- With equal flow, a unit saves about 0.9 times its effectiveness of the shower heat. Feeding only the mixer or only the water heater saves about a sixth less.
-- A good balanced unit saves 200–300 kWh of heat per person per year.
-- A saved kWh of heat is worth a kWh of electricity with a resistance heater, but only about 0.4 kWh with a heat pump.
+Top: consumer price of electricity in DK2 over one day, from the spot price of 30 September 2025, the Radius winter tariff and the charges and taxes of 2026. The dashed line is the daily average consumer price, 1.89 DKK/kWh, the dotted line the average at night, 00–06, 1.22 DKK/kWh, and the dash-dotted orange line the price weighted by the hot water heat drawn in each hour, 2.38 DKK/kWh. Bottom: hot water heat drawn by the family of four in the tank sizing example, per hour. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_price_day.py)
 :::
 
-### Worked example: channel drain or vertical pipe?
+The saving from charging at night depends on the heat source. With an electric water heater, the family uses 5.7 kWh of electricity a day for hot water, and charging at 00–06 instead of at the time of use reduces the cost by 6.6 DKK on this day. With a heat pump at a COP of 2.5, the reduction is 2.6 DKK a day. Both values are upper limits, since they are based on a single day with a large price spread, neglect the standing loss, and assume a heat source that can deliver the shower power directly. Over a year, the saving is of the order of a few thousand DKK with a resistance heater and about a thousand DKK with a heat pump.
 
-A family of four in a 150 m² house takes three showers a day, the same as in the tank sizing example later in this chapter. Each shower lasts 8 minutes at 8 L/min and 40 °C, and the cold water is 10 °C on average. They are rebuilding the bathroom and consider two options:
+### The primary energy factor and CO₂ over the day
 
-- **A.** A Joulia-Inline 5 channel drain ($\varepsilon = 0.41$), connected to the shower mixer only, because the water heater is on the other side of the house (connection 1).
-- **B.** A Showersave QB1-21XE vertical unit ($\varepsilon = 0.70$) in the basement below the bathroom, connected to both the mixer and the water heater (connection 3).
-
-How much heat and electricity does each save per year, with an electric water heater and with a heat pump at a COP of 2.5? What are the simple paybacks with electricity at 2.50 DKK/kWh?
-
-**Shower heat.** One shower takes $64 \cdot 1.155 \cdot (40 - 10) = 2\,217$ Wh. Three a day for a year is $3 \cdot 365 \cdot 2.217 = 2\,428$ kWh.
-
-**Option B.** Balanced connection, so equation {eq}`eq-dwhr-saving` applies directly:
+The Danish energy frame (BR18) uses one fixed primary energy factor for electricity, 1.9. The real factor changes from hour to hour with the production mix. Each source $i$ gets a non-renewable primary energy factor, and the factor of the mix in hour $t$ is
 
 $$
-\theta_p = 10 + 0.70 \cdot (37 - 10) = 28.9 \text{ °C}, \qquad s = \frac{28.9 - 10}{40 - 10} = 0.63
+f_{P,nren}(t) = \frac{\sum_i E_i(t)\, f_{P,nren,i}}{\sum_i E_i(t)}
+$$ (eq-dhw-pef)
+
+where $E_i(t)$ is the electricity from source $i$ in hour $t$. Wind and solar have a non-renewable factor of zero. Fossil plants have a factor close to $1/\eta$. The CO₂ intensity behaves the same way, and for this reason it serves as a proxy for CO₂ in this book.
+
+Danish electricity emitted on average 124 g CO₂-eq/kWh in 2025, counted on consumption and including imports. Single hours ranged from 36 to 363 g/kWh. In winter, the average day goes from 130 g/kWh at 01:00 to 166 g/kWh at 16:00, and in summer from 81 to 100 g/kWh {cite:p}`electricitymaps2025dk`. Price and CO₂ often point the same way, because the expensive evening hours are also the hours with more fossil production and imports. But they are not the same signal. A windy afternoon can be cheap and clean while the night after it is calm and dirty. A charging strategy that follows the price is therefore not automatically the one with the lowest CO₂.
+
+For hand calculations, the hourly data can be reduced to a few periods of the day. Scale the BR18 factor by the mean CO₂ intensity $c$ of each period, relative to the daily mean $\bar c$, weighted by the length of each period:
+
 $$
+f_{P}(t) = 1.9\,\frac{c(t)}{\bar c}
+$$ (eq-dhw-pef-co2)
 
-The unit saves $0.63 \cdot 2\,428 = 1\,529$ kWh of heat per year.
+{numref}`fig-dhw-pef-periods` shows the result for Denmark in 2021, in four periods of the day. The night, 22–06, gets a factor of 1.66, the day, 06–17, 2.05, and the evening, 17–22, 1.95. Averaged over the 24 hours, the factor is 1.9. The spread is only about ±10 % around 1.9, much smaller than the spread in price, which is why a charging strategy saves far more money than primary energy.
 
-**Option A.** Only the cold-water side of the mixer passes the unit, so the flows are unbalanced and the mixing ratio depends on the preheat. Solving the model in the dropdown gives a preheat to 27.2 °C on a cold-side flow of 4.3 L/min, and $s = 0.31$. The unit saves $0.31 \cdot 2\,428 = 752$ kWh of heat per year. Connected for equal flow, the same unit would have saved 37 %.
+% REVIEW LATER (Christian, 2026-10-14): the periods 17-22 and 22-24 do not match the Radius tariff periods 17-21 and 21-24. Regroup when the hourly 2021 DeclarationEmissionHour data is available.
 
-**Electricity and payback.** The incremental installed costs are estimates: about 9,000 DKK for option B (unit about 5,700 DKK, plus fitting it into the drain stack and the extra pipe to the water heater), and about 20,000 DKK for option A (unit about 22,400 DKK, minus the 3,000–4,000 DKK of the ordinary channel drain it replaces, plus the cold water connection).
+:::{figure} figures/c2/dhw-pef-periods.*
+:label: fig-dhw-pef-periods
+:alt: Bar chart of the primary energy factor of electricity over the day, with bar widths equal to the length of each period. 00–06: 1.66 (99 g CO₂/kWh). 06–17: 2.05 (122 g/kWh). 17–22: 1.95 (116 g/kWh). 22–24: 1.67 (100 g/kWh). A dashed line marks the fixed BR18 factor of 1.9.
 
-| | Heat saved (kWh/year) | Electricity saved, resistance heater (kWh/year) | Payback (years) | Electricity saved, heat pump COP 2.5 (kWh/year) | Payback (years) |
-|---|---|---|---|---|---|
-| A: channel drain, to mixer | 752 | 752 | 10.6 | 301 | 27 |
-| B: vertical pipe, balanced | 1 529 | 1 529 | 2.4 | 612 | 5.9 |
-
-Option B saves twice the heat at less than half the cost. With a heat pump, option A does not pay back within the lifetime of a bathroom. The example shows the three things that decide the result: the effectiveness of the unit, the connection, and the price of the heat that is saved.
-
-### Guiding questions
-
-- Why does a vertical unit usually have a higher effectiveness than a horizontal one of the same length? Why is the horizontal one still often chosen?
-- Explain, with the effectiveness of the unit and the flows on each side, why the balanced connection saves the most.
-- A family takes baths instead of showers. How much does a drain water heat recovery unit save, and why?
-- A low-flow shower head cuts the flow from 12 to 8 L/min. Does the unit then save more or less heat per shower? Does it save a larger or smaller share?
-- Does drain water heat recovery pay back faster in a house with an electric water heater or with a heat pump? What about a flat on district heating?
-- Repeat the tank sizing worked example later in this chapter with a balanced unit with $\varepsilon = 0.6$ on all three showers. How much smaller can the tank be with night charging?
-
-:::{dropdown} The shower model behind the figures
-The model is a steady state shower at flow $\dot V$ and mixed temperature $\theta_{mix}$, drain water at $\theta_d$, cold water at $\theta_c$ and a water heater at $\theta_h$. The unit is a counterflow heat exchanger described by equation {eq}`eq-dwhr-ntu-general`. $UA$ is fitted to the certified effectiveness $\varepsilon_8$ at 8 L/min and equal flow, $UA_8 = C_8\,\varepsilon_8/(1 - \varepsilon_8)$, and scaled with the drain flow as $UA = UA_8\,(\dot V/8)^{0.5}$. In all three connections the cold side has the smaller (or equal) flow, so the preheat is $\theta_p = \theta_c + \varepsilon\,(\theta_d - \theta_c)$ with $\varepsilon$ evaluated for that flow.
-
-- **Connection 3:** cold-side flow $\dot V$, heat needed $C(\theta_{mix} - \theta_p)$.
-- **Connection 2:** cold-side flow $\dot V_h = \dot V(\theta_{mix} - \theta_c)/(\theta_h - \theta_c)$, fixed by the mixer; heat needed $\rho\,\dot V_h\,c_p(\theta_h - \theta_p)$.
-- **Connection 1:** cold-side flow $\dot V_c = \dot V(\theta_h - \theta_{mix})/(\theta_h - \theta_p)$, which depends on $\theta_p$. Start with $\theta_p = \theta_c$ and repeat: compute $\dot V_c$, then $\varepsilon$, then a new $\theta_p$, until it no longer changes. Heat needed $\rho\,(\dot V - \dot V_c)\,c_p(\theta_h - \theta_c)$.
-
-The saving fraction is one minus the heat needed with the unit, divided by $C(\theta_{mix} - \theta_c)$. The model keeps $UA$ independent of the cold-side flow, so it slightly flatters the two unbalanced connections: in a real unit, a smaller cold-side flow also gives a lower heat transfer coefficient on that side. The same model in Python can be downloaded here: {download}`dwhr_model.py <code/dwhr_model.py>`.
+Time-varying primary energy factors for electricity, from the mean CO₂ emission intensity of Danish electricity (DK1 and DK2) in four periods of the day in 2021 {cite:p}`eds-declarationemissionhour`, scaled so that the factor averaged over the 24 hours equals the BR18 factor of 1.9 (daily mean 113 g/kWh). [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_pef_periods.py)
 :::
 
 ## Sizing the tank as a thermal battery
@@ -338,7 +226,7 @@ A family of four uses the profile "Family of 4, morning and evening" from the ta
 
 **Step 1.** The tappings add up to 5.73 kWh per day. Of that, 2.91 kWh is drawn between 06:00 and 07:00 and 1.45 kWh between 20:00 and 21:00. The standing loss is $1.2 \cdot (55 - 20) = 42$ W, or 1.01 kWh per day. So $Q_{day} = 6.74$ kWh.
 
-**Step 2.** With night charging, $N = 6$ h and $\Phi_{ch} = 6.74/6 = 1.12$ kW. With uniform charging, $\Phi_{ch} = 6.74/24 = 0.28$ kW. Both are well within the 3 kW of a small heat pump.
+**Step 2.** With night charging, $N = 6$ h and $\Phi_{ch} = 6.74/6 = 1.12$ kW. With uniform charging, $\Phi_{ch} = 6.74/24 = 0.28$ kW. Both are well within the 3 kW of a small heat pump - as long as the heatpump is not tasked with space heating also.
 
 **Step 3.** {numref}`fig-dhw-tank-sizing` shows the cumulative curves. With night charging, the tank receives all of the day's heat by 06:00, before any hot water has been used. The gap is largest at 06:00, just before the morning showers: $Q_{store} = 6.49$ kWh. With uniform charging, the charge curve has to be lifted by 1.34 kWh so that it stays above the demand after the morning showers, where the two curves touch at 08:00. The gap is largest at 06:00, just before the two morning showers: $Q_{store} = 2.77$ kWh. With one shower in the evening, the morning peak is now the one that sets the size.
 
@@ -359,7 +247,7 @@ Night charging needs a tank more than twice as large, because the tank has to ca
 
 **Check in the simulator.** With the default 3 kW heat pump and a sensor at 60 % of the tank height, the simulator gives:
 
-| Strategy | Tank | Unmet hot water | Standing loss |
+| Charging strategy | Tank size | Unmet hot water demand | Standing loss |
 |---|---|---|---|
 | Night 00–06 | 120 L | 0.36 kWh: the evening shower runs cold | 0.30 kWh/day |
 | Night 00–06 | 147 L | 0.02 kWh: the kitchen tap at 22:00 is slightly below 45 °C | 0.40 kWh/day |
@@ -378,3 +266,39 @@ In both cases the hand estimate is close: the tank it gives delivers every showe
 - Charging whenever needed, with a thermostat, needs about 20–25 L per person, enough to cover the largest peak.
 - The heat pump must deliver at least the daily heat divided by the number of allowed hours, plus a margin.
 :::
+
+## Hot water in apartment buildings
+
+In an apartment building, hot water is produced centrally, in a district heating substation with a tank or a plate heat exchanger, and distributed to the flats through risers. Without circulation, the water in a riser cools between tappings, and the user has to run the tap until hot water arrives. A circulation loop prevents this. A pump keeps the hot water moving through the supply pipes and back to the substation, so that the whole network stays hot at all hours. The return of the loop is kept above 50 °C to limit the growth of Legionella.
+
+The heat lost from the circulation pipes is
+
+$$
+\Phi_{circ} = \sum_j \frac{L_j\,(\theta_{w,j} - \theta_{a,j})}{R'_j}
+$$ (eq-dhw-circ)
+
+where $L_j$ is the length of pipe section $j$, $\theta_{w,j}$ the water temperature, $\theta_{a,j}$ the surrounding air temperature and $R'_j$ the thermal resistance per metre of insulated pipe. The loss runs 8760 hours a year, whether hot water is used or not.
+
+Measurements show that the loss is large. In Danish apartment buildings, circulation losses were 23–70 % of the heat delivered to the hot water system, and 54–89 % in office buildings {cite:p}`bohm2013`. In 134 Swedish multi-family buildings, the measured loss ranged from 0.5 to 76 kWh per m² of heated floor area per year. The mean was 14 kWh/m² in older buildings and 6 kWh/m² in newer ones, against an assumed 4 kWh/m² {cite:p}`burke2020`. {numref}`fig-dhw-circulation-burke` shows these results together with the earlier Swedish studies that Burke et al. review. All the mean values lie above the design assumption.
+
+% REVIEW LATER (Christian, 2026-10-14): review the content of the Burke figure. It uses the summary values in Burke et al. (2020) and the earlier studies they cite, not per-building data.
+
+:::{figure} figures/c2/dhw-circulation-burke.*
+:label: fig-dhw-circulation-burke
+:alt: Range chart of measured circulation losses in kWh per m² floor area per year, with a dashed line at the design assumption of 4. Burke et al. 2020, 134 buildings: range 0.5 to 76, mean 6 in newer and 14 in older buildings. Bergqvist, 12 buildings: range 2.3 to 28, mean 9.1. Lindencrona and Lindsköld, 540 buildings: mean 17.4. Alros, 2 buildings: 11 and 37.
+:width: 100%
+
+Measured circulation losses in Swedish multi-family buildings. Range and mean values of 134 measurements, and the earlier studies reviewed in the same paper, compared with the 4 kWh/m² per year assumed in design when no calculation is made {cite:p}`burke2020`. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_circulation_burke.py)
+:::
+
+{numref}`fig-dhw-share-circulation` adds these mean losses to {numref}`fig-dhw-share`. In a building of the Danish low-energy class, the circulation loss of 6 kWh/m² is 21 % of the net heat demand and 60 % of the space heating demand. Hot water and circulation together are two-thirds of the heat demand.
+
+:::{figure} figures/c2/dhw-share-circulation.*
+:label: fig-dhw-share-circulation
+:alt: Horizontal stacked bar chart of net heat demand per m² floor area per year, with space heating, domestic hot water and circulation loss. Energy label D: 150 + 13 + 14 kWh/m², hot water 7 % and circulation 8 %. Passive house: 15 + 13 + 6 kWh/m², hot water 38 % and circulation 18 %. Danish low-energy class: 10 + 13 + 6 kWh/m², hot water 45 % and circulation 21 %.
+:width: 100%
+
+Net heat demand for space heating, domestic hot water and circulation loss in apartment buildings of three Danish standards. Space heating and hot water as in {numref}`fig-dhw-share`. The circulation loss is the measured mean for older buildings (14 kWh/m², label D) and newer buildings (6 kWh/m², passive house and low-energy class) in Swedish multi-family buildings {cite:p}`burke2020`. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_share_circulation.py)
+:::
+
+Part of the loss is useful in the heating season, because the pipes run inside the heated building. In summer, it adds to the internal heat gains.
