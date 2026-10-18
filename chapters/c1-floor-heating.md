@@ -581,7 +581,7 @@ The model below simulates one room in a low-energy house with a light and a heav
 
 :::{figure} figures/c1/floor-control-app.*
 :label: fig-floor-control-app
-:alt: Screenshot of the control model. Sliders for room and climate, supply water, room control and wax thermostat at the top. Below, four charts over 48 hours for the light floor: room temperature, heat flux at the floor surface, supply, return and floor surface temperature, and mass flow in the loop, each comparing the ideal heater, the on/off thermostat and the PI controller with PWM. A table at the bottom lists heating energy, heat vented and hours below and above the setpoint for the three controls.
+:alt: Screenshot of the control model. Sliders for room and climate, supply water, room control and wax thermostat in a column on the left. In the middle, four charts over 48 hours for the light floor: room temperature, heat flux at the floor surface, supply, return and floor surface temperature, and mass flow in the loop, each comparing the ideal heater, the on/off thermostat and the PI controller with PWM. A table on the right lists heating energy, heat vented, degree hours below and above the setpoint and the return temperature for the three controls.
 :width: 100%
 
 The control model with the default inputs, light floor. Open the model to change the inputs and to see the heavy floor.
@@ -655,7 +655,7 @@ T_\mathrm{out} = 7 - 5\cos\frac{2\pi(t-3)}{24}, \quad
 \Phi_\mathrm{sol} = \hat\Phi_\mathrm{sol}\max\!\left(0, \sin\frac{\pi(t-7)}{12}\right)
 $$ (eq-boundary)
 
-with $t$ in hours and $s$ the heating curve slope. The outdoor temperature is 2 °C at 03:00 and 12 °C at 15:00. The sun shines from 07:00 to 19:00 with the peak $\hat\Phi_\mathrm{sol}$ at 13:00.
+with $t$ in hours and $s$ the heating curve slope. With $s = 0$ the supply is constant at $T_\mathrm{sup,max}$. The outdoor temperature is 2 °C at 03:00 and 12 °C at 15:00. The sun shines from 07:00 to 19:00 with the peak $\hat\Phi_\mathrm{sol}$ at 13:00.
 
 **Control.** The on/off controller opens the loop below $T_\mathrm{set} - \Delta T_\mathrm{hyst}$ and closes it above $T_\mathrm{set} + \Delta T_\mathrm{hyst}$. The PI controller computes, at the start of each PWM cycle,
 

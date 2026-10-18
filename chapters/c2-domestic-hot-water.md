@@ -144,6 +144,53 @@ The Danish Energy Agency keeps an official list of heat pumps sold in Denmark, V
 
 % REVIEW LATER (Christian, 2026-10-16): check the note on servicing compact units such as the Nilan Compact P. The MetroAir Aqua data are for the 201 and 301 models; check them against the 202 and 302 in the link.
 
+## Standing loss of the tank
+
+A hot water tank loses heat to the room around it all the time, whether or not water is drawn. This standing loss is set by the insulation and by the temperature difference between the tank and the room. For a tank at a uniform temperature $\theta$ with heat capacity $C = \rho c_p V$ and heat loss coefficient $UA$, the energy balance without tapping and charging is
+
+$$
+C \frac{d\theta}{dt} = -UA\,(\theta - \theta_a)
+$$ (eq-tank-loss)
+
+where $\theta_a$ is the room temperature. From a start temperature $\theta_0$, the tank cools exponentially with the time constant $\tau = C/UA$,
+
+$$
+\theta(t) = \theta_a + (\theta_0 - \theta_a)\,e^{-t/\tau}
+$$ (eq-tank-cooling)
+
+and the heat lost after the time $t$ is $Q(t) = C\,(\theta_0 - \theta(t))$.
+
+Water heaters and hot water tanks sold in the EU carry an energy label. The label class is set by the standing loss $S$ in W, measured with the tank at 65 °C in a room at 20 °C, and the class limits grow with the volume as $V^{0.4}$ {cite:p}`eu812`. Since 2017, a tank of up to 2000 L may only be sold if it is in class C or better {cite:p}`eu814`. {numref}`tab-tank-label` gives the class limits for a 200 L tank. Dividing $S$ by the test temperature difference of 45 K gives $UA$.
+
+:::{table} Limits of the energy label classes for a 200 L hot water tank, and the standing loss when the tank is charged at 00–06 to 55 °C and cools without tapping until midnight in a room at 22 °C.
+:label: tab-tank-label
+
+| Label class | Standing loss $S$ at 65/20 °C, W | $UA$, W/K | $\tau$, h | Tank temperature at 24:00, °C | Standing loss, kWh/day | Standing loss, kWh/year |
+|---|---|---|---|---|---|---|
+| A+ | 32 | 0.71 | 327 | 53.2 | 0.55 | 200 |
+| A | 44 | 0.98 | 237 | 52.6 | 0.75 | 270 |
+| B | 61 | 1.36 | 169 | 51.7 | 1.04 | 380 |
+| C | 86 | 1.91 | 121 | 50.4 | 1.43 | 520 |
+:::
+
+:::{figure} figures/c2/dhw-tank-loss.*
+:label: fig-dhw-tank-loss
+:alt: Line chart of the temperature of a 200 L tank over a day. The tank is held at 55 °C during charging from 00 to 06 and then cools without tapping. At midnight the temperature is 53.2 °C for label A+, 52.6 °C for A, 51.7 °C for B and 50.4 °C for C.
+:width: 100%
+
+Temperature of a 200 L tank at the limit of each label class, charged to 55 °C at 00–06 and cooling without tapping in a room at 22 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_tank_loss.py)
+:::
+
+**Example.** A 200 L tank in class C, $UA$ = 1.9 W/K, is charged at night and kept at 55 °C from 00:00 to 06:00 in a room at 22 °C. The heat capacity is $C$ = 200 L × 4.16 kJ/(L·K) = 0.83 MJ/K, or 0.23 kWh/K.
+
+- **Night, 00–06:** the temperature is held constant, so the loss is $UA\,(\theta - \theta_a)\,t$ = 1.9 × 33 × 6 h = 0.38 kWh.
+- **Day, 06–24:** the time constant is $\tau$ = 0.83 MJ/K / 1.9 W/K = 121 h. After 18 h, equation {eq}`eq-tank-cooling` gives 22 + 33 $e^{-18/121}$ = 50.4 °C, and the loss is 0.23 kWh/K × 4.6 K = 1.05 kWh.
+- **Year:** 1.43 kWh a day, or 520 kWh a year. In a row house of 144 m², that is 3.6 kWh/m², or more than a quarter of the 13 kWh/m² for the hot water itself.
+
+The example gives an upper limit for a tank in use. Every tapping replaces hot water with cold water at the bottom of the tank, so the mean tank temperature, and with it the loss, is lower than in the example. The tank simulator in [](appendix-dhw-tank.md) shows that the night-charged tank in the tank sizing example below loses less than half of the loss for a tank held at the set temperature. A tank placed inside the heated building also gives its loss to the room. In the heating season, this covers part of the space heating, and in summer it adds to the internal heat gains. Over a year, a tank of class A+ instead of C saves about 320 kWh of heat.
+
+% REVIEW LATER (Christian, 2026-10-18): the class limits S = a + b V^0.4 are from the EU label regulation for hot water storage tanks (A+ 5.5 + 3.16 V^0.4, A 8.5 + 4.25 V^0.4, B 12 + 5.93 V^0.4, C 16.66 + 8.33 V^0.4); check them against the regulation.
+
 ## Electricity prices over the day
 
 A household on an hourly contract pays the spot price of the hour plus a set of fixed and time-dependent charges. In eastern Denmark (DK2) in 2026, the price per kWh is
@@ -313,3 +360,10 @@ Net heat demand for space heating, domestic hot water and circulation loss in ap
 :::
 
 Part of the loss is useful in the heating season, because the pipes run inside the heated building. In summer, it adds to the internal heat gains.
+
+## Product links
+
+The links below lead to products that students can use for data sheets and prices in the assignment. They are examples, not recommendations, and prices and data change over time.
+
+- **Electric water heater:** [Metro Therm model 110 type 211 ECO, 98 L](https://www.lavprisvvs.dk/metro-therm-elvandvarmer-model-110-type-211-eco-98-liter-1000027724)
+- **Heat pump for space heating and hot water:** [air-to-water heat pumps, including monoblocks](https://www.lavprisvvs.dk/VVS-installationer-Varmeventilation-Varmepumper.html?Type=Luft%2Fvand) and [indoor units with hot water tank](https://www.lavprisvvs.dk/VVS-installationer-Varmeventilation-Varmepumper-Luft-vand-varmepumper.html?Produkt=Varmepumpe+indedel)
