@@ -1,14 +1,23 @@
-# High Performance Buildings course
+# High Performance Buildings
 
-Background textbook for High Performance Buildings (41463).
+Background textbook for High Performance Buildings course at DTU (41463).
 
-Work in progress.
+Separated into Parts that reflects the course progression.
 
-Separated into Parts that reflects the course assignments.
+## Work in progress
+
+This is work in progress, with several sections under revision.
 
 There are code snippets (apps) embedded into the textbook. The intention of the apps is not to be accurate, but to build virtual experimental tools that are valuable in a learning environment.
 
-**None of the code has been verified, and must be used carefully (2026-10-07)**
+*None of the code has been verified, and must be used carefully (2026-10-07)*
+
+## Disclaimer
+
+The content is **not completely assessed yet and cannot be taken as true!**
+
+*AI-declaration: Claude Opus 5.5 was used to generate this textbook, steered by the author. The author does not take responsibility for chapters marked as "under revision".*
+
 
 ## Contents
 
@@ -36,7 +45,6 @@ There are code snippets (apps) embedded into the textbook. The intention of the 
 - D4 [Ventilative cooling](chapters/d4-ventilative-cooling.md)
 - D5 [Openings for ventilative cooling](chapters/d5-window-openings.md)
 - D6 [Ceiling fans](chapters/d6-ceiling-fans.md)
-- D6 [Ceiling fans, old version (obsolete)](chapters/d6-ceiling-fans_obsolete.md)
 - D7 [Improvements: ideas for cooling](chapters/d7-improvements.md)
 
 **Part E: Prefabrication of type houses** (not written yet)
