@@ -71,6 +71,7 @@ $$
 $$ (eq-dhw-power)
 
 {numref}`tab-dhw-tappings` shows the energy and the power for some typical tappings. A shower at 8 L/min needs about 17 kW while it runs, and filling a bath needs about 25 kW.
+%@claude: Make an illustration with a daily tapping profile here
 
 :::{table} Energy and power for typical tappings, with cold water at 10 °C.
 :label: tab-dhw-tappings

@@ -48,14 +48,11 @@ Heavy floors cannot do that, because heat is stored in the floor before it reach
 
 ## Heat transfer of floors
 
-A heated floor gives off heat to the room by radiation to the other surfaces and by natural convection to the air. Added together they give a heat transfer coefficient of about 11 W/(m²·K) {cite:p}`rehva2007`:.
+A heated floor gives off heat to the room by radiation to the other surfaces and by natural convection to the air. Added together they give a heat transfer coefficient of about 11 W/(m²·K):
 
-:::{admonition} Extra
-:class: dropdown
 - **Radiation** Between surfaces in a thermal enclosure, radiative exchange is approx. 5.0 W/(m²·K), and is pretty much fixed.
 - **Convection** Convective heat transfer from a heated floor depends strongly on surface type, air speed, and forced or natural convection, but can be assumed to be approx. 6.0 W/(m²·K)
 - **Total** Convective and radiative heat transfers sums to 11 W/(m²·K). Source: {cite:p}`rehva2007`
-:::
 
 EN 1264 gives the heat flux $q$ from the mean floor surface temperature $\theta_F$ and the room temperature $\theta_i$ {cite:p}`en1264`:
 
@@ -102,22 +99,24 @@ Floor heating constructions are often grouped by how the pipes are embedded, i.e
 Light and heavy floor heating constructions, drawn to the same scale. The heat capacity above the pipes is about seven times larger in the heavy floor. Response times are from the model in {numref}`fig-floor-step-response`.
 :::
 
-:::{admonition} Details
-:class: dropdown
+%:::{admonition} Details
+%:class: dropdown
+
 ### Light floors
 
 In a light (dry) floor the pipes lie in grooves in an insulation panel, usually EPS. Aluminium heat-diffusion plates wrap around the pipes and spread the heat sideways under the floor covering. The EPS panels rest on a plywood board on the joists, and the covering is laid directly on the plates, typically 22 mm floor boards, a floating wooden floor or gypsum fibre boards. Pipe spacing is anything between 150–300 mm, depending on pipe diameter and system.
 
-Light floors are used on timber joists and battens, in renovation, and wherever build height and weight must be kept low. The whole construction above the insulation is 25–50 mm thick and weighs 10–30 kg/m². Its heat capacity above the pipes is about 15–30 kJ/(m²·K), so there is little heat to store.
+Light floors are used on timber joists and battens, in renovation, and wherever build height and weight must be kept low. The whole construction above the insulation is 25–50 mm thick and weighs 10–30 kg/m². Its heat capacity above the pipes is **about 15–30 kJ/(m²·K)**, so there is little heat to store.
 
 ### Heavy floors
 
-In a heavy floor the pipes are cast into cement screed or concrete. A typical screed system has 45–65 mm of screed above the pipes. In Danish slab-on-ground houses the pipes are often tied to the reinforcement in the middle of a 100 mm concrete slab, with the floor covering laid directly on the slab. The slab weighs around 230 kg/m² and has a heat capacity of 100–250 kJ/(m²·K), and all of it is heated by the pipes.
+In a heavy floor the pipes are cast into cement screed or concrete. A typical screed system has 45–65 mm of screed above the pipes. In Danish slab-on-ground houses the pipes are often tied to the reinforcement in the middle of a 100 mm concrete slab, with the floor covering laid directly on the slab. The slab weighs around 230 kg/m² and has a heat capacity of **100–250 kJ/(m²·K)**, and all of it is heated by the pipes.
 
 %Heavy floors are cheap to build in new houses, robust, and good at evening out short peaks in demand. That is a strength in an old, poorly insulated house. In a low-energy house it is the problem.
-:::
+%:::
 
 ## Hydronic installation
+%@claude: add someting here about pipe loops for individual rooms, floor plan showing the loops. Use the uponor figure in the slides if possible. 
 
 {numref}`fig-hydronic-schematic` shows a typical installation. The parts are the same for light and heavy floors.
 
@@ -129,13 +128,10 @@ In a heavy floor the pipes are cast into cement screed or concrete. A typical sc
 A hydronic floor heating installation. The controller sets the supply temperature from the outdoor temperature (heating curve). The room temperature sensor in each room opens and closes the wax thermostat on its own loop.
 :::
 
-:::{admonition} Details
-:class: dropdown
 - **Heat source.** A heat pump or district heating. Floor heating needs a low supply temperature, typically 30–35 °C in a low-energy house, with 3–5 K between supply and return.
 - **Mixing shunt.** A motorized three-way mixing valve and a circulation pump. The valve mixes return water into the supply to reach the temperature set by the controller. The controller follows a heating curve, which raises the supply temperature as the outdoor temperature falls.
 - **Manifold.** Distributes water to one loop per room, or several loops in large rooms. Each loop should be at most 80–100 m long to keep the pressure drop reasonable. Flow meters or balancing valves on the supply side set the design flow in each loop, so that every room gets its share (hydronic balancing).
 - **Wax thermostats and room temperature sensors.** Each loop has a valve on the return side, opened and closed by a wax thermostat, an electrically heated wax actuator. The room temperature sensor switches it on and off, either directly or by pulse-width modulation (PWM). The valve only opens or closes the loop. It cannot change the water temperature.
-:::
 
 
 ## Hydronic balancing
@@ -157,97 +153,10 @@ $$ (eq-design-flow)
 A bedroom loop with $\Phi = 300$ W and 35/30 °C needs $\dot m = 300/(4180 \cdot 5) = 0.014$ kg/s, or 52 kg/h.
 
 **Pre-setting.** The valve on each loop has an adjustable throttle, the pre-setting, which sets its $K_v$. The installer chooses the pre-setting so that every loop gets its design flow at the same manifold pressure: long loops get a high pre-setting (open), short loops a low one (throttled). The pump sets the pressure, the pre-settings divide the flow between the loops, much like the accelerator and the gear in a car. The pre-settings must be set after the system has been filled and vented, because air in the loops changes their resistance.
+%@claude: add two figures from slides about presetting the  valve  
 
 **What goes wrong without balancing.** A loop that gets too much flow returns water that is almost as warm as the supply. The temperature drop $\Delta\theta$ in {eq}`eq-design-flow` falls, and the return temperature rises. The room with the short loop is heated fast and the room at the end of the long loop too slowly, and the usual response is to raise the supply temperature or the pump setting until the worst room is warm. Both make the other loops worse. A high return temperature lowers the efficiency of a heat pump, and in district heating it increases the heat loss of the return pipes and is often penalised in the tariff.
 
-### Case: a new apartment in Copenhagen
-
-Sarran et al. {cite:p}`sarran2022` studied the floor heating in an 85 m² apartment in a DGNB-Gold multi-family building in Copenhagen, built in 2017 (wall U = 0.12 W/(m²·K), windows 0.95 W/(m²·K)). District heating supplies risers that serve six apartments. In each apartment a mixing shunt with its own pump (Grundfos Alpha2 L 15-60, proportional pressure) lowers the supply to the floors. A motorized valve on the return controls the mixed supply temperature, and a check valve sits in the bypass, as in {numref}`fig-riser-shunts`. The kitchen/living room has two loops, the three bedrooms one each. Each loop has an on/off valve switched by the room thermostat. The floors are 14 mm wood on an 80 mm concrete slab with embedded pipes, over 93 mm insulation.
-
-**Method.** No flows or temperatures were measured in the loops. The apartment had only the data a modern installation already logs: the room temperatures and the valve status from the thermostats (1–5 min), the supply and return temperature and the flow from the apartment's heat meter, and the current drawn by the pump (5 min), see {numref}`fig-sarran-schematic`. The authors built a physical model of the installation in Modelica (Dymola), with the riser, the shunt, the pump curves, the manifold and one floor heating component per loop. Each pipe section and valve follows {eq}`eq-loop-flow-coefficient`. Nine parameters were unknown: the flow coefficient of each room loop, of the bypass and of the return valve, the riser pressure difference, the gain and setpoint of the shunt controller. A genetic algorithm (ModestPy) adjusted them until the model matched the measured return temperature, heat meter flow and pump current, by minimising the sum of their normalised RMS errors. The model was fitted on 14 days and validated on the following 17 days in January 2019.
-
-:::{figure} figures/c1/sarran-schematic.*
-:label: fig-sarran-schematic
-:alt: Schematic of the apartment installation. District heating risers on the left. The supply branch passes a supply riser temperature sensor, a tee where a bypass with a check valve joins from the return, the mixed supply temperature, the pump and the total flow before the supply manifold. One floor loop is drawn as a serpentine in a room; four more loops are dashed. The return manifold has an on/off valve on each loop. The return branch passes the bypass tee, a motorized valve and a heat meter that measures the flow and return riser temperature. Filled red dots mark measured model inputs (supply riser temperature, room temperature, valve status), filled blue dots measured outputs used to fit the model (metered flow, return riser temperature, pump current), and open teal circles the variables the model estimates (mixed supply temperature, total flow, loop flow, loop return temperature, floor surface temperature, room heat output).
-:width: 100%
-
-The apartment installation with the measured and the virtually sensed variables. Redrawn from {cite:t}`sarran2022`, Fig. 3, CC BY 4.0. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/sarran_schematic.py)
-:::
-
-This is a grey-box model: physics with parameters fitted to data. Once calibrated, it works as a virtual heat meter on every loop. It gives the flow, return temperature and heat output of each room, which nobody had measured.
-
-**Fit.** The model matched the pump current and heat meter flow well (NRMSE 0.05 and 0.04). The return temperature was the hardest, with a systematic error of −1.4 K on the energy-weighted mean.
-
-**Findings.** The virtual sensors showed an installation running far from its design ({numref}`tab-sarran-diagnosis`).
-
-```{list-table} Virtually sensed values in the apartment, January 2019, compared with design {cite:p}`sarran2022`
-:header-rows: 1
-:label: tab-sarran-diagnosis
-
-* -
-  - Found
-  - Design or guideline
-* - Mixed supply temperature setpoint
-  - 45.6 °C
-  - 35 °C
-* - Flow in each bedroom loop
-  - 0.08–0.13 kg/s (290–470 kg/h)
-  - 0.01–0.03 kg/s (36–110 kg/h)
-* - Cooling of the water in the bedroom loops
-  - about 2 K
-  - 5 K
-* - Peak output per bedroom loop
-  - 400–600 W
-  - 250–350 W
-* - Floor surface temperature
-  - 26–29 °C
-  - at most 27 °C for wooden floors
-```
-
-The loop flows were 4–10 times the design flow, so the water cooled only about 2 K in the bedrooms and the return to the riser was 38–40 °C. With 45.6 °C supply the floors heated the rooms 1 K in 6–12 hours, then switched off for 1–2 days while the slab discharged. One bedroom kept its loop open for days and probably heated the living room through the wall, since the living room's own loop did not open in that period.
-
-**Improvements.** The calibrated model was then used to test changes before anyone touched the installation ({numref}`tab-sarran-improvements`):
-
-1. **Lower mixed supply temperature, no balancing.** With all loops open, the model found the lowest setpoint that still covered the measured heat demand of the apartment. 35 °C was enough when the demand of the rooms was added up, which matches the design.
-2. **Lower pump curve.** Switching the pump to its lower proportional-pressure curve changed the return temperature only a little, because the loops stayed unbalanced.
-3. **Balancing.** The flow coefficients of the loops were reduced, in the model, until each loop got its design flow from a dimensioning tool: 0.022 kg/s in each living room loop, 0.017 kg/s in bedroom 1 and 0.012 kg/s in bedrooms 2 and 3. In the installation this corresponds to new pre-settings on the loop valves.
-
-```{list-table} Energy-weighted mean return temperature to the riser for the improvement scenarios {cite:p}`sarran2022`
-:header-rows: 1
-:label: tab-sarran-improvements
-
-* - Scenario
-  - Mixed supply setpoint
-  - Return temperature
-* - As found
-  - 45.6 °C
-  - 37.5 °C
-* - Lower setpoint only
-  - 40 °C
-  - 34.4 °C
-* - Lower setpoint only
-  - 35 °C
-  - 31.3 °C
-* - Balanced loops and lower setpoint
-  - 37 °C
-  - 31.0 °C
-```
-
-{numref}`fig-sarran-pump-curves` shows why the lower pump curve alone did little. The loops were so open that the system curve was flat, and the pump ran at high flow on either curve (points 1 and 2). Only the smaller flow coefficients after balancing make the system curve steep, so the flow falls to about a sixth (point 3).
-
-:::{figure} figures/c1/sarran-pump-curves.*
-:label: fig-sarran-pump-curves
-:alt: Pump diagram with water flow from 0 to 0.8 kg/s and pump head from 0 to 45 kPa. Two proportional-pressure pump curves, high and low, and two parabolic system curves. Point 1, as found, is on the high pump curve at about 0.54 kg/s and 32 kPa. Point 2, low pump curve, is at about 0.41 kg/s and 18 kPa. Point 3, low pump curve with balanced loops, is on a much steeper system curve at about 0.09 kg/s and 13 kPa.
-:width: 90%
-
-Pump curves and operating points with all loops open: 1 as found, 2 low pump curve, 3 low pump curve and balanced loops. Values read from {cite:t}`sarran2022`, Fig. 11, CC BY 4.0. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/sarran_pump_curves.py)
-:::
-
-Balancing lowered the return temperature at every supply setpoint. With balanced loops, 37 °C was the lowest setpoint the model found sufficient, which gives the headline result: 8.6 K lower supply and 6.5 K lower return temperature. The balanced loops also cut the pump power to about a third, and the new operating point showed that the pump was oversized.
-
-Two limits should be kept in mind. The return temperature in the model was biased by −1.4 K, and the model did not reproduce the shunt well at low setpoints: a setpoint of 35 °C gave at most 32.5 °C in the model, which is why balancing plus 35 °C did not cover the demand. The results for one apartment save little energy on their own. Repeated over a district heating network, a 6 K lower return reduces the heat loss of the return pipes and raises the efficiency of production. For a biomass boiler with flue gas condensation the authors estimate 3 % more heat from the same fuel.
-
-The design consequence is that a floor heating installation is only as good as its commissioning. The design supply temperature of 35 °C was right, but the installation ran at 45.6 °C with loop flows far above design. Raising the supply temperature is a common response to complaints from occupants, and nobody checks the loops afterwards. Correct pre-settings at commissioning, and a check of the loop flows and the return temperature after the first winter, would have caught both faults.
 
 
 ## Control of floor heating
@@ -535,61 +444,138 @@ The light floor follows the daily swing almost fully, one hour late ({numref}`fi
 
 The lag in {numref}`tab-floor-daily` is for the floor alone. The wax thermostat's dead time and stroke, the room's own heat capacity and the controller all add to it, as the section on control shows.
 
-:::{admonition} Extra: Time constant of a thermal space
-:class: dropdown
-### The room has a time constant too
 
-The same idea applies to the room or the whole house. The heat store is the heat capacity of air, furniture and internal construction, $C$, and the heat leaves through the envelope and the ventilation, with the heat loss coefficient $UA$ [W/K]. The resistance is $R = 1/UA$, so
+Several strategies reduce the problem, but none of them removes it:
 
-$$
-\tau_\text{room} = \frac{C}{UA}, \qquad T(t) = T_\infty + (T_0 - T_\infty)\,e^{-t/\tau_\text{room}}, \qquad T_\infty = T_\text{out} + \frac{\Phi}{UA}
-$$ (eq-tau-room)
+- **Low supply temperature and self-regulation.** With the supply only a few kelvin above the room, the floor delivers less when the room warms up, even with the valve open.
+- **Heating stop.** Stop heating above an outdoor temperature limit, for example 12–15 °C, and use a deadband between the heating and cooling setpoints.
+- **Anticipating the sun.** Lower the setpoint in the morning on sunny days, using a weather forecast or model predictive control.
+- **Shading and ventilative cooling.** Remove the solar gain or the surplus heat (see Part D).
+- **Floor cooling.** The same pipes can cool by 20–40 W/m², limited by the dew point and a minimum floor surface temperature of about 19–20 °C. But the floor is just as slow when cooling.
 
-where $\Phi$ is a constant heat gain. Without gains the room cools towards the outdoor temperature. With gains it settles $\Phi/UA$ above it.
+The conclusion is that a heat emitter with a long time lag is a poor match for a house whose heating demand is small and changes within hours. A fast emitter, such as heating through the ventilation air or a small convector, can switch off at the moment the sun starts to heat the room.
 
-```{list-table} Time constant of a room and its temperature rise from solar gain (40 W/m² of floor, no venting). Values per m² of floor.
+
+
+
+
+## Case: a new apartment in Copenhagen
+
+Sarran et al. {cite:p}`sarran2022` studied the floor heating in an 85 m² apartment in a DGNB-Gold multi-family building in Copenhagen, built in 2017 (wall U = 0.12 W/(m²·K), windows 0.95 W/(m²·K)). District heating supplies risers that serve six apartments. In each apartment a mixing shunt with its own pump (Grundfos Alpha2 L 15-60, proportional pressure) lowers the supply to the floors. A motorized valve on the return controls the mixed supply temperature, and a check valve sits in the bypass, as in {numref}`fig-riser-shunts`. The kitchen/living room has two loops, the three bedrooms one each. Each loop has an on/off valve switched by the room thermostat. The floors are 14 mm wood on an 80 mm concrete slab with embedded pipes, over 93 mm insulation.
+
+**Method.** No flows or temperatures were measured in the loops. The apartment had only the data a modern installation already logs: the room temperatures and the valve status from the thermostats (1–5 min), the supply and return temperature and the flow from the apartment's heat meter, and the current drawn by the pump (5 min), see {numref}`fig-sarran-schematic`. The authors built a physical model of the installation in Modelica (Dymola), with the riser, the shunt, the pump curves, the manifold and one floor heating component per loop. Each pipe section and valve follows {eq}`eq-loop-flow-coefficient`. Nine parameters were unknown: the flow coefficient of each room loop, of the bypass and of the return valve, the riser pressure difference, the gain and setpoint of the shunt controller. A genetic algorithm (ModestPy) adjusted them until the model matched the measured return temperature, heat meter flow and pump current, by minimising the sum of their normalised RMS errors. The model was fitted on 14 days and validated on the following 17 days in January 2019.
+
+:::{figure} figures/c1/sarran-schematic.*
+:label: fig-sarran-schematic
+:alt: Schematic of the apartment installation. District heating risers on the left. The supply branch passes a supply riser temperature sensor, a tee where a bypass with a check valve joins from the return, the mixed supply temperature, the pump and the total flow before the supply manifold. One floor loop is drawn as a serpentine in a room; four more loops are dashed. The return manifold has an on/off valve on each loop. The return branch passes the bypass tee, a motorized valve and a heat meter that measures the flow and return riser temperature. Filled red dots mark measured model inputs (supply riser temperature, room temperature, valve status), filled blue dots measured outputs used to fit the model (metered flow, return riser temperature, pump current), and open teal circles the variables the model estimates (mixed supply temperature, total flow, loop flow, loop return temperature, floor surface temperature, room heat output).
+:width: 100%
+
+The apartment installation with the measured and the virtually sensed variables. Redrawn from {cite:t}`sarran2022`, Fig. 3, CC BY 4.0. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/sarran_schematic.py)
+:::
+
+This is a grey-box model: physics with parameters fitted to data. Once calibrated, it works as a virtual heat meter on every loop. It gives the flow, return temperature and heat output of each room, which nobody had measured.
+
+**Fit.** The model matched the pump current and heat meter flow well (NRMSE 0.05 and 0.04). The return temperature was the hardest, with a systematic error of −1.4 K on the energy-weighted mean.
+
+**Findings.** The virtual sensors showed an installation running far from its design ({numref}`tab-sarran-diagnosis`).
+
+:::{list-table} Virtually sensed values in the apartment, January 2019, compared with design {cite:p}`sarran2022`
 :header-rows: 1
-:label: tab-room-tau
-
-* - House
-  - $UA$
-  - $C$
-  - $\tau_\text{room}$
-  - Steady rise, $\Phi_\text{sol}/UA$
-  - Rise after 6 h of sun
-* - Older house, heavy
-  - 2.5 W/(m²·K)
-  - 150 kJ/(m²·K)
-  - 17 h
-  - 16 K
+:label: tab-sarran-diagnosis
+* -
+  - Found
+  - Design or guideline
+* - Mixed supply temperature setpoint
+  - 45.6 °C
+  - 35 °C
+* - Flow in each bedroom loop
+  - 0.08–0.13 kg/s (290–470 kg/h)
+  - 0.01–0.03 kg/s (36–110 kg/h)
+* - Cooling of the water in the bedroom loops
+  - about 2 K
   - 5 K
-* - Low-energy house, light
-  - 0.6 W/(m²·K)
-  - 40 kJ/(m²·K)
-  - 19 h
-  - 67 K
-  - 18 K
-* - Low-energy house, heavy
-  - 0.6 W/(m²·K)
-  - 150 kJ/(m²·K)
-  - 69 h
-  - 67 K
-  - 6 K
-```
+* - Peak output per bedroom loop
+  - 400–600 W
+  - 250–350 W
+* - Floor surface temperature
+  - 26–29 °C
+  - at most 27 °C for wooden floors
+:::
 
-The older heavy house and the light low-energy house have almost the same time constant, 17 and 19 hours. The low-energy house gets its long time constant from a small $UA$, not from mass. Insulation alone makes a light house as slow as an old heavy one. The difference is the steady temperature rise: with a small $UA$ the same gain lifts the room four times as much. The sun would heat the room 67 K above the outdoor temperature if nothing removed the heat. The room is protected only because the sun sets before that happens, and by its heat capacity, which slows the rise. Any heat from the floor comes on top of the solar gain and has nowhere to go but out of the windows.
+The loop flows were 4–10 times the design flow, so the water cooled only about 2 K in the bedrooms and the return to the riser was 38–40 °C. With 45.6 °C supply the floors heated the rooms 1 K in 6–12 hours, then switched off for 1–2 days while the slab discharged. One bedroom kept its loop open for days and probably heated the living room through the wall, since the living room's own loop did not open in that period.
 
-The app below shows how fast a room cools after the heating stops. Change $UA$ and $\tau$ and compare with the three reference rooms of 20 m² floor.
+**Improvements.** The calibrated model was then used to test changes before anyone touched the installation ({numref}`tab-sarran-improvements`):
 
-```{anywidget} code/room-cooldown.mjs
-{}
-```
+1. **Lower mixed supply temperature, no balancing.** With all loops open, the model found the lowest setpoint that still covered the measured heat demand of the apartment. 35 °C was enough when the demand of the rooms was added up, which matches the design.
+2. **Lower pump curve.** Switching the pump to its lower proportional-pressure curve changed the return temperature only a little, because the loops stayed unbalanced.
+3. **Balancing.** The flow coefficients of the loops were reduced, in the model, until each loop got its design flow from a dimensioning tool: 0.022 kg/s in each living room loop, 0.017 kg/s in bedroom 1 and 0.012 kg/s in bedrooms 2 and 3. In the installation this corresponds to new pre-settings on the loop valves.
 
-The same model in Python: {download}`room_cooldown.py <code/room_cooldown.py>`. Run it with `python room_cooldown.py --UA 12 --tau 18` to simulate one room, or without arguments to compare the reference rooms.
+:::{list-table} Energy-weighted mean return temperature to the riser for the improvement scenarios {cite:p}`sarran2022`
+:header-rows: 1
+:label: tab-sarran-improvements
+
+* - Scenario
+  - Mixed supply setpoint
+  - Return temperature
+* - As found
+  - 45.6 °C
+  - 37.5 °C
+* - Lower setpoint only
+  - 40 °C
+  - 34.4 °C
+* - Lower setpoint only
+  - 35 °C
+  - 31.3 °C
+* - Balanced loops and lower setpoint
+  - 37 °C
+  - 31.0 °C
+:::
+
+{numref}`fig-sarran-pump-curves` shows why the lower pump curve alone did little. The loops were so open that the system curve was flat, and the pump ran at high flow on either curve (points 1 and 2). Only the smaller flow coefficients after balancing make the system curve steep, so the flow falls to about a sixth (point 3).
+
+:::{figure} figures/c1/sarran-pump-curves.*
+:label: fig-sarran-pump-curves
+:alt: Pump diagram with water flow from 0 to 0.8 kg/s and pump head from 0 to 45 kPa. Two proportional-pressure pump curves, high and low, and two parabolic system curves. Point 1, as found, is on the high pump curve at about 0.54 kg/s and 32 kPa. Point 2, low pump curve, is at about 0.41 kg/s and 18 kPa. Point 3, low pump curve with balanced loops, is on a much steeper system curve at about 0.09 kg/s and 13 kPa.
+:width: 90%
+
+Pump curves and operating points with all loops open: 1 as found, 2 low pump curve, 3 low pump curve and balanced loops. Values read from {cite:t}`sarran2022`, Fig. 11, CC BY 4.0. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/sarran_pump_curves.py)
+:::
+
+Balancing lowered the return temperature at every supply setpoint. With balanced loops, 37 °C was the lowest setpoint the model found sufficient, which gives the headline result: 8.6 K lower supply and 6.5 K lower return temperature. The balanced loops also cut the pump power to about a third, and the new operating point showed that the pump was oversized.
+
+Two limits should be kept in mind. The return temperature in the model was biased by −1.4 K, and the model did not reproduce the shunt well at low setpoints: a setpoint of 35 °C gave at most 32.5 °C in the model, which is why balancing plus 35 °C did not cover the demand. The results for one apartment save little energy on their own. Repeated over a district heating network, a 6 K lower return reduces the heat loss of the return pipes and raises the efficiency of production. For a biomass boiler with flue gas condensation the authors estimate 3 % more heat from the same fuel.
+
+The design consequence is that a floor heating installation is only as good as its commissioning. The design supply temperature of 35 °C was right, but the installation ran at 45.6 °C with loop flows far above design. Raising the supply temperature is a common response to complaints from occupants, and nobody checks the loops afterwards. Correct pre-settings at commissioning, and a check of the loop flows and the return temperature after the first winter, would have caught both faults.
+
+
+
+
+## Several manifolds on one riser
+
+In buildings with several floors or apartments, one riser pump often feeds a manifold on each floor, each through its own shunt ({numref}`fig-riser-shunts`). The shunt pump circulates water through the floor loops. A thermostatic valve on the return limits the supply temperature: when the sensor bulb gets too warm, it throttles the water returned to the riser, so less hot water is drawn in and more return water is mixed back through the bypass. The check valve stops riser water from flowing backwards through the bypass into the return.
+
+:::{figure} figures/c1/riser-shunts.*
+:label: fig-riser-shunts
+:alt: Schematic of a riser fed by a heat pump and a riser pump. On each of two floors, a branch from the riser supply passes a bypass junction, a shunt pump and a sensor bulb before reaching a supply manifold with three connections. The return manifold has a wax thermostat on each connection. The return passes the bypass junction and a 2-way thermostatic valve, connected to the sensor bulb by a capillary, before rejoining the riser return. The bypass between return and supply has a check valve. One floor loop is drawn in full.
+:width: 100%
+
+A riser with a riser pump feeding two floor heating manifolds, each through a shunt with its own pump, a 2-way thermostatic valve on the return and a check valve in the bypass. Three pumps in total. Only one floor loop per manifold is drawn.
+:::
+
+The check valve in the bypass is spring loaded and needs a certain pressure difference to open. This becomes a problem in a low-energy apartment buildings, where the floor loops need little heat but the riser pump keeps its pressure up ({numref}`fig-riser-pump-curve`). At design load the shunts draw a large flow from the riser, and the riser pump runs at its design point A. In mild weather the thermostatic valves throttle, the flow drawn from the riser becomes small, and a constant-speed riser pump runs up its curve to almost its shut-off head (point B). The riser pressure then pushes against the bypass. Before any water can flow up through the bypass, the thermostatic valve must absorb both the riser pressure and the opening pressure of the check valve. The valve ends up almost closed with a large pressure across it, so it hunts and can be noisy, and until the check valve opens the floor loops get either too little flow or water that is too hot.
+
+A riser pump in proportional-pressure mode lowers its head as the flow falls (point C), which makes the problem much smaller. A check valve with a low opening pressure also helps.
+
+:::{figure} figures/c1/riser-pump-curve.*
+:label: fig-riser-pump-curve
+:alt: Pump diagram with the flow drawn from the riser on the horizontal axis and differential pressure on the vertical axis. A constant-speed riser pump curve falls slowly from 45 kPa at zero flow. A proportional-pressure curve rises linearly from about 20 kPa to the same design point at 600 litres per hour and 41 kPa. Two system curves are shown, one for design and a steep one for low load. A dashed line 10 kPa above the constant-speed curve marks the pressure the thermostatic valve must absorb before the check valve opens. Point B at low load on the constant-speed curve is at about 45 kPa, and point C on the proportional-pressure curve is at about 23 kPa.
+:width: 90%
+
+Riser pump at design (A) and at low load with constant speed (B) and proportional pressure (C). The shaded band is the opening pressure of the check valve, which the thermostatic valve must absorb on top of the riser pressure before water flows through the bypass. Example values: 45 kPa shut-off head, 600 l/h design flow, 10 kPa opening pressure. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/riser_pump_curve.py)
 :::
 
 
-### Control model
+## Interactive control model
 
 The model below simulates one room in a low-energy house with a light and a heavy floor ({numref}`fig-floor-sections`) over a cloudy spring day followed by a sunny one. The floor is controlled in three ways: an on/off room thermostat, a PI controller whose output is a PWM signal to the wax thermostat, and, for reference, an ideal heater that delivers exactly the heat needed without any delay. Windows are opened when the room gets too warm, and the heat removed this way is counted as heat vented.
 
@@ -616,53 +602,17 @@ The same model in Python, with comments on every assumption, can be downloaded h
 - Four cloudy days are simulated before the two days shown, so the floors start in a realistic state.
 :::
 
-## Heating and cooling within the same 24 hours
 
-In a low-energy house, a spring or autumn day often needs both heating and cooling. The night is cold and the room needs heat in the early morning. From late morning the sun through the windows covers the heat loss, and by the afternoon the room overheats. The heating demand is small and short, and it is followed within a few hours by a cooling demand.
-
-A floor cannot follow this. The heat the controller asks for at 05:00 is still leaving the floor at 10:00, when the sun has taken over. The floor then works as a heater during the hours when the room needs cooling. The room temperature sensor closes the loop as soon as the room is warm, but the stored heat keeps flowing. The heavier the floor, the more heat it stores and the longer it keeps delivering.
-
-The model shows this for the two days. Compared with the ideal heater, the light floor needs about 15 Wh/m² more heat and gives about 10 K·h more overheating. The heavy floor needs about 40 Wh/m² more heat and gives about 30 K·h more overheating. The extra heat is not useful heat. It is heat that ends up being removed again, through open windows or by a cooling system.
-
-Several strategies reduce the problem, but none of them removes it:
-
-- **Low supply temperature and self-regulation.** With the supply only a few kelvin above the room, the floor delivers less when the room warms up, even with the valve open.
-- **Heating stop.** Stop heating above an outdoor temperature limit, for example 12–15 °C, and use a deadband between the heating and cooling setpoints.
-- **Anticipating the sun.** Lower the setpoint in the morning on sunny days, using a weather forecast or model predictive control.
-- **Shading and ventilative cooling.** Remove the solar gain or the surplus heat (see Part D).
-- **Floor cooling.** The same pipes can cool by 20–40 W/m², limited by the dew point and a minimum floor surface temperature of about 19–20 °C. But the floor is just as slow when cooling.
-
-The conclusion is that a heat emitter with a long time lag is a poor match for a house whose heating demand is small and changes within hours. A fast emitter, such as heating through the ventilation air or a small convector, can switch off at the moment the sun starts to heat the room.
-
-### Several manifolds on one riser
-
-In buildings with several floors or apartments, one riser pump often feeds a manifold on each floor, each through its own shunt ({numref}`fig-riser-shunts`). The shunt pump circulates water through the floor loops. A thermostatic valve on the return limits the supply temperature: when the sensor bulb gets too warm, it throttles the water returned to the riser, so less hot water is drawn in and more return water is mixed back through the bypass. The check valve stops riser water from flowing backwards through the bypass into the return.
-
-:::{figure} figures/c1/riser-shunts.*
-:label: fig-riser-shunts
-:alt: Schematic of a riser fed by a heat pump and a riser pump. On each of two floors, a branch from the riser supply passes a bypass junction, a shunt pump and a sensor bulb before reaching a supply manifold with three connections. The return manifold has a wax thermostat on each connection. The return passes the bypass junction and a 2-way thermostatic valve, connected to the sensor bulb by a capillary, before rejoining the riser return. The bypass between return and supply has a check valve. One floor loop is drawn in full.
-:width: 100%
-
-A riser with a riser pump feeding two floor heating manifolds, each through a shunt with its own pump, a 2-way thermostatic valve on the return and a check valve in the bypass. Three pumps in total. Only one floor loop per manifold is drawn.
-:::
-
-The check valve in the bypass is spring loaded and needs a certain pressure difference to open. This becomes a problem in a low-energy house, where the floor loops need little heat but the riser pump keeps its pressure up ({numref}`fig-riser-pump-curve`). At design load the shunts draw a large flow from the riser, and the riser pump runs at its design point A. In mild weather the thermostatic valves throttle, the flow drawn from the riser becomes small, and a constant-speed riser pump runs up its curve to almost its shut-off head (point B). The riser pressure then pushes against the bypass. Before any water can flow up through the bypass, the thermostatic valve must absorb both the riser pressure and the opening pressure of the check valve. The valve ends up almost closed with a large pressure across it, so it hunts and can be noisy, and until the check valve opens the floor loops get either too little flow or water that is too hot.
-
-A riser pump in proportional-pressure mode lowers its head as the flow falls (point C), which makes the problem much smaller. A check valve with a low opening pressure also helps.
-
-:::{figure} figures/c1/riser-pump-curve.*
-:label: fig-riser-pump-curve
-:alt: Pump diagram with the flow drawn from the riser on the horizontal axis and differential pressure on the vertical axis. A constant-speed riser pump curve falls slowly from 45 kPa at zero flow. A proportional-pressure curve rises linearly from about 20 kPa to the same design point at 600 litres per hour and 41 kPa. Two system curves are shown, one for design and a steep one for low load. A dashed line 10 kPa above the constant-speed curve marks the pressure the thermostatic valve must absorb before the check valve opens. Point B at low load on the constant-speed curve is at about 45 kPa, and point C on the proportional-pressure curve is at about 23 kPa.
-:width: 90%
-
-Riser pump at design (A) and at low load with constant speed (B) and proportional pressure (C). The shaded band is the opening pressure of the check valve, which the thermostatic valve must absorb on top of the riser pressure before water flows through the bypass. Example values: 45 kPa shut-off head, 600 l/h design flow, 10 kPa opening pressure. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/riser_pump_curve.py)
-:::
 
 (sec-floor-model-theory)=
-## Theory behind the interactive model
-
-::::{admonition} Show the equations
+::::{admonition} Control model equations
 :class: dropdown
+
+### Theory behind the interactive model
+
+:::{caution}
+Needs review
+:::
 
 The model is an RC network ({numref}`fig-rc-network`). The room is one node, and the floor is split into thin layers of about 2 mm, each a node with its own heat capacity. The water reaches the floor at the pipe plane.
 
@@ -727,3 +677,57 @@ $$ (eq-ideal)
 
 **Solution.** The equations are solved with implicit Euler time steps of 60 s. Each step is a tridiagonal linear system, solved directly. The results in the table are sums over the two days shown: the heating energy $\int\Phi_\mathrm{w}\,\mathrm{d}t$, the heat vented, and the deviation from the setpoint, $\int\max(0, T_\mathrm{set}-T_\mathrm{r})\,\mathrm{d}t$ below and $\int\max(0, T_\mathrm{r}-T_\mathrm{set})\,\mathrm{d}t$ above, in K·h.
 ::::
+
+
+:::{admonition} Extra: Time constant of a thermal space
+:class: dropdown
+### The room has a time constant too
+
+The same idea applies to the room or the whole house. The heat store is the heat capacity of air, furniture and internal construction, $C$, and the heat leaves through the envelope and the ventilation, with the heat loss coefficient $UA$ [W/K]. The resistance is $R = 1/UA$, so
+
+$$
+\tau_\text{room} = \frac{C}{UA}, \qquad T(t) = T_\infty + (T_0 - T_\infty)\,e^{-t/\tau_\text{room}}, \qquad T_\infty = T_\text{out} + \frac{\Phi}{UA}
+$$ (eq-tau-room)
+
+where $\Phi$ is a constant heat gain. Without gains the room cools towards the outdoor temperature. With gains it settles $\Phi/UA$ above it.
+
+```{list-table} Time constant of a room and its temperature rise from solar gain (40 W/m² of floor, no venting). Values per m² of floor.
+:header-rows: 1
+:label: tab-room-tau
+
+* - House
+  - $UA$
+  - $C$
+  - $\tau_\text{room}$
+  - Steady rise, $\Phi_\text{sol}/UA$
+  - Rise after 6 h of sun
+* - Older house, heavy
+  - 2.5 W/(m²·K)
+  - 150 kJ/(m²·K)
+  - 17 h
+  - 16 K
+  - 5 K
+* - Low-energy house, light
+  - 0.6 W/(m²·K)
+  - 40 kJ/(m²·K)
+  - 19 h
+  - 67 K
+  - 18 K
+* - Low-energy house, heavy
+  - 0.6 W/(m²·K)
+  - 150 kJ/(m²·K)
+  - 69 h
+  - 67 K
+  - 6 K
+```
+
+The older heavy house and the light low-energy house have almost the same time constant, 17 and 19 hours. The low-energy house gets its long time constant from a small $UA$, not from mass. Insulation alone makes a light house as slow as an old heavy one. The difference is the steady temperature rise: with a small $UA$ the same gain lifts the room four times as much. The sun would heat the room 67 K above the outdoor temperature if nothing removed the heat. The room is protected only because the sun sets before that happens, and by its heat capacity, which slows the rise. Any heat from the floor comes on top of the solar gain and has nowhere to go but out of the windows.
+
+The app below shows how fast a room cools after the heating stops. Change $UA$ and $\tau$ and compare with the three reference rooms of 20 m² floor.
+
+```{anywidget} code/room-cooldown.mjs
+{}
+```
+
+The same model in Python: {download}`room_cooldown.py <code/room_cooldown.py>`. Run it with `python room_cooldown.py --UA 12 --tau 18` to simulate one room, or without arguments to compare the reference rooms.
+:::
