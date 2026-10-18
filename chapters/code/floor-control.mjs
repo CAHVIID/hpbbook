@@ -209,6 +209,21 @@ const CSS = `
 .fc th, .fc td { padding: 4px 8px; border-bottom: 1px solid var(--grid); text-align: right; }
 .fc th:first-child, .fc td:first-child { text-align: left; }
 .fc .tablewrap { overflow-x: auto; }
+.fc .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+.fc .controls { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.fc .results h4 { margin: 0 0 6px; font-size: 14px; }
+.fc .results .swatch { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 4px; }
+.fc .results td:first-child { color: var(--muted); text-align: left; }
+.fc .results th, .fc .results td { padding: 5px 4px; vertical-align: bottom; }
+.fc .results td { vertical-align: middle; }
+.fc .results td:first-child { width: 48%; padding-left: 0; }
+.fc .results .swatch { display: block; margin: 0 0 3px auto; width: 18px; }
+@media (min-width: 1100px) {
+  .fc .layout { grid-template-columns: 290px minmax(0, 1fr) 330px; }
+  .fc .layout.wide-side { grid-template-columns: 520px minmax(0, 1fr) 330px; }
+  .fc .controls { grid-template-columns: minmax(0, 1fr); }
+  .fc .side, .fc .results { position: sticky; top: 8px; max-height: calc(100vh - 16px); overflow-y: auto; }
+}
 `;
 
 function axis(arrays) {
@@ -273,8 +288,14 @@ function render({ model, el }) {
   el.appendChild(style); el.appendChild(root);
 
   const floors = structuredClone(FLOORS);
+  // layout: inputs on the left, charts in the middle, results table on the right (stacked on narrow screens)
+  const layout = document.createElement("div"); layout.className = "layout"; root.appendChild(layout);
+  const side = document.createElement("div"); side.className = "side";
+  const main = document.createElement("div"); main.className = "main";
+  const results = document.createElement("div"); results.className = "results";
+  layout.append(side, main, results);
   const tabs = document.createElement("div"); tabs.className = "tabs"; tabs.setAttribute("role", "tablist");
-  root.appendChild(tabs);
+  side.appendChild(tabs);
   const controls = document.createElement("div"); controls.className = "controls";
   const sliders = {};
   for (const [group, items] of INPUTS) {
@@ -292,9 +313,9 @@ function render({ model, el }) {
     }
     controls.appendChild(fs);
   }
-  root.appendChild(controls);
+  side.appendChild(controls);
   const extra = document.createElement("div"); extra.className = "extra"; extra.hidden = true;
-  root.appendChild(extra);
+  side.appendChild(extra);
   const COLS = [[1, "Thickness", "mm", 1000, 1], [2, "Conductivity λ", "W/(m·K)", 1, 0.005], [3, "Density ρ", "kg/m³", 1, 10], [4, "Specific heat c", "J/(kg·K)", 1, 10]];
   function buildExtra() {
     extra.innerHTML = `<p class="note">Material properties of the floor layers, from the top surface down. Heat capacity above the pipes controls how fast the floor responds;
@@ -330,6 +351,7 @@ function render({ model, el }) {
     const b = document.createElement("button"); b.textContent = label; b.setAttribute("role", "tab");
     b.addEventListener("click", () => {
       controls.hidden = panel !== controls; extra.hidden = panel !== extra;
+      layout.classList.toggle("wide-side", panel === extra);
       tabs.querySelectorAll("button").forEach(x => { x.classList.toggle("on", x === b); x.setAttribute("aria-selected", x === b); });
     });
     tabs.appendChild(b);
@@ -348,7 +370,7 @@ function render({ model, el }) {
   bar.appendChild(toggle);
   const reset = document.createElement("button"); reset.textContent = "Reset to defaults";
   const status = document.createElement("span");
-  bar.append(reset, status); root.appendChild(bar);
+  bar.append(reset, status); main.appendChild(bar);
   reset.addEventListener("click", () => {
     Object.assign(p, DEFAULTS);
     for (const [key, s] of Object.entries(sliders)) { s.input.value = p[key]; s.show(); }
@@ -364,7 +386,7 @@ function render({ model, el }) {
     ;
   const charts = document.createElement("div"); charts.className = "charts";
   const tableWrap = document.createElement("div"); tableWrap.className = "tablewrap";
-  root.append(legend, charts, tableWrap);
+  main.append(legend, charts); results.appendChild(tableWrap);
 
   let timerId = null;
   function schedule() { clearTimeout(timerId); status.textContent = "calculating…"; timerId = setTimeout(run, 120); }
@@ -388,18 +410,19 @@ function render({ model, el }) {
     html += chart(flowS, { title: `${floorName}: mass flow in the loop [kg/(h·m²)]`, ylabel: "kg/(h·m²)", H: 170,
       ...axis([...flowS.map(sr => sr.y), [0, p.flow_design]]) });
     charts.innerHTML = html;
-    let rows = "";
-    for (const [m, lab] of MODES) {
-      const s = r[m].summary, tr = Number.isFinite(s.return_mw) ? s.return_mw.toFixed(1) : "–";
-      rows += `<tr><td>${lab}</td><td>${s.heating_Wh.toFixed(0)}</td><td>${s.vented_Wh.toFixed(0)}</td>
-        <td>${s.below_Kh.toFixed(1)}</td><td>${s.above_Kh.toFixed(1)}</td><td>${(s.below_Kh + s.above_Kh).toFixed(1)}</td><td>${tr}</td></tr>`;
-    }
-    tableWrap.innerHTML = `<table><thead><tr><th>${floorName}</th><th title="Heat supplied by the water (or the ideal heater) over the two days">Heating energy<br>[Wh/m²]</th>
-      <th title="Heat removed by opening windows above the venting temperature">Heat vented<br>[Wh/m²]</th>
-      <th title="Time integral of how far the room is below the setpoint">Below setpoint<br>[K·h]</th>
-      <th title="Time integral of how far the room is above the setpoint">Above setpoint<br>[K·h]</th><th>Total deviation<br>[K·h]</th>
-      <th title="Average return temperature weighted by the mass flow, i.e. the temperature the heat source actually receives">Return temp., flow-weighted<br>[°C]</th></tr></thead>
-      <tbody>${rows}</tbody></table>`;
+    // results table: one column per control, one row per result
+    const SHORT = { ideal: "Ideal heater", onoff: "On/off", pi: "PI + PWM" };
+    const ROWS = [
+      ["Heating energy [Wh/m²]", "Heat supplied by the water (or the ideal heater) over the two days", s => s.heating_Wh.toFixed(0)],
+      ["Heat vented [Wh/m²]", "Heat removed by opening windows above the venting temperature", s => s.vented_Wh.toFixed(0)],
+      ["Below setpoint [K·h]", "Time integral of how far the room is below the setpoint", s => s.below_Kh.toFixed(1)],
+      ["Above setpoint [K·h]", "Time integral of how far the room is above the setpoint", s => s.above_Kh.toFixed(1)],
+      ["Total deviation [K·h]", "Below plus above setpoint", s => (s.below_Kh + s.above_Kh).toFixed(1)],
+      ["Return temp., flow-weighted [°C]", "Average return temperature weighted by the mass flow, i.e. the temperature the heat source actually receives",
+        s => Number.isFinite(s.return_mw) ? s.return_mw.toFixed(1) : "–"]];
+    const head = MODES.map(([m, , color]) => `<th><span class="swatch" style="background:${color}"></span>${SHORT[m]}</th>`).join("");
+    const body = ROWS.map(([lab, tip, f]) => `<tr><td title="${tip}">${lab}</td>${MODES.map(([m]) => `<td>${f(r[m].summary)}</td>`).join("")}</tr>`).join("");
+    tableWrap.innerHTML = `<h4>Results, ${floorName.toLowerCase()}</h4><table><thead><tr><th></th>${head}</tr></thead><tbody>${body}</tbody></table>`;
     status.textContent = `Two days shown, after ${p.warmup_days} cloudy warm-up days. Calculated in ${Math.round(performance.now() - t0)} ms.`;
   }
   run();
