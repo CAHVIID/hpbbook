@@ -147,9 +147,9 @@ const INPUTS = [
     ["solar_sunny", "Peak solar gain, sunny day", "W/m²", 0, 80, 1,
       "Solar gain through the windows at noon on the second day, per m² floor. 40 W/m² is a clear spring day in a room with south-facing windows."]]],
   ["Supply water", [
-    ["curve_slope", "Heating curve slope", "K/K", 0.2, 1.2, 0.05,
+    ["curve_slope", "Heating curve slope", "K/K", 0, 1.2, 0.05,
       "Supply temperature = 20 °C + slope × (20 °C − outdoor temperature). A steeper curve gives warmer water and more heat stored in the floor."],
-    ["T_supply_max", "Max supply temperature", "°C", 25, 45, 1,
+    ["T_supply_max", "Max supply temperature", "°C", 21, 45, 1,
       "Upper limit of the supply temperature. Set it below the curve to get a constant supply temperature."],
     ["flow_design", "Design mass flow", "kg/(h·m²)", 2, 20, 0.5,
       "Water flow per m² floor when the wax thermostat is fully open (set by hydronic balancing). 6 kg/(h·m²) gives about 5 K cooling of the water at 35 W/m²."]]],
