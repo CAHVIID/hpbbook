@@ -597,7 +597,7 @@ The model below simulates one room in a low-energy house with a light and a heav
 
 :::{figure} figures/c1/floor-control-app.*
 :label: fig-floor-control-app
-:alt: Screenshot of the control model. Sliders for room and climate, supply water, room control and wax thermostat at the top. Below, four charts over 48 hours for the light floor: room temperature, heat flux at the floor surface, supply, return and floor surface temperature, and mass flow in the loop, each comparing the ideal heater, the on/off thermostat and the PI controller with PWM. A table at the bottom lists heating energy, heat vented and hours below and above the setpoint for the three controls.
+:alt: Screenshot of the control model. Sliders for room and climate, supply water, room control and wax thermostat in a column on the left. In the middle, four charts over 48 hours for the light floor: room temperature, heat flux at the floor surface, supply, return and floor surface temperature, and mass flow in the loop, each comparing the ideal heater, the on/off thermostat and the PI controller with PWM. A table on the right lists heating energy, heat vented, degree hours below and above the setpoint and the return temperature for the three controls.
 :width: 100%
 
 The control model with the default inputs, light floor. Open the model to change the inputs and to see the heavy floor.
