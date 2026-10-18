@@ -1,5 +1,5 @@
-"""Figures for the room CFD appendix: a normal window (0.9-2.1 m) against a balcony door
-(0-2.1 m) at 16 and 22 °C supply, 6 ACH, gains set for a well-mixed 26 °C room.
+"""Figures for the room CFD appendix: a normal window (0.9-2.1 m) against a top hatch
+(2.2-2.4 m), 6 ACH, gains set for a well-mixed 26 °C room, supply air 10 K colder (16 °C).
 
 Writes to ../figures/appendix-cfd/. Each run takes a few minutes on the default mesh:
 
@@ -16,8 +16,9 @@ import room_cfd_plots as plots
 
 OUT = Path(__file__).parent.parent / "figures" / "appendix-cfd"
 OUT.mkdir(parents=True, exist_ok=True)
-openings = {"Window (0.9–2.1 m)": Opening("left", 0.9, 2.1), "Door (0.0–2.1 m)": Opening("left", 0.0, 2.1)}
-supply, T_ROOM, ACH = [16.0, 22.0], 26.0, 6
+openings = {"Window (0.9–2.1 m)": Opening("left", 0.9, 2.1), "Top hatch (2.2–2.4 m)": Opening("left", 2.2, 2.4)}
+T_ROOM, ACH = 26.0, 6
+supply = [T_ROOM - 10]
 
 res = {}
 for name, op in openings.items():
@@ -28,7 +29,7 @@ for name, op in openings.items():
         oz = occupied_zone(r)
         print(f"{name:20s} {Tin:4.1f} °C  v_max {oz['v_max']:.2f} m/s  DR {oz['DR']:.0f} %  TS {oz['TS']:+.2f}  PPD_AD {oz['PPD_AD']:.0f} %")
 
-fig, axs = plt.subplots(2, 2, figsize=(11, 6.4), sharex=True, sharey=True)
+fig, axs = plt.subplots(1, 2, figsize=(11, 3.6), sharex=True, sharey=True)
 for a, ((name, Tin), r) in zip(axs.flat, res.items()):
     c = r["case"]; X, Y = np.meshgrid(r["x"], r["y"], indexing="ij")
     uc = 0.5 * (r["u"][1:] + r["u"][:-1]); vc = 0.5 * (r["v"][:, 1:] + r["v"][:, :-1])
@@ -41,11 +42,11 @@ for a, ((name, Tin), r) in zip(axs.flat, res.items()):
     oz = occupied_zone(r)
     a.set_title(f"{name}, supply {Tin:.0f} °C\nfloor speed max {oz['v_max']:.2f} m/s, DR {oz['DR']:.0f} %, ankle PPD$_{{AD}}$ {oz['PPD_AD']:.0f} %", fontsize=9)
     a.set_aspect("equal"); a.set_xlim(0, c.L); a.set_ylim(0, c.H)
-for a in axs[1]: a.set_xlabel("x (m)")
-for a in axs[:, 0]: a.set_ylabel("Height (m)")
+for a in axs: a.set_xlabel("x (m)")
+axs[0].set_ylabel("Height (m)")
 fig.colorbar(im, ax=axs, shrink=0.8, label="Air temperature (°C)")
-fig.savefig(OUT / "window-vs-door.png", dpi=170, bbox_inches="tight")   # no SVG: the streamlines make it 4 MB
+fig.savefig(OUT / "window-vs-hatch.png", dpi=170, bbox_inches="tight")   # no SVG: the streamlines make it 4 MB
 
-sub = {n.split(" (")[0]: res[(n, 16.0)] for n in openings}
-plots.floor_line(sub, h=0.1).savefig(OUT / "window-vs-door-floor-line.png", dpi=160, bbox_inches="tight")
-plots.convergence(res[("Window (0.9–2.1 m)", 16.0)]).savefig(OUT / "convergence-example.png", dpi=150, bbox_inches="tight")
+sub = {n.split(" (")[0]: res[(n, supply[0])] for n in openings}
+plots.floor_line(sub, h=0.1).savefig(OUT / "window-vs-hatch-floor-line.png", dpi=160, bbox_inches="tight")
+plots.convergence(res[("Window (0.9–2.1 m)", supply[0])]).savefig(OUT / "convergence-example.png", dpi=150, bbox_inches="tight")

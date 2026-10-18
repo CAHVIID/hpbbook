@@ -214,13 +214,13 @@ Unlike the DRY files, these are model output, not measured months, so they can b
 Hourly air temperature and daily mean (blue), daily global horizontal radiation (orange, right axis) and relative humidity (green) for the Annex 80 Copenhagen files: three typical years and three heat-wave years. The dashed line marks 26 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_annex80.py)
 ```
 
-In the typical years the Annex 80 files warm in both seasons ({numref}`fig-annex80-boxes`): the winter median rises from 4.2 °C to 6.2 °C and the summer median from 14.1 °C to 15.8 °C. The heat-wave years differ from the typical year of the same period mainly in the upper part of the summer range, not in the median.
+In the typical years the Annex 80 files warm in both seasons ({numref}`fig-annex80-ridges`): the winter median rises from 4.2 °C to 6.2 °C and the summer median from 14.1 °C to 15.8 °C. The heat-wave years have almost the same summer median as the typical year of the same period. They differ in the warm tail, which is longest in the most severe year, with 192 hours above 26 °C against 82 in the typical year.
 
-```{figure} figures/d1/annex80-temperature-boxes.*
-:name: fig-annex80-boxes
+```{figure} figures/d1/annex80-temperature-ridges.*
+:name: fig-annex80-ridges
 :width: 100%
 
-Hourly air temperature in the Annex 80 Copenhagen files, split into winter (October to March) and summer (April to September). Boxes show the quartiles and the median (number above), whiskers the lowest and highest hour. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_temperature_boxes.py)
+Distribution of the hourly air temperature in the Annex 80 Copenhagen files, in winter (October to March) and summer (April to September). The area under every curve is the same. The number under each curve is the median, and the dotted lines mark 0 °C and 26 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_temperature_ridges.py)
 ```
 
 ```{list-table} Annual indicators of the IEA EBC Annex 80 weather files for Copenhagen, computed from the EPW files.

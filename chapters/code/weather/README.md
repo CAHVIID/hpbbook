@@ -1,6 +1,6 @@
 # Weather files
 
-EPW files used by the figure scripts of chapter D1 (`plot_dry.py`, `plot_annex80.py`, `plot_cloud_cover.py`, `plot_temperature_boxes.py`, `vc_potential_uhi.py`). The scripts read this folder by default.
+EPW files used by the figure scripts of chapter D1 (`plot_dry.py`, `plot_annex80.py`, `plot_cloud_cover.py`, `plot_temperature_boxes.py`, `plot_temperature_ridges.py`, `vc_potential_uhi.py`). The scripts read this folder by default.
 
 ## Danish design reference years (DMI, Sjælsmark)
 
