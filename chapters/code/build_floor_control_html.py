@@ -17,7 +17,7 @@ page = f"""<!doctype html>
 <style>
 html, body {{ margin: 0; background: #fff; color: #1f2328; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }}
 @media (prefers-color-scheme: dark) {{ html, body {{ background: #0d1117; color: #e6edf3; }} }}
-main {{ max-width: 1200px; margin: 0 auto; padding: 16px; }}
+main {{ max-width: 1600px; margin: 0 auto; padding: 16px; }}
 h1 {{ font-size: 20px; margin: 4px 0 4px; }}
 p.sub {{ margin: 0 0 12px; font-size: 14px; opacity: .75; }}
 </style>

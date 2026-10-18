@@ -29,7 +29,7 @@ DEFAULTS = dict(
     Q_int=3.0,           # internal gains, W/m2
     solar_cloudy=8.0,    # peak solar gain through windows on the cloudy day, W/m2 floor
     solar_sunny=40.0,    # same on the sunny day
-    curve_slope=0.6,     # heating curve: T_supply = 20 + slope * (20 - T_out)
+    curve_slope=0.6,     # heating curve: T_supply = 20 + slope * (20 - T_out); 0 = constant T_supply_max
     T_supply_max=35.0,   # upper limit of the supply temperature, C
     flow_design=6.0,     # loop mass flow with the wax thermostat fully open, kg/(h m2 floor)
     hyst=0.25,           # on/off thermostat: switches at T_set -/+ hyst, K
@@ -128,7 +128,10 @@ def simulate(floor, mode, p=DEFAULTS):
         d = [Cv[j] / DT * T[j] for j in range(n)]
         d[0] += p["H_loss"] * t_out + p["Q_int"] + sol
         heat, mcp = 0.0, 0.0
-        t_sup = min(p["T_supply_max"], 20 + p["curve_slope"] * (20 - t_out))   # heating curve
+        if p["curve_slope"] > 0:                                               # heating curve
+            t_sup = min(p["T_supply_max"], 20 + p["curve_slope"] * (20 - t_out))
+        else:                                                                  # slope 0: constant supply
+            t_sup = p["T_supply_max"]
         if mode == "ideal":
             heat = max(0.0, p["H_loss"] * (p["T_set"] - t_out) - p["Q_int"] - sol
                        + p["C_room"] * (p["T_set"] - T[0]) / 600)
