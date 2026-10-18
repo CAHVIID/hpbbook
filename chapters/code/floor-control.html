@@ -94,7 +94,7 @@ export function simulate(floor, mode, p = DEFAULTS) {
     d[0] += p.H_loss * tOut + p.Q_int + sol;
     let heat = 0;
     mcp = 0;
-    tSup = Math.min(p.T_supply_max, 20 + p.curve_slope * (20 - tOut));
+    tSup = p.curve_slope > 0 ? Math.min(p.T_supply_max, 20 + p.curve_slope * (20 - tOut)) : p.T_supply_max;   // slope 0: constant supply
     if (mode === "ideal") {
       heat = Math.max(0, p.H_loss * (p.T_set - tOut) - p.Q_int - sol + p.C_room * (p.T_set - T[0]) / 600);
       d[0] += heat;
@@ -165,7 +165,7 @@ const INPUTS = [
       "Solar gain through the windows at noon on the second day, per m² floor. 40 W/m² is a clear spring day in a room with south-facing windows."]]],
   ["Supply water", [
     ["curve_slope", "Heating curve slope", "K/K", 0, 1.2, 0.05,
-      "Supply temperature = 20 °C + slope × (20 °C − outdoor temperature). A steeper curve gives warmer water and more heat stored in the floor."],
+      "Supply temperature = 20 °C + slope × (20 °C − outdoor temperature), limited by the max supply temperature. A steeper curve gives warmer water and more heat stored in the floor. Slope 0 gives a constant supply at the max supply temperature."],
     ["T_supply_max", "Max supply temperature", "°C", 21, 45, 1,
       "Upper limit of the supply temperature. Set it below the curve to get a constant supply temperature."],
     ["flow_design", "Design mass flow", "kg/(h·m²)", 2, 20, 0.5,
