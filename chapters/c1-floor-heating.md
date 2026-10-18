@@ -23,7 +23,7 @@ This chapter is being reworked and may change substantially.
  
   -->
 
-## Introduction
+# Introduction
 
 Floor heating is the standard heat emitter in newer Danish dwellings. It is invisible, it frees wall space, and it potentially works with very low supply temperatures, which suits heat pumps and district heating very well.
 
@@ -46,7 +46,7 @@ Heavy floors cannot do that, because heat is stored in the floor before it reach
 <!-- This chapter shows how large that delay is for a light floor and for a heavy floor, and why it makes floor heating a risky choice in a low-energy house. Control of floor heating, and what it can and cannot fix, is the topic of the later sections.
  -->
 
-## Heat transfer of floors
+# Heat transfer of floors
 
 A heated floor gives off heat to the room by radiation to the other surfaces and by natural convection to the air. Added together they give a heat transfer coefficient of about 11 W/(m²·K):
 
@@ -79,15 +79,7 @@ Floor covering adds thermal resistance between the pipes and the room. Tiles add
 
 %EN 1264 limits the covering resistance to 0.15 m²·K/W.
 
-:::{admonition} Extra
-:class: dropdown
-- **Barely warm** A heat demand of 10 W/m² needs a floor surface **only 1.1 K above** the room temperature. In low energy houses, the occupants will never feel a "warm floor".
-- **Self-regulation** The small temperature difference between floor surface and room means that a small rise in room temperature removes much of the output. If the floor is at 23 °C, the output falls from 30 W/m² to 9 W/m² when the room rises from 20 °C to 22 °C.
-- **TABS** Self-regulation is real and exploitable, potentially removing the need for control systems. In practice, it is often seen in thermo-active building systems, where the pipes are deeply embedded into the core of concrete slabs, making them act as heating or cooling "batteries" for basic loads.
-:::
-
-
-## Build-up
+# Build-up
 
 Floor heating constructions are often grouped by how the pipes are embedded, i.e. how much heat capacity sits between the pipes and the room ({numref}`fig-floor-sections`).
 
@@ -102,131 +94,47 @@ Light and heavy floor heating constructions, drawn to the same scale. The heat c
 %:::{admonition} Details
 %:class: dropdown
 
-### Light floors
+## Light floors
 
 In a light (dry) floor the pipes lie in grooves in an insulation panel, usually EPS. Aluminium heat-diffusion plates wrap around the pipes and spread the heat sideways under the floor covering. The EPS panels rest on a plywood board on the joists, and the covering is laid directly on the plates, typically 22 mm floor boards, a floating wooden floor or gypsum fibre boards. Pipe spacing is anything between 150–300 mm, depending on pipe diameter and system.
 
 Light floors are used on timber joists and battens, in renovation, and wherever build height and weight must be kept low. The whole construction above the insulation is 25–50 mm thick and weighs 10–30 kg/m². Its heat capacity above the pipes is **about 15–30 kJ/(m²·K)**, so there is little heat to store.
 
-### Heavy floors
+## Heavy floors
 
 In a heavy floor the pipes are cast into cement screed or concrete. A typical screed system has 45–65 mm of screed above the pipes. In Danish slab-on-ground houses the pipes are often tied to the reinforcement in the middle of a 100 mm concrete slab, with the floor covering laid directly on the slab. The slab weighs around 230 kg/m² and has a heat capacity of **100–250 kJ/(m²·K)**, and all of it is heated by the pipes.
 
 %Heavy floors are cheap to build in new houses, robust, and good at evening out short peaks in demand. That is a strength in an old, poorly insulated house. In a low-energy house it is the problem.
 %:::
 
-## Hydronic installation
-%@claude: add someting here about pipe loops for individual rooms, floor plan showing the loops. Use the uponor figure in the slides if possible. 
-
-{numref}`fig-hydronic-schematic` shows a typical installation. The parts are the same for light and heavy floors.
-
-:::{figure} figures/c1/hydronic-schematic.*
-:label: fig-hydronic-schematic
-:alt: Schematic of a hydronic floor heating system. A heat pump or district heating unit supplies water through a three-way mixing valve and a circulation pump to a manifold. The controller sets the mixing valve from an outdoor sensor and a supply temperature sensor. From the manifold, one loop runs to each of three rooms. The controller drives a motorized mixing valve. Each loop has a flow meter on the supply side and a wax thermostat on the return side, switched by a temperature sensor in its room.
+# Time constant of floor heating 
+:::{figure} figures/c1/floor-daily-swing.*
+:label: fig-floor-daily-swing
+:alt: Line chart over two days of the deviation from the daily mean, in percent of the demand swing. The heating demand is a sine peaking at 04:00 at plus 100 % and bottoming at 16:00 at minus 100 %. The light floor, time constant 1 hour, follows almost the same curve, 97 % of the swing and 1 hour late. The heavy floor, time constant 12 hours, swings only plus/minus 30 % and peaks 4.8 hours late, around 09:00.
 :width: 100%
 
-A hydronic floor heating installation. The controller sets the supply temperature from the outdoor temperature (heating curve). The room temperature sensor in each room opens and closes the wax thermostat on its own loop.
+A first-order floor following a heating demand that swings over 24 hours, equation {eq}`eq-sine-response`. The arrows mark the lag behind the demand peak at 04:00. Only the swing is shown; the daily mean is delivered in full. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/c1_small_figures.py)
 :::
 
-- **Heat source.** A heat pump or district heating. Floor heating needs a low supply temperature, typically 30–35 °C in a low-energy house, with 3–5 K between supply and return.
-- **Mixing shunt.** A motorized three-way mixing valve and a circulation pump. The valve mixes return water into the supply to reach the temperature set by the controller. The controller follows a heating curve, which raises the supply temperature as the outdoor temperature falls.
-- **Manifold.** Distributes water to one loop per room, or several loops in large rooms. Each loop should be at most 80–100 m long to keep the pressure drop reasonable. Flow meters or balancing valves on the supply side set the design flow in each loop, so that every room gets its share (hydronic balancing).
-- **Wax thermostats and room temperature sensors.** Each loop has a valve on the return side, opened and closed by a wax thermostat, an electrically heated wax actuator. The room temperature sensor switches it on and off, either directly or by pulse-width modulation (PWM). The valve only opens or closes the loop. It cannot change the water temperature.
+The light floor follows the daily swing almost fully, one hour late ({numref}`fig-floor-daily-swing`). The heavy floor flattens it to a third and shifts it by nearly five hours. Heat asked for at 04:00, the coldest hour, is delivered around 09:00, just as the sun takes over. A lag of a quarter of the period is the worst case: the floor then heats hardest when the demand is changing from heating to cooling. This is why heating demand at night turns into overheating during the day.
+
+The lag in {numref}`tab-floor-daily` is for the floor alone. The wax thermostat's dead time and stroke, the room's own heat capacity and the controller all add to it, as the section on control shows.
 
 
-## Hydronic balancing
+Several strategies reduce the problem, but none of them removes it:
 
-The loops on a manifold are connected in parallel, so they all see the same pressure difference $\Delta p$ between the supply and return manifold. The pressure drop in a loop grows with the square of the flow,
+- **Low supply temperature and self-regulation.** With the supply only a few kelvin above the room, the floor delivers less when the room warms up, even with the valve open.
+- **Heating stop.** Stop heating above an outdoor temperature limit, for example 12–15 °C, and use a deadband between the heating and cooling setpoints.
+- **Anticipating the sun.** Lower the setpoint in the morning on sunny days, using a weather forecast or model predictive control.
+- **Shading and ventilative cooling.** Remove the solar gain or the surplus heat (see Part D).
+- **Floor cooling.** The same pipes can cool by 20–40 W/m², limited by the dew point and a minimum floor surface temperature of about 19–20 °C. But the floor is just as slow when cooling.
 
-$$
-\Delta p = \left(\frac{\dot m}{K}\right)^2 \qquad\Rightarrow\qquad \dot m = K\,\sqrt{\Delta p}
-$$ (eq-loop-flow-coefficient)
+The conclusion is that a heat emitter with a long time lag is a poor match for a house whose heating demand is small and changes within hours. A fast emitter, such as heating through the ventilation air or a small convector, can switch off at the moment the sun starts to heat the room.
 
-where $K$ is the flow coefficient of the loop: the mass flow at a pressure drop of 1 bar. Manufacturers give the flow coefficient of a valve as $K_v$ in m³/h at 1 bar. $K$ for a whole loop combines the pipe and the valve. With the same $\Delta p$ on all loops, each loop gets a flow proportional to its own $K$. A pipe's resistance grows with its length, so with a constant friction factor $K \propto 1/\sqrt{L}$. A 50 m loop then takes $\sqrt{2} = 1.4$ times the flow of a 100 m loop, although it usually serves a smaller room and needs less.
-
-The design flow of a loop follows from its design heat output $\Phi$ and the temperature drop $\Delta\theta$ between supply and return:
-
-$$
-\dot m_\text{design} = \frac{\Phi}{c_p\,\Delta\theta}
-$$ (eq-design-flow)
-
-A bedroom loop with $\Phi = 300$ W and 35/30 °C needs $\dot m = 300/(4180 \cdot 5) = 0.014$ kg/s, or 52 kg/h.
-
-**Pre-setting.** The valve on each loop has an adjustable throttle, the pre-setting, which sets its $K_v$. The installer chooses the pre-setting so that every loop gets its design flow at the same manifold pressure: long loops get a high pre-setting (open), short loops a low one (throttled). The pump sets the pressure, the pre-settings divide the flow between the loops, much like the accelerator and the gear in a car. The pre-settings must be set after the system has been filled and vented, because air in the loops changes their resistance.
-%@claude: add two figures from slides about presetting the  valve  
-
-**What goes wrong without balancing.** A loop that gets too much flow returns water that is almost as warm as the supply. The temperature drop $\Delta\theta$ in {eq}`eq-design-flow` falls, and the return temperature rises. The room with the short loop is heated fast and the room at the end of the long loop too slowly, and the usual response is to raise the supply temperature or the pump setting until the worst room is warm. Both make the other loops worse. A high return temperature lowers the efficiency of a heat pump, and in district heating it increases the heat loss of the return pipes and is often penalised in the tariff.
-
-
-
-## Control of floor heating
-
-Floor heating has two levels of control ({numref}`fig-hydronic-schematic`). The supply temperature follows a heating curve, set from the outdoor temperature. Each room then switches its own loop with a wax thermostat, driven by its room temperature sensor.
-
-<!-- :::{admonition} Control
-:class: Tip
-The installation has **two levels of control**.
-The supply temperature is set centrally from the outdoor temperature, and each room switches its own loop on or off.
-Lower supply temperature will keep the loops more on, and vice versa.
-Low supply temperature increases self-regulation.
-::: -->
-
-A wax thermostat is an on/off valve ({numref}`fig-wax-thermostat`). A small heater warms a wax capsule, the wax expands and pushes the valve open. It takes 2–3 min before the valve starts to move and another 3–5 min to open fully, and about the same to close.
-
-:::{figure} figures/c1/wax-thermostat.jpg
-:label: fig-wax-thermostat
-:alt: Photo of a wax thermostat: a blue cylindrical actuator with a grey threaded base that screws onto the valve on the manifold, and a grey cable for the 24 V supply from the room unit.
-:width: 35%
-
-Wax thermostat (telestat) for mounting on the manifold, 24 V, 2 W, normally closed. Photo: Uponor.
-:::
-
-The wax thermostat cannot hold positions between fully open, and fully closed, so they are  controlled via pulse-width modulation.
-
-### On/off control.
-
-The loop opens when the room is below the setpoint minus a hysteresis and closes when it is above the setpoint plus the hysteresis. The valve response depends on how narrow or wide the proportional band was set by the user. A narrow proportional band causes the valve to respond "a lot" for even small deviations, a band too wide causes the valve to never quite respond as needed to close the deviation.
-
-{numref}`fig-proportional-band` compares three cases:
-- On/off control swings the room between about 20 and 21.3 °C, well outside the ±0.25 K hysteresis, because the floor keeps heating after the valve closes and keeps lagging after it opens
-- A narrow band settles close to the setpoint after a few damped oscillations.
-- A wide band gives a smooth response, but the room settles about 0.7 K below the setpoint.
-
-<!-- In this example the room needs more than 50 % output, and a proportional controller only gives more than 50 % when the room is below the setpoint. This remaining deviation is the offset. The I part of a PI controller removes it. -->
-
-:::{figure} figures/c1/proportional-band.*
-:label: fig-proportional-band
-:alt: Left, controller output in percent against room temperature. On/off control jumps between 0 and 100 % with a ±0.25 K hysteresis around 21 °C. A 0.5 K proportional band gives a steep line and a 4 K band a shallow line, both passing 50 % at the setpoint. Right, room temperature over 12 hours after a cold start at 18 °C. On/off control cycles between about 20 and 21.3 °C. The narrow band overshoots to the setpoint and settles with small damped oscillations just below it. The wide band rises smoothly and settles at about 20.3 °C, an offset of about 0.7 K below the setpoint.
-:width: 100%
-
-On/off control compared with a proportional controller with a narrow and a wide proportional band. a) Controller output against room temperature. The dashed line is the switching path when the room cools. b) Room temperature after a cold start. Simple room model with a light floor and a 12 min valve delay. The valve follows the controller output directly, so PWM is averaged out. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/pband_figure.py)
-:::
-
-
-### PWM control
-
-The room unit runs a PI controller with a predefined duty cycle. If 40 % output is required and the cycle is 15 min, the valve is only (fully) open for about 6 min of each cycle. On average this behaves like a valve that is 40 % open.
-
-
-<!-- > - **On/off control.** The loop opens when the room is below the setpoint minus a hysteresis and closes when it is above the setpoint plus the hysteresis. Not used anymore
-> - **PWM control.** The room unit runs a PI controller and turns its output into a duty cycle. With a 15–20 min cycle and 40 % output, the valve is open for about 6–8 min of each cycle. On average this behaves like a valve that is 40 % open. -->
-
-
-
-{numref}`fig-pwm-principle` shows how PWM works. The room unit compares the measured room temperature with a triangular signal that sweeps the proportional band once per cycle. The valve is open while the room is colder than the triangle. Below the band the valve stays open the whole cycle, and above the band it stays closed. Inside the band, the colder the room, the longer the valve is open in each cycle.
-
-:::{figure} figures/c1/pwm-principle.*
-:label: fig-pwm-principle
-:alt: Top, a room temperature curve wanders around a 21 °C setpoint inside a 1 K proportional band, crossed by a triangular signal with a 20 min period. Above the band the valve is always closed, below it always open. Bottom, the resulting valve signal is a series of open pulses whose length in each 20 min cycle varies from 18 % to 77 %, longest when the room is coldest.
-:width: 100%
-
-PWM control of a wax thermostat. The valve is open while the measured room temperature lies below the triangular signal. The dotted lines link one open pulse to the two crossings that start and end it. The percentages give the share of each cycle that the valve is open. Illustration with a 20 min cycle and a 1 K proportional band. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/pwm_figure.py)
-:::
-
-PWM smooths the room temperature, but it does not remove the delay: the sensor measures the room, the valve acts on the water, but the thermal mass of the floor lies in between. Whatever the controller decides, the floor delivers it over the next 0.5–1 h (light floor) or many hours (heavy floor). When the room warms, the controller sees that and closes the valve, but it cannot take back the heat already stored in the floor.
-
-```{admonition} Modeling time constant of floor heating
+::::{admonition} Time constant
 :class: dropdown
+
+# Modeling time constant of floor heating
 
 When the water flow in a loop starts or stops, the heat output to the room does not change at once. This section explains why, and what the delay means for a low-energy house.
 
@@ -317,7 +225,195 @@ Switching on is therefore much faster than switching off, by a factor of 4–8. 
 The lumped model assumes the floor has one temperature. That is reasonable when the resistance inside the floor is small compared with the resistance at its surface, measured by the Biot number $Bi = h\,L/\lambda$. For the concrete slab $Bi \approx 0.35$, so the slab is close to uniform, and one time constant describes it well. For the light floor the boards themselves are the main resistance ($Bi \approx 2$), but they hold little heat, so the floor still behaves almost as one lump.
 
 In reality a floor has many layers and therefore many time constants.  -->
+
+
+## What the time constant means over a day
+
+The heating demand of a low-energy house in early spring swings over the day, roughly as a sine with a 24-hour period, from a demand at night to a surplus when the sun shines.
+A first-order system that is asked to follow such a swing does two things: it lags behind, and it delivers less of the swing than asked, because demand starts dropping before the full output is reached.
+
+- Time Lag: The output peak lags behind the input peak.
+- Attenuation: The output amplitude is reduced.
+
+For a diurnal cycle with a period of $T = 24\text{ hours } (86{,}400\text{ s})$
+
+- Ordinary Frequency ($f$): $f = \frac{1}{T} = 0.0417\text{ cycles/hour}$
+- Angular Frequency ($\omega$): $\omega = 2\pi f = \frac{2\pi}{24\text{ h}} \approx 0.262\text{ rad/hour}$
+
+The system's dynamic performance is governed by its amplitude ratio (the attenuation factor) and time lag (the temporal phase shift):
+
+$$
+\text{amplitude ratio} = \frac{1}{\sqrt{1 + (\omega\tau)^2}}, \qquad
+\text{time lag} = \frac{\arctan(\omega\tau)}{\omega}
+$$ (eq-sine-response)
+
+The product $\omega\tau = 2\pi\,\tau/24\,\mathrm{h}$ compares the time constant with the length of the day. If the floor reacts quickly compared with the day ($\omega\tau \ll 1$), it keeps up: the amplitude ratio is close to 1 and the lag close to $\tau$. If it reacts slowly ($\omega\tau \gg 1$), the demand has already turned before the floor has warmed up. It then follows only a small part of the swing, and the lag approaches a quarter of the period, 6 h. For the light floor $\omega\tau = 0.26$; for the heavy floor $\omega\tau = 3.1$. The daily mean is always delivered in full; only the swing around it is damped and delayed.
+
+```{list-table} Response of a first-order floor to a heating demand that swings over 24 hours
+:header-rows: 1
+:label: tab-floor-daily
+
+* - Time constant $\tau$
+  - Share of the swing delivered
+  - Time lag
+* - 1 h (light floor)
+  - 97 %
+  - 1.0 h
+* - 2 h
+  - 89 %
+  - 1.8 h
+* - 6 h
+  - 54 %
+  - 3.8 h
+* - 12 h (heavy floor)
+  - 30 %
+  - 4.8 h
 ```
+
+The older heavy house and the light low-energy house have almost the same time constant, 17 and 19 hours. The low-energy house gets its long time constant from a small $UA$, not from mass. Insulation alone makes a light house as slow as an old heavy one. The difference is the steady temperature rise: with a small $UA$ the same gain lifts the room four times as much. The sun would heat the room 67 K above the outdoor temperature if nothing removed the heat. The room is protected only because the sun sets before that happens, and by its heat capacity, which slows the rise. Any heat from the floor comes on top of the solar gain and has nowhere to go but out of the windows.
+
+The app below shows how fast a room cools after the heating stops. Change $UA$ and $\tau$ and compare with the three reference rooms of 20 m² floor.
+
+```{anywidget} code/room-cooldown.mjs
+{}
+```
+
+The same model in Python: {download}`room_cooldown.py <code/room_cooldown.py>`. Run it with `python room_cooldown.py --UA 12 --tau 18` to simulate one room, or without arguments to compare the reference rooms.
+::::
+
+
+
+
+
+
+## Hydronic installation
+
+{numref}`fig-hydronic-schematic` shows a typical installation. The parts are the same for light and heavy floors.
+
+:::{figure} figures/c1/hydronic-schematic.*
+:label: fig-hydronic-schematic
+:alt: Schematic of a hydronic floor heating system. A heat pump or district heating unit supplies water through a three-way mixing valve and a circulation pump to a manifold. The controller sets the mixing valve from an outdoor sensor and a supply temperature sensor. From the manifold, one loop runs to each of three rooms. The controller drives a motorized mixing valve. Each loop has a flow meter on the supply side and a wax thermostat on the return side, switched by a temperature sensor in its room.
+:width: 100%
+
+A hydronic floor heating installation. The controller sets the supply temperature from the outdoor temperature (heating curve). The room temperature sensor in each room opens and closes the wax thermostat on its own loop.
+:::
+
+- **Heat source.** A heat pump or district heating. Floor heating needs a low supply temperature, typically 30–35 °C in a low-energy house, with 3–5 K between supply and return.
+- **Mixing shunt.** A motorized three-way mixing valve and a circulation pump. The valve mixes return water into the supply to reach the temperature set by the controller. The controller follows a heating curve, which raises the supply temperature as the outdoor temperature falls.
+- **Manifold.** Distributes water to one loop per room, or several loops in large rooms. Each loop should be at most 80–100 m long to keep the pressure drop reasonable. Flow meters or balancing valves on the supply side set the design flow in each loop, so that every room gets its share (hydronic balancing).
+- **Wax thermostats and room temperature sensors.** Each loop has a valve on the return side, opened and closed by a wax thermostat, an electrically heated wax actuator. The room temperature sensor switches it on and off, either directly or by pulse-width modulation (PWM). The valve only opens or closes the loop. It cannot change the water temperature.
+
+
+## Hydronic balancing
+
+The loops on a manifold are connected in parallel, so they all see the same pressure difference $\Delta p$ between the supply and return manifold. The pressure drop in a loop grows with the square of the flow,
+
+$$
+\Delta p = \left(\frac{\dot m}{K}\right)^2 \qquad\Rightarrow\qquad \dot m = K\,\sqrt{\Delta p}
+$$ (eq-loop-flow-coefficient)
+
+where $K$ is the flow coefficient of the loop: the mass flow at a pressure drop of 1 bar. Manufacturers give the flow coefficient of a valve as $K_v$ in m³/h at 1 bar. $K$ for a whole loop combines the pipe and the valve. With the same $\Delta p$ on all loops, each loop gets a flow proportional to its own $K$. A pipe's resistance grows with its length, so with a constant friction factor $K \propto 1/\sqrt{L}$. A 50 m loop then takes $\sqrt{2} = 1.4$ times the flow of a 100 m loop, although it usually serves a smaller room and needs less.
+
+The design flow of a loop follows from its design heat output $\Phi$ and the temperature drop $\Delta\theta$ between supply and return:
+
+$$
+\dot m_\text{design} = \frac{\Phi}{c_p\,\Delta\theta}
+$$ (eq-design-flow)
+
+A bedroom loop with $\Phi = 300$ W and 35/30 °C needs $\dot m = 300/(4180 \cdot 5) = 0.014$ kg/s, or 52 kg/h.
+
+**Pre-setting.** The valve on each loop has an adjustable throttle, the pre-setting, which sets its $K_v$. The installer chooses the pre-setting so that every loop gets its design flow at the same manifold pressure: long loops get a high pre-setting (open), short loops a low one (throttled). The pump sets the pressure, the pre-settings divide the flow between the loops, much like the accelerator and the gear in a car. The pre-settings must be set after the system has been filled and vented, because air in the loops changes their resistance.
+
+{numref}`fig-presetting-valve` shows the pre-settings for a 100 m² house with six loops of 35–96 m. The pump is set so that the loop with the largest pressure drop, one of the two 96 m loops in the living room, gets its design flow with the valve fully open (N), here 2.4 kPa over the manifold. Every other loop then has pressure to spare, and its valve must take up the difference. A short loop that needs little flow needs a low pre-setting and takes most of the 2.4 kPa in the valve.
+
+:::{figure} figures/c1/presetting-valve.*
+:label: fig-presetting-valve
+:alt: Log-log chart of pressure drop over the valve, 0.01 to 40 kPa, against flow, 5 to 1000 l/h. Eight parallel straight lines, one per pre-setting from 1 (left, most throttled) to 7 and N (fully open, drawn bold). The operating points of six loops are marked. The two living room loops sit on the N line at about 54 l/h and 0.3 kPa. The hall loop is on setting 1 at about 25 l/h and 2 kPa, the bathroom and bedroom 1 on setting 2 at about 33 l/h and 1.7–1.9 kPa, and bedroom 2 on setting 3 at about 36 l/h and 1.4 kPa.
+:width: 80%
+
+Pressure drop over a loop valve for pre-settings 1–7 and N (fully open), with the operating point of each loop in the house. Loops 1 and 2 overlap. Typical $K_v$ values for a small pre-settable valve, not product data. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/c1_loops_presetting.py)
+:::
+
+{numref}`fig-presetting-flows` shows what the pre-settings achieve. With all valves fully open, the four shorter loops take 1.5–3.5 times their design flow, and the hall the most. With the pre-settings, every loop is close to its design flow. The hall still gets too much, because it would need a $K_v$ below the lowest setting. The settings come in steps, so balancing is only ever approximate.
+
+:::{figure} figures/c1/presetting-flows.*
+:label: fig-presetting-flows
+:alt: Bar chart of flow in kg/h for six loops, each with three bars: design flow, all valves fully open, and with pre-settings. Loops 1 and 2, living and kitchen, 95–96 m, setting N: all three bars about 54 kg/h. Loop 3, hall, 38 m, setting 1: design 19, open 67, pre-set 25 kg/h. Loop 4, bathroom, 35 m, setting 2: design 34, open 70, pre-set 34 kg/h. Loop 5, bedroom 1, 54 m, setting 2: design 29, open 57, pre-set 32 kg/h. Loop 6, bedroom 2, 70 m, setting 3: design 37, open 57, pre-set 36 kg/h.
+:width: 100%
+
+Flow in each loop with all valves fully open and with the pre-settings in {numref}`fig-presetting-valve`, compared with the design flow (35/30 °C). The manifold pressure difference is 2.4 kPa in both cases. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/c1_loops_presetting.py)
+:::
+
+**What goes wrong without balancing.** A loop that gets too much flow returns water that is almost as warm as the supply. The temperature drop $\Delta\theta$ in {eq}`eq-design-flow` falls, and the return temperature rises. The room with the short loop is heated fast and the room at the end of the long loop too slowly, and the usual response is to raise the supply temperature or the pump setting until the worst room is warm. Both make the other loops worse. A high return temperature lowers the efficiency of a heat pump, and in district heating it increases the heat loss of the return pipes and is often penalised in the tariff.
+
+
+
+## Control of floor heating
+
+Floor heating has two levels of control ({numref}`fig-hydronic-schematic`). The supply temperature follows a heating curve, set from the outdoor temperature. Each room then switches its own loop with a wax thermostat, driven by its room temperature sensor.
+
+<!-- :::{admonition} Control
+:class: Tip
+The installation has **two levels of control**.
+The supply temperature is set centrally from the outdoor temperature, and each room switches its own loop on or off.
+Lower supply temperature will keep the loops more on, and vice versa.
+Low supply temperature increases self-regulation.
+::: -->
+
+A wax thermostat is an on/off valve ({numref}`fig-wax-thermostat`). A small heater warms a wax capsule, the wax expands and pushes the valve open. It takes 2–3 min before the valve starts to move and another 3–5 min to open fully, and about the same to close.
+
+:::{figure} figures/c1/wax-thermostat.jpg
+:label: fig-wax-thermostat
+:alt: Photo of a wax thermostat: a blue cylindrical actuator with a grey threaded base that screws onto the valve on the manifold, and a grey cable for the 24 V supply from the room unit.
+:width: 35%
+
+Wax thermostat (telestat) for mounting on the manifold, 24 V, 2 W, normally closed. Photo: Uponor.
+:::
+
+The wax thermostat cannot hold positions between fully open, and fully closed, so they are  controlled via pulse-width modulation.
+
+### On/off control.
+
+The loop opens when the room is below the setpoint minus a hysteresis and closes when it is above the setpoint plus the hysteresis. The valve response depends on how narrow or wide the proportional band was set by the user. A narrow proportional band causes the valve to respond "a lot" for even small deviations, a band too wide causes the valve to never quite respond as needed to close the deviation.
+
+{numref}`fig-proportional-band` compares three cases:
+- On/off control swings the room between about 20 and 21.3 °C, well outside the ±0.25 K hysteresis, because the floor keeps heating after the valve closes and keeps lagging after it opens
+- A narrow band settles close to the setpoint after a few damped oscillations.
+- A wide band gives a smooth response, but the room settles about 0.7 K below the setpoint.
+
+<!-- In this example the room needs more than 50 % output, and a proportional controller only gives more than 50 % when the room is below the setpoint. This remaining deviation is the offset. The I part of a PI controller removes it. -->
+
+:::{figure} figures/c1/proportional-band.*
+:label: fig-proportional-band
+:alt: Left, controller output in percent against room temperature. On/off control jumps between 0 and 100 % with a ±0.25 K hysteresis around 21 °C. A 0.5 K proportional band gives a steep line and a 4 K band a shallow line, both passing 50 % at the setpoint. Right, room temperature over 12 hours after a cold start at 18 °C. On/off control cycles between about 20 and 21.3 °C. The narrow band overshoots to the setpoint and settles with small damped oscillations just below it. The wide band rises smoothly and settles at about 20.3 °C, an offset of about 0.7 K below the setpoint.
+:width: 100%
+
+On/off control compared with a proportional controller with a narrow and a wide proportional band. a) Controller output against room temperature. The dashed line is the switching path when the room cools. b) Room temperature after a cold start. Simple room model with a light floor and a 12 min valve delay. The valve follows the controller output directly, so PWM is averaged out. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/pband_figure.py)
+:::
+
+
+### PWM control
+
+The room unit runs a PI controller with a predefined duty cycle. If 40 % output is required and the cycle is 15 min, the valve is only (fully) open for about 6 min of each cycle. On average this behaves like a valve that is 40 % open.
+
+
+<!-- > - **On/off control.** The loop opens when the room is below the setpoint minus a hysteresis and closes when it is above the setpoint plus the hysteresis. Not used anymore
+> - **PWM control.** The room unit runs a PI controller and turns its output into a duty cycle. With a 15–20 min cycle and 40 % output, the valve is open for about 6–8 min of each cycle. On average this behaves like a valve that is 40 % open. -->
+
+
+
+{numref}`fig-pwm-principle` shows how PWM works. The room unit compares the measured room temperature with a triangular signal that sweeps the proportional band once per cycle. The valve is open while the room is colder than the triangle. Below the band the valve stays open the whole cycle, and above the band it stays closed. Inside the band, the colder the room, the longer the valve is open in each cycle.
+
+:::{figure} figures/c1/pwm-principle.*
+:label: fig-pwm-principle
+:alt: Top, a room temperature curve wanders around a 21 °C setpoint inside a 1 K proportional band, crossed by a triangular signal with a 20 min period. Above the band the valve is always closed, below it always open. Bottom, the resulting valve signal is a series of open pulses whose length in each 20 min cycle varies from 18 % to 77 %, longest when the room is coldest.
+:width: 100%
+
+PWM control of a wax thermostat. The valve is open while the measured room temperature lies below the triangular signal. The dotted lines link one open pulse to the two crossings that start and end it. The percentages give the share of each cycle that the valve is open. Illustration with a 20 min cycle and a 1 K proportional band. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/pwm_figure.py)
+:::
+
+PWM smooths the room temperature, but it does not remove the delay: the sensor measures the room, the valve acts on the water, but the thermal mass of the floor lies in between. Whatever the controller decides, the floor delivers it over the next 0.5–1 h (light floor) or many hours (heavy floor). When the room warms, the controller sees that and closes the valve, but it cannot take back the heat already stored in the floor.
+
 
 
 
@@ -389,75 +485,17 @@ A light floor holds about an eighth of that heat, and most of it is released wit
 ::: -->
 
 
-### What the time constant means over a day
 
-The heating demand of a low-energy house in early spring swings over the day, roughly as a sine with a 24-hour period, from a demand at night to a surplus when the sun shines.
-A first-order system that is asked to follow such a swing does two things: it lags behind, and it delivers less of the swing than asked, because demand starts dropping before the full output is reached.
-
-- Time Lag: The output peak lags behind the input peak.
-- Attenuation: The output amplitude is reduced.
-
-For a diurnal cycle with a period of $T = 24\text{ hours } (86{,}400\text{ s})$
-
-- Ordinary Frequency ($f$): $f = \frac{1}{T} = 0.0417\text{ cycles/hour}$
-- Angular Frequency ($\omega$): $\omega = 2\pi f = \frac{2\pi}{24\text{ h}} \approx 0.262\text{ rad/hour}$
-
-The system's dynamic performance is governed by its amplitude ratio (the attenuation factor) and time lag (the temporal phase shift):
-
-$$
-\text{amplitude ratio} = \frac{1}{\sqrt{1 + (\omega\tau)^2}}, \qquad
-\text{time lag} = \frac{\arctan(\omega\tau)}{\omega}
-$$ (eq-sine-response)
-
-The product $\omega\tau = 2\pi\,\tau/24\,\mathrm{h}$ compares the time constant with the length of the day. If the floor reacts quickly compared with the day ($\omega\tau \ll 1$), it keeps up: the amplitude ratio is close to 1 and the lag close to $\tau$. If it reacts slowly ($\omega\tau \gg 1$), the demand has already turned before the floor has warmed up. It then follows only a small part of the swing, and the lag approaches a quarter of the period, 6 h. For the light floor $\omega\tau = 0.26$; for the heavy floor $\omega\tau = 3.1$. The daily mean is always delivered in full; only the swing around it is damped and delayed.
-
-```{list-table} Response of a first-order floor to a heating demand that swings over 24 hours
-:header-rows: 1
-:label: tab-floor-daily
-
-* - Time constant $\tau$
-  - Share of the swing delivered
-  - Time lag
-* - 1 h (light floor)
-  - 97 %
-  - 1.0 h
-* - 2 h
-  - 89 %
-  - 1.8 h
-* - 6 h
-  - 54 %
-  - 3.8 h
-* - 12 h (heavy floor)
-  - 30 %
-  - 4.8 h
-```
-
-:::{figure} figures/c1/floor-daily-swing.*
-:label: fig-floor-daily-swing
-:alt: Line chart over two days of the deviation from the daily mean, in percent of the demand swing. The heating demand is a sine peaking at 04:00 at plus 100 % and bottoming at 16:00 at minus 100 %. The light floor, time constant 1 hour, follows almost the same curve, 97 % of the swing and 1 hour late. The heavy floor, time constant 12 hours, swings only plus/minus 30 % and peaks 4.8 hours late, around 09:00.
-:width: 100%
-
-A first-order floor following a heating demand that swings over 24 hours, equation {eq}`eq-sine-response`. The arrows mark the lag behind the demand peak at 04:00. Only the swing is shown; the daily mean is delivered in full. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/c1_small_figures.py)
-:::
-
-The light floor follows the daily swing almost fully, one hour late ({numref}`fig-floor-daily-swing`). The heavy floor flattens it to a third and shifts it by nearly five hours. Heat asked for at 04:00, the coldest hour, is delivered around 09:00, just as the sun takes over. A lag of a quarter of the period is the worst case: the floor then heats hardest when the demand is changing from heating to cooling. This is why heating demand at night turns into overheating during the day.
-
-The lag in {numref}`tab-floor-daily` is for the floor alone. The wax thermostat's dead time and stroke, the room's own heat capacity and the controller all add to it, as the section on control shows.
-
-
-Several strategies reduce the problem, but none of them removes it:
-
-- **Low supply temperature and self-regulation.** With the supply only a few kelvin above the room, the floor delivers less when the room warms up, even with the valve open.
-- **Heating stop.** Stop heating above an outdoor temperature limit, for example 12–15 °C, and use a deadband between the heating and cooling setpoints.
-- **Anticipating the sun.** Lower the setpoint in the morning on sunny days, using a weather forecast or model predictive control.
-- **Shading and ventilative cooling.** Remove the solar gain or the surplus heat (see Part D).
-- **Floor cooling.** The same pipes can cool by 20–40 W/m², limited by the dew point and a minimum floor surface temperature of about 19–20 °C. But the floor is just as slow when cooling.
-
-The conclusion is that a heat emitter with a long time lag is a poor match for a house whose heating demand is small and changes within hours. A fast emitter, such as heating through the ventilation air or a small convector, can switch off at the moment the sun starts to heat the room.
+## Self-regulation
+The small temperature difference between floor surface and room means that a small rise in room temperature removes much of the output. If the floor is at 23 °C, the output falls from 30 W/m² %to 9 W/m² when the room rises from 20 °C to 22 °C.
 
 
 
-## Case: a new apartment in Copenhagen
+
+
+
+
+## Example: a new apartment in Copenhagen
 
 Sarran et al. {cite:p}`sarran2022` studied the floor heating in an 85 m² apartment in a DGNB-Gold multi-family building in Copenhagen, built in 2017 (wall U = 0.12 W/(m²·K), windows 0.95 W/(m²·K)). District heating supplies risers that serve six apartments. In each apartment a mixing shunt with its own pump (Grundfos Alpha2 L 15-60, proportional pressure) lowers the supply to the floors. A motorized valve on the return controls the mixed supply temperature, and a check valve sits in the bypass, as in {numref}`fig-riser-shunts`. The kitchen/living room has two loops, the three bedrooms one each. Each loop has an on/off valve switched by the room thermostat. The floors are 14 mm wood on an 80 mm concrete slab with embedded pipes, over 93 mm insulation.
 
@@ -719,13 +757,3 @@ where $\Phi$ is a constant heat gain. Without gains the room cools towards the o
   - 6 K
 ```
 
-The older heavy house and the light low-energy house have almost the same time constant, 17 and 19 hours. The low-energy house gets its long time constant from a small $UA$, not from mass. Insulation alone makes a light house as slow as an old heavy one. The difference is the steady temperature rise: with a small $UA$ the same gain lifts the room four times as much. The sun would heat the room 67 K above the outdoor temperature if nothing removed the heat. The room is protected only because the sun sets before that happens, and by its heat capacity, which slows the rise. Any heat from the floor comes on top of the solar gain and has nowhere to go but out of the windows.
-
-The app below shows how fast a room cools after the heating stops. Change $UA$ and $\tau$ and compare with the three reference rooms of 20 m² floor.
-
-```{anywidget} code/room-cooldown.mjs
-{}
-```
-
-The same model in Python: {download}`room_cooldown.py <code/room_cooldown.py>`. Run it with `python room_cooldown.py --UA 12 --tau 18` to simulate one room, or without arguments to compare the reference rooms.
-:::
