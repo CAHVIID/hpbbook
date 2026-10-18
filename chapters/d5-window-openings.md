@@ -172,4 +172,4 @@ A venting hatch is an opening made only for ventilation, usually an insulated pa
 
 The third is the best for ventilative cooling. The high automatic hatch is better for noise, rain, insects and safety, so it can stay open at night. Its cold inflow mixes under the ceiling before it reaches people, and together with the low escape hatch it gives a large height for buoyant flow.
 
-The room CFD model in [](appendix-room-cfd.md) compares a window, a balcony door, a top hatch and a low slot in the same room, and shows the floor speed and the draught at the feet for each.
+The room CFD model in [](appendix-room-cfd.md) compares a window and a top hatch in the same room on a cool summer night and shows the floor speed and the draught at the feet for each. Its app also has a balcony door and a low slot.

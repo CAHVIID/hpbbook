@@ -457,8 +457,6 @@ The conclusion is that a heat emitter with a long time lag is a poor match for a
 
 
 
-
-
 ## Case: a new apartment in Copenhagen
 
 Sarran et al. {cite:p}`sarran2022` studied the floor heating in an 85 m² apartment in a DGNB-Gold multi-family building in Copenhagen, built in 2017 (wall U = 0.12 W/(m²·K), windows 0.95 W/(m²·K)). District heating supplies risers that serve six apartments. In each apartment a mixing shunt with its own pump (Grundfos Alpha2 L 15-60, proportional pressure) lowers the supply to the floors. A motorized valve on the return controls the mixed supply temperature, and a check valve sits in the bypass, as in {numref}`fig-riser-shunts`. The kitchen/living room has two loops, the three bedrooms one each. Each loop has an on/off valve switched by the room thermostat. The floors are 14 mm wood on an 80 mm concrete slab with embedded pipes, over 93 mm insulation.

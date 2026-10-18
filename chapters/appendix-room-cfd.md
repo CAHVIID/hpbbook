@@ -7,7 +7,7 @@ This appendix was not verified, needs rework and will change substantially.
 This appendix documents a small 2D computational fluid dynamics (CFD) model of a room section. It is used in Part D to show how the placement of an opening, the supply temperature and the airflow decide whether ventilative cooling gives draught at the feet. The model is made for comparing cases and seeing the physics. It does not give design values.
 
 The model exists in two versions that give the same results:
-%@claude: When inlet airflow has higher temperature than well-mixed, the  
+
 
 - {download}`room_cfd.py <code/room_cfd.py>` is the reference version in Python, with plotting functions in {download}`room_cfd_plots.py <code/room_cfd_plots.py>` and the figures of this appendix in {download}`cfd_examples.py <code/cfd_examples.py>`.
 - {download}`room-cfd.mjs <code/room-cfd.mjs>` is the same solver in JavaScript, which runs as the app.
@@ -189,21 +189,24 @@ Annex 20 test room: horizontal velocity $u/u_0$ on the four measuring lines, mod
 Convergence of the window case at 16 °C supply with k-ε. The flow never becomes steady: the cold stream along the floor pulses with a period of about one minute, so the rates of change level off instead of falling. The exhaust temperature settles after about 20 minutes, two time constants of the room air ($2/n$ at 6 ACH), which is why the comfort values are averaged over the last 10 minutes.
 :::
 
-## Example: window or balcony door
-%@claude: redo the comparison in this section between a window at 0.9 m sill height and top-hatch. Check the setpoint where windows open that is being used in general across the course - if its 26C, keep 26C as well-mixed temperature, if its 25C, or 24C, redo with that as new well-mixed temperature. Use supply temperature 10 C below well-mixed temperature.
+## Example: window or top hatch
 
-{numref}`fig-cfd-window-door` compares a normal window (sill at 0.9 m, head at 2.1 m) with a balcony door (floor to 2.1 m), both fully open, at 6 air changes per hour and with gains set for a well-mixed 26 °C.
+{numref}`fig-cfd-window-hatch` compares a normal window (sill at 0.9 m, head at 2.1 m) with a top hatch (2.2–2.4 m), both fully open, at 6 air changes per hour. The gains are set for a well-mixed room at 26 °C, and the supply air is 10 K colder, at 16 °C, as on a summer night.
 
-:::{figure} figures/appendix-cfd/window-vs-door.*
-:label: fig-cfd-window-door
+:::{figure} figures/appendix-cfd/window-vs-hatch.*
+:label: fig-cfd-window-hatch
 :width: 100%
 
-Time-averaged temperature and streamlines for a window and a balcony door at 16 °C and 22 °C supply. Yellow and orange contours mark 0.15 and 0.25 m/s. The dotted box holds the heat gains.
+Time-averaged temperature and streamlines for a window and a top hatch at 16 °C supply and 6 air changes per hour, with gains for a well-mixed 26 °C. Yellow and orange contours mark 0.15 and 0.25 m/s. The dotted box holds the heat gains.
 :::
 
-In both cases the cold air falls along the facade and runs along the floor. From the window it falls 0.9 m before it reaches the floor and gains speed on the way, so the floor speed is higher. Through the door it enters at floor level and spreads as a cold layer that is slower but 1.3–2 K colder and reaches further into the room ({numref}`fig-cfd-floor-line`). The draught is worst within 1 m of the facade, where neither the window nor the door meets ISO 7730 at 16 °C supply.
+From the window the cold air falls 0.9 m along the facade and runs along the floor. It slows down about 1 m into the room but leaves a cool layer of about 22 °C over the floor ({numref}`fig-cfd-floor-line`).
 
-:::{figure} figures/appendix-cfd/window-vs-door-floor-line.*
+The flow from the top hatch does not stay on the ceiling. The opening is low and narrow, so the inflow is fast and the Archimedes number is large ({eq}`eq-sh-ar`), and the jet falls along the facade from 2.2 m. It gains more speed on the way down than the window flow and reaches the floor at up to 0.39 m/s against 0.29 m/s. The fast floor stream also reaches further into the room: the ISO 7730 draught rate is above 20 % up to about 1.6 m from the facade, against about 0.9 m for the window. The air at the floor is 1.5–2 K warmer than with the window, because the falling jet mixes with room air on its way down.
+
+Neither opening meets ISO 7730 near the facade at this supply temperature, while both stay below the ASHRAE 55 ankle limit, at 15 % for the window and 17 % for the hatch. The hatch in the model is a plain slot in the wall. A real bottom-hung hatch deflects the inflow upwards, which helps it attach to the ceiling ([](d5-window-openings.md)), so the result is a worst case for the hatch.
+
+:::{figure} figures/appendix-cfd/window-vs-hatch-floor-line.*
 :label: fig-cfd-floor-line
 :width: 80%
 

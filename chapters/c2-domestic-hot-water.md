@@ -71,7 +71,17 @@ $$
 $$ (eq-dhw-power)
 
 {numref}`tab-dhw-tappings` shows the energy and the power for some typical tappings. A shower at 8 L/min needs about 17 kW while it runs, and filling a bath needs about 25 kW.
-%@claude: Make an illustration with a daily tapping profile here
+
+{numref}`fig-tapping-profile` shows a day of tappings for a family of four. Each tapping lasts only minutes, but a shower draws 15 kW while it runs. The whole day adds up to only 5.7 kWh.
+
+:::{figure} figures/c2/tapping-profile.*
+:label: fig-tapping-profile
+:alt: Chart of the heat power drawn at the taps over one day. Two morning showers around 06:30 and one evening shower at 20:00 each draw 15 kW for a few minutes. Short tappings at the washbasin and kitchen tap draw 9 to 15 kW. A black line shows the cumulative heat, which reaches 5.7 kWh at the end of the day.
+:width: 100%
+
+Heat power while tapping (bars) and cumulative heat over the day (line) for the profile "Family of 4, morning and evening", used again for the tank sizing later in this chapter. Cold water at 10 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dhw_tapping_profile.py)
+:::
+
 
 :::{table} Energy and power for typical tappings, with cold water at 10 °C.
 :label: tab-dhw-tappings
@@ -268,7 +278,7 @@ In both cases the hand estimate is close: the tank it gives delivers every showe
 - The heat pump must deliver at least the daily heat divided by the number of allowed hours, plus a margin.
 :::
 
-## Hot water in apartment buildings
+## Circulation in apartment buildings
 
 In an apartment building, hot water is produced centrally, in a district heating substation with a tank or a plate heat exchanger, and distributed to the flats through risers. Without circulation, the water in a riser cools between tappings, and the user has to run the tap until hot water arrives. A circulation loop prevents this. A pump keeps the hot water moving through the supply pipes and back to the substation, so that the whole network stays hot at all hours. The return of the loop is kept above 50 °C to limit the growth of Legionella.
 
