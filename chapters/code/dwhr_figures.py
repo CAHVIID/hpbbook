@@ -134,8 +134,8 @@ plt.close(fig)
 # ---------------------------------------------------------------- A3 effectiveness plots
 fig, (p1, p2) = plt.subplots(1, 2, figsize=(9.5, 3.9))
 v = np.linspace(4, 14, 101)
-cols = [BLUE, GREEN, PURPLE, ORANGE, RED]
-for (name, typ, e), col in zip(m.PRODUCTS, cols):
+shown = [(p, col) for p, col in zip(m.PRODUCTS, (PURPLE, None, None, None, RED)) if col]   # Showersave, Joulia
+for (name, typ, e), col in shown:
     p1.plot(v, [m.shower(e, 3, v=x)["eps"] for x in v], color=col, lw=2, label=f"{name} ({typ})")
     p1.plot([8], [e], "o", color=col, ms=5)
 p1.axvline(8, color=MUTED, lw=0.8, ls="--"); p1.text(8.2, 0.33, "PHI test\n8 L/min", fontsize=8.5, color=MUTED)
@@ -145,6 +145,9 @@ p1.set_title("Effectiveness falls with flow", fontsize=10, color=INK, loc="left"
 er = np.linspace(0.3, 0.75, 46)
 for c, col, lab in ((3, GREEN, "3 to both (equal flow)"), (2, ORANGE, "2 to the water heater"), (1, BLUE, "1 to the shower mixer")):
     p2.plot(er, [m.shower(x, c)["saving"] * 100 for x in er], color=col, lw=2, label=lab)
+for (name, typ, e), col in shown:
+    p2.axvline(e, color=col, lw=1, ls="--")
+    p2.text(e + 0.006, 42 if e < 0.5 else 22, name.split()[0], color=col, fontsize=8.5, rotation=90, va="bottom")
 p2.set_xlabel("Certified effectiveness at 8 L/min", fontsize=10, color=INK); p2.set_ylabel("Shower heat saved, %", fontsize=10, color=INK)
 p2.legend(frameon=False, fontsize=8.5, loc="upper left"); style(p2)
 p2.set_title("Saving by connection, 8 L/min shower", fontsize=10, color=INK, loc="left")

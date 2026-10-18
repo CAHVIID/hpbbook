@@ -107,6 +107,83 @@ In a heavy floor the pipes are cast into cement screed or concrete. A typical sc
 %Heavy floors are cheap to build in new houses, robust, and good at evening out short peaks in demand. That is a strength in an old, poorly insulated house. In a low-energy house it is the problem.
 %:::
 
+
+
+
+
+
+# Hydronic installation
+
+{numref}`fig-floor-loops` shows a 100 m² single-storey house with one manifold and six loops of 35–96 m. The living room and kitchen need two loops to keep each below 100 m, and the bathroom has a closer pipe spacing for a warm comfort floor.
+
+:::{figure} figures/c1/floor-loops.*
+:label: fig-floor-loops
+:alt: Floor plan of an 8 by 12.5 m house with five rooms: living and kitchen on the left, hall and bathroom in the middle, bedroom 1 and bedroom 2 on the right. The manifold sits on the hall wall next to the living room. Each room has a serpentine pipe loop drawn to scale, with dashed feed pipes from the manifold. Loop lengths: living and kitchen 95 m and 96 m, hall 38 m, bathroom 35 m with closer spacing, bedroom 1 54 m, bedroom 2 70 m.
+:width: 100%
+
+Floor heating loops in a 100 m² house, drawn to scale from the manifold. Pipe spacing 300 mm, 150 mm in the bathroom. The loop lengths include the feed pipes and are measured on the drawing. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/c1_loops_presetting.py)
+:::
+
+{numref}`fig-hydronic-schematic` shows a typical shunt installation with manifolds and valves. The parts are the same for light and heavy floors.
+
+:::{figure} figures/c1/hydronic-schematic.*
+:label: fig-hydronic-schematic
+:alt: Schematic of a hydronic floor heating system. A heat pump or district heating unit supplies water through a three-way mixing valve and a circulation pump to a manifold. The controller sets the mixing valve from an outdoor sensor and a supply temperature sensor. From the manifold, one loop runs to each of three rooms. The controller drives a motorized mixing valve. Each loop has a flow meter on the supply side and a wax thermostat on the return side, switched by a temperature sensor in its room.
+:width: 100%
+
+A hydronic floor heating installation. The controller sets the supply temperature from the outdoor temperature (heating curve). The room temperature sensor in each room opens and closes the wax thermostat on its own loop.
+:::
+
+- **Heat source.** A heat pump or district heating. Floor heating needs a low supply temperature, typically 30–35 °C in a low-energy house, with 3–5 K between supply and return.
+- **Mixing shunt.** A motorized three-way mixing valve and a circulation pump. The valve mixes return water into the supply to reach the temperature set by the controller. The controller follows a heating curve, which raises the supply temperature as the outdoor temperature falls.
+- **Manifold.** Distributes water to one loop per room, or several loops in large rooms. Each loop should be at most 80–100 m long to keep the pressure drop reasonable. Flow meters or balancing valves on the supply side set the design flow in each loop, so that every room gets its share (hydronic balancing).
+- **Wax thermostats and room temperature sensors.** Each loop has a valve on the return side, opened and closed by a wax thermostat, an electrically heated wax actuator. The room temperature sensor switches it on and off, either directly or by pulse-width modulation (PWM). The valve only opens or closes the loop. It cannot change the water temperature.
+
+
+# Hydronic balancing
+
+The loops on a manifold are connected in parallel, so they all see the same pressure difference $\Delta p$ between the supply and return manifold. The pressure drop in a loop grows with the square of the flow,
+
+$$
+\Delta p = \left(\frac{\dot m}{K}\right)^2 \qquad\Rightarrow\qquad \dot m = K\,\sqrt{\Delta p}
+$$ (eq-loop-flow-coefficient)
+
+where $K$ is the flow coefficient of the loop: the mass flow at a pressure drop of 1 bar. Manufacturers give the flow coefficient of a valve as $K_v$ in m³/h at 1 bar. $K$ for a whole loop combines the pipe and the valve. With the same $\Delta p$ on all loops, each loop gets a flow proportional to its own $K$. A pipe's resistance grows with its length, so with a constant friction factor $K \propto 1/\sqrt{L}$. A 50 m loop then takes $\sqrt{2} = 1.4$ times the flow of a 100 m loop, although it usually serves a smaller room and needs less.
+
+The design flow of a loop follows from its design heat output $\Phi$ and the temperature drop $\Delta\theta$ between supply and return:
+
+$$
+\dot m_\text{design} = \frac{\Phi}{c_p\,\Delta\theta}
+$$ (eq-design-flow)
+
+A bedroom loop with $\Phi = 300$ W and 35/30 °C needs $\dot m = 300/(4180 \cdot 5) = 0.014$ kg/s, or 52 kg/h.
+
+**Pre-setting.** The valve on each loop has an adjustable throttle, the pre-setting, which sets its $K_v$. The installer chooses the pre-setting so that every loop gets its design flow at the same manifold pressure: long loops get a high pre-setting (open), short loops a low one (throttled). The pump sets the pressure, the pre-settings divide the flow between the loops, much like the accelerator and the gear in a car. The pre-settings must be set after the system has been filled and vented, because air in the loops changes their resistance.
+
+
+{numref}`fig-presetting-valve` shows the pre-settings for this house. The pump is set so that the loop with the largest pressure drop, one of the two 96 m loops in the living room, gets its design flow with the valve fully open (N), here 2.4 kPa over the manifold. Every other loop then has pressure to spare, and its valve must take up the difference. A short loop that needs little flow needs a low pre-setting and takes most of the 2.4 kPa in the valve.
+
+:::{figure} figures/c1/presetting-valve.*
+:label: fig-presetting-valve
+:alt: Log-log chart of pressure drop over the valve, 0.01 to 40 kPa, against flow, 5 to 1000 l/h. Eight parallel straight lines, one per pre-setting from 1 (left, most throttled) to 7 and N (fully open, drawn bold). The operating points of six loops are marked. The two living room loops sit on the N line at about 54 l/h and 0.3 kPa. The hall loop is on setting 1 at about 25 l/h and 2 kPa, the bathroom and bedroom 1 on setting 2 at about 33 l/h and 1.7–1.9 kPa, and bedroom 2 on setting 3 at about 36 l/h and 1.4 kPa.
+:width: 80%
+
+Pressure drop over a loop valve for pre-settings 1–7 and N (fully open), with the operating point of each loop in the house. Loops 1 and 2 overlap. Typical $K_v$ values for a small pre-settable valve, not product data. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/c1_loops_presetting.py)
+:::
+
+{numref}`fig-presetting-flows` shows what the pre-settings achieve. With all valves fully open, the four shorter loops take 1.5–3.5 times their design flow, and the hall the most. With the pre-settings, every loop is close to its design flow. The hall still gets too much, because it would need a $K_v$ below the lowest setting. The settings come in steps, so balancing is only ever approximate.
+
+:::{figure} figures/c1/presetting-flows.*
+:label: fig-presetting-flows
+:alt: Bar chart of flow in kg/h for six loops, each with three bars: design flow, all valves fully open, and with pre-settings. Loops 1 and 2, living and kitchen, 95–96 m, setting N: all three bars about 54 kg/h. Loop 3, hall, 38 m, setting 1: design 19, open 67, pre-set 25 kg/h. Loop 4, bathroom, 35 m, setting 2: design 34, open 70, pre-set 34 kg/h. Loop 5, bedroom 1, 54 m, setting 2: design 29, open 57, pre-set 32 kg/h. Loop 6, bedroom 2, 70 m, setting 3: design 37, open 57, pre-set 36 kg/h.
+:width: 100%
+
+Flow in each loop with all valves fully open and with the pre-settings in {numref}`fig-presetting-valve`, compared with the design flow (35/30 °C). The manifold pressure difference is 2.4 kPa in both cases. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/c1_loops_presetting.py)
+:::
+
+**What goes wrong without balancing.** A loop that gets too much flow returns water that is almost as warm as the supply. The temperature drop $\Delta\theta$ in {eq}`eq-design-flow` falls, and the return temperature rises. The room with the short loop is heated fast and the room at the end of the long loop too slowly, and the usual response is to raise the supply temperature or the pump setting until the worst room is warm. Both make the other loops worse. A high return temperature lowers the efficiency of a heat pump, and in district heating it increases the heat loss of the return pipes and is often penalised in the tariff.
+
+
 # Time constant of floor heating 
 :::{figure} figures/c1/floor-daily-swing.*
 :label: fig-floor-daily-swing
@@ -134,7 +211,7 @@ The conclusion is that a heat emitter with a long time lag is a poor match for a
 ::::{admonition} Time constant
 :class: dropdown
 
-# Modeling time constant of floor heating
+## Modeling time constant of floor heating
 
 When the water flow in a loop starts or stops, the heat output to the room does not change at once. This section explains why, and what the delay means for a low-energy house.
 
@@ -285,70 +362,7 @@ The same model in Python: {download}`room_cooldown.py <code/room_cooldown.py>`. 
 
 
 
-
-## Hydronic installation
-
-{numref}`fig-hydronic-schematic` shows a typical installation. The parts are the same for light and heavy floors.
-
-:::{figure} figures/c1/hydronic-schematic.*
-:label: fig-hydronic-schematic
-:alt: Schematic of a hydronic floor heating system. A heat pump or district heating unit supplies water through a three-way mixing valve and a circulation pump to a manifold. The controller sets the mixing valve from an outdoor sensor and a supply temperature sensor. From the manifold, one loop runs to each of three rooms. The controller drives a motorized mixing valve. Each loop has a flow meter on the supply side and a wax thermostat on the return side, switched by a temperature sensor in its room.
-:width: 100%
-
-A hydronic floor heating installation. The controller sets the supply temperature from the outdoor temperature (heating curve). The room temperature sensor in each room opens and closes the wax thermostat on its own loop.
-:::
-
-- **Heat source.** A heat pump or district heating. Floor heating needs a low supply temperature, typically 30–35 °C in a low-energy house, with 3–5 K between supply and return.
-- **Mixing shunt.** A motorized three-way mixing valve and a circulation pump. The valve mixes return water into the supply to reach the temperature set by the controller. The controller follows a heating curve, which raises the supply temperature as the outdoor temperature falls.
-- **Manifold.** Distributes water to one loop per room, or several loops in large rooms. Each loop should be at most 80–100 m long to keep the pressure drop reasonable. Flow meters or balancing valves on the supply side set the design flow in each loop, so that every room gets its share (hydronic balancing).
-- **Wax thermostats and room temperature sensors.** Each loop has a valve on the return side, opened and closed by a wax thermostat, an electrically heated wax actuator. The room temperature sensor switches it on and off, either directly or by pulse-width modulation (PWM). The valve only opens or closes the loop. It cannot change the water temperature.
-
-
-## Hydronic balancing
-
-The loops on a manifold are connected in parallel, so they all see the same pressure difference $\Delta p$ between the supply and return manifold. The pressure drop in a loop grows with the square of the flow,
-
-$$
-\Delta p = \left(\frac{\dot m}{K}\right)^2 \qquad\Rightarrow\qquad \dot m = K\,\sqrt{\Delta p}
-$$ (eq-loop-flow-coefficient)
-
-where $K$ is the flow coefficient of the loop: the mass flow at a pressure drop of 1 bar. Manufacturers give the flow coefficient of a valve as $K_v$ in m³/h at 1 bar. $K$ for a whole loop combines the pipe and the valve. With the same $\Delta p$ on all loops, each loop gets a flow proportional to its own $K$. A pipe's resistance grows with its length, so with a constant friction factor $K \propto 1/\sqrt{L}$. A 50 m loop then takes $\sqrt{2} = 1.4$ times the flow of a 100 m loop, although it usually serves a smaller room and needs less.
-
-The design flow of a loop follows from its design heat output $\Phi$ and the temperature drop $\Delta\theta$ between supply and return:
-
-$$
-\dot m_\text{design} = \frac{\Phi}{c_p\,\Delta\theta}
-$$ (eq-design-flow)
-
-A bedroom loop with $\Phi = 300$ W and 35/30 °C needs $\dot m = 300/(4180 \cdot 5) = 0.014$ kg/s, or 52 kg/h.
-
-**Pre-setting.** The valve on each loop has an adjustable throttle, the pre-setting, which sets its $K_v$. The installer chooses the pre-setting so that every loop gets its design flow at the same manifold pressure: long loops get a high pre-setting (open), short loops a low one (throttled). The pump sets the pressure, the pre-settings divide the flow between the loops, much like the accelerator and the gear in a car. The pre-settings must be set after the system has been filled and vented, because air in the loops changes their resistance.
-
-{numref}`fig-presetting-valve` shows the pre-settings for a 100 m² house with six loops of 35–96 m. The pump is set so that the loop with the largest pressure drop, one of the two 96 m loops in the living room, gets its design flow with the valve fully open (N), here 2.4 kPa over the manifold. Every other loop then has pressure to spare, and its valve must take up the difference. A short loop that needs little flow needs a low pre-setting and takes most of the 2.4 kPa in the valve.
-
-:::{figure} figures/c1/presetting-valve.*
-:label: fig-presetting-valve
-:alt: Log-log chart of pressure drop over the valve, 0.01 to 40 kPa, against flow, 5 to 1000 l/h. Eight parallel straight lines, one per pre-setting from 1 (left, most throttled) to 7 and N (fully open, drawn bold). The operating points of six loops are marked. The two living room loops sit on the N line at about 54 l/h and 0.3 kPa. The hall loop is on setting 1 at about 25 l/h and 2 kPa, the bathroom and bedroom 1 on setting 2 at about 33 l/h and 1.7–1.9 kPa, and bedroom 2 on setting 3 at about 36 l/h and 1.4 kPa.
-:width: 80%
-
-Pressure drop over a loop valve for pre-settings 1–7 and N (fully open), with the operating point of each loop in the house. Loops 1 and 2 overlap. Typical $K_v$ values for a small pre-settable valve, not product data. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/c1_loops_presetting.py)
-:::
-
-{numref}`fig-presetting-flows` shows what the pre-settings achieve. With all valves fully open, the four shorter loops take 1.5–3.5 times their design flow, and the hall the most. With the pre-settings, every loop is close to its design flow. The hall still gets too much, because it would need a $K_v$ below the lowest setting. The settings come in steps, so balancing is only ever approximate.
-
-:::{figure} figures/c1/presetting-flows.*
-:label: fig-presetting-flows
-:alt: Bar chart of flow in kg/h for six loops, each with three bars: design flow, all valves fully open, and with pre-settings. Loops 1 and 2, living and kitchen, 95–96 m, setting N: all three bars about 54 kg/h. Loop 3, hall, 38 m, setting 1: design 19, open 67, pre-set 25 kg/h. Loop 4, bathroom, 35 m, setting 2: design 34, open 70, pre-set 34 kg/h. Loop 5, bedroom 1, 54 m, setting 2: design 29, open 57, pre-set 32 kg/h. Loop 6, bedroom 2, 70 m, setting 3: design 37, open 57, pre-set 36 kg/h.
-:width: 100%
-
-Flow in each loop with all valves fully open and with the pre-settings in {numref}`fig-presetting-valve`, compared with the design flow (35/30 °C). The manifold pressure difference is 2.4 kPa in both cases. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/c1_loops_presetting.py)
-:::
-
-**What goes wrong without balancing.** A loop that gets too much flow returns water that is almost as warm as the supply. The temperature drop $\Delta\theta$ in {eq}`eq-design-flow` falls, and the return temperature rises. The room with the short loop is heated fast and the room at the end of the long loop too slowly, and the usual response is to raise the supply temperature or the pump setting until the worst room is warm. Both make the other loops worse. A high return temperature lowers the efficiency of a heat pump, and in district heating it increases the heat loss of the return pipes and is often penalised in the tariff.
-
-
-
-## Control of floor heating
+# Control of floor heating
 
 Floor heating has two levels of control ({numref}`fig-hydronic-schematic`). The supply temperature follows a heating curve, set from the outdoor temperature. Each room then switches its own loop with a wax thermostat, driven by its room temperature sensor.
 
@@ -362,17 +376,17 @@ Low supply temperature increases self-regulation.
 
 A wax thermostat is an on/off valve ({numref}`fig-wax-thermostat`). A small heater warms a wax capsule, the wax expands and pushes the valve open. It takes 2–3 min before the valve starts to move and another 3–5 min to open fully, and about the same to close.
 
-:::{figure} figures/c1/wax-thermostat.jpg
+:::{figure} figures/c1/wax-actuators-manifold.jpg
 :label: fig-wax-thermostat
-:alt: Photo of a wax thermostat: a blue cylindrical actuator with a grey threaded base that screws onto the valve on the manifold, and a grey cable for the 24 V supply from the room unit.
-:width: 35%
+:alt: Photo of six wax thermostats from different makers, side by side on the valve connections of a brass floor heating manifold. They are small cylindrical or box-shaped actuators, mostly white, one dark grey with a blue top, each screwed onto a valve with a knurled ring, and each with a cable to the room unit.
+:width: 90%
 
-Wax thermostat (telestat) for mounting on the manifold, 24 V, 2 W, normally closed. Photo: Uponor.
+Wax thermostats (thermoelectric actuators) from different makers, mounted on the valves of a floor heating manifold. Each one opens or closes one loop. Photo: Harold2013, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Thermische_Stellantriebe,_Thermische_Antriebe,_Fussbodenheizung,_thermal_actuator,_actuateur_thermique.jpg), CC0.
 :::
 
 The wax thermostat cannot hold positions between fully open, and fully closed, so they are  controlled via pulse-width modulation.
 
-### On/off control.
+## On/off
 
 The loop opens when the room is below the setpoint minus a hysteresis and closes when it is above the setpoint plus the hysteresis. The valve response depends on how narrow or wide the proportional band was set by the user. A narrow proportional band causes the valve to respond "a lot" for even small deviations, a band too wide causes the valve to never quite respond as needed to close the deviation.
 
@@ -392,7 +406,7 @@ On/off control compared with a proportional controller with a narrow and a wide 
 :::
 
 
-### PWM control
+## Pulse-width-modulation (PWM)
 
 The room unit runs a PI controller with a predefined duty cycle. If 40 % output is required and the cycle is 15 min, the valve is only (fully) open for about 6 min of each cycle. On average this behaves like a valve that is 40 % open.
 
@@ -487,7 +501,21 @@ A light floor holds about an eighth of that heat, and most of it is released wit
 
 
 ## Self-regulation
-The small temperature difference between floor surface and room means that a small rise in room temperature removes much of the output. If the floor is at 23 °C, the output falls from 30 W/m² %to 9 W/m² when the room rises from 20 °C to 22 °C.
+The small temperature difference between floor surface and room means that a small rise in room temperature removes much of the output. If the floor is at 23 °C, the output falls from 30 W/m² to 9 W/m² when the room rises from 20 °C to 22 °C ({numref}`fig-floor-self-regulation`a). No controller is involved. The heat flux follows the temperature difference, and the room temperature is part of that difference.
+
+If the room rises above the floor, the flux changes sign and the floor cools the room. A floor at 23 °C takes 14 W/m² out of a room at 25 °C. Cooling is weaker than heating for the same temperature difference, about 7 instead of 9–11 W/(m²·K), because warm air above a cool floor is stable and convection is weak {cite:p}`en1264`.
+
+{numref}`fig-floor-self-regulation`b shows what this means over a sunny spring day. The floor surface stays at 23 °C while the room swings between 21 °C at night and 25 °C in the afternoon. The floor heats the room until about 09:00, then cools it until about 21:00, when it starts heating again. Over the day it delivers about 140 Wh/m² and takes back about 110 Wh/m². The same slab is a heater at night and a cooler in the afternoon, without anything switching.
+
+:::{figure} figures/c1/floor-self-regulation.*
+:label: fig-floor-self-regulation
+:alt: Two charts. Left, heat flux from the floor against room temperature from 19 to 27 °C for a floor surface at 23 °C. The line falls from about 38 W/m² at 19 °C through 30 W/m² at 20 °C and 9 W/m² at 22 °C to zero at 23 °C, shaded orange and labelled floor heats. Above 23 °C it continues down, less steeply, to minus 14 W/m² at 25 °C and minus 28 W/m² at 27 °C, shaded blue and labelled floor cools. Right, over 24 hours the room temperature swings as a sine between 21 °C at 03:00 and 25 °C at 15:00, around a constant floor surface temperature of 23 °C. The heat flux is positive, up to 19 W/m² at 03:00, until about 09:00, then negative, down to minus 14 W/m² at 15:00, until about 21:00, then positive again.
+:width: 100%
+
+Self-regulation of a floor with its surface at 23 °C. a) Heat flux against room temperature; EN 1264 characteristic for heating, 7 W/(m²·K) for cooling. b) The same floor over a sunny day with the room swinging ±2 K around the floor temperature. Illustration: the floor surface is held constant, which a heavy floor with a low, constant supply temperature roughly does. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/c1_self_regulation.py)
+:::
+
+Self-regulation works best when the floor surface temperature is close to the room temperature, which requires a low supply temperature. With water at 35 °C instead, the floor surface is warmer than any room temperature the occupants would accept, so the floor never cools and a 2 K rise in the room only trims its output by a fraction. Self-regulation is also no substitute for control in a low-energy house. In {numref}`fig-floor-self-regulation`b the room still swings by 4 K, and the heat the floor delivers at night is part of what makes the afternoon too warm.
 
 
 
@@ -495,7 +523,7 @@ The small temperature difference between floor surface and room means that a sma
 
 
 
-## Example: a new apartment in Copenhagen
+# Example: balancing floor heating with virtual sensors
 
 Sarran et al. {cite:p}`sarran2022` studied the floor heating in an 85 m² apartment in a DGNB-Gold multi-family building in Copenhagen, built in 2017 (wall U = 0.12 W/(m²·K), windows 0.95 W/(m²·K)). District heating supplies risers that serve six apartments. In each apartment a mixing shunt with its own pump (Grundfos Alpha2 L 15-60, proportional pressure) lowers the supply to the floors. A motorized valve on the return controls the mixed supply temperature, and a check valve sits in the bypass, as in {numref}`fig-riser-shunts`. The kitchen/living room has two loops, the three bedrooms one each. Each loop has an on/off valve switched by the room thermostat. The floors are 14 mm wood on an 80 mm concrete slab with embedded pipes, over 93 mm insulation.
 
@@ -546,6 +574,18 @@ The loop flows were 4–10 times the design flow, so the water cooled only about
 2. **Lower pump curve.** Switching the pump to its lower proportional-pressure curve changed the return temperature only a little, because the loops stayed unbalanced.
 3. **Balancing.** The flow coefficients of the loops were reduced, in the model, until each loop got its design flow from a dimensioning tool: 0.022 kg/s in each living room loop, 0.017 kg/s in bedroom 1 and 0.012 kg/s in bedrooms 2 and 3. In the installation this corresponds to new pre-settings on the loop valves.
 
+{numref}`fig-sarran-pump-curves` shows why the lower pump curve alone did little. The loops were so open that the system curve was flat, and the pump ran at high flow on either curve (points 1 and 2). Only the smaller flow coefficients after balancing make the system curve steep, so the flow falls to about a sixth (point 3).
+
+:::{figure} figures/c1/sarran-pump-curves.*
+:label: fig-sarran-pump-curves
+:alt: Pump diagram with water flow from 0 to 0.8 kg/s and pump head from 0 to 45 kPa. Two proportional-pressure pump curves, high and low, and two parabolic system curves. Point 1, as found, is on the high pump curve at about 0.54 kg/s and 32 kPa. Point 2, low pump curve, is at about 0.41 kg/s and 18 kPa. Point 3, low pump curve with balanced loops, is on a much steeper system curve at about 0.09 kg/s and 13 kPa.
+:width: 90%
+
+Pump curves and operating points with all loops open: 1 as found, 2 low pump curve, 3 low pump curve and balanced loops. Values read from {cite:t}`sarran2022`, Fig. 11, CC BY 4.0. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/sarran_pump_curves.py)
+:::
+
+
+%@claude: change this table to figure 12 from the journal paper. 
 :::{list-table} Energy-weighted mean return temperature to the riser for the improvement scenarios {cite:p}`sarran2022`
 :header-rows: 1
 :label: tab-sarran-improvements
@@ -567,26 +607,12 @@ The loop flows were 4–10 times the design flow, so the water cooled only about
   - 31.0 °C
 :::
 
-{numref}`fig-sarran-pump-curves` shows why the lower pump curve alone did little. The loops were so open that the system curve was flat, and the pump ran at high flow on either curve (points 1 and 2). Only the smaller flow coefficients after balancing make the system curve steep, so the flow falls to about a sixth (point 3).
-
-:::{figure} figures/c1/sarran-pump-curves.*
-:label: fig-sarran-pump-curves
-:alt: Pump diagram with water flow from 0 to 0.8 kg/s and pump head from 0 to 45 kPa. Two proportional-pressure pump curves, high and low, and two parabolic system curves. Point 1, as found, is on the high pump curve at about 0.54 kg/s and 32 kPa. Point 2, low pump curve, is at about 0.41 kg/s and 18 kPa. Point 3, low pump curve with balanced loops, is on a much steeper system curve at about 0.09 kg/s and 13 kPa.
-:width: 90%
-
-Pump curves and operating points with all loops open: 1 as found, 2 low pump curve, 3 low pump curve and balanced loops. Values read from {cite:t}`sarran2022`, Fig. 11, CC BY 4.0. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/sarran_pump_curves.py)
-:::
-
-Balancing lowered the return temperature at every supply setpoint. With balanced loops, 37 °C was the lowest setpoint the model found sufficient, which gives the headline result: 8.6 K lower supply and 6.5 K lower return temperature. The balanced loops also cut the pump power to about a third, and the new operating point showed that the pump was oversized.
-
-Two limits should be kept in mind. The return temperature in the model was biased by −1.4 K, and the model did not reproduce the shunt well at low setpoints: a setpoint of 35 °C gave at most 32.5 °C in the model, which is why balancing plus 35 °C did not cover the demand. The results for one apartment save little energy on their own. Repeated over a district heating network, a 6 K lower return reduces the heat loss of the return pipes and raises the efficiency of production. For a biomass boiler with flue gas condensation the authors estimate 3 % more heat from the same fuel.
-
-The design consequence is that a floor heating installation is only as good as its commissioning. The design supply temperature of 35 °C was right, but the installation ran at 45.6 °C with loop flows far above design. Raising the supply temperature is a common response to complaints from occupants, and nobody checks the loops afterwards. Correct pre-settings at commissioning, and a check of the loop flows and the return temperature after the first winter, would have caught both faults.
 
 
 
 
-## Several manifolds on one riser
+
+# Several manifolds on one riser
 
 In buildings with several floors or apartments, one riser pump often feeds a manifold on each floor, each through its own shunt ({numref}`fig-riser-shunts`). The shunt pump circulates water through the floor loops. A thermostatic valve on the return limits the supply temperature: when the sensor bulb gets too warm, it throttles the water returned to the riser, so less hot water is drawn in and more return water is mixed back through the bypass. The check valve stops riser water from flowing backwards through the bypass into the return.
 
@@ -611,7 +637,7 @@ Riser pump at design (A) and at low load with constant speed (B) and proportiona
 :::
 
 
-## Interactive control model
+# Interactive control model
 
 The model below simulates one room in a low-energy house with a light and a heavy floor ({numref}`fig-floor-sections`) over a cloudy spring day followed by a sunny one. The floor is controlled in three ways: an on/off room thermostat, a PI controller whose output is a PWM signal to the wax thermostat, and, for reference, an ideal heater that delivers exactly the heat needed without any delay. Windows are opened when the room gets too warm, and the heat removed this way is counted as heat vented.
 
@@ -644,7 +670,7 @@ The same model in Python, with comments on every assumption, can be downloaded h
 ::::{admonition} Control model equations
 :class: dropdown
 
-### Theory behind the interactive model
+## Theory behind the interactive model
 
 :::{caution}
 Needs review
@@ -717,7 +743,7 @@ $$ (eq-ideal)
 
 :::{admonition} Extra: Time constant of a thermal space
 :class: dropdown
-### The room has a time constant too
+## The room has a time constant too
 
 The same idea applies to the room or the whole house. The heat store is the heat capacity of air, furniture and internal construction, $C$, and the heat leaves through the envelope and the ventilation, with the heat loss coefficient $UA$ [W/K]. The resistance is $R = 1/UA$, so
 

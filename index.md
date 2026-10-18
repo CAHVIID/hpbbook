@@ -16,7 +16,8 @@ There are code snippets (apps) embedded into the textbook. The intention of the 
 
 The content is **not completely assessed yet and cannot be taken as true!**
 
-*AI-declaration: Claude Opus 5.5 was used to generate this textbook, steered by the author. The author does not take responsibility for chapters marked as "under revision".*
+## AI-declaration
+Claude Opus 5.5 was used to generate this textbook, steered by the author. The author does not take responsibility for chapters marked as "under revision".*
 
 
 ## Contents
