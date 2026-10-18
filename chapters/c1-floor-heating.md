@@ -138,6 +138,118 @@ A hydronic floor heating installation. The controller sets the supply temperatur
 :::
 
 
+## Hydronic balancing
+
+The loops on a manifold are connected in parallel, so they all see the same pressure difference $\Delta p$ between the supply and return manifold. The pressure drop in a loop grows with the square of the flow,
+
+$$
+\Delta p = \left(\frac{\dot m}{K}\right)^2 \qquad\Rightarrow\qquad \dot m = K\,\sqrt{\Delta p}
+$$ (eq-loop-flow-coefficient)
+
+where $K$ is the flow coefficient of the loop: the mass flow at a pressure drop of 1 bar. Manufacturers give the flow coefficient of a valve as $K_v$ in m³/h at 1 bar. $K$ for a whole loop combines the pipe and the valve. With the same $\Delta p$ on all loops, each loop gets a flow proportional to its own $K$. A pipe's resistance grows with its length, so with a constant friction factor $K \propto 1/\sqrt{L}$. A 50 m loop then takes $\sqrt{2} = 1.4$ times the flow of a 100 m loop, although it usually serves a smaller room and needs less.
+
+The design flow of a loop follows from its design heat output $\Phi$ and the temperature drop $\Delta\theta$ between supply and return:
+
+$$
+\dot m_\text{design} = \frac{\Phi}{c_p\,\Delta\theta}
+$$ (eq-design-flow)
+
+A bedroom loop with $\Phi = 300$ W and 35/30 °C needs $\dot m = 300/(4180 \cdot 5) = 0.014$ kg/s, or 52 kg/h.
+
+**Pre-setting.** The valve on each loop has an adjustable throttle, the pre-setting, which sets its $K_v$. The installer chooses the pre-setting so that every loop gets its design flow at the same manifold pressure: long loops get a high pre-setting (open), short loops a low one (throttled). The pump sets the pressure, the pre-settings divide the flow between the loops, much like the accelerator and the gear in a car. The pre-settings must be set after the system has been filled and vented, because air in the loops changes their resistance.
+
+**What goes wrong without balancing.** A loop that gets too much flow returns water that is almost as warm as the supply. The temperature drop $\Delta\theta$ in {eq}`eq-design-flow` falls, and the return temperature rises. The room with the short loop is heated fast and the room at the end of the long loop too slowly, and the usual response is to raise the supply temperature or the pump setting until the worst room is warm. Both make the other loops worse. A high return temperature lowers the efficiency of a heat pump, and in district heating it increases the heat loss of the return pipes and is often penalised in the tariff.
+
+### Case: a new apartment in Copenhagen
+
+Sarran et al. {cite:p}`sarran2022` studied the floor heating in an 85 m² apartment in a DGNB-Gold multi-family building in Copenhagen, built in 2017 (wall U = 0.12 W/(m²·K), windows 0.95 W/(m²·K)). District heating supplies risers that serve six apartments. In each apartment a mixing shunt with its own pump (Grundfos Alpha2 L 15-60, proportional pressure) lowers the supply to the floors. A motorized valve on the return controls the mixed supply temperature, and a check valve sits in the bypass, as in {numref}`fig-riser-shunts`. The kitchen/living room has two loops, the three bedrooms one each. Each loop has an on/off valve switched by the room thermostat. The floors are 14 mm wood on an 80 mm concrete slab with embedded pipes, over 93 mm insulation.
+
+**Method.** No flows or temperatures were measured in the loops. The apartment had only the data a modern installation already logs: the room temperatures and the valve status from the thermostats (1–5 min), the supply and return temperature and the flow from the apartment's heat meter, and the current drawn by the pump (5 min), see {numref}`fig-sarran-schematic`. The authors built a physical model of the installation in Modelica (Dymola), with the riser, the shunt, the pump curves, the manifold and one floor heating component per loop. Each pipe section and valve follows {eq}`eq-loop-flow-coefficient`. Nine parameters were unknown: the flow coefficient of each room loop, of the bypass and of the return valve, the riser pressure difference, the gain and setpoint of the shunt controller. A genetic algorithm (ModestPy) adjusted them until the model matched the measured return temperature, heat meter flow and pump current, by minimising the sum of their normalised RMS errors. The model was fitted on 14 days and validated on the following 17 days in January 2019.
+
+:::{figure} figures/c1/sarran-schematic.*
+:label: fig-sarran-schematic
+:alt: Schematic of the apartment installation. District heating risers on the left. The supply branch passes a supply riser temperature sensor, a tee where a bypass with a check valve joins from the return, the mixed supply temperature, the pump and the total flow before the supply manifold. One floor loop is drawn as a serpentine in a room; four more loops are dashed. The return manifold has an on/off valve on each loop. The return branch passes the bypass tee, a motorized valve and a heat meter that measures the flow and return riser temperature. Filled red dots mark measured model inputs (supply riser temperature, room temperature, valve status), filled blue dots measured outputs used to fit the model (metered flow, return riser temperature, pump current), and open teal circles the variables the model estimates (mixed supply temperature, total flow, loop flow, loop return temperature, floor surface temperature, room heat output).
+:width: 100%
+
+The apartment installation with the measured and the virtually sensed variables. Redrawn from {cite:t}`sarran2022`, Fig. 3, CC BY 4.0. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/sarran_schematic.py)
+:::
+
+This is a grey-box model: physics with parameters fitted to data. Once calibrated, it works as a virtual heat meter on every loop. It gives the flow, return temperature and heat output of each room, which nobody had measured.
+
+**Fit.** The model matched the pump current and heat meter flow well (NRMSE 0.05 and 0.04). The return temperature was the hardest, with a systematic error of −1.4 K on the energy-weighted mean.
+
+**Findings.** The virtual sensors showed an installation running far from its design ({numref}`tab-sarran-diagnosis`).
+
+```{list-table} Virtually sensed values in the apartment, January 2019, compared with design {cite:p}`sarran2022`
+:header-rows: 1
+:label: tab-sarran-diagnosis
+
+* -
+  - Found
+  - Design or guideline
+* - Mixed supply temperature setpoint
+  - 45.6 °C
+  - 35 °C
+* - Flow in each bedroom loop
+  - 0.08–0.13 kg/s (290–470 kg/h)
+  - 0.01–0.03 kg/s (36–110 kg/h)
+* - Cooling of the water in the bedroom loops
+  - about 2 K
+  - 5 K
+* - Peak output per bedroom loop
+  - 400–600 W
+  - 250–350 W
+* - Floor surface temperature
+  - 26–29 °C
+  - at most 27 °C for wooden floors
+```
+
+The loop flows were 4–10 times the design flow, so the water cooled only about 2 K in the bedrooms and the return to the riser was 38–40 °C. With 45.6 °C supply the floors heated the rooms 1 K in 6–12 hours, then switched off for 1–2 days while the slab discharged. One bedroom kept its loop open for days and probably heated the living room through the wall, since the living room's own loop did not open in that period.
+
+**Improvements.** The calibrated model was then used to test changes before anyone touched the installation ({numref}`tab-sarran-improvements`):
+
+1. **Lower mixed supply temperature, no balancing.** With all loops open, the model found the lowest setpoint that still covered the measured heat demand of the apartment. 35 °C was enough when the demand of the rooms was added up, which matches the design.
+2. **Lower pump curve.** Switching the pump to its lower proportional-pressure curve changed the return temperature only a little, because the loops stayed unbalanced.
+3. **Balancing.** The flow coefficients of the loops were reduced, in the model, until each loop got its design flow from a dimensioning tool: 0.022 kg/s in each living room loop, 0.017 kg/s in bedroom 1 and 0.012 kg/s in bedrooms 2 and 3. In the installation this corresponds to new pre-settings on the loop valves.
+
+```{list-table} Energy-weighted mean return temperature to the riser for the improvement scenarios {cite:p}`sarran2022`
+:header-rows: 1
+:label: tab-sarran-improvements
+
+* - Scenario
+  - Mixed supply setpoint
+  - Return temperature
+* - As found
+  - 45.6 °C
+  - 37.5 °C
+* - Lower setpoint only
+  - 40 °C
+  - 34.4 °C
+* - Lower setpoint only
+  - 35 °C
+  - 31.3 °C
+* - Balanced loops and lower setpoint
+  - 37 °C
+  - 31.0 °C
+```
+
+{numref}`fig-sarran-pump-curves` shows why the lower pump curve alone did little. The loops were so open that the system curve was flat, and the pump ran at high flow on either curve (points 1 and 2). Only the smaller flow coefficients after balancing make the system curve steep, so the flow falls to about a sixth (point 3).
+
+:::{figure} figures/c1/sarran-pump-curves.*
+:label: fig-sarran-pump-curves
+:alt: Pump diagram with water flow from 0 to 0.8 kg/s and pump head from 0 to 45 kPa. Two proportional-pressure pump curves, high and low, and two parabolic system curves. Point 1, as found, is on the high pump curve at about 0.54 kg/s and 32 kPa. Point 2, low pump curve, is at about 0.41 kg/s and 18 kPa. Point 3, low pump curve with balanced loops, is on a much steeper system curve at about 0.09 kg/s and 13 kPa.
+:width: 90%
+
+Pump curves and operating points with all loops open: 1 as found, 2 low pump curve, 3 low pump curve and balanced loops. Values read from {cite:t}`sarran2022`, Fig. 11, CC BY 4.0. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/sarran_pump_curves.py)
+:::
+
+Balancing lowered the return temperature at every supply setpoint. With balanced loops, 37 °C was the lowest setpoint the model found sufficient, which gives the headline result: 8.6 K lower supply and 6.5 K lower return temperature. The balanced loops also cut the pump power to about a third, and the new operating point showed that the pump was oversized.
+
+Two limits should be kept in mind. The return temperature in the model was biased by −1.4 K, and the model did not reproduce the shunt well at low setpoints: a setpoint of 35 °C gave at most 32.5 °C in the model, which is why balancing plus 35 °C did not cover the demand. The results for one apartment save little energy on their own. Repeated over a district heating network, a 6 K lower return reduces the heat loss of the return pipes and raises the efficiency of production. For a biomass boiler with flue gas condensation the authors estimate 3 % more heat from the same fuel.
+
+The design consequence is that a floor heating installation is only as good as its commissioning. The design supply temperature of 35 °C was right, but the installation ran at 45.6 °C with loop flows far above design. Raising the supply temperature is a common response to complaints from occupants, and nobody checks the loops afterwards. Correct pre-settings at commissioning, and a check of the loop flows and the return temperature after the first winter, would have caught both faults.
+
+
 ## Control of floor heating
 
 Floor heating has two levels of control ({numref}`fig-hydronic-schematic`). The supply temperature follows a heating curve, set from the outdoor temperature. Each room then switches its own loop with a wax thermostat, driven by its room temperature sensor.
