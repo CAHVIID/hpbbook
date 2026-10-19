@@ -238,6 +238,8 @@ The effectiveness rises from 0.60 to 0.79 and the cold water gets 5 K warmer, bu
 
 ## Connecting the unit
 
+% REVIEW LATER (Christian, 2026-10-19): remove connection 2 (preheated water to the water heater only) before next year's course. It is a bit strange; keep connections 1 and 3, and update the figure, the effectiveness figure, the table in "Power of the water heater" and dwhr_figures.py to match.
+
 The preheated water can go to three places ({numref}`fig-dwhr-connections`):
 
 1. **To the cold side of the shower mixer only.** The water heater is still fed with cold mains water.
