@@ -238,6 +238,8 @@ The effectiveness rises from 0.60 to 0.79 and the cold water gets 5 K warmer, bu
 
 ## Connecting the unit
 
+% REVIEW LATER (Christian, 2026-10-19): remove connection 2 (preheated water to the water heater only) before next year's course. It is a bit strange; keep connections 1 and 3, and update the figure, the effectiveness figure, the table in "Power of the water heater" and dwhr_figures.py to match.
+
 The preheated water can go to three places ({numref}`fig-dwhr-connections`):
 
 1. **To the cold side of the shower mixer only.** The water heater is still fed with cold mains water.
@@ -252,6 +254,35 @@ The preheated water can go to three places ({numref}`fig-dwhr-connections`):
 The three ways of connecting a drain water heat recovery unit with an effectiveness of 0.60 at 8 L/min. Shower at 40 °C and 8 L/min, drain water at 37 °C, cold water at 10 °C, water heater at 55 °C. Calculated with the model in the dropdown at the end of the section. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/dwhr_figures.py)
 :::
 
+
+### Power of the water heater
+
+Connection 2 feeds the preheated water to the cold inlet of the one central water heater, a tank or a district heating heat exchanger. It needs a single pipe from the unit to the heater, not a heater at each tap.
+
+During a shower, the water heater only has to supply the heat that the unit does not recover ({numref}`tab-dwhr-heater-power`).
+
+```{list-table} Heat supplied by the water heater during an 8 L/min shower at 40 °C, unit with $\varepsilon = 0.60$ at 8 L/min. Water heater at 55 °C, drain water at 37 °C, cold water at 10 °C.
+:header-rows: 1
+:label: tab-dwhr-heater-power
+
+* - Connection
+  - Water heated by the heater
+  - Power
+* - No unit
+  - 5.3 L/min from 10 to 55 °C
+  - 16.6 kW
+* - 1: mixer only
+  - 2.9 L/min from 10 to 55 °C
+  - 9.1 kW
+* - 2: water heater only
+  - 5.3 L/min from 31 to 55 °C
+  - 8.9 kW
+* - 3: both, equal flow
+  - 3.8 L/min from 26 to 55 °C
+  - 7.7 kW
+```
+
+The heater must still be sized for the shower without the unit, 16.6 kW, for two reasons. The unit only preheats once warm water reaches the drain, so at the start of every shower the heater gets cold water. All other taps, and a bath, get no preheat at all. The unit therefore lowers the energy but not the installed power. That matters for an instantaneous electric water heater, which at these powers needs a three-phase supply. A tank or a district heating heat exchanger covers the peak anyway.
 
 ### Effectiveness increases with lower shower flow
 
@@ -279,7 +310,7 @@ where $Q_{shower}$ is the heat for showers over the year, $Q = \rho\,V\,c_p\,(\t
 
 The saving varies over the year with the cold water temperature. With cold water at 5 °C in late winter, the unit with $\varepsilon = 0.5$ warms it by 16 K; at 15 °C in late summer, by 11 K. The *fraction* saved hardly changes (equation {eq}`eq-dwhr-saving` gives 46 % and 44 %), because the shower also needs more heat in winter.
 
-What the saved heat is worth depends on how the water is heated. With an electric resistance heater, every kWh of heat saved is a kWh of electricity saved. With a heat pump that delivers hot water at a COP of 2.5, it is only 0.4 kWh of electricity. Drain water heat recovery therefore pays back two to three times faster in a house with an electric water heater than in a heat pump house. In a heat pump house, it competes with the heat pump: both are ways of not buying the same kWh of heat.
+What the saved heat is worth depends on how the water is heated. With an electric resistance heater, every kWh of heat saved is a kWh of electricity saved. With a heat pump that delivers hot water at a COP of 3, it is only 0.33 kWh of electricity. Drain water heat recovery therefore pays back about three times faster in a house with an electric water heater than in a heat pump house. In a heat pump house, it competes with the heat pump: both are ways of not buying the same kWh of heat.
 
 Drain water heat recovery also helps when the tank is used as a thermal battery, as in [Domestic hot water](c2-domestic-hot-water.md). It cuts the heat drawn from the tank during each shower, by about half with a good balanced unit, so the tank needs to store less heat to cover the evening showers from a charge in cheap hours. A smaller tank also has a smaller standing loss.
 
@@ -290,7 +321,7 @@ Drain water heat recovery also helps when the tank is used as a thermal battery,
 - Effectiveness falls as the flow rises: about 0.05 lower at 12 L/min than at 8 L/min.
 - With equal flow, a unit saves about 0.9 times its effectiveness of the shower heat. Feeding only the mixer or only the water heater saves about a sixth less.
 - A good balanced unit saves 200–300 kWh of heat per person per year.
-- A saved kWh of heat is worth a kWh of electricity with a resistance heater, but only about 0.4 kWh with a heat pump.
+- A saved kWh of heat is worth a kWh of electricity with a resistance heater, but only about 0.33 kWh with a heat pump.
 :::
  -->
 ## Worked example: channel drain or vertical pipe?
@@ -300,7 +331,7 @@ A family of four in a 150 m² house takes three showers a day, the same as in th
 - **A.** A Joulia-Inline 5 channel drain ($\varepsilon = 0.41$), connected to the shower mixer only, because the water heater is on the other side of the house (connection 1).
 - **B.** A Showersave QB1-21XE vertical unit ($\varepsilon = 0.70$) in the basement below the bathroom, connected to both the mixer and the water heater (connection 3).
 
-How much heat and electricity does each save per year, with an electric water heater and with a heat pump at a COP of 2.5? What are the simple paybacks with electricity at 2.50 DKK/kWh?
+How much heat and electricity does each save per year, with an electric water heater and with a heat pump at a COP of 3? What are the simple paybacks with electricity at 1.2 DKK/kWh?
 
 **Shower heat.** One shower takes $64 \cdot 1.155 \cdot (40 - 10) = 2\,217$ Wh. Three a day for a year is $3 \cdot 365 \cdot 2.217 = 2\,428$ kWh.
 
@@ -316,10 +347,10 @@ The unit saves $0.63 \cdot 2\,428 = 1\,529$ kWh of heat per year.
 
 **Electricity and payback.** The incremental installed costs are estimates: about 9,000 DKK for option B (unit about 5,700 DKK, plus fitting it into the drain stack and the extra pipe to the water heater), and about 20,000 DKK for option A (unit about 22,400 DKK, minus the 3,000–4,000 DKK of the ordinary channel drain it replaces, plus the cold water connection).
 
-| | Heat saved (kWh/year) | Electricity saved, resistance heater (kWh/year) | Payback (years) | Electricity saved, heat pump COP 2.5 (kWh/year) | Payback (years) |
+| | Heat saved (kWh/year) | Electricity saved, resistance heater (kWh/year) | Payback (years) | Electricity saved, heat pump COP 3 (kWh/year) | Payback (years) |
 |---|---|---|---|---|---|
-| A: channel drain, to mixer | 752 | 752 | 10.6 | 301 | 27 |
-| B: vertical pipe, balanced | 1 529 | 1 529 | 2.4 | 612 | 5.9 |
+| A: channel drain, to mixer | 752 | 752 | 22 | 251 | 66 |
+| B: vertical pipe, balanced | 1 529 | 1 529 | 4.9 | 510 | 15 |
 
 Option B saves twice the heat at less than half the cost. With a heat pump, option A does not pay back within the lifetime of a bathroom. The example shows the three things that decide the result: the effectiveness of the unit, the connection, and the price of the heat that is saved.
 
