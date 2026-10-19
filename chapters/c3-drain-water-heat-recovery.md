@@ -253,6 +253,35 @@ The three ways of connecting a drain water heat recovery unit with an effectiven
 :::
 
 
+### Power of the water heater
+
+Connection 2 feeds the preheated water to the cold inlet of the one central water heater, a tank or a district heating heat exchanger. It needs a single pipe from the unit to the heater, not a heater at each tap.
+
+During a shower, the water heater only has to supply the heat that the unit does not recover ({numref}`tab-dwhr-heater-power`).
+
+```{list-table} Heat supplied by the water heater during an 8 L/min shower at 40 °C, unit with $\varepsilon = 0.60$ at 8 L/min. Water heater at 55 °C, drain water at 37 °C, cold water at 10 °C.
+:header-rows: 1
+:label: tab-dwhr-heater-power
+
+* - Connection
+  - Water heated by the heater
+  - Power
+* - No unit
+  - 5.3 L/min from 10 to 55 °C
+  - 16.6 kW
+* - 1: mixer only
+  - 2.9 L/min from 10 to 55 °C
+  - 9.1 kW
+* - 2: water heater only
+  - 5.3 L/min from 31 to 55 °C
+  - 8.9 kW
+* - 3: both, equal flow
+  - 3.8 L/min from 26 to 55 °C
+  - 7.7 kW
+```
+
+The heater must still be sized for the shower without the unit, 16.6 kW, for two reasons. The unit only preheats once warm water reaches the drain, so at the start of every shower the heater gets cold water. All other taps, and a bath, get no preheat at all. The unit therefore lowers the energy but not the installed power. That matters for an instantaneous electric water heater, which at these powers needs a three-phase supply. A tank or a district heating heat exchanger covers the peak anyway.
+
 ### Effectiveness increases with lower shower flow
 
 A unit with $\varepsilon = 0.70$ has $NTU = 0.70/0.30 = 2.3$, and one with $\varepsilon = 0.41$ has $NTU = 0.7$. When the shower flow rises, $C$ rises in proportion. $UA$ also rises, because faster water transfers heat better, but less than in proportion. So $NTU$ falls, and the effectiveness with it. {numref}`fig-dwhr-effectiveness` (left) shows this for the two units of {numref}`tab-dwhr-products`, assuming $UA$ grows with the square root of the flow. A low-flow shower head therefore saves twice: it uses less hot water, and the unit recovers a larger share of the heat in the water that is used.
