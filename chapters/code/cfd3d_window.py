@@ -1,4 +1,4 @@
-"""Appendix C figure: full-width window against a 1.2 m wide window in 3D (16 °C supply, 6 ACH, gains for 26 °C).
+"""Appendix D figure: full-width window against a 1.2 m wide window in 3D (16 °C supply, 6 ACH, gains for 26 °C).
 
 Runs both cases with room_cfd_3d_numba.py (25 x 20 x 25 cells, 30 min, about 5 min each) and plots the mean air
 speed at 0.1 m. Pass two saved result pickles (full, narrow) to plot without running. Writes to ../figures/appendix-cfd-3d/.

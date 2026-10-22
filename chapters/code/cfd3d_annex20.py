@@ -1,4 +1,4 @@
-"""Appendix C figure: the IEA Annex 20 room in 3D against the measurements and the 2D model on the same x-z grid.
+"""Appendix D figure: the IEA Annex 20 room in 3D against the measurements and the 2D model on the same x-z grid.
 
 Runs the room (9 x 3 x 3 m, slot across the full width, isothermal, k-epsilon) with room_cfd_3d_numba.py on
 72 x 18 x 36 cells (30 min simulated, roughly half an hour), and the 2D model on 72 x 36 cells. Pass a saved

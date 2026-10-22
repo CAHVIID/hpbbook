@@ -1,5 +1,5 @@
 (app-dhw-tank)=
-# Appendix D: Stratified tank simulator
+# Appendix E: Stratified tank simulator
 
 :::{warning} Under revision
 This appendix is being reworked and may change substantially.
