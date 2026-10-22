@@ -54,8 +54,8 @@ Claude Opus 5.5 was used to generate this textbook, steered by the author. The a
 
 - Appendix A [Heat pump](chapters/appendix-heat-pumps.md)
 - Appendix B [CFD](chapters/appendix-room-cfd.md)
-- Appendix D [CFD](chapters/appendix-room-cfd-3d.md)
 - Appendix C [Air-conditioning in Europe, summer 2026](chapters/appendix-ac-europe.md)
+- Appendix D [CFD](chapters/appendix-room-cfd-3d.md)
 - Appendix E [Stratified tank simulator](chapters/appendix-dhw-tank.md)
 
 - [Improvements](improvements.md)
