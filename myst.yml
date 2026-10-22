@@ -32,6 +32,8 @@ project:
           title: "Air heating (under revision)"
         - file: chapters/c1-floor-heating.md
           title: "Floor heating (under revision)"
+        - file: chapters/c1-floor-heating_improved.md
+          title: "Floor heating, improved (under revision)"
         - file: chapters/c2-domestic-hot-water.md
           title: "Domestic hot water (under revision)"
         - file: chapters/c3-drain-water-heat-recovery.md
