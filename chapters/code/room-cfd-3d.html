@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Room CFD 3D</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #f3f5f7; --panel: #ffffff; --ink: #17212b; --muted: #5b6875; --line: #d5dce3;
+  --accent: #1f6fb2; --accent-ink: #ffffff; --good: #1f8a5b; --bad: #c0392b;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #11161b; --panel: #182029; --ink: #e5ebf0; --muted: #94a2af; --line: #2b3742;
+    --accent: #5aa6e6; --accent-ink: #0d1318; --good: #4cc38a; --bad: #ef6b5b; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #11161b; --panel: #182029; --ink: #e5ebf0; --muted: #94a2af; --line: #2b3742;
+  --accent: #5aa6e6; --accent-ink: #0d1318; --good: #4cc38a; --bad: #ef6b5b; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 14px; line-height: 1.45; }
+main { max-width: 1240px; margin: 0 auto; padding: 16px; container: app / inline-size; }
+h1 { font-size: 22px; font-weight: 600; margin: 4px 0; }
+p.sub { margin: 0 0 12px; font-size: 14px; color: var(--muted); max-width: 75ch; }
+.layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 16px; align-items: start; }
+@container app (max-width: 820px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; min-width: 0; }
+.controls { display: grid; gap: 14px; }
+.group { display: grid; gap: 8px; }
+.group h2 { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; font-weight: 600; }
+label { display: grid; gap: 4px; font-size: 13px; }
+.row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.val { font-family: var(--font-data); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+select { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { border: 0; background: transparent; color: var(--ink); padding: 6px 4px; font: inherit; font-size: 12.5px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.btns { display: flex; gap: 8px; }
+.btn { flex: 1; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); border-radius: 6px; padding: 8px 10px; font: inherit; font-weight: 600; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--accent); }
+.note { color: var(--muted); font-size: 12px; margin: 0; }
+.main { display: grid; gap: 16px; min-width: 0; }
+.head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.status { font-family: var(--font-data); font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+canvas { display: block; width: 100%; }
+.readouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.ro { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; display: grid; gap: 2px; background: var(--panel); }
+.ro .k { font-size: 11.5px; color: var(--muted); } .ro .v { font-family: var(--font-data); font-size: 17px; }
+.ro .s { font-size: 11.5px; font-weight: 600; }
+.ro[data-state="pass"] { border-left: 4px solid var(--good); } .ro[data-state="pass"] .s { color: var(--good); }
+.ro[data-state="fail"] { border-left: 4px solid var(--bad); } .ro[data-state="fail"] .s { color: var(--bad); }
+.warn { border-left: 4px solid var(--bad); }
+details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; } summary { cursor: pointer; color: var(--ink); font-weight: 500; }
+.meta { color: var(--muted); font-size: 12px; margin: 0; }
+</style>
+</head><body><main>
+<h1>Room CFD 3D</h1>
+<p class="sub">A 5 m deep, 4 m wide and 2.5 m high office cooled by outdoor air through a window in the facade. The air leaves through an exhaust high in the back wall. The whole room is computed in 3D on the graphics card, so a window narrower than the room can be studied.</p>
+<div class="panel warn" id="nogpu" hidden><strong>This browser has no WebGPU.</strong> Use a recent Chrome or Edge on Windows, macOS or ChromeOS, or Safari 26 or later. Firefox has WebGPU on Windows from version 141.</div>
+<div class="layout">
+  <aside class="panel controls" aria-label="Case settings">
+    <div class="group">
+      <h2>Window (facade)</h2>
+      <label for="width"><span class="row"><span>Width, centred</span><span class="val" id="widthV"></span></span>
+        <input id="width" type="range" min="0.4" max="4" step="0.2" value="1.2"></label>
+      <label for="lo"><span class="row"><span>Bottom edge</span><span class="val" id="loV"></span></span>
+        <input id="lo" type="range" min="0" max="2.3" step="0.1" value="0.9"></label>
+      <label for="hi"><span class="row"><span>Top edge</span><span class="val" id="hiV"></span></span>
+        <input id="hi" type="range" min="0.2" max="2.5" step="0.1" value="2.1"></label>
+    </div>
+    <div class="group">
+      <h2>Air and heat</h2>
+      <label for="tin"><span class="row"><span>Supply temperature</span><span class="val" id="tinV"></span></span>
+        <input id="tin" type="range" min="4" max="24" step="1" value="16"></label>
+      <label for="ach"><span class="row"><span>Air change rate</span><span class="val" id="achV"></span></span>
+        <input id="ach" type="range" min="1" max="12" step="0.5" value="6"></label>
+      <label for="troom"><span class="row"><span>Well-mixed room temperature</span><span class="val" id="troomV"></span></span>
+        <input id="troom" type="range" min="20" max="30" step="0.5" value="26"></label>
+      <p class="note" id="gainsNote"></p>
+    </div>
+    <div class="group">
+      <h2>Numerics</h2>
+      <label for="mesh">Mesh
+        <select id="mesh">
+          <option value="25,20,25">25 × 20 × 25 cells (fast)</option>
+          <option value="50,40,25" selected>50 × 40 × 25 cells</option>
+          <option value="100,80,50">100 × 80 × 50 cells (needs a good GPU)</option>
+        </select></label>
+      <div class="group"><span style="font-size:13px">Turbulence</span>
+        <div class="seg" id="turb" role="group" aria-label="Turbulence model">
+          <button type="button" data-v="k-epsilon" aria-pressed="true">k-ε</button>
+          <button type="button" data-v="chen-xu" aria-pressed="false">Chen &amp; Xu</button>
+          <button type="button" data-v="constant" aria-pressed="false">Constant ν<sub>t</sub></button>
+        </div></div>
+    </div>
+    <div class="btns">
+      <button class="btn" id="run" type="button">Run</button>
+      <button class="btn ghost" id="stop" type="button">Stop</button>
+    </div>
+    <p class="note">Each run simulates 30 minutes and averages the last 10. The plots show the flow as it develops, then the average.</p>
+  </aside>
+  <section class="main">
+    <div class="panel">
+      <div class="head">
+        <div class="seg" id="fieldSel" role="group" aria-label="Field shown">
+          <button type="button" data-v="T" aria-pressed="true">Temperature</button>
+          <button type="button" data-v="speed" aria-pressed="false">Air speed</button>
+          <button type="button" data-v="DR" aria-pressed="false">ISO 7730 DR</button>
+        </div>
+        <span class="status" id="status">Ready</span>
+      </div>
+      <canvas id="sec" height="300" aria-label="Vertical section through the room"></canvas>
+      <label for="ycut" style="margin-top:8px"><span class="row"><span>Section at y (across the width)</span><span class="val" id="ycutV"></span></span>
+        <input id="ycut" type="range" min="0" max="4" step="0.05" value="2"></label>
+    </div>
+    <div class="panel">
+      <canvas id="plan" height="320" aria-label="Plan of the room at one height"></canvas>
+      <label for="zcut" style="margin-top:8px"><span class="row"><span>Plan at height z</span><span class="val" id="zcutV"></span></span>
+        <input id="zcut" type="range" min="0.05" max="2.45" step="0.05" value="0.1"></label>
+    </div>
+    <div class="readouts" id="readouts"></div>
+    <details class="panel">
+      <summary>About the model</summary>
+      <p>The solver is room_cfd_3d.py from the course, ported to WebGPU compute shaders: the incompressible Navier–Stokes equations with Boussinesq buoyancy and an energy equation, on a staggered grid, marching in time with a pressure projection. The pressure equation is solved by conjugate gradients with a multigrid preconditioner. Turbulence: standard k-ε with wall functions (default), Chen &amp; Xu (1998), or a constant ν<sub>t</sub> of 0.002 m²/s. The graphics card computes in single precision; on a test case it agrees with the Python version to about 1 part in a million.</p>
+      <p>The heat gains sit in a 0.4 m deep block across the room at x = 2.3–2.7 m, up to 1.2 m. The occupied zone starts 0.6 m from the facade, back and side walls. The readouts are at ankle height (0.1 m). ISO 7730 DR uses Tu = 40 %; the ASHRAE 55 ankle draught model uses the PMV of the occupied zone at 1.2 met, 0.5 clo, 50 % RH and t<sub>r</sub> = t<sub>a</sub>. Both limits are 20 %.</p>
+    </details>
+    <p class="meta">Contact: Christian Hviid, cahv@dtu.dk · <strong>Use at own risk.</strong> A simplified teaching model for comparing cases. Not for design values, and provided without warranty.</p>
+  </section>
+</div>
+</main>
+<script type="module">
+import { createSim, defaultCase } from "./room_cfd_3d_gpu.mjs";
+
+// comfort functions, as in room-cfd.mjs
+function draughtRate(ta, v, tu = 40) {
+  v = Math.max(v, 0.05);
+  return Math.min(Math.max((34 - ta) * Math.pow(v - 0.05, 0.62) * (0.37 * v * tu + 3.14), 0), 100);
+}
+function pmv(ta, v, rh = 50, met = 1.2, clo = 0.5) {
+  const tr = ta, pa = rh * 10 * Math.exp(16.6536 - 4030.183 / (ta + 235));
+  const icl = 0.155 * clo, m = met * 58.15, mw = m;
+  const fcl = icl <= 0.078 ? 1 + 1.29 * icl : 1.05 + 0.645 * icl, hcf = 12.1 * Math.sqrt(v);
+  const taa = ta + 273, tra = tr + 273, tcla = taa + (35.5 - ta) / (3.5 * icl + 0.1);
+  const p1 = icl * fcl, p2 = p1 * 3.96, p3 = p1 * 100, p4 = p1 * taa, p5 = 308.7 - 0.028 * mw + p2 * (tra / 100) ** 4;
+  let xn = tcla / 100, xf = tcla / 50, hc = hcf;
+  for (let it = 0; it < 150 && Math.abs(xn - xf) >= 1.5e-5; it++) {
+    xf = (xf + xn) / 2; hc = Math.max(hcf, 2.38 * Math.abs(100 * xf - taa) ** 0.25);
+    xn = (p5 + p4 * hc - p2 * xf ** 4) / (100 + p3 * hc);
+  }
+  const tcl = 100 * xn - 273;
+  const hl = 3.05e-3 * (5733 - 6.99 * mw - pa) + (mw > 58.15 ? 0.42 * (mw - 58.15) : 0) + 1.7e-5 * m * (5867 - pa)
+    + 0.0014 * m * (34 - ta) + 3.96 * fcl * (xn ** 4 - (tra / 100) ** 4) + fcl * hc * (tcl - ta);
+  return (0.303 * Math.exp(-0.036 * m) + 0.028) * (mw - hl);
+}
+const ankleDraftPPD = (v, ts) => { const z = -2.58 + 3.05 * v - 1.06 * ts; return 100 * Math.exp(z) / (1 + Math.exp(z)); };
+const ankleLimit = (ts) => (Math.log(0.25) + 2.58 + 1.06 * ts) / 3.05;
+
+const $ = (id) => document.getElementById(id);
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const fmt = (x, d = 2) => Number.isFinite(x) ? x.toFixed(d) : "–";
+const L = 5, W = 4, H = 2.5;
+const state = { width: 1.2, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, mesh: [50, 40, 25], turb: "k-epsilon", field: "T", ycut: 2, zcut: 0.1 };
+let device = null, sim = null, geo = null, f = null, runId = 0, stopReq = false, done = false, lastProg = null;
+
+function syncLabels() {
+  $("widthV").textContent = state.width.toFixed(1) + " m"; $("loV").textContent = state.lo.toFixed(1) + " m"; $("hiV").textContent = state.hi.toFixed(1) + " m";
+  $("tinV").textContent = state.tin + " °C"; $("achV").textContent = state.ach + " h⁻¹"; $("troomV").textContent = state.troom + " °C";
+  $("ycutV").textContent = state.ycut.toFixed(2) + " m"; $("zcutV").textContent = state.zcut.toFixed(2) + " m";
+  const q = state.ach * L * W * H / 3600, Q = 1.2 * 1005 * q * (state.troom - state.tin);
+  const U = q / (state.width * Math.max(state.hi - state.lo, 0.05));
+  $("gainsNote").textContent = Q > 0 ? `Airflow ${(q * 1000).toFixed(0)} L/s. Heat gains ${Q.toFixed(0)} W (${(Q / (L * W)).toFixed(0)} W/m² floor). Inlet speed ${U.toFixed(2)} m/s.`
+    : "The supply must be colder than the room. Raise the room temperature or lower the supply.";
+}
+function makeCase() {
+  const q = state.ach * L * W * H / 3600, Q = Math.max(1.2 * 1005 * q * (state.troom - state.tin), 0);
+  const [nx, ny, nz] = state.mesh, y0 = (W - state.width) / 2;
+  return Object.assign(defaultCase(), { L, W, H, nx, ny, nz, ach: state.ach, T_in: state.tin,
+    inlet: { side: "left", start: state.lo, end: state.hi, y0: state.width >= W ? null : y0, y1: state.width >= W ? null : y0 + state.width },
+    outlet: { side: "right", start: 2.3, end: 2.4 },
+    heat: [{ x0: 2.3, x1: 2.7, y0: 0, y1: W, z0: 0, z1: 1.2, power: Q }], turbulence: state.turb, t_end: 1800, t_avg: 600 });
+}
+
+async function start() {
+  const id = ++runId; stopReq = false; done = false;
+  if (!device) {
+    if (!navigator.gpu) { $("nogpu").hidden = false; return; }
+    const a = await navigator.gpu.requestAdapter({ powerPreference: "high-performance" });
+    if (!a) { $("nogpu").hidden = false; return; }
+    device = await a.requestDevice({ requiredLimits: { maxStorageBufferBindingSize: a.limits.maxStorageBufferBindingSize, maxBufferSize: a.limits.maxBufferSize } });
+  }
+  if (sim) { sim.destroy(); sim = null; }
+  const c = makeCase();
+  $("status").textContent = "Compiling the shaders …";
+  try { sim = await createSim(device, c); } catch (e) { $("status").textContent = e.message; return; }
+  if (id !== runId) return;
+  const [nx, ny, nz] = state.mesh;
+  geo = { nx, ny, nz, dx: L / nx, dy: W / ny, dz: H / nz, c };
+  let lastDraw = 0;
+  await sim.run(async (p) => {
+    lastProg = p;
+    if (performance.now() - lastDraw > 400) { lastDraw = performance.now(); f = live(await sim.snapshot()); draw(); }
+  }, { stopFlag: () => stopReq || id !== runId });
+  if (id !== runId) return;
+  if (lastProg.t >= c.t_end) { f = avgFields(await sim.results()); done = true; } else f = live(await sim.snapshot());
+  draw();
+}
+// cell-centred fields
+function centre(u, v, w) {
+  const { nx, ny, nz } = geo, N = nx * ny * nz, uc = new Float32Array(N), vc = new Float32Array(N), wc = new Float32Array(N);
+  for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++) {
+    const m = (i * ny + j) * nz + k;
+    uc[m] = 0.5 * (u[m] + u[m + ny * nz]); vc[m] = 0.5 * (v[(i * (ny + 1) + j) * nz + k] + v[(i * (ny + 1) + j + 1) * nz + k]);
+    wc[m] = 0.5 * (w[(i * ny + j) * (nz + 1) + k] + w[(i * ny + j) * (nz + 1) + k + 1]);
+  }
+  return { uc, vc, wc };
+}
+function live(s) {
+  const r = centre(s.u, s.v, s.w); r.T = s.T; r.speed = r.uc.map((x, m) => Math.hypot(x, r.vc[m], r.wc[m])); return r;
+}
+function avgFields(res) { const r = centre(res.u, res.v, res.w); r.T = res.T; r.speed = res.speed; return r; }
+
+function occupied() {
+  const { nx, ny, nz, dx, dy, dz } = geo, kz = Math.min(Math.floor(0.1 / dz), nz - 1);
+  let vmax = -1, at = [0, 0], tAt = 0, tS = 0, vS = 0, n = 0;
+  for (let i = 0; i < nx; i++) {
+    const x = (i + 0.5) * dx; if (x <= 0.6 || x >= L - 0.6) continue;
+    for (let j = 0; j < ny; j++) {
+      const y = (j + 0.5) * dy; if (y <= 0.6 || y >= W - 0.6) continue;
+      const m = (i * ny + j) * nz + kz;
+      if (f.speed[m] > vmax) { vmax = f.speed[m]; at = [x, y]; tAt = f.T[m]; }
+      for (let k = 0; k < nz; k++) if ((k + 0.5) * dz < 1.8) { tS += f.T[(i * ny + j) * nz + k]; vS += f.speed[(i * ny + j) * nz + k]; n++; }
+    }
+  }
+  const ts = pmv(tS / n, Math.max(vS / n, 0.05));
+  return { v_max: vmax, at, T: tAt, DR: draughtRate(tAt, vmax), TS: ts, PPD_AD: ankleDraftPPD(vmax, ts), v_limit: ankleLimit(ts), T_oz: tS / n };
+}
+
+// ---------- plots ----------
+const lerp = (a, b, t) => a + (b - a) * t;
+function ramp(stops, t) {
+  t = Math.min(Math.max(t, 0), 1);
+  const n = stops.length - 1, k = Math.min(Math.floor(t * n), n - 1), g = t * n - k, a = stops[k], b = stops[k + 1];
+  return [lerp(a[0], b[0], g), lerp(a[1], b[1], g), lerp(a[2], b[2], g)];
+}
+const CMAPS = {
+  T: [[59, 76, 192], [124, 159, 249], [192, 212, 245], [242, 203, 183], [238, 132, 104], [180, 4, 38]],
+  speed: [[247, 251, 255], [198, 219, 239], [107, 174, 214], [33, 113, 181], [8, 48, 107]],
+  DR: [[252, 253, 191], [254, 176, 120], [241, 96, 93], [183, 55, 121], [114, 31, 129], [44, 17, 95]],
+};
+function sizeCanvas(cv, hFit) {
+  if (!cv.dataset.h) cv.dataset.h = cv.getAttribute("height");
+  const r = window.devicePixelRatio || 1, w = cv.clientWidth, h = Math.min(+cv.dataset.h, hFit(w));
+  if (cv.width !== Math.round(w * r) || cv.height !== Math.round(h * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); }
+  cv.style.height = h + "px";
+  const g = cv.getContext("2d"); g.setTransform(r, 0, 0, r, 0, 0); return [g, w, h];
+}
+function range() {
+  if (state.field === "T") return [Math.floor(Math.min(state.tin, state.troom - 6)), Math.ceil(state.troom + 2), "Temperature (°C)", 0];
+  if (state.field === "speed") return [0, 0.5, "Air speed (m/s)", 2];
+  return [0, 40, "DR (%)", 0];
+}
+// one slice: a = horizontal axis (0 = x), b = vertical axis (2 = z or 1 = y); idx(i, j) -> cell index
+function slice(cv, A, B, na, nb, idx, va, vb, decor) {
+  const padL = 40, padR = 64, padT = 8, padB = 30;
+  const [g, Wc, Hc] = sizeCanvas(cv, (w) => (w - padL - padR) * B / A + padT + padB);
+  g.clearRect(0, 0, Wc, Hc);
+  const sc = Math.min((Wc - padL - padR) / A, (Hc - padT - padB) / B), pw = A * sc, ph = B * sc;
+  const X = (x) => padL + x * sc, Y = (y) => padT + ph - y * sc;
+  const [lo, hi, unit, dec] = range();
+  const off = document.createElement("canvas"); off.width = na; off.height = nb;
+  const og = off.getContext("2d"), img = og.createImageData(na, nb);
+  for (let i = 0; i < na; i++) for (let j = 0; j < nb; j++) {
+    const m = idx(i, j), val = state.field === "T" ? f.T[m] : state.field === "speed" ? f.speed[m] : draughtRate(f.T[m], f.speed[m]);
+    const c = ramp(CMAPS[state.field], (val - lo) / (hi - lo)), p = 4 * ((nb - 1 - j) * na + i);
+    img.data[p] = c[0]; img.data[p + 1] = c[1]; img.data[p + 2] = c[2]; img.data[p + 3] = 255;
+  }
+  og.putImageData(img, 0, 0); g.imageSmoothingEnabled = true; g.drawImage(off, padL, padT, pw, ph);
+  const da = A / na, db = B / nb, step = Math.max(1, Math.round(0.25 / da));
+  g.strokeStyle = "rgba(20,25,30,0.75)"; g.fillStyle = "rgba(20,25,30,0.75)"; g.lineWidth = 1;
+  for (let i = Math.floor(step / 2); i < na; i += step) for (let j = Math.floor(step / 2); j < nb; j += Math.max(1, Math.round(0.25 / db))) {
+    const m = idx(i, j), u = va[m], v = vb[m], sp = Math.hypot(u, v); if (sp < 0.01) continue;
+    const len = Math.min(sp / 0.4, 1) * 0.22 * sc + 3, ax = X((i + 0.5) * da), ay = Y((j + 0.5) * db);
+    const ex = ax + u / sp * len, ey = ay - v / sp * len, an = Math.atan2(ey - ay, ex - ax);
+    g.beginPath(); g.moveTo(ax, ay); g.lineTo(ex, ey); g.stroke();
+    g.beginPath(); g.moveTo(ex, ey); g.lineTo(ex - 4 * Math.cos(an - 0.45), ey - 4 * Math.sin(an - 0.45)); g.lineTo(ex - 4 * Math.cos(an + 0.45), ey - 4 * Math.sin(an + 0.45)); g.fill();
+  }
+  g.strokeStyle = css("--ink"); g.lineWidth = 1.5; g.strokeRect(padL, padT, pw, ph);
+  decor(g, X, Y, sc);
+  const muted = css("--muted"); g.fillStyle = muted; g.font = "11px " + css("--font-data"); g.textAlign = "center";
+  for (let x = 0; x <= A; x++) g.fillText(x + " m", X(x), padT + ph + 16);
+  g.textAlign = "right"; for (let y = 0; y <= B + 1e-9; y += 0.5) g.fillText(y.toFixed(1), padL - 6, Y(y) + 4);
+  const cbx = padL + pw + 14, cbw = 10;
+  for (let k = 0; k < ph; k++) { const c = ramp(CMAPS[state.field], 1 - k / ph); g.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`; g.fillRect(cbx, padT + k, cbw, 1.5); }
+  g.fillStyle = muted; g.textAlign = "left";
+  for (let k = 0; k <= 4; k++) g.fillText((lo + (hi - lo) * k / 4).toFixed(dec), cbx + cbw + 4, Y(B * k / 4) + 4);
+  g.save(); g.translate(Wc - 6, padT + ph / 2); g.rotate(-Math.PI / 2); g.textAlign = "center"; g.fillText(unit, 0, 0); g.restore();
+}
+function draw() {
+  if (!f || !geo) return;
+  const { nx, ny, nz, dy, dz } = geo, y0 = (W - state.width) / 2;
+  const j = Math.min(Math.floor(state.ycut / dy), ny - 1), k = Math.min(Math.floor(state.zcut / dz), nz - 1);
+  slice($("sec"), L, H, nx, nz, (i, kk) => (i * ny + j) * nz + kk, f.uc, f.wc, (g, X, Y, sc) => {
+    g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; g.strokeRect(X(0.6), Y(1.8), 3.8 * sc, 1.8 * sc);
+    g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; g.strokeRect(X(2.3), Y(1.2), 0.4 * sc, 1.2 * sc); g.setLineDash([]);
+    const inWin = state.width >= W || ((j + 0.5) * dy > y0 && (j + 0.5) * dy < y0 + state.width);
+    g.lineWidth = 6; g.strokeStyle = inWin ? "#2f7fd0" : "rgba(47,127,208,0.35)";
+    g.beginPath(); g.moveTo(X(0) - 2, Y(state.lo)); g.lineTo(X(0) - 2, Y(state.hi)); g.stroke();
+    g.strokeStyle = css("--muted"); g.beginPath(); g.moveTo(X(L) + 2, Y(2.3)); g.lineTo(X(L) + 2, Y(2.4)); g.stroke();
+  });
+  slice($("plan"), L, W, nx, ny, (i, jj) => (i * ny + jj) * nz + k, f.uc, f.vc, (g, X, Y, sc) => {
+    g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; g.strokeRect(X(0.6), Y(W - 0.6), 3.8 * sc, (W - 1.2) * sc);
+    g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; g.strokeRect(X(2.3), Y(W), 0.4 * sc, W * sc); g.setLineDash([]);
+    g.lineWidth = 6; g.strokeStyle = "#2f7fd0"; g.beginPath(); g.moveTo(X(0) - 2, Y(Math.max(y0, 0))); g.lineTo(X(0) - 2, Y(Math.min(y0 + state.width, W))); g.stroke();
+    g.strokeStyle = "rgba(255,255,255,0.9)"; g.setLineDash([3, 3]); g.lineWidth = 1; g.beginPath(); g.moveTo(X(0), Y(state.ycut)); g.lineTo(X(L), Y(state.ycut)); g.stroke(); g.setLineDash([]);
+  });
+  const oz = occupied();
+  const items = [
+    ["Floor speed, max", fmt(oz.v_max) + " m/s", `at x = ${fmt(oz.at[0], 1)}, y = ${fmt(oz.at[1], 1)} m`],
+    ["ISO 7730 DR", fmt(oz.DR, 0) + " %", oz.DR <= 20 ? "Pass" : "Fail", oz.DR <= 20 ? "pass" : "fail"],
+    ["TS (PMV), occupied zone", (oz.TS >= 0 ? "+" : "") + fmt(oz.TS), `zone mean ${fmt(oz.T_oz, 1)} °C`],
+    ["Ankle PPD_AD (ASHRAE 55)", fmt(oz.PPD_AD, 0) + " %", `${oz.PPD_AD <= 20 ? "Pass" : "Fail"}, limit ${fmt(oz.v_limit)} m/s`, oz.PPD_AD <= 20 ? "pass" : "fail"],
+  ];
+  $("readouts").innerHTML = items.map(([k, v, s, st]) => `<div class="ro"${st ? ` data-state="${st}"` : ""}><span class="k">${k}</span><span class="v">${v}</span><span class="s">${s}</span></div>`).join("");
+  const p = lastProg;
+  $("status").textContent = done ? `Done: ${p.steps} steps in ${p.elapsed.toFixed(0)} s. Showing the 20–30 min average.`
+    : p ? `${stopReq ? "Stopped" : "Running"}, instantaneous. t = ${(p.t / 60).toFixed(1)} of 30 min, ${(p.steps / p.elapsed).toFixed(0)} steps/s` : "";
+}
+
+function setSeg(id, key) {
+  $(id).querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+    $(id).querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    state[key] = b.dataset.v; if (key === "field") draw(); else start();
+  }));
+}
+setSeg("turb", "turb"); setSeg("fieldSel", "field");
+for (const id of ["width", "lo", "hi", "tin", "ach", "troom"]) {
+  $(id).addEventListener("input", (e) => {
+    state[id] = +e.target.value;
+    if (id === "lo" && state.hi < state.lo + 0.2) { state.hi = Math.min(state.lo + 0.2, 2.5); $("hi").value = state.hi; }
+    if (id === "hi" && state.lo > state.hi - 0.2) { state.lo = Math.max(state.hi - 0.2, 0); $("lo").value = state.lo; }
+    syncLabels();
+  });
+  $(id).addEventListener("change", start);
+}
+for (const id of ["ycut", "zcut"]) $(id).addEventListener("input", (e) => { state[id] = +e.target.value; syncLabels(); draw(); });
+$("mesh").addEventListener("change", (e) => { state.mesh = e.target.value.split(",").map(Number); start(); });
+$("run").addEventListener("click", start);
+$("stop").addEventListener("click", () => { stopReq = true; });
+window.addEventListener("resize", draw);
+syncLabels();
+if (!navigator.gpu) $("nogpu").hidden = false;
+window.__cfd = { start, state, get prog() { return lastProg; }, get done() { return done; } };
+</script>
+</body></html>
