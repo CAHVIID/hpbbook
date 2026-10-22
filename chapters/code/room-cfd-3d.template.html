@@ -232,26 +232,39 @@ function makeCase() {
     heat: [Object.assign(heatBox(), { power: Q })], turbulence: state.turb, advection: state.adv, t_end: 1800, t_avg: 600 });
 }
 
-async function start() {
-  const id = ++runId; stopReq = false; done = false;
-  if (!device) {
-    if (!navigator.gpu) { $("nogpu").hidden = false; return; }
-    const a = await navigator.gpu.requestAdapter({ powerPreference: "high-performance" });
-    if (!a) { $("nogpu").hidden = false; return; }
-    device = await a.requestDevice({ requiredLimits: { maxStorageBufferBindingSize: a.limits.maxStorageBufferBindingSize, maxBufferSize: a.limits.maxBufferSize } });
-  }
-  if (sim) { sim.destroy(); sim = null; }
-  const c = makeCase();
-  $("status").textContent = "Compiling the shaders …";
-  try { sim = await createSim(device, c); } catch (e) { $("status").textContent = e.message; return; }
-  if (id !== runId) return;
+// grid, exhaust cells and the floor monitor point of a case
+function makeGeo(c) {
   const [nx, ny, nz] = state.mesh;
   const bnd = boundaries(c), outCells = [];
   for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++) if (bnd.R[j * nz + k] === 2) outCells.push(((nx - 1) * ny + j) * nz + k);
   for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) if (bnd.T[i * ny + j] === 2) outCells.push((i * ny + j) * nz + nz - 1);
   const q = c.ach * L * W * H / 3600, Q = c.heat.reduce((s, b) => s + b.power, 0);
-  geo = { nx, ny, nz, dx: L / nx, dy: W / ny, dz: H / nz, c, outCells, q, Q, Tmix: c.T_in + Q / (1.2 * 1005 * q),
-          mon: ((Math.min(Math.floor(1.0 / (L / nx)), nx - 1) * ny + Math.min(Math.floor(W / 2 / (W / ny)), ny - 1)) * nz + Math.min(Math.floor(0.1 / (H / nz)), nz - 1)) };
+  return { nx, ny, nz, dx: L / nx, dy: W / ny, dz: H / nz, c, outCells, q, Q, Tmix: c.T_in + Q / (1.2 * 1005 * q),
+           mon: ((Math.min(Math.floor(1.0 / (L / nx)), nx - 1) * ny + Math.min(Math.floor(W / 2 / (W / ny)), ny - 1)) * nz + Math.min(Math.floor(0.1 / (H / nz)), nz - 1)) };
+}
+// before a run: the empty room with the window, the exhaust and the heat source at the well-mixed temperature
+function preview() {
+  if (running) return;
+  try { geo = makeGeo(makeCase()); } catch (e) { $("status").textContent = e.message; running = false; return; }
+  const N = geo.nx * geo.ny * geo.nz, z = new Float32Array(N);
+  f = { T: new Float32Array(N).fill(geo.Tmix), speed: z, uc: z, vc: z, wc: z, preview: true };
+  done = false; lastProg = null; hist = null; draw();
+}
+let running = false;
+async function start() {
+  const id = ++runId; stopReq = false; done = false; running = true;
+  if (!device) {
+    if (!navigator.gpu) { $("nogpu").hidden = false; running = false; return; }
+    const a = await navigator.gpu.requestAdapter({ powerPreference: "high-performance" });
+    if (!a) { $("nogpu").hidden = false; running = false; return; }
+    device = await a.requestDevice({ requiredLimits: { maxStorageBufferBindingSize: a.limits.maxStorageBufferBindingSize, maxBufferSize: a.limits.maxBufferSize } });
+  }
+  if (sim) { sim.destroy(); sim = null; }
+  const c = makeCase();
+  $("status").textContent = "Compiling the shaders …";
+  try { sim = await createSim(device, c); } catch (e) { $("status").textContent = e.message; running = false; return; }
+  if (id !== runId) return;
+  geo = makeGeo(c);
   hist = { t: [], dU: [], dT: [], v_floor: [], T_exh: [], imb: [] }; prev = null;
   let lastDraw = 0;
   await sim.run(async (p) => {
@@ -261,7 +274,7 @@ async function start() {
   }, { stopFlag: () => stopReq || id !== runId });
   if (id !== runId) return;
   if (lastProg.t >= c.t_end) { f = avgFields(await sim.results()); done = true; } else f = live(await sim.snapshot());
-  draw();
+  running = false; draw();
 }
 // convergence monitor from successive snapshots: rates of change, floor speed, exhaust temperature, energy balance
 const rms = (a, b) => { let s = 0; for (let m = 0; m < a.length; m++) s += (a[m] - b[m]) ** 2; return Math.sqrt(s / a.length); };
@@ -438,6 +451,11 @@ function draw() {
     g.lineWidth = 6; g.strokeStyle = "#2f7fd0"; g.beginPath(); g.moveTo(X(0) - 2, Y(Math.max(y0, 0))); g.lineTo(X(0) - 2, Y(Math.min(y0 + state.width, W))); g.stroke();
     g.strokeStyle = "rgba(255,255,255,0.9)"; g.setLineDash([3, 3]); g.lineWidth = 1; g.beginPath(); g.moveTo(X(0), Y(state.ycut)); g.lineTo(X(L), Y(state.ycut)); g.stroke(); g.setLineDash([]);
   });
+  if (f.preview) {
+    $("readouts").innerHTML = ""; $("status").textContent = "Ready. Press Run to start.";
+    for (const id of ["floor", "conv"]) { const [g, w, h] = sizeCanvas($(id), () => 1e9); g.clearRect(0, 0, w, h); }
+    return;
+  }
   const oz = occupied();
   const items = [
     ["Floor speed, max", fmt(oz.v_max) + " m/s", `at x = ${fmt(oz.at[0], 1)}, y = ${fmt(oz.at[1], 1)} m`],
@@ -466,7 +484,7 @@ for (const id of ["width", "lo", "hi", "tin", "ach", "troom", "hx", "hy", "hw", 
     state[id] = +e.target.value;
     if (id === "lo" && state.hi < state.lo + 0.2) { state.hi = Math.min(state.lo + 0.2, 2.5); $("hi").value = state.hi; }
     if (id === "hi" && state.lo > state.hi - 0.2) { state.lo = Math.max(state.hi - 0.2, 0); $("lo").value = state.lo; }
-    syncLabels();
+    syncLabels(); preview();
   });
   $(id).addEventListener("change", start);
 }
@@ -479,11 +497,11 @@ $("plan").addEventListener("click", (e) => {
   state.hx = Math.round(x * 10) / 10; state.hy = Math.round(y * 10) / 10;
   $("hx").value = state.hx; $("hy").value = state.hy; syncLabels(); start();
 });
-$("mesh").addEventListener("change", (e) => { state.mesh = e.target.value.split(",").map(Number); start(); });
+$("mesh").addEventListener("change", (e) => { state.mesh = e.target.value.split(",").map(Number); preview(); start(); });
 $("run").addEventListener("click", start);
 $("stop").addEventListener("click", () => { stopReq = true; });
 window.addEventListener("resize", draw);
-syncLabels();
+syncLabels(); preview();
 if (!navigator.gpu) $("nogpu").hidden = false;
 window.__cfd = { start, state, get prog() { return lastProg; }, get done() { return done; } };
 </script>
