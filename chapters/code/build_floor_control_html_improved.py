@@ -23,7 +23,7 @@ p.sub {{ margin: 0 0 12px; font-size: 14px; opacity: .75; }}
 </style>
 </head><body><main>
 <h1>Floor heating control model</h1>
-<p class="sub">One room in a low-energy house with a light and a heavy floor over a cloudy and a sunny spring day. On/off thermostat, PI control with PWM to the wax thermostat, and an ideal heater for reference.</p>
+<p class="sub">One room in a low-energy house with a light and a heavy floor over a cloudy and a sunny spring day. On/off thermostat, PI control with PWM to the wax thermostat, a fixed design flow with no room control, and an ideal heater for reference.</p>
 <div id="app"></div>
 </main>
 <script type="module">

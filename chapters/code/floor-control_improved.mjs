@@ -83,7 +83,9 @@ export function simulate(floor, mode, p = DEFAULTS) {
       d[0] += heat;
     } else {
       let nw = cmd;
-      if (mode === "onoff") {
+      if (mode === "open") {
+        nw = true;                // no room control: loop always open at design flow (self-regulation only)
+      } else if (mode === "onoff") {
         if (T[0] < p.T_set - p.hyst) nw = true; else if (T[0] > p.T_set + p.hyst) nw = false;
       } else {
         if (s % cycleSteps === 0) {
@@ -170,7 +172,16 @@ const INPUTS = [
 ];
 const MODES = [["ideal", "Ideal heater, no delay", "#8a8f94", "6 4"],
                ["onoff", "On/off thermostat", "#d0663a", ""],
-               ["pi", "PI controller with PWM", "#2b7bb9", ""]];
+               ["pi", "PI controller with PWM", "#2b7bb9", ""],
+               ["open", "Fixed design flow, no room control", "#c2417a", ""]];
+// controls shown in the charts and the table (the ideal heater is always shown)
+const SHOWN = { onoff: true, pi: true, open: false };
+const CHECKS = [["onoff", "On/off thermostat",
+                 "Show the on/off thermostat in the charts and the table."],
+                ["pi", "PI controller with PWM",
+                 "Show the PI controller with PWM in the charts and the table."],
+                ["open", "Fixed design flow (loop always open)",
+                 "No room control: the wax thermostat stays open and the loop runs at the design mass flow. The floor is controlled only by self-regulation and the supply temperature."]];
 
 const C_SUP = "#7b5ea7";
 
@@ -186,6 +197,8 @@ const CSS = `
 .fc .help { color: var(--muted); cursor: help; font-size: 12px; }
 .fc .val { font-variant-numeric: tabular-nums; color: var(--muted); }
 .fc .note0 { grid-column: 1 / 3; font-size: 12px; color: #d0663a; }
+.fc label.check { display: flex; align-items: center; gap: 6px; }
+.fc label.check input { width: auto; margin: 0; accent-color: var(--c); }
 .fc .bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 4px 0 8px; color: var(--muted); font-size: 13px; }
 .fc button { font: inherit; padding: 4px 12px; border-radius: 6px; border: 1px solid var(--grid); background: var(--panel); color: var(--ink); cursor: pointer; }
 .fc .charts { display: grid; gap: 6px; }
@@ -298,10 +311,19 @@ function render({ model, el }) {
   const tabs = document.createElement("div"); tabs.className = "tabs"; tabs.setAttribute("role", "tablist");
   side.appendChild(tabs);
   const controls = document.createElement("div"); controls.className = "controls";
-  const sliders = {};
+  const sliders = {}, checks = {}, shown = { ...SHOWN };
   for (const [group, items] of INPUTS) {
     const fs = document.createElement("fieldset");
     fs.innerHTML = `<legend>${group}</legend>`;
+    if (group === "Room control") for (const [m, label, help] of CHECKS) {
+      // checkboxes that select which controls are simulated and shown
+      const lab = document.createElement("label"); lab.className = "check"; lab.title = help;
+      lab.style.setProperty("--c", MODES.find(md => md[0] === m)[2]);
+      lab.innerHTML = `<input type="checkbox"><span>${label} <span class="help" aria-label="${help}">ⓘ</span></span>`;
+      const input = lab.querySelector("input"); input.checked = shown[m];
+      input.addEventListener("change", () => { shown[m] = input.checked; schedule(); });
+      checks[m] = input; fs.appendChild(lab);
+    }
     for (const [key, label, unit, min, max, step, help] of items) {
       const lab = document.createElement("label");
       lab.title = help;
@@ -380,11 +402,13 @@ function render({ model, el }) {
   reset.addEventListener("click", () => {
     Object.assign(p, DEFAULTS);
     for (const [key, s] of Object.entries(sliders)) { s.input.value = p[key]; s.show(); }
+    Object.assign(shown, SHOWN);
+    for (const [m, input] of Object.entries(checks)) input.checked = shown[m];
     Object.assign(floors, structuredClone(FLOORS)); buildExtra();
     schedule();
   });
   const legend = document.createElement("div"); legend.className = "legend";
-  legend.innerHTML = MODES.map(([, lab, col, dash]) =>
+  const showLegend = modes => legend.innerHTML = modes.map(([, lab, col, dash]) =>
     `<span><svg width="26" height="10"><line x1="0" x2="26" y1="5" y2="5" stroke="${col}" stroke-width="2.2" ${dash ? `stroke-dasharray="${dash}"` : ""}/></svg>${lab}</span>`).join("")
     + `<span><svg width="18" height="10"><rect width="18" height="10" fill="var(--sun)" opacity="0.6"/></svg>Solar gain</span>`
     + `<span><svg width="26" height="10"><line x1="0" x2="26" y1="5" y2="5" stroke="${C_SUP}" stroke-width="2.2"/></svg>Supply temperature</span>`
@@ -399,16 +423,18 @@ function render({ model, el }) {
   function run() {
     const t0 = performance.now();
     const floor = floors[floorName];
-    const r = Object.fromEntries(MODES.map(([m]) => [m, simulate(floor, m, p)]));
-    const water = MODES.filter(([m]) => m !== "ideal");
-    const roomS = MODES.map(([m, , color, dash]) => ({ x: r[m].t, y: r[m].room, color, dash }));
+    const modes = MODES.filter(([m]) => m === "ideal" || shown[m]);   // unchecked controls are not simulated
+    showLegend(modes);
+    const r = Object.fromEntries(modes.map(([m]) => [m, simulate(floor, m, p)]));
+    const water = modes.filter(([m]) => m !== "ideal");
+    const roomS = modes.map(([m, , color, dash]) => ({ x: r[m].t, y: r[m].room, color, dash }));
     let html = chart(roomS, { title: `${floorName}: room temperature [°C]`, ylabel: "°C", hline: p.T_vent,
       ...axis([...roomS.map(sr => sr.y), [p.T_set, p.T_vent]]) });
-    const fluxS = MODES.map(([m, , color, dash]) => ({ x: r[m].t, y: r[m].q_floor, color, dash }));
+    const fluxS = modes.map(([m, , color, dash]) => ({ x: r[m].t, y: r[m].q_floor, color, dash }));
     html += chart(fluxS, { title: `${floorName}: heat flux floor surface [W/m²] (ideal heater: its own output)`, ylabel: "W/m²",
       zero: true, fill: { x: r.ideal.t, y: r.ideal.solar }, ...axis([...fluxS.map(sr => sr.y), r.ideal.solar, [0]]) });
     const tSeries = [{ x: r.ideal.t, y: r.ideal.t_sup, color: C_SUP },
-        ...MODES.map(([m, , color, dash]) => ({ x: r[m].t, y: r[m].surface, color, dash })),
+        ...modes.map(([m, , color, dash]) => ({ x: r[m].t, y: r[m].surface, color, dash })),
         ...water.map(([m, , color]) => ({ x: r[m].t, y: r[m].t_ret, color, width: 1, step: 1 }))];
     html += chart(tSeries, { title: `${floorName}: supply, return (thin) and floor surface temperature [°C]`, ylabel: "°C",
       ...axis(tSeries.map(sr => sr.y)) });
@@ -417,7 +443,7 @@ function render({ model, el }) {
       ...axis([...flowS.map(sr => sr.y), [0, p.flow_design]]) });
     charts.innerHTML = html;
     // results table: one column per control, one row per result
-    const SHORT = { ideal: "Ideal heater", onoff: "On/off", pi: "PI + PWM" };
+    const SHORT = { ideal: "Ideal heater", onoff: "On/off", pi: "PI + PWM", open: "Fixed flow" };
     const ROWS = [
       ["Heating energy [Wh/m²]", "Heat supplied by the water (or the ideal heater) over the two days", s => s.heating_Wh.toFixed(0)],
       ["Heat vented [Wh/m²]", "Heat removed by opening windows above the venting temperature", s => s.vented_Wh.toFixed(0)],
@@ -426,8 +452,8 @@ function render({ model, el }) {
       ["Total deviation [K·h]", "Below plus above setpoint", s => (s.below_Kh + s.above_Kh).toFixed(1)],
       ["Return temp., flow-weighted [°C]", "Average return temperature weighted by the mass flow, i.e. the temperature the heat source actually receives",
         s => Number.isFinite(s.return_mw) ? s.return_mw.toFixed(1) : "–"]];
-    const head = MODES.map(([m, , color]) => `<th><span class="swatch" style="background:${color}"></span>${SHORT[m]}</th>`).join("");
-    const body = ROWS.map(([lab, tip, f]) => `<tr><td title="${tip}">${lab}</td>${MODES.map(([m]) => `<td>${f(r[m].summary)}</td>`).join("")}</tr>`).join("");
+    const head = modes.map(([m, , color]) => `<th><span class="swatch" style="background:${color}"></span>${SHORT[m]}</th>`).join("");
+    const body = ROWS.map(([lab, tip, f]) => `<tr><td title="${tip}">${lab}</td>${modes.map(([m]) => `<td>${f(r[m].summary)}</td>`).join("")}</tr>`).join("");
     tableWrap.innerHTML = `<h4>Results, ${floorName.toLowerCase()}</h4><table><thead><tr><th></th>${head}</tr></thead><tbody>${body}</tbody></table>`;
     status.textContent = `Two days shown, after ${p.warmup_days} cloudy warm-up days. Calculated in ${Math.round(performance.now() - t0)} ms.`;
   }

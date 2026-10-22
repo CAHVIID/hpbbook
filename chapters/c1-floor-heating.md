@@ -628,8 +628,7 @@ Self-regulation works best when the floor surface temperature is close to the ro
 
 
 # Interactive control model
-
-The model below simulates one room in a low-energy house with a light and a heavy floor ({numref}`fig-floor-sections-improved`) over a cloudy spring day followed by a sunny one. The floor is controlled in three ways: an on/off room thermostat, a PI controller whose output is a PWM signal to the wax thermostat, and, for reference, an ideal heater that delivers exactly the heat needed without any delay. The ideal heater stands for a fast emitter, such as an electric panel radiator or air heating. Windows are opened when the room gets too warm, and the heat removed this way is counted as heat vented.
+The model below simulates one room in a low-energy house with a light and a heavy floor ({numref}`fig-floor-sections-improved`) over a cloudy spring day followed by a sunny one. The floor is controlled in three ways: an on/off room thermostat, a PI controller whose output is a PWM signal to the wax thermostat, and, for reference, an ideal heater that delivers exactly the heat needed without any delay. The ideal heater stands for a fast emitter, such as an electric panel radiator or air heating. A fourth option, fixed design flow, keeps the loop open at the design mass flow with no room control, so the floor is controlled only by self-regulation and the supply temperature. Checkboxes under Room control select which controls are shown; the ideal heater is always shown. Windows are opened when the room gets too warm, and the heat removed this way is counted as heat vented.
 
 **[Open the control model in a new tab](code/floor-control_improved.html)**. It runs in your browser and needs no installation. {numref}`fig-floor-control-app-improved` shows it with the default inputs.
 
@@ -788,7 +787,7 @@ Self-regulation of the heavy floor in the control model, setpoint 21 °C. Consta
 :::{admonition} Try it in the control model
 :class: seealso
 
-Open the [control model](code/floor-control_improved.html), select the heavy floor and set the heating curve slope to 0, so the supply temperature is constant.
+Open the [control model](code/floor-control_improved.html), select the heavy floor, tick *Fixed design flow* under Room control and set the heating curve slope to 0, so the supply temperature is constant.
 
 1. Set the max supply temperature to 35 °C and then to 25 °C. How do the heat flux at the floor surface and the room temperature change on the cloudy day?
 2. Lower the supply temperature further, to 23 °C and 22 °C. When does the room start to fall below the setpoint at night? What happens to the return temperature?
