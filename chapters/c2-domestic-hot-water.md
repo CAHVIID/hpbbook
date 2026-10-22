@@ -4,6 +4,20 @@
 This chapter is being reworked and may change substantially.
 :::
 
+:::{admonition} Learning outcomes
+:class: note
+
+After this chapter you should be able to:
+
+1. **Calculate** the heat in a tapping and the yearly hot water demand, and **explain** why hot water becomes the largest heat demand in a low-energy house.
+2. **Calculate** the power of a shower, and **explain** why a heat pump needs a storage tank to supply it.
+3. **Describe** the main types of hot water heater and their heat sources: electric water heater, hot water heat pump, heat pump for space heating and hot water, and compact unit.
+4. **Calculate** the standing loss of a tank from its energy label class, and the temperature of a tank that cools without tapping.
+5. **Explain** how the electricity price and the primary energy factor vary over the day, and **estimate** the saving from charging the tank at night.
+6. **Size** a tank as a thermal battery for a given tapping profile and charging period with the four-step hand method, and **check** the size with the tank simulator.
+7. **Calculate** the circulation loss in an apartment building, and **explain** why its share of the hot water heat is large in new buildings.
+:::
+
 ## Introduction
 
 For most of the twentieth century, domestic hot water was a small item in the heat budget of a Danish house. A typical older house with energy label D needs around 150 kWh of space heating per m² of floor area per year. Hot water adds 13 kWh/m², less than a tenth of the total.
