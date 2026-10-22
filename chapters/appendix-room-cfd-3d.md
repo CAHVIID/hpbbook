@@ -1,4 +1,4 @@
-# Appendix D: 3D room CFD model
+# Appendix C: 3D room CFD model
 
 :::{warning} Under revision
 This appendix was not verified, needs rework and will change substantially.
