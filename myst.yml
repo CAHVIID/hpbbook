@@ -42,21 +42,21 @@ project:
           title: "Recirculating showers (under revision)"
     - title: "Part D: Cooling"
       children:
-        #- file: parts/part-d-cooling.md
-        #- file: chapters/d1-weather-files.md
-        #  title: "Future climate and weather files (under revision)"
-        #- file: chapters/d2-cooling-strategy.md
-        #  title: "Cooling strategy (under revision)"
-        #- file: chapters/d3-facade-design.md
-        #  title: "Façade design (under revision)"
-        #- file: chapters/d4-ventilative-cooling.md
-        #  title: "Ventilative cooling (under revision)"
-        #- file: chapters/d5-window-openings.md
-        #  title: "Openings for ventilative cooling (under revision)"
-        #- file: chapters/d6-ceiling-fans.md
-        #  title: "Ceiling fans (under revision)"
-        #- file: chapters/d6-ceiling-fans_obsolete.md
-        #  title: "Ceiling fans (obsolete)"
+        - file: parts/part-d-cooling.md
+        - file: chapters/d1-weather-files.md
+          title: "Future climate and weather files (under revision)"
+        - file: chapters/d2-cooling-strategy.md
+          title: "Cooling strategy (under revision)"
+        - file: chapters/d3-facade-design.md
+          title: "Façade design (under revision)"
+        - file: chapters/d4-ventilative-cooling.md
+          title: "Ventilative cooling (under revision)"
+        - file: chapters/d5-window-openings.md
+          title: "Openings for ventilative cooling (under revision)"
+        - file: chapters/d6-ceiling-fans.md
+          title: "Ceiling fans (under revision)"
+        - file: chapters/d6-ceiling-fans_obsolete.md
+          title: "Ceiling fans (obsolete)"
         #- file: chapters/d7-improvements.md
         #  title: "Improvements (ideas)"
         #- file: assignments/cooling/cooling-assignment.md
@@ -68,8 +68,8 @@ project:
       children:
         #- file: chapters/appendix-heat-pumps.md
         #  title: "Heat pump model (under revision)"
-        #- file: chapters/appendix-ac-europe.md
-        #  title: "Air-conditioning in Europe, summer 2026 (under revision)"
+        - file: chapters/appendix-ac-europe.md
+          title: "Air-conditioning in Europe, summer 2026 (under revision)"
         - file: chapters/appendix-dhw-tank.md
           title: "Stratified tank simulator (under revision)"
         - file: chapters/appendix-room-cfd.md
