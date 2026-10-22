@@ -216,6 +216,7 @@ export async function createSim(device, c) {
     const cells = [];
     for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++)
       if (xc[i] > hb.x0 && xc[i] < hb.x1 && yc[j] > hb.y0 && yc[j] < hb.y1 && zc[k] > hb.z0 && zc[k] < hb.z1) cells.push(id(i, j, k));
+    if (!cells.length) throw new Error("the heat source covers no cell centres: make it larger or refine the mesh");
     for (const r of cells) Sv[r] += hb.power / (cells.length * dx * dy * dz);
   }
   const qf = new Float32Array(nx * ny);

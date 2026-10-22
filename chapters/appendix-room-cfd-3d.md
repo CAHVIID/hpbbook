@@ -30,7 +30,7 @@ The app is a single HTML file, {download}`room-cfd-3d.html <code/room-cfd-3d.htm
 
 ## The room and the cases
 
-The room is 5 m deep (x), 4 m wide (y) and 2.5 m high (z), with the facade at x = 0. The supply opening sits in the facade or the back wall and can have any width; it is centred unless `y0` and `y1` are given. The exhaust is in the back wall or the ceiling. The heat gains are a block 0.4 m deep and 1.2 m high across the full width at x = 2.3–2.7 m, sized as in the 2D model so that the well-mixed room temperature is the same in every case:
+The room is 5 m deep (x), 4 m wide (y) and 2.5 m high (z), with the facade at x = 0. The supply opening sits in the facade or the back wall and can have any width; it is centred unless `y0` and `y1` are given. The exhaust is in the back wall or the ceiling. The heat gains are a box standing on the floor, by default 0.4 m deep and 1.2 m high across the full width at x = 2.3–2.7 m; in the app it can be moved and resized, or placed by clicking in the plan. The power is sized as in the 2D model so that the well-mixed room temperature is the same in every case:
 
 $$
 \Phi = \rho \, c_p \, q_v \, (T_{room} - T_{supply})
