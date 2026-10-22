@@ -216,6 +216,7 @@ export async function createSim(device, c) {
     const cells = [];
     for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++)
       if (xc[i] > hb.x0 && xc[i] < hb.x1 && yc[j] > hb.y0 && yc[j] < hb.y1 && zc[k] > hb.z0 && zc[k] < hb.z1) cells.push(id(i, j, k));
+    if (!cells.length) throw new Error("the heat source covers no cell centres: make it larger or refine the mesh");
     for (const r of cells) Sv[r] += hb.power / (cells.length * dx * dy * dz);
   }
   const qf = new Float32Array(nx * ny);
@@ -223,6 +224,7 @@ export async function createSim(device, c) {
     const cells = [];
     for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++)
       if (xc[i] > f.x0 && xc[i] < f.x1 && yc[j] > f.y0 && yc[j] < f.y1) cells.push(i * ny + j);
+    if (!cells.length) throw new Error("the heated floor area covers no cell centres: make it larger or refine the mesh");
     for (const r of cells) qf[r] += f.power / (cells.length * dx * dy);
   }
   put("ypw", ypw); put("lwall", lw); put("S", Sv); put("qfl", qf);
@@ -589,7 +591,7 @@ fn flux(o: i32, m: i32, phin: f32, tv: bool, kind: i32) -> f32 {
     if (p.y > 0 && p.y < NY) { let pm = p - sh(1, 1); f -= 0.5 * (D(kind, p) + D(kind, pm)) * (F[o + ix(NC, p)] - F[o + ix(NC, pm)]) / DY; }
   } else {
     let p = id3(u32(m - ${Nu + Nv}), ushp(2));
-    if (p.z == 0) { return select(0.0, -F[O_qfl + p.x * NY + p.y] / RCP, kind == 0); }
+    if (p.z == 0) { return select(0.0, F[O_qfl + p.x * NY + p.y] / RCP, kind == 0); }   // heat flux up through the floor
     let vel = F[O_w + m - ${Nu + Nv}];
     let a0 = F[o + ix(NC, vec3<i32>(p.x, p.y, max(p.z - 2, 0)))]; let a1 = F[o + ix(NC, vec3<i32>(p.x, p.y, p.z - 1))];
     let a2 = F[o + ix(NC, vec3<i32>(p.x, p.y, min(p.z, NZ - 1)))]; let a3 = F[o + ix(NC, vec3<i32>(p.x, p.y, min(p.z + 1, NZ - 1)))];

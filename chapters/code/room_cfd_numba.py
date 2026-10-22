@@ -546,7 +546,7 @@ def run(case: Case, verbose=False, live=False, monitor_every=50, live_every=20):
 
         # ---- energy (finite volume, upwind or TVD face values) ----
         Fx, Fy = _k_fluxes(T, u, v, inL, inR, case.T_in, alpha_c, dx, dy, tvd)
-        Fy[:, 0] -= qfloor / (RHO * CP)                                   # floor heat flux enters through bottom faces
+        Fy[:, 0] += qfloor / (RHO * CP)                                   # floor heat flux enters through bottom faces
         T_old = T
         T = T + dt * _k_divergence(Fx, Fy, dx, dy) + dt * S / (RHO * CP)
 

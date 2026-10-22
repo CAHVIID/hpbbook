@@ -439,7 +439,7 @@ def run(case: Case, verbose=False, monitor_every=50):
 
         # ---- energy (finite volume) ----
         F = fluxes(T, case.T_in, alpha_c, tvd)
-        F[2][:, :, 0] -= qfloor / (RHO * CP)
+        F[2][:, :, 0] += qfloor / (RHO * CP)              # heat flux up into the air through the floor
         T_old = T
         T = T - dt * divergence(F) + dt * S / (RHO * CP)
 

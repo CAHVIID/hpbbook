@@ -305,7 +305,7 @@ def run(case: Case, verbose=False, live=False, monitor_every=50, live_every=20):
         diffx = np.zeros_like(Fx); diffx[1:-1] = -0.5 * (alpha_c[1:] + alpha_c[:-1]) * (T[1:] - T[:-1]) / dx
         diffy = np.zeros_like(Fy); diffy[:, 1:-1] = -0.5 * (alpha_c[:, 1:] + alpha_c[:, :-1]) * (T[:, 1:] - T[:, :-1]) / dy
         Fx += diffx; Fy += diffy
-        Fy[:, 0] -= qfloor / (RHO * CP)                                   # floor heat flux enters through bottom faces
+        Fy[:, 0] += qfloor / (RHO * CP)                                   # floor heat flux enters through bottom faces
         T_old = T
         T = T - dt * ((Fx[1:] - Fx[:-1]) / dx + (Fy[:, 1:] - Fy[:, :-1]) / dy) + dt * S / (RHO * CP)
 
