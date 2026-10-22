@@ -592,7 +592,7 @@ def run(case: Case, verbose=False, monitor_every=50):
 
         # ---- energy ----
         _k_fluxes(T, U, inL, inR, case.T_in, alpha_c, da, tvd, F[0], F[1], F[2])
-        F[2][:, :, 0] -= qfloor / (RHO * CP)
+        F[2][:, :, 0] += qfloor / (RHO * CP)              # heat flux up into the air through the floor
         _k_div(F[0], F[1], F[2], da, div)
         T_old = T
         T = np.empty(n); _k_energy(T_old, div, S, dt, T)

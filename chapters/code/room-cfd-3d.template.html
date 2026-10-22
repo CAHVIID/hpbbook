@@ -95,7 +95,7 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
       <label for="hd"><span class="row"><span>Depth</span><span class="val" id="hdV"></span></span>
         <input id="hd" type="range" min="0.4" max="2" step="0.2" value="0.4"></label>
       <label for="hh"><span class="row"><span>Height</span><span class="val" id="hhV"></span></span>
-        <input id="hh" type="range" min="0.2" max="2.4" step="0.1" value="1.2"></label>
+        <input id="hh" type="range" min="0" max="2.4" step="0.1" value="1.2"></label>
       <p class="note">Or click in the plan to move it there.</p>
     </div>
     <div class="group">
@@ -211,6 +211,7 @@ function syncLabels() {
   $("widthV").textContent = state.width.toFixed(1) + " m"; $("loV").textContent = state.lo.toFixed(1) + " m"; $("hiV").textContent = state.hi.toFixed(1) + " m";
   $("tinV").textContent = state.tin + " °C"; $("achV").textContent = state.ach + " h⁻¹"; $("troomV").textContent = state.troom + " °C";
   for (const k of ["hx", "hy", "hw", "hd", "hh"]) $(k + "V").textContent = state[k].toFixed(1) + " m";
+  if (state.hh === 0) $("hhV").textContent = "0 m, heated floor";
   $("ycutV").textContent = state.ycut.toFixed(2) + " m"; $("zcutV").textContent = state.zcut.toFixed(2) + " m";
   const q = state.ach * L * W * H / 3600, Q = 1.2 * 1005 * q * (state.troom - state.tin);
   const U = q / (state.width * Math.max(state.hi - state.lo, 0.05));
@@ -229,7 +230,9 @@ function makeCase() {
   return Object.assign(defaultCase(), { L, W, H, nx, ny, nz, ach: state.ach, T_in: state.tin,
     inlet: { side: "left", start: state.lo, end: state.hi, y0: state.width >= W ? null : y0, y1: state.width >= W ? null : y0 + state.width },
     outlet: { side: "right", start: 2.3, end: 2.4 },
-    heat: [Object.assign(heatBox(), { power: Q })], turbulence: state.turb, advection: state.adv, t_end: 1800, t_avg: 600 });
+    // height 0: the heat source collapses to a heated patch of floor (heat flux into the air at the floor)
+    heat: state.hh > 0 ? [Object.assign(heatBox(), { power: Q })] : [],
+    floor_flux: state.hh > 0 ? [] : [(({ x0, x1, y0, y1 }) => ({ x0, x1, y0, y1, power: Q }))(heatBox())], turbulence: state.turb, advection: state.adv, t_end: 1800, t_avg: 600 });
 }
 
 // grid, exhaust cells and the floor monitor point of a case
@@ -238,7 +241,7 @@ function makeGeo(c) {
   const bnd = boundaries(c), outCells = [];
   for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++) if (bnd.R[j * nz + k] === 2) outCells.push(((nx - 1) * ny + j) * nz + k);
   for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) if (bnd.T[i * ny + j] === 2) outCells.push((i * ny + j) * nz + nz - 1);
-  const q = c.ach * L * W * H / 3600, Q = c.heat.reduce((s, b) => s + b.power, 0);
+  const q = c.ach * L * W * H / 3600, Q = [...c.heat, ...c.floor_flux].reduce((s, b) => s + b.power, 0);
   return { nx, ny, nz, dx: L / nx, dy: W / ny, dz: H / nz, c, outCells, q, Q, Tmix: c.T_in + Q / (1.2 * 1005 * q),
            mon: ((Math.min(Math.floor(1.0 / (L / nx)), nx - 1) * ny + Math.min(Math.floor(W / 2 / (W / ny)), ny - 1)) * nz + Math.min(Math.floor(0.1 / (H / nz)), nz - 1)) };
 }
@@ -438,8 +441,10 @@ function draw() {
   const j = Math.min(Math.floor(state.ycut / dy), ny - 1), k = Math.min(Math.floor(state.zcut / dz), nz - 1);
   slice($("sec"), L, H, nx, nz, (i, kk) => (i * ny + j) * nz + kk, f.uc, f.wc, (g, X, Y, sc) => {
     g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; g.strokeRect(X(0.6), Y(1.8), 3.8 * sc, 1.8 * sc);
-    g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; const hb = geo.c.heat[0], cut = (state.ycut > hb.y0 && state.ycut < hb.y1);
-    g.strokeStyle = cut ? "rgba(20,25,30,0.8)" : "rgba(20,25,30,0.3)"; g.strokeRect(X(hb.x0), Y(hb.z1), (hb.x1 - hb.x0) * sc, hb.z1 * sc); g.setLineDash([]);
+    g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; const hb = heatBox(), cut = (state.ycut > hb.y0 && state.ycut < hb.y1);
+    g.strokeStyle = cut ? "rgba(20,25,30,0.8)" : "rgba(20,25,30,0.3)"; if (hb.z1 > 0) g.strokeRect(X(hb.x0), Y(hb.z1), (hb.x1 - hb.x0) * sc, hb.z1 * sc);
+    else { g.setLineDash([]); g.lineWidth = 5; g.strokeStyle = cut ? "#c0392b" : "rgba(192,57,43,0.35)"; g.beginPath(); g.moveTo(X(hb.x0), Y(0) - 2); g.lineTo(X(hb.x1), Y(0) - 2); g.stroke(); g.lineWidth = 1.4; }
+    g.setLineDash([]);
     const inWin = state.width >= W || ((j + 0.5) * dy > y0 && (j + 0.5) * dy < y0 + state.width);
     g.lineWidth = 6; g.strokeStyle = inWin ? "#2f7fd0" : "rgba(47,127,208,0.35)";
     g.beginPath(); g.moveTo(X(0) - 2, Y(state.lo)); g.lineTo(X(0) - 2, Y(state.hi)); g.stroke();
@@ -447,7 +452,7 @@ function draw() {
   });
   slice($("plan"), L, W, nx, ny, (i, jj) => (i * ny + jj) * nz + k, f.uc, f.vc, (g, X, Y, sc) => {
     g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; g.strokeRect(X(0.6), Y(W - 0.6), 3.8 * sc, (W - 1.2) * sc);
-    g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; const hb = geo.c.heat[0]; g.strokeRect(X(hb.x0), Y(hb.y1), (hb.x1 - hb.x0) * sc, (hb.y1 - hb.y0) * sc); g.setLineDash([]);
+    g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; const hb = heatBox(); g.strokeRect(X(hb.x0), Y(hb.y1), (hb.x1 - hb.x0) * sc, (hb.y1 - hb.y0) * sc); g.setLineDash([]);
     g.lineWidth = 6; g.strokeStyle = "#2f7fd0"; g.beginPath(); g.moveTo(X(0) - 2, Y(Math.max(y0, 0))); g.lineTo(X(0) - 2, Y(Math.min(y0 + state.width, W))); g.stroke();
     g.strokeStyle = "rgba(255,255,255,0.9)"; g.setLineDash([3, 3]); g.lineWidth = 1; g.beginPath(); g.moveTo(X(0), Y(state.ycut)); g.lineTo(X(L), Y(state.ycut)); g.stroke(); g.setLineDash([]);
   });
