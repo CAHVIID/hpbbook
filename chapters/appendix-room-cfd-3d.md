@@ -18,15 +18,15 @@ The model exists in three versions that give the same results:
 
 :::{figure} figures/appendix-cfd-3d/room-cfd-3d-app.*
 :label: fig-room-cfd-3d-app
-:alt: Screenshot of the 3D room CFD app. Inputs for the window width and height, supply temperature, air change rate, room temperature, mesh and turbulence model on the left. On the right, a vertical section and a plan at ankle height with temperature and velocity arrows, and key results for floor speed, ISO 7730 draught rate, PMV and ankle draught.
+:alt: Screenshot of the 3D room CFD app. Inputs for the window width and height, supply temperature, air change rate, room temperature, mesh, advection scheme and turbulence model on the left. On the right, a vertical section and a plan at ankle height with temperature and velocity arrows, key results for floor speed, ISO 7730 draught rate, PMV, ankle draught, exhaust temperature and energy balance, and charts of the conditions at ankle height and of the convergence.
 :width: 100%
 
 The 3D room CFD app with a window 1.2 m wide, 0.9–2.1 m high, 16 °C supply air and 6 air changes per hour.
 :::
 
-A run simulates 30 minutes and averages the last 10. The section and the plan show the instantaneous field while the simulation runs and the time-averaged field when it finishes. Two sliders move the section across the width and the plan up through the room.
+A run simulates 30 minutes and averages the last 10. The section and the plan show the instantaneous field while the simulation runs and the time-averaged field when it finishes. Two sliders move the section across the width and the plan up through the room. As in the 2D app, a chart shows the air speed, the ISO 7730 draught rate and the ASHRAE 55 ankle draught along the floor, here in the chosen section, and a second chart shows the convergence: the rates of change of velocity and temperature and the floor speed 1 m from the facade at the centre of the window.
 
-Unlike the 2D app, the page loads the solver as a separate module, so it must be served by a web server. To use it offline, put {download}`room-cfd-3d.html <code/room-cfd-3d.html>` and {download}`room_cfd_3d_gpu.mjs <code/room_cfd_3d_gpu.mjs>` in one folder, run `python -m http.server` there and open `http://localhost:8000/room-cfd-3d.html`.
+The app is a single HTML file, {download}`room-cfd-3d.html <code/room-cfd-3d.html>`, with the solver inlined. Save it anywhere and double-click it to use it offline.
 
 ## The room and the cases
 
