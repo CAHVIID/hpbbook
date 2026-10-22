@@ -127,3 +127,7 @@ The air is at about 24–25 °C after mixing, and the occupants are warm, so in 
 4. A side-hung window must be restricted to 10° for safety. How much of the summer airflow is lost, and what other opening could make up for it?
 5. In the worked example the inflow runs along the floor at about 0.2–0.4 m/s. When is this welcome, and when is it draught?
 -->
+
+
+
+# Use your own heatpump operation as a case for DHW and SH and SCOP
