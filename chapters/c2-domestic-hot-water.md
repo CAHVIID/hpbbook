@@ -72,7 +72,8 @@ $$ (eq-dhw-power)
 
 {numref}`tab-dhw-tappings` shows the energy and the power for some typical tappings. A shower at 8 L/min needs about 17 kW while it runs, and filling a bath needs about 25 kW.
 
-{numref}`fig-tapping-profile` shows a day of tappings for a family of four. Each tapping lasts only minutes, but a shower draws 15 kW while it runs. The whole day adds up to only 5.7 kWh.
+{numref}`fig-tapping-profile` shows a day of tappings for a family of four. Each tapping lasts only minutes, but a shower draws 15 kW while it runs. The whole day adds up to only 5.7 kWh
+%@claude: add a link here to the tank simulator, stating that it contains more tapping profiles 
 
 :::{figure} figures/c2/tapping-profile.*
 :label: fig-tapping-profile
