@@ -6,62 +6,166 @@ This chapter is being reworked and may change substantially. Sections marked *Ou
 
 ## D3.1 Introduction
 
-*Outline:*
+The row house has been optimised to a very low heating demand. The same envelope that keeps heat in during winter keeps solar gains in during summer, and in the 2050 climate the cooling demand, not the heating demand, becomes the design problem. The façade is where the solar gain enters, so it is the first step of the cooling strategy ([](d2-cooling-strategy.md)): every kilowatt-hour that the façade keeps out is one that ventilative cooling ([](d4-ventilative-cooling.md)) and ceiling fans ([](d6-ceiling-fans.md)) do not have to deal with.
 
-- Low-energy houses overheat because of solar gains; the row house already has a very low heating demand, and the 2050 climate makes cooling the design problem [Assignment 04, 16.1].
-- Reduce the gains first: the façade decides the gain before any ventilation or fan has to remove it. Step 1 of the cooling strategy ([](d2-cooling-strategy.md)), before ventilative cooling ([](d4-ventilative-cooling.md)) and ceiling fans ([](d6-ceiling-fans.md)).
-- The conflict: every measure that cuts solar gain also cuts daylight. Since BR18, daylight can be documented with climate-based simulation to EN 17037, which makes the trade-off something you can optimise.
-- The running case: the critical centre zone of the course row house, 4 × 4 × 2.5 m, prefab constructions with U = 0.1 W/m²K, facing north or south.
-- Figure: the four design variables on one façade section and elevation (window height, glazing, overhang, side fins).
+The difficulty is that solar gain and daylight come through the same glass. A smaller window, a lower g-value or a deeper overhang cuts both. Since BR18, daylight can be documented with climate-based simulation to EN 17037, so the daylight requirement becomes a number, sDA300, that can be traded against cooling and heating demand in an optimisation.
+
+The running case is the critical centre zone of the course row house: 4 × 4 m floor, 2.5 m room height, prefabricated constructions with U = 0.1 W/(m²K), and one façade facing north or south. The four design variables are the window size, the glazing, the overhang depth and side fins ({numref}`fig-d3-variables`).
+
+```{figure} figures/d3/design-variables.*
+:name: fig-d3-variables
+:alt: Left, a section of the 4 m deep, 2.5 m high zone with the window in the façade, an overhang above it and the daylight plane dotted across the room. Right, an elevation of the 4 m wide façade with a window, an overhang above it and a side fin on each side, and the largest possible window of 3.8 by 1.5 m dashed.
+
+The centre zone and the four façade design variables.
+```
 
 ## D3.2 Solar gains through the façade
 
-*Outline:*
+The solar gain through a window is
 
-- Sun position over the year in Copenhagen (55.7 °N): noon altitude about 11° in December and 58° in June. Incident radiation on north, east, south, west and horizontal surfaces, from the course weather file.
-- Glazing properties: U-value, g-value, light transmittance LT, selectivity LT/g. Solar-control coatings on the outer pane (surface 2) and what they do to g and LT.
-- Glazing table for the assignment: reference Pilkington S3 (U 0.6, g 0.49, LT 71 %), Suncool 70/35, 66/33, Coollite and SKN coatings. Keep LT ≥ 50 % [Advice for parametric run].
-- Figure: incident radiation by orientation and month; g against LT for the candidate glazings, with lines of constant selectivity.
-- Rules-of-thumb box: g-value, selectivity limits (about 2 for double/triple coatings), what LT does to sDA.
+$$
+\Phi_{sol} = g \, F_{sh} \, A_g \, I_{\perp}
+$$ (eq-d3-solar)
+
+where $g$ is the total solar energy transmittance of the glazing (–), $F_{sh}$ the shading factor of overhangs and fins (–, 1 without shading), $A_g$ the glazed area (m²) and $I_{\perp}$ the solar irradiance on the façade (W/m²). The glazing properties $g$, $U_g$ and $\tau_v$ are defined in [](a3-glazing.md).
+
+How much radiation reaches the façade depends on its orientation ({numref}`fig-d3-radiation`). In the Annex 80 Copenhagen TMY for 2041–2060, a south façade receives 776 kWh/m² a year and a north façade 390 kWh/m². In summer the picture changes: from May to August, east and west façades receive 380 kWh/m², as much as south (372 kWh/m²), and even north receives 241 kWh/m². The summer sun rises in the north-east and sets in the north-west, so the north façade gets low morning and evening sun, and east and west get the low sun head-on. South is the façade that gains the most in winter, but not the one that gains the most in summer.
+
+```{figure} figures/d3/facade-radiation.*
+:name: fig-d3-radiation
+:alt: Line chart of monthly solar radiation from January to December on south, east or west, north and horizontal surfaces. Horizontal peaks at about 170 kWh per square metre in July. South is flat at 90 to 100 from April to July. East and west peak at about 105 in July. North peaks at about 65 in July. Annual totals are 776 south, 640 east and west, 390 north and 991 horizontal.
+
+Monthly solar radiation on vertical façades and the horizontal, Annex 80 Copenhagen TMY 2041–2060 (isotropic sky, ground reflectance 0.2). Script: {download}`d3_facade_figures.py <code/d3_facade_figures.py>`.
+```
+
+A solar-control coating on the outer pane (surface 2) reflects most of the near-infrared half of the solar spectrum, which carries heat but no light. It lowers $g$ more than $\tau_v$, so the selectivity
+
+$$
+S = \frac{\tau_v}{g}
+$$ (eq-d3-selectivity)
+
+rises. Clear triple glazing has $S \approx 1.4$–$1.5$. The best solar-control coatings approach $S \approx 2$, close to the physical limit, because a glazing that lets all visible light through and blocks all infrared still transmits about half the solar energy.
+
+```{list-table} Triple glazings for the assignment (centre-of-glass values).
+:header-rows: 1
+:name: tab-d3-glazing
+
+* - Glazing
+  - $U_g$ (W/(m²K))
+  - $g$ (–)
+  - $\tau_v$ (–)
+  - $S$ (–)
+* - Pilkington S3 (reference)
+  - 0.6
+  - 0.49
+  - 0.71
+  - 1.45
+* - Suncool 70/35
+  - 0.6
+  - 0.34
+  - 0.63
+  - 1.85
+* - Suncool 66/33
+  - 0.6
+  - 0.32
+  - 0.59
+  - 1.84
+```
+
+Going from the reference glazing to Suncool 66/33 cuts the solar gain by 35 % and the light by 17 %. Below $\tau_v \approx 0.5$ the glazing looks dark from inside and the window must grow to keep sDA300, which brings back the solar gain.
+
+:::{admonition} Rules of thumb
+- In Copenhagen, 1 m² of south glazing with $g = 0.49$ admits about 180 kWh of solar heat from May to August; with $g = 0.32$, about 120 kWh.
+- East and west façades receive as much summer radiation as south, and are harder to shade.
+- Selectivity above 2 is not available; keep $\tau_v \geq 0.5$.
+:::
 
 ## D3.3 Fixed shading: overhangs and side fins
 
-*Outline:*
+An overhang shades according to the sun's profile angle $\Omega$, the sun's altitude projected onto a vertical plane perpendicular to the façade:
 
-- Profile angle and how an overhang blocks a high summer sun but admits a low winter sun. Why that works towards south and fails towards east and west, where fins (or movable shading) are needed.
-- Overhang depth from the profile angle; the balcony as an overhang. Side fins on one or both sides.
-- Fixed shading also cuts diffuse light and so daylight; the heating penalty in winter and shoulder seasons.
-- Short note on movable shading (blinds, screens) and why the chapter keeps to fixed elements (robust, no control, no occupant behaviour).
-- Figure: section and plan showing profile angle, overhang and fins against the sun path for June, March/September and December.
-- Rules-of-thumb box: overhang depth for a given window height towards south.
+$$
+\tan \Omega = \frac{\tan \alpha}{\cos \gamma}
+$$ (eq-d3-profile)
+
+where $\alpha$ is the solar altitude and $\gamma$ the angle between the sun's azimuth and the façade normal. An overhang of depth $d$ placed at the window head shades a window of height $H$ completely when
+
+$$
+d \tan \Omega \geq H .
+$$ (eq-d3-overhang)
+
+At 55.7 °N the noon altitude is $90° - 55.7° + \delta$: 58° at the summer solstice, 34° at the equinoxes and 11° at the winter solstice ({numref}`fig-d3-overhang`a). Towards south the noon sun is high in summer and low in winter, so an overhang blocks the summer sun and admits the winter sun. The 1.2 m overhang over the 1.1 m south window of the worked example shades the whole window whenever $\Omega > 42.5°$, which at noon is from mid-April to the end of August. Over the year it cuts the direct radiation on the window from 420 to 91 kWh/m², and from May to August it removes all of it. From November to February it removes 28 % (65 to 47 kWh/m²), which is the heating penalty ({numref}`fig-d3-overhang`b).
+
+```{figure} figures/d3/overhang.*
+:name: fig-d3-overhang
+:alt: Left, a section of the south window, 1.1 m high on a 0.9 m sill, with a 1.2 m overhang at its head. Noon sun rays past the overhang tip at 58 degrees in June reach below the sill, at 34 degrees in March and September they shade the upper half of the window, and at 11 degrees in December they reach almost the whole window. Right, monthly bars of direct radiation on the window with and without the overhang. With the overhang it is zero from May to August and only slightly reduced from November to February.
+
+(a) Noon sun past a 1.2 m overhang at 55.7 °N. (b) Direct radiation on the south window with and without the overhang, Annex 80 Copenhagen TMY 2041–2060. The overhang is taken as infinitely long; diffuse radiation is not reduced.
+```
+
+Towards east and west the sun meets the façade at low altitude with $\gamma$ near zero, so $\Omega \approx \alpha$ is small and an overhang does little. There the sun must be blocked sideways, by side fins, or by movable shading. Side fins shade according to the horizontal angle $\gamma$; towards south they cut the low morning and evening sun, which reaches the glass at grazing angles anyway, and towards north they cut the low summer sun from north-east and north-west.
+
+Fixed shading also blocks part of the sky, so it costs diffuse daylight all year, and this is what usually limits the overhang depth when sDA300 is a constraint.
+
+Movable shading (external blinds, screens, shutters) can block more sun when it matters and give the full window back on overcast days. It needs control and depends on the occupants, so this chapter keeps to fixed elements; shutters for heat waves are a later step of the cooling strategy.
+
+:::{admonition} Rules of thumb
+- Towards south at 55–56 °N, an overhang at the window head with depth $d \approx H$ shades the window completely around noon from late April to late August.
+- Overhangs work towards south. Towards east and west, use fins, movable shading or a lower g-value.
+:::
 
 ## D3.4 Daylight: sDA300 and what drives it
 
-*Outline:*
+BR18 requires daylight in habitable rooms. It can be documented by simulation to EN 17037: an illuminance of at least 300 lx on at least 50 % of the reference plane for at least 50 % of the daylight hours,
 
-- The BR18 / EN 17037 requirement: at least 300 lux for 50 % of daylight hours on at least 50 % of the reference plane (sDA300,50% > 50 %). The daylight factor route as the alternative.
-- Climate-based daylight modelling in IDA ICE: what it calculates and its settings.
-- What drives sDA: window head height and area, LT, room depth, overhangs and fins, orientation, external obstructions.
-- Why "just enough" daylight: sDA far above 50 % means solar gain you pay for in cooling (Potin: sDA300 > 50 % in bedrooms, sDA500 > 50 % in living rooms, but not much more).
-- Figure: sDA300 and cooling demand against window height for the reference glazing, north and south.
+$$
+\mathrm{sDA}_{300,50\%} \geq 50\ \% .
+$$ (eq-d3-sda)
+
+The reference plane is 0.85 m above the floor. BR18 also accepts a simple rule for unobstructed rooms: a glass area of at least 10 % of the floor area, increased when the light transmittance is below 0.75. With a 15 % frame, that is a window-to-floor ratio of about 12 %. EN 17037 also allows the daylight factor route, with a target of about 2 % in the Danish climate, but climate-based modelling is the only one that responds to orientation and to the actual sky.
+
+Climate-based daylight modelling in IDA ICE calculates the illuminance in a grid of points on the reference plane for every daylight hour of the weather file, with the Radiance ray tracer, and counts the share of the plane that reaches 300 lx for half the hours. The result depends on:
+
+- **Window head height and area.** Daylight reaches roughly twice the head height into the room, so with a 4 m deep room and a head at 2.0–2.4 m the whole floor can be lit.
+- **Light transmittance.** The illuminance scales with $\tau_v$.
+- **Overhangs and fins**, which cut the sky view of the window.
+- **Orientation.** South has more direct sun, so it reaches sDA300 with a smaller window than north.
+- **External obstructions**, such as the neighbouring row of houses.
+
+The target is enough daylight, not as much as possible. Every point of sDA above 50 % is glass area that also lets in solar gain. Potin {cite:p}`potin2023` recommends sDA300 > 50 % in bedrooms and sDA500 > 50 % in living rooms, and not much more. In the optimisation the daylight constraint is therefore usually active: the best design sits just above 50 %.
 
 ## D3.5 Cooling demand as the objective
 
-*Outline:*
+In the zone model, an ideal cooler removes exactly the heat needed to hold the room at the cooling set point, and an ideal heater supplies exactly the heat needed to hold the heating set point. The annual cooling demand $Q_C$ (kWh/m² floor) is the sum of the heat removed. It is not the electricity of a real cooling system, which would be $Q_C$ divided by its efficiency. It measures the surplus heat the façade lets in, and that is why it is a good objective for comparing façades.
 
-- What "cooling demand" means in the zone model: an ideal cooler at a set point, so the number measures the surplus heat the façade lets in, not a real cooling system.
-- Heating demand as the second objective: less solar gain means more heating.
-- Weather: the 2050 climate file (more critical than 2090), Annex 80 TMY 2041–2060 as in the cooling assignment ([](d1-weather-files.md)).
+The heating demand $Q_H$ is the second objective, because almost everything that cuts solar gain in summer also cuts useful solar gain in winter. With U = 0.1 W/(m²K) walls and the other surfaces of the zone adiabatic, the window dominates both numbers, so the zone shows the effect of the façade alone.
+
+The weather file is the Annex 80 Copenhagen TMY 2041–2060 ([](d1-weather-files.md)). The 2050 climate is more critical than 2090 for this study, because it combines higher temperatures with more solar radiation.
 
 ## D3.6 Multi-objective optimisation
 
-*Outline:*
+The design variables span a large space. Seven window sizes, five glazings, five overhang depths, four fin depths and two orientations already give 7 × 5 × 5 × 4 × 2 = 1,400 combinations, and each needs an energy and a daylight simulation. A full factorial study of this size is impractical, and most of its runs are far from any useful design.
 
-- Design variables, ranges and steps; why the number of runs explodes in a full factorial study.
-- Objectives versus constraints: minimise cooling and heating, constrain sDA300 to 40–60 %.
-- The Pareto front: designs where no objective can improve without another getting worse. Choosing one design from the front.
-- How IDA ICE concentrates runs near the interesting region when roles are set; sampling versus a full grid.
-- Figure: a Pareto front of cooling against heating demand, coloured by sDA, with the feasible region marked.
+The problem is stated as
+
+$$
+\min_{x} \; \big( Q_C(x),\; Q_H(x) \big) \quad \text{subject to} \quad \mathrm{sDA}_{300}(x) \geq 50\ \%
+$$ (eq-d3-moo)
+
+where $x$ is a combination of the design variables. Cooling and heating demand are objectives: they should be as low as possible. Daylight is a constraint: it must be met, and there is no value in exceeding it.
+
+The two objectives conflict, so there is no single best design. A design is Pareto-optimal if no other feasible design is better in one objective without being worse in the other. The Pareto-optimal designs form the Pareto front ({numref}`fig-d3-pareto`). Every design off the front can be improved for free; choosing among designs on the front is a trade-off. One way to choose is to convert both demands to the electricity of the actual systems, $Q_H/\mathrm{COP} + Q_C/\mathrm{EER}$, and pick the design on the front with the lowest total.
+
+```{figure} figures/d3/pareto-concept.*
+:name: fig-d3-pareto
+:alt: Scatter plot with heating demand on the x-axis and cooling demand on the y-axis. Feasible designs with sDA300 of at least 50 percent are filled dots above a curved line, the Pareto front, running from high cooling and low heating at the top left to low cooling and high heating at the bottom right. Infeasible designs are open circles below the front. One point on the front is marked as the chosen design.
+
+A Pareto front of cooling against heating demand (concept, not simulation results). Designs with too little daylight lie below the front; they would have lower cooling demand but are not allowed.
+```
+
+The infeasible designs lie below the front: small windows and dark glazing would give lower cooling demand, but fail the daylight constraint. This is why the constraint is usually active at the optimum.
+
+IDA ICE's optimisation (AutoMOO in the parametric runs) uses the roles given to each output, objective or constraint, to steer new runs towards the feasible part of the front, so a few hundred runs resolve the front better than the same number spread over a full grid. The price is that the trends away from the front are not visible. The brute-force sweep in D3.7 gives those trends.
 
 ## D3.7 A façade guideline from a brute-force sweep
 
