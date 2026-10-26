@@ -305,20 +305,18 @@ Distribution of the hourly air temperature in the Annex 80 Copenhagen files, in 
 
 ### Future cloud cover and solar irradiation
 
-The two file sets disagree on future cloudiness ({numref}`fig-cloud-cover`). The future DRY files show no trend in summer cloud cover, but they cannot: they are built from measured months chosen to match projected temperatures. The Annex 80 files, which are climate model output, have 6% less summer solar irradiation in 2041–2060 and 12% less in 2081–2100 than in 2001–2020, which means less PV output in the cooling season, when AC demand already peaks after sunset ([](#app-ac-europe)).
+The two file sets disagree on future cloudiness ({numref}`fig-cloud-cover`), which is problematic for simulation of solar gain and PV production.
 
 ```{figure} figures/d1/cloud-cover.*
 :name: fig-cloud-cover
 :width: 100%
 
-(a) Mean total sky cover, May to September, in the DMI DRY files. (b) Monthly global horizontal irradiation in the Annex 80 Copenhagen TMY files, which contain no cloud cover data. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_cloud_cover.py)
+May to September. (a) Mean total sky cover in the DMI DRY files. (b) Monthly global horizontal irradiation in the Annex 80 Copenhagen TMY files, which contain no cloud cover data. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/plot_cloud_cover.py)
 ```
 
 ## D1.5 Extremes
 
 ### Heat waves
-
-A heat wave is a run of hot days. A simple definition, used here, is a period of days with a maximum temperature above 25 °C. A *tropical night* is a night where the temperature does not fall below 20 °C {cite:p}`farahani2021`.
 
 Heat waves raise mortality, mainly through cardiovascular and respiratory strain, and the old and the sick are most at risk. The hot summer of 2018 caused about 380 additional deaths in Finland, and the heat-related mortality risk in Helsinki was about 2.5 times that of the surrounding rural areas {cite:p}`farahani2021`.
 
@@ -326,7 +324,9 @@ The summer of 2026 gave similar numbers in western Europe. All three are provisi
 
 % REVIEW: the three 2026 figures above are provisional agency estimates, not journal publications. France (Santé publique France, 22 July 2026) is all-cause excess mortality; England (UKHSA interim report, 30 July 2026) is modelled heat-associated deaths; Spain is the MoMo estimate of Instituto de Salud Carlos III as reported by Meteored, a secondary source. Final figures are expected late 2026 (France, Spain) and early 2027 (England).
 
-A reference year holds typical months, so it has no real heat wave. The Annex 80 heat-wave files fill the gap. They are the three years of 2041–2060 with the longest, the most intense (hottest) and the most severe (longest and hottest combined) heat wave. {numref}`tab-heat-waves` compares them with the typical years.
+A reference year is assembled from typical months, so it contains no real heat wave. The Annex 80 project therefore produced separate heat-wave years.
+
+They are the three years of 2041–2060 with the longest, the most intense (hottest) and the most severe (longest and hottest combined) heat wave. {numref}`tab-heat-waves` compares them with the typical years.
 
 ```{list-table} Hot days and tropical nights in the Copenhagen weather files, computed from the EPW files. A tropical night has a minimum above 20 °C between 21:00 and 09:00.
 :name: tab-heat-waves
@@ -375,13 +375,16 @@ Simulations of Finnish apartment buildings without cooling show the result {cite
 
 The same heat wave moved to the climate of 2050 has 15 tropical nights and gives about 14,000 degree-hours above 27 °C, and the degree-hours above 32 °C, a health risk threshold, triple from about 1,000 to 3,000. Openable windows were the most effective passive measure, but only a cooling unit removed the overheating completely.
 
-### A measured heat wave in the DRY
+### The heat wave of 2018
 
-The Annex 80 heat-wave years are model output for 2041–2060. A measured alternative is the summer of 2018, the Nordic heat-wave summer. July 2018 is in none of the DMI reference years, and August 2018 only in the RCP4.5 2055–2074 year. To get a file with a real heat wave on the same basis as the reference year, July and August of DRY 2011–2023 were replaced by DMI observations from Sjælsmark (station 06188), 1 July to 31 August 2018:
+The summer of 2018 was a Nordic heat-wave summer. To see how it compares, July and August of DRY 2011–2023 were replaced by DMI observations from Sjælsmark (station 06188), 1 July to 31 August 2018.
 
+:::{admonition} How the file was built
+:class: dropdown
 - Hourly mean air temperature, relative humidity, pressure, global radiation, wind, cloud cover and precipitation from the DMI open data API. Dew point is computed from temperature and humidity.
 - DMI measures only global radiation. Direct and diffuse radiation are split from it with the Erbs model {cite:p}`erbs1982`. On the original July and August of the DRY, the split gives about 10 % less direct and 5 % more diffuse radiation than DMI's own values.
 - The jumps in temperature and humidity at 1 July and 1 September are spread over 13 hours. All other months are the original DRY.
+:::
 
 [Download the EPW](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/weather/DRY_2011-2023_heatwave2018.epw). {numref}`tab-heatwave-2018` and {numref}`fig-heatwave-2018` compare it with the Annex 80 files on the same indicators as {numref}`tab-annex80-summary` and {numref}`tab-heat-waves`.
 
@@ -461,13 +464,7 @@ The Annex 80 heat-wave years are model output for 2041–2060. A measured altern
 (a) Hours above a given air temperature, June to August. (b) Daily maximum air temperature, June to August, for three of the files. The dashed line marks 25 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/compare_heatwave_files.py), [build script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/build_dry_heatwave_2018.py)
 ```
 
-The 2018 heat wave was on par with the Annex 80 "most intense" year 2055. Their summers have almost the same mean (18.2 and 18.0 °C), the same 99th percentile (29.2 and 29.1 °C) and about the same degree-hours above 26 °C (217 and 194 Kh). It was far from the "most severe" year 2054, which has nearly twice the degree-hours (399 Kh), 192 instead of 125 hours above 26 °C and 42 instead of 29 days above 25 °C. A summer that has already been measured is therefore a realistic heat wave for the 2050s, but not the worst case.
-
-:::{admonition} Take aways
-- The measured 2018 heat wave matches the Annex 80 "most intense" year 2055 (217 vs 194 Kh above 26 °C), but has only about half the degree-hours of the "most severe" year 2054 (399 Kh).
-- The 2018 file has no tropical nights at Sjælsmark, a rural station. In the city, add the urban heat island (next section) before trusting night cooling.
-- Use the DRY + 2018 file to stress-test overheating with measured weather; use the Annex 80 "most severe" file for the future case.
-:::
+The 2018 heat wave was on par with the Annex 80 "most intense" year 2055. Their summers have almost the same mean (18.2 and 18.0 °C), the same 99th percentile (29.2 and 29.1 °C) and about the same degree-hours above 26 °C (217 and 194 Kh). It was far from the "most severe" year 2054, which has nearly twice the degree-hours (399 Kh), 192 instead of 125 hours above 26 °C and 42 instead of 29 days above 25 °C. The summer of 2018 is therefore a realistic heat wave for the 2050s, but not the worst case.
 
 ### Urban heat island
 
