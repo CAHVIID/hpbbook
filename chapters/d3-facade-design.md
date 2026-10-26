@@ -155,13 +155,6 @@ Climate-based daylight modelling in IDA ICE calculates the illuminance in a grid
 
 The target is enough daylight, not as much as possible. Every point of sDA above 50 % is glass area that also lets in solar gain. Potin {cite:p}`potin2023` recommends sDA300 > 50 % in bedrooms and sDA500 > 50 % in living rooms, and not much more. In the optimisation the daylight constraint is therefore usually active: the best design sits just above 50 %.
 
-## D3.5 Cooling demand as the objective
-
-In the zone model, an ideal cooler removes exactly the heat needed to hold the room at the cooling set point, and an ideal heater supplies exactly the heat needed to hold the heating set point. The annual cooling demand $Q_C$ (kWh/m² floor) is the sum of the heat removed. It is not the electricity of a real cooling system, which would be $Q_C$ divided by its efficiency. It measures the surplus heat the façade lets in, and that is why it is a good objective for comparing façades.
-
-The heating demand $Q_H$ is the second objective, because almost everything that cuts solar gain in summer also cuts useful solar gain in winter. With U = 0.1 W/(m²K) walls and the other surfaces of the zone adiabatic, the window dominates both numbers, so the zone shows the effect of the façade alone.
-
-The weather file is the Annex 80 Copenhagen TMY 2041–2060 ([](d1-weather-files.md)). The 2050 climate is more critical than 2090 for this study, because it combines higher temperatures with more solar radiation.
 
 ## D3.6 Multi-objective optimisation
 
@@ -239,48 +232,3 @@ Expected shape of the façade guideline (schematic, not simulation results). Lin
 
 Solar control and overhangs move the daylight and cooling curves down together, so they also move the minimum WFR to the right. The design question is then whether a larger window with solar control beats a smaller window with clear glazing. The figure answers it directly: compare $n_C$ at the two minimum-WFR points.
 
-### The guideline
-
-The result of the sweep is a short table per orientation:
-
-| | North | South |
-|---|---|---|
-| Minimum WFR, reference glazing | | |
-| Minimum WFR, best solar control + overhang | | |
-| $n_C$ and $n_T$ at each minimum | | |
-| WFR where $h_{II}$ starts to rise | | |
-| Recommended combination | | |
-
-The table holds for this climate file, this room depth and this construction. A deeper room needs a larger WFR for the same sDA, and a future climate file moves the comfort threshold to the left.
-
-## D3.8 Running the study in IDA ICE
-
-*Outline:*
-
-- Step by step: the single-zone model, the glazing database, parameters (window height with sill at 0.9 m, glazing type, overhang depth, fins, orientation), output metrics and their roles, "custom" plus "climate-based daylight" simulation, keep generated models, faster settings (tolerance, max time step) [15.2, How-to guide, Assignment 04 Q2].
-- Test with a small study first.
-- Reading the Explore view (parallel coordinates) and exporting results.
-- Pitfalls box: physically impossible parameter combinations, too fine steps, results from earlier runs mixed in, sDA computed on the wrong plane.
-
-## D3.9 Worked example: the row house centre zone
-
-*Outline:*
-
-- Reference: cooling 20.8 kWh/m² north (sDA 65 %) and 53.0 kWh/m² south (sDA 93 %).
-- Optimised north: reference glazing, no overhang, 1.4 m window height; sDA 59 %, cooling 15.1 kWh/m² (−27 %).
-- Optimised south: g 0.32 glazing, 1.2 m overhang, 1.1 m window height; sDA 53 %, cooling 19.6 kWh/m² (−63 %).
-- Heating penalty, and the same designs under today's and the future weather and a heat-wave year.
-- Table plus the Pareto figure from section 6.
-
-## D3.10 From one zone to the whole house
-
-*Outline:*
-
-- Carrying the north and south designs back to the full row house; rooms with other depths and uses.
-- What is left for ventilative cooling ([](d4-ventilative-cooling.md)) and ceiling fans ([](d6-ceiling-fans.md)).
-
-## D3.11 Guiding questions
-
-*TBA*
-
-- Five to seven questions on the trade-offs, e.g. why the optimal south window is smaller than the north one, and when fins pay off.
