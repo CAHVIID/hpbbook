@@ -105,6 +105,15 @@ At 55.7 °N the noon altitude is $90° - 55.7° + \delta$: 58° at the summer so
 
 Towards east and west the sun meets the façade at low altitude with $\gamma$ near zero, so $\Omega \approx \alpha$ is small and an overhang does little. There the sun must be blocked sideways, by side fins, or by movable shading. Side fins shade according to the horizontal angle $\gamma$; towards south they cut the low morning and evening sun, which reaches the glass at grazing angles anyway, and towards north they cut the low summer sun from north-east and north-west.
 
+A fin of depth $d$ on each side of a window of width $W$ shades a strip of width $d \tan \gamma$ on the side the sun comes from, so the window is fully shaded when $d \tan \gamma \geq W$. Towards south the effect is small ({numref}`fig-d3-side-fins`). For a 2.8 m wide south window, 0.6 m fins on both sides cut the direct radiation from May to August by 23 % (164 to 126 kWh/m²) and over the year by 19 %, compared with 100 % in summer for the 1.2 m overhang. The fins act only in the morning and afternoon, when the sun is far to the side. Around noon, when the gain peaks, $\gamma$ is small and the fins shade almost nothing.
+
+```{figure} figures/d3/side-fins.*
+:name: fig-d3-side-fins
+:alt: Left, a plan of a 2.8 m wide south window with a 0.6 m fin on each side. The sun on 21 June at 09:00, 64 degrees east of south, passes the east fin tip and shades a strip of about 1.2 m of the glass; at 14:00, 47 degrees west of south, it passes the west fin and shades about 0.6 m. Right, monthly bars of direct radiation on the window with and without the fins. The fins reduce it by roughly 10 to 25 percent in every month, and no month comes near zero.
+
+(a) Sun past 0.6 m side fins on a south window on 21 June, plan. (b) Direct radiation on the south window with and without the fins, Annex 80 Copenhagen TMY 2041–2060. The fins are taken as infinitely tall; diffuse radiation is not reduced. Compare with the overhang in {numref}`fig-d3-overhang`.
+```
+
 Fixed shading also blocks part of the sky, so it costs diffuse daylight all year, and this is what usually limits the overhang depth when sDA300 is a constraint.
 
 Movable shading (external blinds, screens, shutters) can block more sun when it matters and give the full window back on overcast days. It needs control and depends on the occupants, so this chapter keeps to fixed elements; shutters for heat waves are a later step of the cooling strategy.
