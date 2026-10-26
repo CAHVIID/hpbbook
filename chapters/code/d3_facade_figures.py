@@ -4,14 +4,14 @@
    variables (window size, glazing, overhang, side fins). Drawing only.
 2. d3/facade-radiation: monthly solar radiation on vertical north, east/west and south façades and on
    the horizontal, from the Annex 80 Copenhagen TMY 2041-2060. Isotropic sky, ground reflectance 0.2.
-3. d3/overhang: (a) section of the south window (sill 0.9 m, height 1.1 m) with a 1.2 m overhang at the
+3. d3/overhang: (a) section of the south window (sill 0.9 m, height 1.1 m) with a 1.0 m overhang at the
    window head and the noon sun in June, March/September and December; (b) monthly direct (beam)
-   radiation on the window with and without the overhang. The overhang is taken as infinitely long
-   (2D), so only the profile angle matters; diffuse radiation is not reduced (conservative).
+   radiation on the window with and without the overhang. The overhang is as long as the window
+   (2.3 m), so the sun from the side passes its ends; diffuse radiation is not reduced (conservative).
 4. d3/pareto-concept: what a Pareto front of cooling against heating demand looks like. Concept only,
    no simulation results.
-5. d3/side-fins, side-fins-east, side-fins-west: (a) plan of a 2.8 m wide window (the WFR scaling for
-   1.1 m height) with 0.5 m side fins on both sides and the sun at two hours on 21 June; (b) monthly
+5. d3/side-fins, side-fins-east, side-fins-west: (a) plan of the 2.3 m wide window with 0.5 m side
+   fins (both sides towards south, only the south side towards east and west) and the sun at two hours on 21 June; (b) monthly
    direct radiation on the window with and without the fins. The fins are taken as infinitely tall (2D), so
    only the horizontal angle between sun and façade normal matters; diffuse radiation is not reduced.
 
@@ -33,7 +33,8 @@ INK, MUTED, GRID, SURF, WALL, GLASS = '#0b0b0b', '#52514e', '#e4e3dc', '#fcfcfb'
 plt.rcParams.update({'font.size': 9, 'axes.edgecolor': MUTED, 'axes.labelcolor': INK,
                      'xtick.color': MUTED, 'ytick.color': MUTED, 'font.family': 'DejaVu Sans'})
 MONTHS = 'JFMAMJJASOND'
-H_WIN, SILL, D_OH = 1.1, 0.9, 1.2                         # south window and overhang of the worked example
+H_WIN, SILL, D_OH = 1.1, 0.9, 1.0                         # south window height, sill and overhang depth
+W_WIN = 2.3                                                # window width; the overhang is as long as the window
 
 
 def save(fig, name):
@@ -101,7 +102,12 @@ save(fig, 'facade-radiation')
 # ---------- 3. overhang ----------
 beam_s, diff_s = on_vertical(alt, az, 0.0, ghi, dni, dhi)
 tan_prof = np.tan(alt) / np.clip(np.cos(az), 1e-6, None)    # profile angle, south façade
-shaded = np.clip(D_OH * tan_prof / H_WIN, 0, 1) * (np.cos(az) > 0)
+dv = D_OH * np.clip(tan_prof, 0, None)                       # shadow depth below the window head
+dh = D_OH * np.abs(np.tan(np.where(np.cos(az) > 0, az, 0.0)))  # sideways shift of the shadow
+y_end = np.minimum(H_WIN, np.where(dh > 0, W_WIN * dv / np.maximum(dh, 1e-9), H_WIN))
+y_end = np.minimum(y_end, dv)
+area = W_WIN * y_end - np.where(dv > 0, dh / np.maximum(dv, 1e-9), 0) * y_end ** 2 / 2
+shaded = np.clip(area / (W_WIN * H_WIN), 0, 1) * (np.cos(az) > 0)
 beam_oh = beam_s * (1 - shaded)
 m_beam = np.array([beam_s[month == m].sum() / 1000 for m in range(1, 13)])
 m_oh = np.array([beam_oh[month == m].sum() / 1000 for m in range(1, 13)])
@@ -128,10 +134,11 @@ a.text(D_OH / 2, head + 0.3, f'{D_OH} m', ha='center', fontsize=8)
 a.text(-0.4, SILL + H_WIN / 2, f'{H_WIN} m', ha='right', va='center', fontsize=8)
 a.text(-0.4, SILL / 2, f'sill {SILL} m', ha='right', va='center', fontsize=8, color=MUTED)
 a.set_xlim(-1.3, 3.4); a.set_ylim(-0.1, 3.9)
-a.set_title('(a) Noon sun past a 1.2 m overhang, south', loc='left', fontsize=9)
+a.set_title(f'(a) Noon sun past a {D_OH} m overhang, south', loc='left', fontsize=9)
+a.text(1.6, 0.35, f'overhang {W_WIN} m long,\nas wide as the window', fontsize=7.5, color=MUTED)
 w = 0.38
 b.bar(x - w / 2, m_beam, w, color=ORANGE, label='Without overhang')
-b.bar(x + w / 2, m_oh, w, color=BLUE, label='With 1.2 m overhang')
+b.bar(x + w / 2, m_oh, w, color=BLUE, label=f'With {D_OH} m overhang')
 b.set_xticks(x, list(MONTHS)); b.set_ylabel('Direct radiation on window, kWh/m² per month')
 b.legend(frameon=False, loc='upper right'); b.set_ylim(0, 70); b.set_facecolor(SURF)
 b.grid(axis='y', color=GRID); b.set_axisbelow(True)
@@ -201,16 +208,18 @@ ax.legend(frameon=False, loc='upper right', fontsize=8)
 save(fig, 'pareto-concept')
 
 # ---------- 5. side fins ----------
-W_WIN, D_FIN = 2.8, 0.5                                    # window width, fin depth (both sides)
+D_FIN = 0.5                                                # fin depth
 
 
-def fins_figure(name, faz, hours, sides):
+def fins_figure(name, faz, hours, sides, fin='both'):
     """Plan of the window with fins and the sun at two hours on 21 June, and monthly direct radiation.
-    faz: façade azimuth from south, west positive; sides: (left, right) labels seen from the room."""
+    faz: façade azimuth from south, west positive; sides: (left, right) labels in the plan;
+    fin: 'both', 'left' or 'right' (which side of the window has a fin, as drawn in the plan)."""
     beam, _ = on_vertical(alt, az, faz, ghi, dni, dhi)
     gam = np.angle(np.exp(1j * (az - faz)))                 # horizontal angle sun - façade normal
     gam = np.where(np.cos(gam) > 0, gam, 0.0)
-    beam_fin = beam * (1 - np.clip(D_FIN * np.abs(np.tan(gam)) / W_WIN, 0, 1))
+    acts = {'both': gam != 0, 'right': gam > 0, 'left': gam < 0}[fin]       # a fin shades sun from its own side
+    beam_fin = beam * (1 - np.clip(D_FIN * np.abs(np.tan(gam)) / W_WIN, 0, 1) * acts)
     m0 = np.array([beam[month == m].sum() / 1000 for m in range(1, 13)])
     m1 = np.array([beam_fin[month == m].sum() / 1000 for m in range(1, 13)])
     print(f'{name} window beam with {D_FIN} m fins: annual {m0.sum():.0f} -> {m1.sum():.0f} kWh/m2 '
@@ -221,8 +230,9 @@ def fins_figure(name, faz, hours, sides):
     a.set_aspect('equal'); a.axis('off')
     a.add_patch(Rectangle((-0.6, -0.3), W_WIN + 1.2, 0.3, color=WALL))         # wall in plan, outside up
     a.add_patch(Rectangle((0, -0.3), W_WIN, 0.3, color=GLASS, ec=MUTED, lw=0.8))
-    for xf in (-0.06, W_WIN):
-        a.add_patch(Rectangle((xf, 0), 0.06, D_FIN, color=MUTED))              # fins
+    for xf, sd in ((-0.06, 'left'), (W_WIN, 'right')):
+        if fin in ('both', sd):
+            a.add_patch(Rectangle((xf, 0), 0.06, D_FIN, color=MUTED))          # fins
     a.text(W_WIN / 2, -0.4, 'room', ha='center', va='top', fontsize=8, color=MUTED)
     a.text(-0.7, -0.15, sides[0], ha='right', va='center', fontsize=8, color=MUTED)
     a.text(W_WIN + 0.7, -0.15, sides[1], ha='left', va='center', fontsize=8, color=MUTED)
@@ -239,13 +249,17 @@ def fins_figure(name, faz, hours, sides):
         a.plot([start[0], hit], [start[1], 0], color=col, lw=1.6)
         a.text(start[0], start[1] + 0.06, f'June 21, {st:02d}:00\n{abs(np.degrees(g)):.0f}° from the normal',
                ha='center', va='bottom', fontsize=8)
-    a.annotate('', (W_WIN + 0.25, 0), (W_WIN + 0.25, D_FIN), arrowprops=dict(arrowstyle='<->', color=INK, lw=0.8))
-    a.text(W_WIN + 0.3, D_FIN / 2, f'{D_FIN} m', ha='left', va='center', fontsize=8)
+    xa = W_WIN + 0.25 if fin != 'left' else -0.25
+    a.annotate('', (xa, 0), (xa, D_FIN), arrowprops=dict(arrowstyle='<->', color=INK, lw=0.8))
+    a.text(xa + (0.05 if fin != 'left' else -0.05), D_FIN / 2, f'{D_FIN} m', ha='left' if fin != 'left' else 'right',
+           va='center', fontsize=8)
     a.text(W_WIN / 2, -0.75, f'window {W_WIN} m, shaded strips coloured', ha='center', va='top', fontsize=8, color=MUTED)
     a.set_xlim(-1.8, W_WIN + 1.8); a.set_ylim(-1.1, 2.7)
-    a.set_title(f'(a) Plan: sun past {D_FIN} m side fins, {name.lower()}', loc='left', fontsize=9)
+    what = 'side fins' if fin == 'both' else f'side fin on the {sides[0 if fin == "left" else 1]} side'
+    a.set_title(f'(a) Plan: sun past {D_FIN} m {what}, {name.lower()}', loc='left', fontsize=9)
     b.bar(x - w / 2, m0, w, color=ORANGE, label='Without fins')
-    b.bar(x + w / 2, m1, w, color=VIOLET, label=f'With {D_FIN} m fins, both sides')
+    b.bar(x + w / 2, m1, w, color=VIOLET, label=f'With {D_FIN} m fins, both sides' if fin == 'both'
+          else f'With {D_FIN} m fin, {sides[0 if fin == "left" else 1]} side')
     b.set_xticks(x, list(MONTHS)); b.set_ylabel('Direct radiation on window, kWh/m² per month')
     b.legend(frameon=False, loc='upper right'); b.set_ylim(0, 70); b.set_facecolor(SURF)
     b.grid(axis='y', color=GRID); b.set_axisbelow(True)
@@ -255,5 +269,5 @@ def fins_figure(name, faz, hours, sides):
 
 
 fins_figure('South', 0.0, (9, 14), ('E', 'W'))
-fins_figure('East', -np.pi / 2, (5, 10), ('N', 'S'))
-fins_figure('West', np.pi / 2, (14, 19), ('S', 'N'))
+fins_figure('East', -np.pi / 2, (9, 11), ('N', 'S'), fin='right')
+fins_figure('West', np.pi / 2, (13, 15), ('S', 'N'), fin='left')
