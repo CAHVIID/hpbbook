@@ -114,36 +114,15 @@ A fin of depth $d$ on each side of a window of width $W$ shades a strip of width
 (a) Sun past 0.5 m side fins on a south window on 21 June (solar time), plan. (b) Direct radiation on the south window with and without the fins, Annex 80 Copenhagen TMY 2041–2060. The fins are taken as infinitely tall; diffuse radiation is not reduced. Compare with the overhang in {numref}`fig-d3-overhang`.
 ```
 
-Towards east and west, fins do even less ({numref}`fig-d3-side-fins-east` and {numref}`fig-d3-side-fins-west`). There only the fin on the south side of the window matters, since the sun comes from the north side only in the early morning and late evening. A single 0.5 m fin on the south side cuts the direct radiation from May to August by 10 % on both façades (east 161 to 145, west 172 to 155 kWh/m²) and over the year by 15 %. The strongest sun on an east façade comes in the early morning, when the sun is low and almost straight in front of the window, so $\gamma$ is small and the fins cast little shadow. They shade the glass mainly when the sun is far to the side, around 10:00 on an east façade and 14:00 on a west façade, when the radiation on the façade is already falling. To block the low, frontal sun, the fins must be closely spaced or angled, like vertical louvres, or the shading must be movable.
+Towards east and west, fins do even less, and only the fin on the south side of the window matters, since the sun comes from the north side only in the early morning and late evening ({numref}`fig-d3-side-fins-split`). The strongest sun on an east façade comes in the early morning, when the sun is low and almost straight in front of the window, so $\gamma$ is small and the fin casts little shadow. A single 0.5 m fin on a 2.3 m window cuts the direct radiation from May to August by only 10 % (east 161 to 145, west 172 to 155 kWh/m²).
 
-```{figure} figures/d3/side-fins-east.*
-:name: fig-d3-side-fins-east
-:alt: Left, a plan of a 2.3 m wide east window with a 0.5 m fin on its south side only, north on the left and south on the right. On 21 June at 09:00 the sun is 26 degrees south of the façade normal and the fin shades a strip of about 0.25 m; at 11:00 it is 65 degrees south of the normal and the fin shades about 1.1 m. Right, monthly bars of direct radiation on the window with and without the fin; the fin reduces it by about 10 percent in summer.
+Fins work better on narrow windows, because the shaded strip $d \tan \gamma$ is a larger share of a narrow window. Splitting the 2.3 m window into two 1.15 m windows, each with its own fin, gives the same glass area but doubles the shaded share. The cut from May to August rises to 18 % on the east façade (132 kWh/m²) and 17 % on the west façade (142 kWh/m²), and over the year from 15 % to 26 %. Even so, the low sun straight in front of the window gets through. Closely spaced vertical louvres take this further, and movable shading blocks the frontal sun as well.
 
-(a) Sun past a 0.5 m side fin on the south side of an east window on 21 June (solar time), plan. (b) Direct radiation on the east window with and without the fin, Annex 80 Copenhagen TMY 2041–2060. Same assumptions as {numref}`fig-d3-side-fins`.
-```
+```{figure} figures/d3/side-fins-split.*
+:name: fig-d3-side-fins-split
+:alt: Two rows, east façade on top and west below. Left, plan of one 2.3 m window with a 0.5 m fin on its south side; middle, plan of two 1.15 m windows separated by 0.3 m of wall, each with a 0.5 m fin on its south side, with the sun's rays on 21 June at two hours and the shaded strips. Right, monthly bars of direct radiation on the glass without fins, with one window and fin, and with two windows and fins; the split window cuts the summer radiation about twice as much as the single window.
 
-```{figure} figures/d3/side-fins-west.*
-:name: fig-d3-side-fins-west
-:alt: Left, a plan of a 2.3 m wide west window with a 0.5 m fin on its south side only, south on the left and north on the right. On 21 June at 13:00 the sun is 65 degrees south of the façade normal and the fin shades a strip of about 1.1 m; at 15:00 it is 26 degrees south of the normal and the fin shades about 0.25 m. Right, monthly bars of direct radiation on the window with and without the fin; the fin reduces it by about 10 percent in summer.
-
-(a) Sun past a 0.5 m side fin on the south side of a west window on 21 June (solar time), plan. (b) Direct radiation on the west window with and without the fin, Annex 80 Copenhagen TMY 2041–2060. Same assumptions as {numref}`fig-d3-side-fins`.
-```
-
-Fins work better on narrow windows, because the shaded strip $d \tan \gamma$ is a larger share of a narrow window. Splitting the 2.3 m window into two 1.15 m windows, each with its own 0.5 m fin on the south side, doubles the shaded share for the same glass area ({numref}`fig-d3-side-fins-east-2win` and {numref}`fig-d3-side-fins-west-2win`). From May to August the cut rises from 10 % to 18 % on the east façade (161 to 132 kWh/m²) and to 17 % on the west façade (172 to 142 kWh/m²), and over the year from 15 % to 26 %. Even so, the strong low sun straight in front of the window still gets through. Closely spaced vertical louvres take this further: many narrow openings, each with a fin.
-
-```{figure} figures/d3/side-fins-east-2win.*
-:name: fig-d3-side-fins-east-2win
-:alt: Left, a plan of two 1.15 m wide east windows separated by 0.3 m of wall, each with a 0.5 m fin on its south side. On 21 June at 09:00 and 11:00 the sun passes each fin tip and shades a strip of each window; the shaded share is twice that of the single 2.3 m window. Right, monthly bars of direct radiation with and without the fins; the fins reduce it by about 18 percent in summer.
-
-(a) Sun past 0.5 m fins on the south side of two 1.15 m east windows on 21 June (solar time), plan. (b) Direct radiation on the east windows with and without the fins, Annex 80 Copenhagen TMY 2041–2060. Same glass area and assumptions as {numref}`fig-d3-side-fins-east`.
-```
-
-```{figure} figures/d3/side-fins-west-2win.*
-:name: fig-d3-side-fins-west-2win
-:alt: Left, a plan of two 1.15 m wide west windows separated by 0.3 m of wall, each with a 0.5 m fin on its south side. On 21 June at 13:00 and 15:00 the sun passes each fin tip and shades a strip of each window; the shaded share is twice that of the single 2.3 m window. Right, monthly bars of direct radiation with and without the fins; the fins reduce it by about 17 percent in summer.
-
-(a) Sun past 0.5 m fins on the south side of two 1.15 m west windows on 21 June (solar time), plan. (b) Direct radiation on the west windows with and without the fins, Annex 80 Copenhagen TMY 2041–2060. Same glass area and assumptions as {numref}`fig-d3-side-fins-west`.
+Side fins on the south side of east (top) and west (bottom) windows. (a, d) One 2.3 m window with one 0.5 m fin. (b, e) The same glass split into two 1.15 m windows with 0.3 m of wall between them, each with a 0.5 m fin. Plans with the sun on 21 June (solar time). (c, f) Direct radiation on the glass, Annex 80 Copenhagen TMY 2041–2060. Same assumptions as {numref}`fig-d3-side-fins`.
 ```
 
 Fixed shading also blocks part of the sky, so it costs diffuse daylight all year, and this is what usually limits the overhang depth when sDA300 is a constraint.
