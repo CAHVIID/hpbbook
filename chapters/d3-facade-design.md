@@ -130,6 +130,22 @@ Towards east and west, fins do even less ({numref}`fig-d3-side-fins-east` and {n
 (a) Sun past a 0.5 m side fin on the south side of a west window on 21 June (solar time), plan. (b) Direct radiation on the west window with and without the fin, Annex 80 Copenhagen TMY 2041–2060. Same assumptions as {numref}`fig-d3-side-fins`.
 ```
 
+Fins work better on narrow windows, because the shaded strip $d 	an \gamma$ is a larger share of a narrow window. Splitting the 2.3 m window into two 1.15 m windows, each with its own 0.5 m fin on the south side, doubles the shaded share for the same glass area ({numref}`fig-d3-side-fins-east-2win` and {numref}`fig-d3-side-fins-west-2win`). From May to August the cut rises from 10 % to 18 % on the east façade (161 to 132 kWh/m²) and to 17 % on the west façade (172 to 142 kWh/m²), and over the year from 15 % to 26 %. Even so, the strong low sun straight in front of the window still gets through. Closely spaced vertical louvres take this further: many narrow openings, each with a fin.
+
+```{figure} figures/d3/side-fins-east-2win.*
+:name: fig-d3-side-fins-east-2win
+:alt: Left, a plan of two 1.15 m wide east windows separated by 0.3 m of wall, each with a 0.5 m fin on its south side. On 21 June at 09:00 and 11:00 the sun passes each fin tip and shades a strip of each window; the shaded share is twice that of the single 2.3 m window. Right, monthly bars of direct radiation with and without the fins; the fins reduce it by about 18 percent in summer.
+
+(a) Sun past 0.5 m fins on the south side of two 1.15 m east windows on 21 June (solar time), plan. (b) Direct radiation on the east windows with and without the fins, Annex 80 Copenhagen TMY 2041–2060. Same glass area and assumptions as {numref}`fig-d3-side-fins-east`.
+```
+
+```{figure} figures/d3/side-fins-west-2win.*
+:name: fig-d3-side-fins-west-2win
+:alt: Left, a plan of two 1.15 m wide west windows separated by 0.3 m of wall, each with a 0.5 m fin on its south side. On 21 June at 13:00 and 15:00 the sun passes each fin tip and shades a strip of each window; the shaded share is twice that of the single 2.3 m window. Right, monthly bars of direct radiation with and without the fins; the fins reduce it by about 17 percent in summer.
+
+(a) Sun past 0.5 m fins on the south side of two 1.15 m west windows on 21 June (solar time), plan. (b) Direct radiation on the west windows with and without the fins, Annex 80 Copenhagen TMY 2041–2060. Same glass area and assumptions as {numref}`fig-d3-side-fins-west`.
+```
+
 Fixed shading also blocks part of the sky, so it costs diffuse daylight all year, and this is what usually limits the overhang depth when sDA300 is a constraint.
 
 Movable shading (external blinds, screens, shutters) can block more sun when it matters and give the full window back on overcast days. It needs control and depends on the occupants, so this chapter keeps to fixed elements; shutters for heat waves are a later step of the cooling strategy.
