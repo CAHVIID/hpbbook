@@ -103,7 +103,7 @@ At 55.7 °N the noon altitude is $90° - 55.7° + \delta$: 58° at the summer so
 (a) Noon sun past a 1.0 m overhang at 55.7 °N. (b) Direct radiation on a 2.3 m wide south window with and without the overhang, Annex 80 Copenhagen TMY 2041–2060. The overhang is as long as the window, so sun from the side passes its ends; diffuse radiation is not reduced.
 ```
 
-Towards east and west the sun meets the façade at low altitude with $\gamma$ near zero, so $\Omega \approx \alpha$ is small and an overhang does little. There the sun must be blocked sideways, by side fins, or by movable shading. Side fins shade according to the horizontal angle $\gamma$; towards south they cut the low morning and evening sun, which reaches the glass at grazing angles anyway, and towards north they cut the low summer sun from north-east and north-west.
+Towards east and west the sun meets the façade at low altitude with $\gamma$ near zero, so $\Omega \approx \alpha$ is small and an overhang does little. The low sun there comes almost straight at the window, which fixed elements block poorly. Side fins at the window edges help only on narrow windows, as shown below, so movable shading or a lower g-value is usually needed. Side fins shade according to the horizontal angle $\gamma$; towards south they cut the low morning and evening sun, which reaches the glass at grazing angles anyway, and towards north they cut the low summer sun from north-east and north-west.
 
 A fin of depth $d$ on each side of a window of width $W$ shades a strip of width $d \tan \gamma$ on the side the sun comes from, so the window is fully shaded when $d \tan \gamma \geq W$. Towards south the effect is small ({numref}`fig-d3-side-fins`). For the 2.3 m wide south window, 0.5 m fins on both sides cut the direct radiation from May to August by 23 % (164 to 125 kWh/m²) and over the year by 19 %, compared with 85 % in summer for the 1.0 m overhang. The fins act only in the morning and afternoon, when the sun is far to the side. Around noon, when the gain peaks, $\gamma$ is small and the fins shade almost nothing.
 
@@ -131,7 +131,7 @@ Fixed shading also blocks part of the sky, so it costs diffuse daylight all year
 Movable shading (external blinds, screens, shutters) can block more sun when it matters and give the full window back on overcast days. It needs control and depends on the occupants, so this chapter keeps to fixed elements; shutters for heat waves are a later step of the cooling strategy.
 
 :::{admonition} Rules of thumb
-- Towards south at 55–56 °N, an overhang at the window head with depth $d \approx H$ shades the window completely around noon from late April to late August.
+- Towards south at 55–56 °N, an overhang at the window head with depth $d \approx H$ shades the window completely around noon from late April to mid-August.
 - Overhangs work towards south. Towards east and west, fins only help on narrow windows; use movable shading or a lower g-value.
 :::
 
