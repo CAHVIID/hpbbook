@@ -131,7 +131,7 @@ Movable shading (external blinds, screens, shutters) can block more sun when it 
 
 :::{admonition} Rules of thumb
 - Towards south at 55–56 °N, an overhang at the window head with depth $d \approx H$ shades the window completely around noon from late April to late August.
-- Overhangs work towards south. Towards east and west, use fins, movable shading or a lower g-value.
+- Overhangs work towards south. Towards east and west, fins only help on narrow windows; use movable shading or a lower g-value.
 :::
 
 ## D3.4 Daylight: sDA300 and what drives it
