@@ -39,4 +39,4 @@ Figures compiled by {cite:t}`carbonbriefac` from national sources of different y
 
 ## Consequence for design
 
-Northern Europe still has little AC, but sales are growing. Every AC unit added to a home that could have been kept cool passively adds to the evening peak, when solar output is low and gas plants set the price. This is the case for the cooling strategy in [](d2-cooling-strategy.md), where AC is the last step.
+Northern Europe still has little AC, but sales are growing. Every AC unit added to a home that could have been kept cool passively adds to the evening peak, when solar output is low and gas plants set the price.
