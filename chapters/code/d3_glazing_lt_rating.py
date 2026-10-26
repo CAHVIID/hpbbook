@@ -1,6 +1,6 @@
 """Light transmittance of six glazings against how test subjects rated the daylight behind them.
 
-Data: Dubois, Cantin and Johnsen (2007), SBi pilot study with 18 subjects looking into a 1:7.5 scale model
+Data: Dubois and Johnsen (2003), By og Byg Documentation 044, pilot study with 18 subjects looking into a 1:7.5 scale model
 of an office under overcast skies. LT is the manufacturer's value; the category is the authors' summary of
 the 7-point ratings (colour, brightness, details, acceptability). The report gives no medians, only box plots.
 
