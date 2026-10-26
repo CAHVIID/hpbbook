@@ -1,4 +1,4 @@
-"""Monthly cloud cover (DMI DRY) and global horizontal irradiation (DMI DRY and Annex 80 TMY), May-Sep."""
+"""Monthly cloud cover (DMI DRY) and global horizontal irradiation (Annex 80 TMY), May-Sep."""
 import csv, sys
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -27,15 +27,13 @@ for name, f, c in dry:
     ax[0].plot(mlab, v, color=c, lw=2, marker="o", ms=6, label=name)
 ax[0].set_ylim(0, 10); ax[0].set_ylabel("Mean total sky cover (tenths)")
 ax[0].set_title("(a) Cloud cover, DMI DRY Sjælsmark", loc="left", fontsize=10)
-for name, f, c in dry:
+w = 0.27
+for i, (name, f, c) in enumerate(a80):
     v = ghi(load(f)); out.append((name, "GHI kWh/m2", v))
-    ax[1].plot(mlab, v, color=c, lw=2, marker="o", ms=6, label=name)
-for name, f, c in a80:
-    v = ghi(load(f)); out.append((name, "GHI kWh/m2", v))
-    ax[1].plot(mlab, v, color=c, lw=1.6, ls="--", marker="s", ms=5, mfc="white", label="Annex 80 " + name)
-ax[1].set_ylim(0, 200)
+    ax[1].bar([k + (i - 1) * w for k in range(5)], v, width=w - 0.02, color=c, label=name)
+ax[1].set_xticks(range(5)); ax[1].set_xticklabels(mlab)
 ax[1].set_ylabel("Global horizontal irradiation (kWh/m²)")
-ax[1].set_title("(b) Solar irradiation, DRY (solid) and Annex 80 (dashed)", loc="left", fontsize=10)
+ax[1].set_title("(b) Solar irradiation, Annex 80 Copenhagen", loc="left", fontsize=10)
 for a in ax:
     a.grid(axis="y", color="#e5e5e5"); a.set_axisbelow(True); a.legend(frameon=False, fontsize=8.5)
 fig.tight_layout()
