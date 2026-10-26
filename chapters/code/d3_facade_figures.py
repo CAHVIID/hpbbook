@@ -10,6 +10,10 @@
    (2D), so only the profile angle matters; diffuse radiation is not reduced (conservative).
 4. d3/pareto-concept: what a Pareto front of cooling against heating demand looks like. Concept only,
    no simulation results.
+5. d3/side-fins: (a) plan of the same south window (2.8 m wide, the WFR scaling for 1.1 m height) with
+   0.6 m side fins on both sides and the sun on 21 June at 09 and 14 solar time; (b) monthly direct
+   radiation on the window with and without the fins. The fins are taken as infinitely tall (2D), so
+   only the horizontal angle between sun and façade normal matters; diffuse radiation is not reduced.
 
 Sun position: Spencer (1971) declination and equation of time, EPW hour h taken at h - 0.5 local
 standard time (UTC+1). Run from anywhere: python d3_facade_figures.py [path to EPW].
@@ -195,3 +199,48 @@ ax.set_xticks([]); ax.set_yticks([]); ax.set_facecolor(SURF)
 for s in ('top', 'right'): ax.spines[s].set_visible(False)
 ax.legend(frameon=False, loc='upper right', fontsize=8)
 save(fig, 'pareto-concept')
+
+# ---------- 5. side fins ----------
+W_WIN, D_FIN = 2.8, 0.6                                    # window width, fin depth (both sides)
+gam = np.where(np.cos(az) > 0, az, 0.0)                     # horizontal angle sun - façade normal
+fin_shaded = np.clip(D_FIN * np.abs(np.tan(gam)) / W_WIN, 0, 1)
+beam_fin = beam_s * (1 - fin_shaded)
+m_fin = np.array([beam_fin[month == m].sum() / 1000 for m in range(1, 13)])
+print(f'South window beam with {D_FIN} m fins: annual {m_beam.sum():.0f} -> {m_fin.sum():.0f} kWh/m2; '
+      f'May-Aug {m_beam[4:8].sum():.0f} -> {m_fin[4:8].sum():.0f}; '
+      f'Nov-Feb {m_beam[[10,11,0,1]].sum():.0f} -> {m_fin[[10,11,0,1]].sum():.0f}')
+fig, (a, b) = plt.subplots(1, 2, figsize=(10, 4.0), facecolor=SURF, layout='constrained',
+                           gridspec_kw={'width_ratios': [1, 1.35]})
+a.set_aspect('equal'); a.axis('off')
+a.add_patch(Rectangle((-0.6, -0.3), W_WIN + 1.2, 0.3, color=WALL))             # wall in plan, outside up
+a.add_patch(Rectangle((0, -0.3), W_WIN, 0.3, color=GLASS, ec=MUTED, lw=0.8))   # window
+for xf in (-0.06, W_WIN):
+    a.add_patch(Rectangle((xf, 0), 0.06, D_FIN, color=MUTED))                  # fins
+a.text(W_WIN / 2, -0.4, 'room', ha='center', va='top', fontsize=8, color=MUTED)
+a.text(-0.7, -0.15, 'E', ha='right', va='center', fontsize=8, color=MUTED)
+a.text(W_WIN + 0.7, -0.15, 'W', ha='left', va='center', fontsize=8, color=MUTED)
+for st, col in [(9, ORANGE), (14, BLUE)]:
+    g = np.radians(15 * (st - 12))
+    g = np.arctan2(np.sin(g), np.cos(g) * np.sin(np.radians(lat)) - np.tan(np.radians(23.44)) * np.cos(np.radians(lat)))
+    side = -1 if g < 0 else 1                                                    # sun from east: left fin
+    tip = np.array([0.0 if side < 0 else W_WIN, D_FIN])
+    shadow = min(D_FIN * np.tan(abs(g)), W_WIN)                                 # shaded strip of the glass
+    hit = tip[0] - side * shadow
+    a.add_patch(Rectangle((min(tip[0], hit), -0.3), shadow, 0.3, color=col, alpha=0.35, lw=0))
+    start = tip + 1.5 * np.array([side * np.sin(abs(g)), np.cos(abs(g))])
+    a.plot([start[0], hit], [start[1], 0], color=col, lw=1.6)
+    a.text(start[0], start[1] + 0.06, f'June 21, {st:02d}:00\n{abs(np.degrees(g)):.0f}° from south',
+           ha='center', va='bottom', fontsize=8)
+a.annotate('', (W_WIN + 0.25, 0), (W_WIN + 0.25, D_FIN), arrowprops=dict(arrowstyle='<->', color=INK, lw=0.8))
+a.text(W_WIN + 0.3, D_FIN / 2, f'{D_FIN} m', ha='left', va='center', fontsize=8)
+a.text(W_WIN / 2, -0.75, f'window {W_WIN} m, shaded strips coloured', ha='center', va='top', fontsize=8, color=MUTED)
+a.set_xlim(-1.8, W_WIN + 1.8); a.set_ylim(-1.1, 2.7)
+a.set_title(f'(a) Plan: sun past {D_FIN} m side fins, south', loc='left', fontsize=9)
+b.bar(x - w / 2, m_beam, w, color=ORANGE, label='Without fins')
+b.bar(x + w / 2, m_fin, w, color=VIOLET, label=f'With {D_FIN} m fins, both sides')
+b.set_xticks(x, list(MONTHS)); b.set_ylabel('Direct radiation on window, kWh/m² per month')
+b.legend(frameon=False, loc='upper right'); b.set_ylim(0, 70); b.set_facecolor(SURF)
+b.grid(axis='y', color=GRID); b.set_axisbelow(True)
+for s in ('top', 'right'): b.spines[s].set_visible(False)
+b.set_title('(b) Direct sun on the south window, 2050 TMY', loc='left', fontsize=9)
+save(fig, 'side-fins')
