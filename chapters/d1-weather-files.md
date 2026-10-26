@@ -375,6 +375,98 @@ Simulations of Finnish apartment buildings without cooling show the result {cite
 
 The same heat wave moved to the climate of 2050 has 15 tropical nights and gives about 14,000 degree-hours above 27 °C, and the degree-hours above 32 °C, a health risk threshold, triple from about 1,000 to 3,000. Openable windows were the most effective passive measure, but only a cooling unit removed the overheating completely.
 
+### A measured heat wave in the DRY
+
+The Annex 80 heat-wave years are model output for 2041–2060. A measured alternative is the summer of 2018, the Nordic heat-wave summer. July 2018 is in none of the DMI reference years, and August 2018 only in the RCP4.5 2055–2074 year. To get a file with a real heat wave on the same basis as the reference year, July and August of DRY 2011–2023 were replaced by DMI observations from Sjælsmark (station 06188), 1 July to 31 August 2018:
+
+- Hourly mean air temperature, relative humidity, pressure, global radiation, wind, cloud cover and precipitation from the DMI open data API. Dew point is computed from temperature and humidity.
+- DMI measures only global radiation. Direct and diffuse radiation are split from it with the Erbs model {cite:p}`erbs1982`. On the original July and August of the DRY, the split gives about 10 % less direct and 5 % more diffuse radiation than DMI's own values.
+- The jumps in temperature and humidity at 1 July and 1 September are spread over 13 hours. All other months are the original DRY.
+
+[Download the EPW](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/weather/DRY_2011-2023_heatwave2018.epw). {numref}`tab-heatwave-2018` and {numref}`fig-heatwave-2018` compare it with the Annex 80 files on the same indicators as {numref}`tab-annex80-summary` and {numref}`tab-heat-waves`.
+
+```{list-table} The DRY with summer 2018 against the original DRY and the Annex 80 files, computed from the EPW files. The first five columns are annual; the last three cover June to August.
+:name: tab-heatwave-2018
+:header-rows: 1
+
+* - Weather file
+  - Max (°C)
+  - Hours above 26 °C
+  - Hours UTCI > 26 °C
+  - Days above 25 °C (longest run)
+  - Tropical nights
+  - Mean (°C)
+  - 99th percentile (°C)
+  - Degree-hours above 26 °C (Kh)
+* - DRY 2011–2023
+  - 30.3
+  - 37
+  - 432
+  - 12 (4)
+  - 0
+  - 16.7
+  - 26.5
+  - 33
+* - DRY 2011–2023 + summer 2018
+  - 31.0
+  - 125
+  - 639
+  - 29 (14)
+  - 0
+  - 18.2
+  - 29.2
+  - 217
+* - Annex 80 TMY 2041–2060
+  - 30.2
+  - 82
+  - 464
+  - 16 (7)
+  - 0
+  - 17.5
+  - 28.2
+  - 138
+* - Heat wave longest (2045)
+  - 29.8
+  - 78
+  - 537
+  - 27 (10)
+  - 1
+  - 17.6
+  - 27.3
+  - 93
+* - Heat wave most intense (2055)
+  - 32.8
+  - 100
+  - 620
+  - 25 (5)
+  - 2
+  - 18.0
+  - 29.1
+  - 194
+* - Heat wave most severe (2054)
+  - 32.0
+  - 192
+  - 683
+  - 42 (14)
+  - 1
+  - 18.7
+  - 30.2
+  - 399
+```
+
+```{figure} figures/d1/heatwave-2018-compare.*
+:name: fig-heatwave-2018
+:width: 100%
+
+(a) Hours above a given air temperature, June to August. (b) Daily maximum air temperature, June to August, for three of the files. The dashed line marks 25 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/compare_heatwave_files.py), [build script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/build_dry_heatwave_2018.py)
+```
+
+:::{admonition} Take aways
+- A measured Danish summer, 2018, is already as hot as the Annex 80 "most intense" heat-wave year of 2041–2060, and only the "most severe" year is clearly hotter.
+- The 2018 file has no tropical nights at Sjælsmark, a rural station. In the city, add the urban heat island (next section) before trusting night cooling.
+- Use the DRY + 2018 file to stress-test overheating with measured weather; use the Annex 80 "most severe" file for the future case.
+:::
+
 ### Urban heat island
 
 The urban heat island intensity is the air temperature difference $\Delta T_\mathrm{UHI} = T_\mathrm{urban} - T_\mathrm{rural}$. It is mainly a night-time effect and peaks a few hours before sunrise on calm, clear summer nights. The causes:
