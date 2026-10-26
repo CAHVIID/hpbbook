@@ -13,9 +13,9 @@ def tsc(rows):  # mean total sky cover, tenths
     return [sum(float(r[22]) for r in rows if int(r[1]) == m) / sum(1 for r in rows if int(r[1]) == m) for m in months]
 def ghi(rows):  # monthly GHI sum, kWh/m2 (cap corrupt values)
     return [sum(min(float(r[13]), 1500) for r in rows if int(r[1]) == m) / 1000 for m in months]
-dry = [("DRY 2001–2010", "Denmark_DRY_2001-2010.epw", "#9a9a9a"),
-       ("DRY 2011–2023", "DRY_2011-2023_epw-fil.epw", "#2a78d6"),
-       ("DRY RCP4.5 2045–2064", "DRY_rcp45_2045_2064_epw-fil.epw", "#eb6834")]
+dry = [("DRY 2011–2023", "DRY_2011-2023_epw-fil.epw", "#9a9a9a"),
+       ("DRY RCP4.5 2045–2064", "DRY_rcp45_2045_2064_epw-fil.epw", "#2a78d6"),
+       ("DRY RCP4.5 2080–2099", "DRY_rcp45_2080_2099_epw-fil.epw", "#eb6834")]
 a80 = [("TMY 2001–2020", "5A_Copenhagen_TMY_2001-2020.epw", "#9a9a9a"),
        ("TMY 2041–2060", "5A_Copenhagen_TMY_2041-2060.epw", "#2a78d6"),
        ("TMY 2081–2100", "5A_Copenhagen_TMY_2081-2100.epw", "#eb6834")]
