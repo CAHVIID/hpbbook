@@ -461,8 +461,10 @@ The Annex 80 heat-wave years are model output for 2041–2060. A measured altern
 (a) Hours above a given air temperature, June to August. (b) Daily maximum air temperature, June to August, for three of the files. The dashed line marks 25 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/compare_heatwave_files.py), [build script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/build_dry_heatwave_2018.py)
 ```
 
+The 2018 heat wave was on par with the Annex 80 "most intense" year 2055. Their summers have almost the same mean (18.2 and 18.0 °C), the same 99th percentile (29.2 and 29.1 °C) and about the same degree-hours above 26 °C (217 and 194 Kh). It was far from the "most severe" year 2054, which has nearly twice the degree-hours (399 Kh), 192 instead of 125 hours above 26 °C and 42 instead of 29 days above 25 °C. A summer that has already been measured is therefore a realistic heat wave for the 2050s, but not the worst case.
+
 :::{admonition} Take aways
-- A measured Danish summer, 2018, is already as hot as the Annex 80 "most intense" heat-wave year of 2041–2060, and only the "most severe" year is clearly hotter.
+- The measured 2018 heat wave matches the Annex 80 "most intense" year 2055 (217 vs 194 Kh above 26 °C), but has only about half the degree-hours of the "most severe" year 2054 (399 Kh).
 - The 2018 file has no tropical nights at Sjælsmark, a rural station. In the city, add the urban heat island (next section) before trusting night cooling.
 - Use the DRY + 2018 file to stress-test overheating with measured weather; use the Annex 80 "most severe" file for the future case.
 :::
