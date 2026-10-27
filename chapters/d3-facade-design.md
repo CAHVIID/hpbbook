@@ -74,7 +74,7 @@ rises. Clear triple glazing has $S \approx 1.4$–$1.5$. The best solar-control 
 
 Going from the reference glazing to Suncool 66/33 cuts the solar gain by 35 % and the light by 17 %. Below $\tau_v \approx 0.5$ the glazing looks dark from inside and the window must grow to keep sDA300, which brings back the solar gain.
 
-A low $\tau_v$ also changes how the daylight looks, and the tint of the coating matters as much as the number. In a Danish pilot study, 18 subjects rated the view into a scale model of an office behind six glazings ({numref}`fig-d3-glazing-lt-rating`) {cite}`dubois2003`. Glazings with $\tau_v$ of 0.66–0.70 coloured the daylight in a way some subjects found unacceptable, and the one at 0.50 in a way most did.
+A low $\tau_v$ also changes how the daylight looks, and the tint of the coating matters as much as the number. In a Danish pilot study, 18 subjects rated the view into a scale model of an office behind six glazings ({numref}`fig-d3-glazing-lt-rating`) {cite}`dubois2003`. Glazings with $\tau_v$ of 0.66–0.70 coloured the daylight in a way some subjects found unacceptable, and the one at 0.50 in a way most did. No Danish rule sets a minimum $\tau_v$. LEED v4.1 and WELL v2 require more than 0.40 for view and daylight glazing {cite}`leed41,wellv2`, and the Danish indoor climate guideline accepts 1:1 window replacement in renovation without a daylight check when $\tau_v \geq 0.70$ {cite}`bvi2025`. The tint is handled through the colour rendering index of the glazing, $R_a$ per EN 410: DGNB gives points for $R_a \geq 80$ and the most for $R_a \geq 90$ {cite}`dgnb2020soc14`.
 
 ```{figure} figures/d3/glazing-lt-rating.*
 :name: fig-d3-glazing-lt-rating
@@ -86,7 +86,7 @@ Light transmittance of six glazings against the rated quality of the daylight be
 :::{admonition} Rules of thumb
 - In Copenhagen, 1 m² of south glazing with $g = 0.49$ admits about 180 kWh of solar heat from May to August; with $g = 0.32$, about 120 kWh.
 - East and west façades receive as much summer radiation as south, and are harder to shade.
-- Selectivity above 2 is not available; keep $\tau_v \geq 0.5$.
+- Selectivity above 2 is not available; keep $\tau_v \geq 0.5$ and choose a colour-neutral glazing with $R_a \geq 90$.
 :::
 
 ## D3.3 Fixed shading: overhangs and side fins
