@@ -97,7 +97,7 @@ Q = C_d \, A_\text{eff} \, \sqrt{2 \, g \, h \, \frac{T_i - T_o}{T_i}}
 
 The stack effect is weak in summer, because the temperature difference is small. A window and a roof window, each 0.5 m² and 5 m apart in height, with a 3 K temperature difference, give a pressure difference of only 0.6 Pa. The airflow is still useful: $Q = 0.65 \cdot 0.35 \cdot 0.99 = 0.23$ m³/s, or about 830 W of cooling. Height is what makes the stack effect work, which is why roof windows, skylights and stairwells are so effective.
 
-A single opening also has a stack effect: cool air enters at the bottom of the opening and warm air leaves at the top. The airflow is
+A single opening also has a stack effect: cool air enters at the bottom of the opening and warm air leaves at the top. The airflow is {cite:p}`awbi_cibse`
 
 ```{math}
 :label: eq-vc-single
