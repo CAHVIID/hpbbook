@@ -62,10 +62,12 @@ When air flows through two openings in series, for example in through a window a
 
 ```{math}
 :label: eq-vc-aeff
-\frac{1}{A_\text{eff}^2} = \frac{1}{A_1^2} + \frac{1}{A_2^2}
+\frac{1}{(C_d A)_\text{eff}^2} = \frac{1}{(C_{d,1} A_1)^2} + \frac{1}{(C_{d,2} A_2)^2}
 ```
 
-The smaller opening dominates. Two openings of 0.5 m² each give an effective area of only 0.35 m², and a large window does not help much if the outlet is small.
+which replaces $C_d A$ in the orifice equation. When both openings have the same discharge coefficient, $(C_d A)_\text{eff} = C_d A_\text{eff}$ with $1/A_\text{eff}^2 = 1/A_1^2 + 1/A_2^2$. This form is used in the examples below. If one opening is a louvre or a grille with a lower $C_d$, use the general form.
+
+The weaker opening dominates. Two openings of 0.5 m² each give an effective area of only 0.35 m², and a large window does not help much if the outlet is small.
 
 The pressure difference has two sources: buoyancy (the stack effect) and wind. Together with the placement of the openings they give the three modes of natural ventilative cooling in {numref}`fig-vc-modes`.
 
@@ -101,7 +103,7 @@ The stack effect is weak in summer, because the temperature difference is small.
 A window and a roof window, each 0.5 m² and 5 m apart in height, with a 3 K temperature difference, give a pressure difference of only 0.3 Pa. The airflow is still useful: $Q = 0.65 \cdot 0.35 \cdot 0.99 = 0.23$ m³/s, or about 830 W of cooling. Height is what makes the stack effect work, which is why roof windows, skylights and stairwells are so effective.
 :::
 
-A single opening also has a stack effect: cool air enters at the bottom of the opening and warm air leaves at the top. The airflow is
+A single opening also has a stack effect: cool air enters at the bottom of the opening and warm air leaves at the top. The airflow is {cite:p}`awbi_cibse`
 
 ```{math}
 :label: eq-vc-single
@@ -196,7 +198,7 @@ A 30 m² room with a ceiling height of 2.5 m (75 m³) has one openable window on
 Q_\text{stack} = \frac{0.65 \cdot 0.6}{3} \sqrt{9.81 \cdot 1.2 \cdot \frac{5}{298}} = 0.13 \cdot 0.44 = 0.058 \text{ m}^3\text{/s} = 58 \text{ L/s}
 ```
 
-**Wind alone.** With a single opening there is no pressure difference across the room, so {eq}`eq-vc-cross` does not apply. The wind still drives some exchange through turbulence and pulsating flow at the opening. A simple empirical estimate by Warren and Parkins is $Q_\text{wind} = 0.025 \, A \, v$:
+**Wind alone.** With a single opening there is no pressure difference across the room, so {eq}`eq-vc-cross` does not apply. The wind still drives some exchange through turbulence and pulsating flow at the opening. A simple empirical estimate {cite:p}`warren1985` is $Q_\text{wind} = 0.025 \, A \, v$:
 
 ```{math}
 Q_\text{wind} = 0.025 \cdot 0.6 \cdot 2 = 0.030 \text{ m}^3\text{/s} = 30 \text{ L/s}
