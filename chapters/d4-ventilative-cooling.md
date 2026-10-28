@@ -182,6 +182,15 @@ At that wind speed the airflow almost stops, and the room is not cooled even tho
 
 Building simulation tools such as IDA ICE solve the same problem as an airflow network, where every opening is a flow element and the pressures are balanced in each zone and every time step. Hand calculations like the one above are still essential for checking whether the simulated airflows have the right order of magnitude.
 
+{numref}`fig-vc-pressures` puts typical numbers on the two driving forces in a Copenhagen summer.
+
+:::{figure} figures/d4/driving-pressures.*
+:label: fig-vc-pressures
+:alt: Horizontal bar chart of driving pressure differences in pascal for a Copenhagen summer afternoon (ΔT 5 K, wind 3.8 m/s) and night (ΔT 12 K, wind 2.2 m/s). Stack over one 1.5 m window: 0.3 and 0.7 Pa. Stack over two storeys, 5 m: 1.0 and 2.4 Pa. Wind with ΔCp = 0.5: 4.3 and 1.5 Pa.
+:width: 80%
+Driving pressure differences from the stack effect {eq}`eq-vc-stack` and wind {eq}`eq-vc-cross` on a summer afternoon (15:00) and night (03:00) in Copenhagen. Temperature differences are to a 26 °C room. Outdoor temperature and wind (10 m) are June–August hourly means from the Annex 80 TMY 2041–2060 file. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/d4_driving_pressures.py)
+:::
+
 ## D4.4 Ventilation strategies - Worked examples
 
 The three modes in {numref}`fig-vc-modes` are compared here with one worked example each, using the equations above.
