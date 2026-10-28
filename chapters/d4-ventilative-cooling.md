@@ -52,11 +52,13 @@ The airflow through an opening is driven by the pressure difference across it. F
 Q = C_d \, A \, \sqrt{\frac{2 \, \Delta p}{\rho}}
 ```
 
-where $C_d$ is the discharge coefficient (–), $A$ the free opening area (m²) and $\Delta p$ the pressure difference (Pa). The discharge coefficient accounts for the contraction of the air jet through the opening. It is about 0.6 to 0.65 for a sharp-edged opening; IDA ICE uses 0.65. Grilles, insect nets and louvres lower it considerably, so always use the free area and the discharge coefficient of the actual product. As an example, the rain-defence louvre tested by Bugenings et al. has a discharge coefficient of only 0.29, rated according to EN 13030 {cite:p}`bugenings2025`.
+where $C_d$ is the discharge coefficient (–), $A$ the free opening area (m²) and $\Delta p$ the pressure difference (Pa).
 
-Because the airflow only grows with the square root of the pressure difference, doubling the driving pressure gives just 40 % more airflow. Doubling the opening area doubles it.
+The discharge coefficient accounts for the contraction of the air jet through the opening. It is about 0.6 to 0.65 for a sharp-edged opening; IDA ICE uses 0.65. Grilles, insect nets and louvres lower it considerably, so always use the free area and the discharge coefficient of the actual product. As an example, the rain-defence louvre tested by Bugenings et al. has a discharge coefficient of 0.29, rated according to EN 13030 {cite:p}`bugenings2025`.
 
-When air flows through two openings in series, for example in through a window and out through a roof window, the openings can be combined into one effective area:
+Because the airflow only grows with the square root of the pressure difference, **doubling the driving pressure gives just 40 % more airflow. Doubling the opening area, doubles it.**
+
+When air flows through two openings in series, for example in through a window and out through a roof window, the openings can be combined into one effective area (assuming same $C_d$):
 
 ```{math}
 :label: eq-vc-aeff
@@ -93,7 +95,11 @@ Inserting {eq}`eq-vc-stack` in {eq}`eq-vc-orifice` gives the stack-driven airflo
 Q = C_d \, A_\text{eff} \, \sqrt{2 \, g \, h \, \frac{T_i - T_o}{T_i}}
 ```
 
-The stack effect is weak in summer, because the temperature difference is small. A window and a roof window, each 0.5 m² and 5 m apart in height, with a 3 K temperature difference, give a pressure difference of only 0.6 Pa. The airflow is still useful: $Q = 0.65 \cdot 0.35 \cdot 0.99 = 0.23$ m³/s, or about 830 W of cooling. Height is what makes the stack effect work, which is why roof windows, skylights and stairwells are so effective.
+The stack effect is weak in summer, because the temperature difference is small.
+
+:::{note}
+A window and a roof window, each 0.5 m² and 5 m apart in height, with a 3 K temperature difference, give a pressure difference of only 0.3 Pa. The airflow is still useful: $Q = 0.65 \cdot 0.35 \cdot 0.99 = 0.23$ m³/s, or about 830 W of cooling. Height is what makes the stack effect work, which is why roof windows, skylights and stairwells are so effective.
+:::
 
 A single opening also has a stack effect: cool air enters at the bottom of the opening and warm air leaves at the top. The airflow is
 
@@ -102,7 +108,11 @@ A single opening also has a stack effect: cool air enters at the bottom of the o
 Q = \frac{C_d \, A}{3} \sqrt{g \, H \, \frac{T_i - T_o}{T_i}}
 ```
 
-where $H$ is the height of the opening. A 0.6 m² window that is 1.2 m tall gives only 45 L/s, or 160 W of cooling, at a 3 K temperature difference. Single-sided ventilation is weak, and tall openings are better than wide ones.
+where $H$ is the height of the opening.
+
+:::{note}
+A 0.6 m² window that is 1.2 m tall gives only 45 L/s, or 160 W of cooling, at a 3 K temperature difference. Single-sided ventilation is weak, and tall openings are better than wide ones.
+:::
 
 ### Wind
 
@@ -122,11 +132,15 @@ For cross-ventilation, the driving pressure is the difference between the two fa
 \Delta p = (C_{p,1} - C_{p,2}) \, \tfrac{1}{2} \, \rho \, v^2
 ```
 
+:::{note}
 With the same two 0.5 m² openings on opposite façades, a wind speed of 3 m/s and a $C_p$ difference of 0.8, the pressure difference is 4.3 Pa. The airflow is 0.62 m³/s, almost three times the stack-driven airflow, and gives 2.2 kW of cooling at a 3 K temperature difference.
+:::
 
-Cross-ventilation therefore gives much more airflow than single-sided ventilation, but wind is unreliable. It varies in speed and direction, and the warmest days are often calm. Design for the stack effect on a calm day, and treat the wind as a bonus. Strong wind also causes its own problems: draught, slamming doors and papers flying, which make occupants close the openings.
+Cross-ventilation therefore gives much more airflow than single-sided ventilation, but wind is unreliable. It varies in speed and direction, and the warmest days are often calm.
 
-### Combined wind and stack effect
+**Design for the stack effect on a calm day, and consider the wind to be a bonus.**
+
+### Combined wind and stack effect (two openings only)
 
 In reality wind and buoyancy act at the same time. For two openings, the hand calculation follows directly from the equations above, because the two pressure differences add up across the openings:
 
@@ -166,11 +180,11 @@ At that wind speed the airflow almost stops, and the room is not cooled even tho
 
 Building simulation tools such as IDA ICE solve the same problem as an airflow network, where every opening is a flow element and the pressures are balanced in each zone and every time step. Hand calculations like the one above are still essential for checking whether the simulated airflows have the right order of magnitude.
 
-## D4.4 Ventilation strategies
+## D4.4 Ventilation strategies - Worked examples
 
 The three modes in {numref}`fig-vc-modes` are compared here with one worked example each, using the equations above.
 
-### Single-sided ventilation
+### Single-sided ventilation (1 opening)
 
 **Worked example.**
 
@@ -188,7 +202,7 @@ Q_\text{stack} = \frac{0.65 \cdot 0.6}{3} \sqrt{9.81 \cdot 1.2 \cdot \frac{5}{29
 Q_\text{wind} = 0.025 \cdot 0.6 \cdot 2 = 0.030 \text{ m}^3\text{/s} = 30 \text{ L/s}
 ```
 
-**Wind and stack combined.** The two drivers do not simply add up. EN 16798-7 uses an empirical expression for single-sided ventilation through an open window, based on measurements by de Gids and Phaff, where the larger of the two drivers decides:
+**Wind and stack combined.** The two drivers do not simply add up across a single opening. EN 16798-7 uses an empirical expression for single-sided ventilation through an open window, based on measurements by de Gids and Phaff, where the larger of the two drivers decides:
 
 ```{math}
 :label: eq-vc-en16798
@@ -207,9 +221,11 @@ Q = 0.5 \cdot 0.6 \cdot \sqrt{0.021} = 0.044 \text{ m}^3\text{/s} = 44 \text{ L/
 P = 1.2 \cdot 1005 \cdot 0.044 \cdot 5 \approx 260 \text{ W}
 ```
 
-Two lessons follow. At a moderate wind speed of 2 m/s, the stack effect over the height of the window dominates, so a tall window is worth more than a wide one. And even with a 5 K temperature difference, one window removes only about a quarter of the 1 kW of heat gains from the earlier example. Single-sided ventilation can handle a well-shaded room, but a room with large solar gains needs cross or stack ventilation.
+Two lessons follow:
+- At a moderate wind speed of 2 m/s, the stack effect over the height of the window dominates, so a tall window is worth more than a wide one.
+- Even with a 5 K temperature difference, one window removes only 260 W of heat gains, much less than what an un-shaded room receives from the sun.
 
-### Cross-ventilation
+### Cross-ventilation (two opposing openings)
 
 **Worked example.**
 
@@ -239,7 +255,9 @@ Q = 0.65 \cdot 0.42 \cdot \sqrt{\frac{2 \cdot 1.92}{1.2}} = 0.49 \text{ m}^3\tex
 P = 1.2 \cdot 1005 \cdot 0.49 \cdot 5 \approx 3.0 \text{ kW}
 ```
 
-**Result.** Opening a second window on the opposite façade raises the airflow from about 45 L/s to 490 L/s, more than ten times as much. That is about 24 air changes per hour, which removes the 1 kW of heat gains with plenty to spare. In practice the occupants will close the windows partly long before that, because air speeds this high cause draught ([](d5-window-openings.md)).
+Two lessons follow:
+- Opening a second window on the opposite façade raises the airflow from about 45 L/s to 490 L/s, more than ten times as much.
+- The airchange per hour is 24, which in practice will force the occupants to part-close the windows, because air speeds this high cause draught ([](d5-window-openings.md)).
 
 The result is sensitive to the assumptions:
 
@@ -247,7 +265,7 @@ The result is sensitive to the assumptions:
 - **Internal doors.** In a dwelling the air must usually pass through an internal door on its way across. An open door of 1.6 m² is a third opening in series and hardly matters: the airflow drops to 480 L/s. A closed door with a 2 cm undercut leaves only about 0.02 m², and the airflow drops to 23 L/s, less than single-sided ventilation through one window. Cross-ventilation only works when the path through the building is open.
 - **Wind speed.** The wind speed in the equation is the local wind at the building, not the meteorological wind measured at 10 m height in open terrain. In a built-up area the local wind is often only half the meteorological value or less.
 
-### Stack ventilation
+### Stack ventilation (only two openings)
 
 **Worked example.** A two-storey house has an open stair. On the ground floor a window with a free area of $A_1 = 1.0$ m² is open, and at the top of the stair a roof window with $A_2 = 0.6$ m² is open. The height between the centres of the two openings is $h = 5.5$ m. There is no wind. The house is at 25 °C (298 K) and the outdoor air at 22 °C, so $\Delta T = 3$ K. What is the airflow and the cooling power, and what happens on the first floor?
 
@@ -268,22 +286,20 @@ Q = 0.65 \cdot 0.51 \cdot \sqrt{2 \cdot 9.81 \cdot 5.5 \cdot \frac{3}{298}} = 0.
 ```{math}
 P = 1.2 \cdot 1005 \cdot 0.35 \cdot 3 \approx 1.3 \text{ kW}
 ```
+Two lessons learned:
+- This is five times the single-sided window above, at a smaller temperature difference and with no wind at all.
+- At night, with the outdoor air at 17 °C ($\Delta T = 8$ K), the airflow rises to 0.57 m³/s and the cooling power to about 5.5 kW. For the size of the row house this is (38 W/m2).
 
-This is five times the single-sided window above, at a smaller temperature difference and with no wind at all. At night, with the outdoor air at 17 °C ($\Delta T = 8$ K), the airflow rises to 0.57 m³/s and the cooling power to about 5.5 kW.
+:::{caution} More openings - Neutral plane
+The neutral plane separates positive from negative pressure. With only two openings in series, the same airflow passes both. With multiple openings, the in- and outflow of each depends on the internal pressure and the opening's distance to the neutral plane, which can only be solved iteratively.
 
-**Neutral plane.** The same airflow passes both openings, so the pressure difference across each one scales with $1/A^2$. The neutral plane therefore lies at a height above the lower opening of
-
-```{math}
-:label: eq-vc-npl
-h_n = \frac{h}{1 + (A_1/A_2)^2} = \frac{5.5}{1 + (1.0/0.6)^2} = 1.5 \text{ m}
-```
-
-The neutral plane sits low, close to the larger opening. Everything above about 1.5 m is at overpressure, so a bedroom window opened on the first floor lets warm air out instead of letting cool air in. To ventilate the first floor as well, the roof window must be the larger opening. Doubling it to 1.2 m² raises the airflow by 50 % to 0.52 m³/s and lifts the neutral plane to 3.3 m.
+Everything above the plane is at overpressure, so a bedroom window opened on the first floor lets warm air out instead of letting cool air in. The position of the neutral plane moves with opening sizes, so to ventilate the first floor as well, the roof window must be made larger.
+:::
 
 ### Practical issue: Nordhavn
 
 :::{admonition} Practical issue
-:class: warning
+:class: note
 In a low-energy apartment building in Nordhavn, Copenhagen, the summer comfort check in Be18 used a simple daytime venting rate based on the openable window area as a share of the floor area:
 
 ```{math}
