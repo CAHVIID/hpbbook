@@ -56,14 +56,16 @@ where $C_d$ is the discharge coefficient (–), $A$ the free opening area (m²) 
 
 Because the airflow only grows with the square root of the pressure difference, doubling the driving pressure gives just 40 % more airflow. Doubling the opening area doubles it.
 
-When air flows through two openings in series, for example in through a window and out through a roof window, the openings can be combined into one effective area:
+When air flows through two openings in series, for example in through a window and out through a roof window, the same airflow passes both and their pressure drops add up. The openings can then be combined into one effective opening:
 
 ```{math}
 :label: eq-vc-aeff
-\frac{1}{A_\text{eff}^2} = \frac{1}{A_1^2} + \frac{1}{A_2^2}
+\frac{1}{(C_d A)_\text{eff}^2} = \frac{1}{(C_{d,1} A_1)^2} + \frac{1}{(C_{d,2} A_2)^2}
 ```
 
-The smaller opening dominates. Two openings of 0.5 m² each give an effective area of only 0.35 m², and a large window does not help much if the outlet is small.
+which replaces $C_d A$ in the orifice equation. When both openings have the same discharge coefficient, $(C_d A)_\text{eff} = C_d A_\text{eff}$ with $1/A_\text{eff}^2 = 1/A_1^2 + 1/A_2^2$. This form is used in the examples below. If one opening is a louvre or a grille with a lower $C_d$, use the general form.
+
+The weaker opening dominates. Two openings of 0.5 m² each give an effective area of only 0.35 m², and a large window does not help much if the outlet is small.
 
 The pressure difference has two sources: buoyancy (the stack effect) and wind. Together with the placement of the openings they give the three modes of natural ventilative cooling in {numref}`fig-vc-modes`.
 
