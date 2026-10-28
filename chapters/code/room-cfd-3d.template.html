@@ -123,7 +123,7 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
       <label for="hd"><span class="row"><span>Depth</span><span class="val" id="hdV"></span></span>
         <input id="hd" type="range" min="0.4" max="2" step="0.2" value="0.6"></label>
       <label for="hh"><span class="row"><span>Height</span><span class="val" id="hhV"></span></span>
-        <input id="hh" type="range" min="0" max="2.4" step="0.1" value="1.7"></label>
+        <input id="hh" type="range" min="0" max="2.4" step="0.1" value="1.2"></label>
       <p class="note">Or click in the plan to move it there.</p>
     </div>
     <div class="group">
@@ -206,7 +206,7 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
     <details class="panel">
       <summary>About the model</summary>
       <p>The solver is room_cfd_3d.py from the course, ported to WebGPU compute shaders: the incompressible Navier–Stokes equations with Boussinesq buoyancy and an energy equation, on a staggered grid, marching in time with a pressure projection. The pressure equation is solved by conjugate gradients with a multigrid preconditioner. Turbulence: standard k-ε with wall functions (default), Chen &amp; Xu (1998), or a constant ν<sub>t</sub> of 0.002 m²/s. The graphics card computes in single precision; on a test case it agrees with the Python version to about 1 part in a million.</p>
-      <p>The heat gains sit in a box from the floor up, by default 0.6 m deep, 0.8 m wide and 1.7 m high in the middle of the room; move and resize it under Heat source or click in the plan. The occupied zone starts 0.6 m from the facade, back and side walls. The readouts are at ankle height (0.1 m). ISO 7730 DR uses Tu = 40 %; the ASHRAE 55 ankle draught model uses the PMV of the occupied zone at 1.2 met, 0.5 clo, 50 % RH and t<sub>r</sub> = t<sub>a</sub>. Both limits are 20 %.</p>
+      <p>The heat gains sit in a box from the floor up, by default 0.6 m deep, 0.8 m wide and 1.2 m high in the middle of the room; move and resize it under Heat source or click in the plan. The occupied zone starts 0.6 m from the facade, back and side walls. The readouts are at ankle height (0.1 m). ISO 7730 DR uses Tu = 40 %; the ASHRAE 55 ankle draught model uses the PMV of the occupied zone at 1.2 met, 0.5 clo, 50 % RH and t<sub>r</sub> = t<sub>a</sub>. Both limits are 20 %.</p>
     </details>
     <p class="meta">Contact: Christian Hviid, cahv@dtu.dk · <strong>Use at own risk.</strong> A simplified teaching model for comparing cases. Not for design values, and provided without warranty.</p>
   </section>
@@ -243,7 +243,7 @@ const $ = (id) => document.getElementById(id);
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const fmt = (x, d = 2) => Number.isFinite(x) ? x.toFixed(d) : "–";
 let L = 5, W = 4, H = 2.5;
-const state = { preset: "window", wy: 2, width: 1.2, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, L: 5, W: 4, H: 2.5, hx: 2.5, hy: 2, hw: 0.8, hd: 0.6, hh: 1.7, heatCentred: true, showCuts: true, showOZ: true, iso: { T: 24, speed: 0.15, DR: 20 }, mesh: [0.1, 0.1, 0.1], turb: "k-epsilon", adv: "tvd", field: "T", ycut: 2, zcut: 0.1 };
+const state = { preset: "window", wy: 2, width: 1.2, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, L: 5, W: 4, H: 2.5, hx: 2.5, hy: 2, hw: 0.8, hd: 0.6, hh: 1.2, heatCentred: true, showCuts: true, showOZ: true, iso: { T: 24, speed: 0.15, DR: 20 }, mesh: [0.1, 0.1, 0.1], turb: "k-epsilon", adv: "tvd", field: "T", ycut: 2, zcut: 0.1 };
 let device = null, sim = null, geo = null, f = null, runId = 0, stopReq = false, done = false, lastProg = null, hist = null, prev = null;
 
 function syncLabels() {
