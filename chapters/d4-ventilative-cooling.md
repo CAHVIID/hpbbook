@@ -298,10 +298,8 @@ The neutral plane separates positive from negative pressure. With only two openi
 Everything above the plane is at overpressure, so a bedroom window opened on the first floor lets warm air out instead of letting cool air in. The position of the neutral plane moves with opening sizes, so to ventilate the first floor as well, the roof window must be made larger.
 :::
 
-### Practical issue: Nordhavn
+## D4.5 Venting according to legislation: Nordhavn
 
-:::{admonition} Practical issue
-:class: note
 In a low-energy apartment building in Nordhavn, Copenhagen, the summer comfort check in Be18 used a simple daytime venting rate based on the openable window area as a share of the floor area:
 
 ```{math}
@@ -317,4 +315,4 @@ For the 30 m² room in the worked examples above, that is 200 L/s, or about 9.5 
 | Cross-ventilation, two windows, 2 m/s | 490 | 16 |
 
 The assumed rate is more than four times what one open window delivers. It is only reached with cross or stack ventilation, with the openings actually open and the path through the dwelling open. In the building most openings were balcony doors that could only be secured at a 1 cm opening, or were too windy to leave open. The top-floor flats, with no balcony above to shade them, overheated badly, and solar control films had to be installed afterwards. Openings must be designed so that they can stay open when they are needed: secure, protected from rain, quiet and free of draught ([](d5-window-openings.md)).
-:::
+
