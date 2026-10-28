@@ -10,16 +10,7 @@ The heating demand of the course row house has been reduced to a very low level.
 
 Daylight and solar gain are transmitted through the same glazing, and a smaller window, a lower g-value or a deeper overhang reduces both. BR18 allows daylight to be documented by climate-based simulation to EN 17037, which expresses the requirement as one metric, sDA300. The metric can be used as a constraint when cooling and heating demand are minimised.
 
-The case is the critical centre zone of the course row house: 4 × 4 m floor, 2.5 m room height, prefabricated constructions with U = 0.1 W/(m²K), and one façade facing north or south. The design variables are window size, glazing, overhang depth and side fins ({numref}`fig-d3-variables`).
-
-```{figure} figures/d3/design-variables.*
-:name: fig-d3-variables
-:alt: Left, a section of the 4 m deep, 2.5 m high zone with the window in the façade, an overhang above it and the daylight plane dotted across the room. Right, an elevation of the 4 m wide façade with a window, an overhang above it and a side fin on each side, and the largest possible window of 3.8 by 1.5 m dashed.
-
-The centre zone and the four façade design variables.
-```
-
-## D3.2 Solar gains and glazing properties
+## D3.2 Solar gains through the façade
 
 The solar gain through a window is
 
@@ -27,9 +18,9 @@ $$
 \Phi_{sol} = g \, F_{sh} \, A_g \, I_{\perp}
 $$ (eq-d3-solar)
 
-where $g$ is the total solar energy transmittance of the glazing (–), $F_{sh}$ the shading factor of overhangs and fins (–, 1 without shading), $A_g$ the glazed area (m²) and $I_{\perp}$ the solar irradiance on the façade (W/m²). The glazing properties $g$, $U_g$ and $\tau_v$ are defined in [](a3-glazing.md).
+where $g$ is the total solar energy transmittance of the glazing (–), $F_{sh}$ the shading factor of overhangs and fins (–, 1 without shading), $A_g$ the glazed area (m²) and $I_{\perp}$ the solar irradiance on the façade (W/m²). The glazing properties $g$, $U_g$ and $\tau_v$ are defined in [](a3-glazing.md). The $g$-value given in product data applies at normal incidence. It decreases with the angle of incidence, slowly up to about 50° and steeply above 60°, because the reflection at each pane increases. Simulation tools such as IDA ICE account for this; hand calculations with the normal-incidence value overestimate the gain when the sun strikes the glass at a large angle.
 
-The irradiation depends on the orientation of the façade ({numref}`fig-d3-radiation`). In the Annex 80 Copenhagen TMY for 2041–2060, a south façade receives 776 kWh/m² per year and a north façade 390 kWh/m². From May to August, east and west façades receive 380 kWh/m², the same as south (372 kWh/m²), and north receives 241 kWh/m². In summer the sun rises in the north-east and sets in the north-west, so the north façade receives low sun in the morning and evening, and the east and west façades receive it at near-normal incidence. The south façade has the largest gain in winter but not in summer.
+{numref}`fig-d3-radiation` shows the monthly solar radiation on façades of different orientation in the Annex 80 Copenhagen TMY for 2041–2060.
 
 ```{figure} figures/d3/facade-radiation.*
 :name: fig-d3-radiation
@@ -38,58 +29,16 @@ The irradiation depends on the orientation of the façade ({numref}`fig-d3-radia
 Monthly solar radiation on vertical façades and the horizontal, Annex 80 Copenhagen TMY 2041–2060 (isotropic sky, ground reflectance 0.2). Script: {download}`d3_facade_figures.py <code/d3_facade_figures.py>`.
 ```
 
-A solar-control coating on the outer pane (surface 2) reflects most of the near-infrared part of the solar spectrum, which carries about half of the solar energy but no visible light. The coating reduces $g$ more than $\tau_v$, and the selectivity
+## D3.3 Fixed shading: overhangs and side fins
 
-$$
-S = \frac{\tau_v}{g}
-$$ (eq-d3-selectivity)
+The fixed shading elements considered are an overhang above the window and side fins at its edges ({numref}`fig-d3-variables`).
 
-increases. Clear triple glazing has $S \approx 1.4$–$1.5$. Solar-control coatings reach $S \approx 2$, which is close to the theoretical limit: a glazing that transmits all visible light and blocks all infrared radiation still transmits about half of the solar energy.
+```{figure} figures/d3/design-variables.*
+:name: fig-d3-variables
+:alt: Left, a section of the 4 m deep, 2.5 m high zone with the window in the façade, an overhang above it and the daylight plane dotted across the room. Right, an elevation of the 4 m wide façade with a window, an overhang above it and a side fin on each side, and the largest possible window of 3.8 by 1.5 m dashed.
 
-```{list-table} Triple glazings for the assignment (centre-of-glass values).
-:header-rows: 1
-:name: tab-d3-glazing
-
-* - Glazing
-  - $U_g$ (W/(m²K))
-  - $g$ (–)
-  - $\tau_v$ (–)
-  - $S$ (–)
-* - Pilkington S3 (reference)
-  - 0.6
-  - 0.49
-  - 0.71
-  - 1.45
-* - Suncool 70/35
-  - 0.6
-  - 0.34
-  - 0.63
-  - 1.85
-* - Suncool 66/33
-  - 0.6
-  - 0.32
-  - 0.59
-  - 1.84
+The façade design variables: window size, glazing, overhang and side fins.
 ```
-
-Replacing the reference glazing with Suncool 66/33 reduces $g$ by 35 % and $\tau_v$ by 17 % ({numref}`tab-d3-glazing`). Below $\tau_v \approx 0.5$ the room appears dark from the inside, and a larger window is needed to meet sDA300, which increases the solar gain again.
-
-A coating also changes the colour of the transmitted daylight. In a Danish pilot study, 18 subjects assessed the daylight in a scale model of an office behind six glazings ({numref}`fig-d3-glazing-lt-rating`) {cite}`dubois2003`. Some subjects found the colour unacceptable at $\tau_v$ of 0.66–0.70, and most subjects at 0.50. The ratings did not follow $\tau_v$ alone: the reference glazing at 0.77 was rated higher than a coated glazing at 0.79.
-
-```{figure} figures/d3/glazing-lt-rating.*
-:name: fig-d3-glazing-lt-rating
-:alt: Dot chart of six glazings, light transmittance on the x-axis from 45 to 85 percent and rated daylight quality on the y-axis. The reference glazing at 77 percent is rated excellent; A at 79 and D at 76 percent good; E at 66 and B at 70 percent moderate, colour unacceptable to some; C at 50 percent poor, colour unacceptable to most.
-
-Light transmittance of six glazings against the rated quality of the daylight behind them, 18 subjects, 1:7.5 scale model of an office under overcast skies {cite}`dubois2003`. Manufacturers' $\tau_v$; categories as summarised by the authors. A small pilot study, so indicative only. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/d3_glazing_lt_rating.py)
-```
-
-:::{admonition} Rules of thumb
-- In Copenhagen, 1 m² of south glazing with $g = 0.49$ admits about 180 kWh of solar heat from May to August; with $g = 0.32$, about 120 kWh.
-- From May to August, east and west façades receive as much radiation as south and are more difficult to shade.
-- Selectivity above 2 is not available; keep $\tau_v \geq 0.5$.
-:::
-
-## D3.3 Fixed external shading
 
 An overhang shades according to the profile angle $\Omega$, which is the solar altitude projected onto the vertical plane perpendicular to the façade:
 
@@ -144,33 +93,69 @@ Movable shading (external blinds, screens, shutters) can block more of the sun w
 - Overhangs are effective towards south. Towards east and west, fins are effective only on narrow windows; use movable shading or a lower g-value.
 :::
 
-## D3.4 Daylight requirement and sDA300
+## D3.4 Fixed shading: solar-coatings
 
-BR18 requires daylight in habitable rooms. Compliance can be documented by simulation to EN 17037: an illuminance of at least 300 lx on at least 50 % of the reference plane for at least 50 % of the daylight hours,
+A solar-control coating on the outer pane (surface 2) reflects most of the near-infrared part of the solar spectrum, which carries about half of the solar energy but no visible light. The coating reduces $g$ more than $\tau_v$, and the selectivity
+
+$$
+S = \frac{\tau_v}{g}
+$$ (eq-d3-selectivity)
+
+increases. Clear triple glazing has $S \approx 1.4$–$1.5$. Solar-control coatings reach $S \approx 2$, which is close to the theoretical limit: a glazing that transmits all visible light and blocks all infrared radiation still transmits about half of the solar energy.
+
+```{list-table} Triple glazings for the assignment (centre-of-glass values).
+:header-rows: 1
+:name: tab-d3-glazing
+
+* - Glazing
+  - $U_g$ (W/(m²K))
+  - $g$ (–)
+  - $\tau_v$ (–)
+  - $S$ (–)
+* - Pilkington S3 (reference)
+  - 0.6
+  - 0.49
+  - 0.71
+  - 1.45
+* - Suncool 70/35
+  - 0.6
+  - 0.34
+  - 0.63
+  - 1.85
+* - Suncool 66/33
+  - 0.6
+  - 0.32
+  - 0.59
+  - 1.84
+```
+
+Replacing the reference glazing with Suncool 66/33 reduces $g$ by 35 % and $\tau_v$ by 17 % ({numref}`tab-d3-glazing`). Below $\tau_v \approx 0.5$ the room appears dark from the inside, and a larger window is needed to meet sDA300, which increases the solar gain again.
+
+A coating also changes the colour of the transmitted daylight. In a Danish pilot study, 18 subjects assessed the daylight in a scale model of an office behind six glazings ({numref}`fig-d3-glazing-lt-rating`) {cite}`dubois2003`. Some subjects found the colour unacceptable at $\tau_v$ of 0.66–0.70, and most subjects at 0.50. The ratings did not follow $\tau_v$ alone: the reference glazing at 0.77 was rated higher than a coated glazing at 0.79.
+
+```{figure} figures/d3/glazing-lt-rating.*
+:name: fig-d3-glazing-lt-rating
+:alt: Dot chart of six glazings, light transmittance on the x-axis from 45 to 85 percent and rated daylight quality on the y-axis. The reference glazing at 77 percent is rated excellent; A at 79 and D at 76 percent good; E at 66 and B at 70 percent moderate, colour unacceptable to some; C at 50 percent poor, colour unacceptable to most.
+
+Light transmittance of six glazings against the rated quality of the daylight behind them, 18 subjects, 1:7.5 scale model of an office under overcast skies {cite}`dubois2003`. Manufacturers' $\tau_v$; categories as summarised by the authors. A small pilot study, so indicative only. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/d3_glazing_lt_rating.py)
+```
+
+:::{admonition} Rules of thumb
+- In Copenhagen, 1 m² of south glazing with $g = 0.49$ admits about 180 kWh of solar heat from May to August; with $g = 0.32$, about 120 kWh.
+- Selectivity above 2 is not available; keep $\tau_v \geq 0.5$.
+:::
+
+## D3.5 Daylight requirement and sDA300
+
+BR18 requires daylight in habitable rooms. Compliance can be documented by simulation to EN 17037: an illuminance of at least 300 lx on at least 50 % of a reference plane 0.85 m above the floor for at least 50 % of the daylight hours,
 
 $$
 \mathrm{sDA}_{300,50\%} \geq 50\ \% .
 $$ (eq-d3-sda)
 
-The reference plane is 0.85 m above the floor. For unobstructed rooms BR18 also accepts a simplified rule: a glass area of at least 10 % of the floor area, increased when the light transmittance is below 0.75. With a frame fraction of 15 %, this corresponds to a window-to-floor ratio of about 12 %. EN 17037 also allows the daylight factor method, with a target of about 2 % in the Danish climate, but only climate-based modelling accounts for orientation and the actual sky conditions.
+For unobstructed rooms BR18 also accepts a glass area of at least 10 % of the floor area, increased when the light transmittance is below 0.75.
 
-In IDA ICE, climate-based daylight modelling uses the Radiance ray tracer to calculate the illuminance in a grid of points on the reference plane for every daylight hour of the weather file. The result is the fraction of the plane that reaches 300 lx for at least half of the hours. It depends on:
-
-- **Window head height and area.** Daylight penetrates to a depth of about twice the head height, so with a 4 m deep room and a head height of 2.0–2.4 m the whole floor can be daylit.
-- **Light transmittance.** The illuminance scales with $\tau_v$.
-- **Overhangs and fins**, which reduce the sky view of the window.
-- **Orientation.** A south façade receives more direct sun and reaches sDA300 with a smaller window than a north façade.
-- **External obstructions**, such as the neighbouring row of houses.
-
-The requirement is a minimum. Every percentage point of sDA above 50 % corresponds to glazing that also admits solar gain. Potin {cite:p}`potin2023` recommends sDA300 > 50 % in bedrooms and sDA500 > 50 % in living rooms, and not much more. In the optimisation the daylight constraint is therefore normally active, and the optimal design is close to sDA300 = 50 %.
-
-## D3.5 Cooling and heating demand as objectives
-
-In the zone model an ideal cooler removes the heat required to keep the room at the cooling set point, and an ideal heater supplies the heat required to keep it at the heating set point. The annual cooling demand $Q_C$ (kWh/m² floor area) is the sum of the heat removed. It is not the electricity use of a cooling system, which is $Q_C$ divided by the system efficiency. $Q_C$ quantifies the surplus heat admitted through the façade and is therefore suitable for comparing façade designs.
-
-The heating demand $Q_H$ is the second objective, because measures that reduce the solar gain in summer also reduce the useful solar gain in winter. With wall U-values of 0.1 W/(m²K) and the remaining surfaces of the zone adiabatic, the window dominates both quantities, and the zone isolates the effect of the façade.
-
-The weather file is the Annex 80 Copenhagen TMY 2041–2060 ([](d1-weather-files.md)). For this study the 2050 climate is more critical than the 2090 climate, because it combines higher temperatures with more solar radiation.
+sDA300 increases with window area and head height, light transmittance and a southern orientation, and decreases with overhangs, fins and external obstructions. Daylight penetrates to a depth of about twice the head height. The requirement is a minimum, and sDA above 50 % corresponds to glazing that also admits solar gain. Potin {cite:p}`potin2023` recommends sDA300 > 50 % in bedrooms and sDA500 > 50 % in living rooms. In the optimisation the daylight constraint is therefore normally active, and the optimal design is close to sDA300 = 50 %.
 
 ## D3.6 Multi-objective optimisation
 
@@ -182,7 +167,7 @@ $$
 \min_{x} \; \big( Q_C(x),\; Q_H(x) \big) \quad \text{subject to} \quad \mathrm{sDA}_{300}(x) \geq 50\ \%
 $$ (eq-d3-moo)
 
-where $x$ is a combination of the design variables. Cooling and heating demand are objectives to be minimised. Daylight is a constraint that must be satisfied; exceeding it has no value.
+where $x$ is a combination of the design variables, and $Q_C$ and $Q_H$ are the annual cooling and heating demand (kWh/m²) of the zone with an ideal cooler and heater. Cooling and heating demand are objectives to be minimised. Daylight is a constraint that must be satisfied; exceeding it has no value.
 
 The two objectives conflict, so there is no single optimal design. A design is Pareto-optimal if no other feasible design is better in one objective without being worse in the other. The Pareto-optimal designs form the Pareto front ({numref}`fig-d3-pareto`). A design that is not on the front can be improved in one objective without a penalty in the other, whereas the choice between designs on the front is a trade-off. One method is to convert both demands to the electricity use of the actual systems, $Q_H/\mathrm{COP} + Q_C/\mathrm{EER}$, and select the design on the front with the lowest total.
 
