@@ -74,6 +74,15 @@ rises. Clear triple glazing has $S \approx 1.4$–$1.5$. The best solar-control 
 
 Going from the reference glazing to Suncool 66/33 cuts the solar gain by 35 % and the light by 17 %. Below $\tau_v \approx 0.5$ the glazing looks dark from inside and the window must grow to keep sDA300, which brings back the solar gain.
 
+A low $\tau_v$ also changes how the daylight looks, and the tint of the coating matters as much as the number. In a Danish pilot study, 18 subjects rated the view into a scale model of an office behind six glazings ({numref}`fig-d3-glazing-lt-rating`) {cite}`dubois2003`. Glazings with $\tau_v$ of 0.66–0.70 coloured the daylight in a way some subjects found unacceptable, and the one at 0.50 in a way most did.
+
+```{figure} figures/d3/glazing-lt-rating.*
+:name: fig-d3-glazing-lt-rating
+:alt: Dot chart of six glazings, light transmittance on the x-axis from 45 to 85 percent and rated daylight quality on the y-axis. The reference glazing at 77 percent is rated excellent; A at 79 and D at 76 percent good; E at 66 and B at 70 percent moderate, colour unacceptable to some; C at 50 percent poor, colour unacceptable to most.
+
+Light transmittance of six glazings against the rated quality of the daylight behind them, 18 subjects, 1:7.5 scale model of an office under overcast skies {cite}`dubois2003`. Manufacturers' $\tau_v$; categories as summarised by the authors. A small pilot study, so indicative only. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/d3_glazing_lt_rating.py)
+```
+
 :::{admonition} Rules of thumb
 - In Copenhagen, 1 m² of south glazing with $g = 0.49$ admits about 180 kWh of solar heat from May to August; with $g = 0.32$, about 120 kWh.
 - East and west façades receive as much summer radiation as south, and are harder to shade.
