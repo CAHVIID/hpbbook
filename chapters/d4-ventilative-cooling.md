@@ -226,6 +226,8 @@ with $C_\text{wnd} = 0.001$ (1/(m/s)) and $C_\text{st} = 0.0035$ ((m/s)/(m·K)).
 Q = 0.5 \cdot 0.6 \cdot \sqrt{0.021} = 0.044 \text{ m}^3\text{/s} = 44 \text{ L/s}
 ```
 
+The models for single-sided ventilation differ considerably. Jiang et al. compared twelve of them with tracer-gas measurements on bottom-hung windows. Most models underestimated the airflow, and the EN 16798-7 model deviated by −82 % on average {cite:p}`jiang2025`. The calculated airflows for single-sided ventilation are therefore uncertain and probably on the low side.
+
 **Result.** The window gives about 45 to 60 L/s, or 2 to 3 air changes per hour. With {eq}`eq-vc-cooling` this removes
 
 ```{math}
