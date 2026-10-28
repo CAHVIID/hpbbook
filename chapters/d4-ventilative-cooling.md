@@ -184,7 +184,7 @@ A 30 m² room with a ceiling height of 2.5 m (75 m³) has one openable window on
 Q_\text{stack} = \frac{0.65 \cdot 0.6}{3} \sqrt{9.81 \cdot 1.2 \cdot \frac{5}{298}} = 0.13 \cdot 0.44 = 0.058 \text{ m}^3\text{/s} = 58 \text{ L/s}
 ```
 
-**Wind alone.** With a single opening there is no pressure difference across the room, so {eq}`eq-vc-cross` does not apply. The wind still drives some exchange through turbulence and pulsating flow at the opening. A simple empirical estimate from wind-tunnel and full-scale measurements {cite:p}`warren1985` is $Q_\text{wind} = 0.025 \, A \, v$:
+**Wind alone.** With a single opening there is no pressure difference across the room, so {eq}`eq-vc-cross` does not apply. The wind still drives some exchange through turbulence and pulsating flow at the opening. A simple empirical estimate {cite:p}`warren1985` is $Q_\text{wind} = 0.025 \, A \, v$:
 
 ```{math}
 Q_\text{wind} = 0.025 \cdot 0.6 \cdot 2 = 0.030 \text{ m}^3\text{/s} = 30 \text{ L/s}
