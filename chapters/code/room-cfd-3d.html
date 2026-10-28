@@ -41,6 +41,9 @@ select { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid va
 .btn.ghost { background: transparent; color: var(--accent); }
 .note { color: var(--muted); font-size: 12px; margin: 0; }
 .main { display: grid; gap: 16px; min-width: 0; }
+.checks { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); }
+.checks label { display: flex; gap: 5px; align-items: center; cursor: pointer; }
+.checks input { accent-color: var(--accent); margin: 0; }
 .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
 .status { font-family: var(--font-data); font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
 canvas { display: block; width: 100%; }
@@ -157,6 +160,10 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
           <button type="button" data-v="T" aria-pressed="true">Temperature</button>
           <button type="button" data-v="speed" aria-pressed="false">Air speed</button>
           <button type="button" data-v="DR" aria-pressed="false">ISO 7730 DR</button>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" id="showCuts" checked>Section and plan lines</label>
+          <label><input type="checkbox" id="showOZ" checked>Occupied zone</label>
         </div>
         <span class="status" id="status">Ready</span>
       </div>
@@ -1044,7 +1051,7 @@ const $ = (id) => document.getElementById(id);
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const fmt = (x, d = 2) => Number.isFinite(x) ? x.toFixed(d) : "–";
 let L = 5, W = 4, H = 2.5;
-const state = { preset: "window", wy: 2, width: 1.2, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, L: 5, W: 4, H: 2.5, hx: 2.5, hy: 2, hw: 0.8, hd: 0.6, hh: 1.7, heatCentred: true, iso: { T: 24, speed: 0.15, DR: 20 }, mesh: [0.1, 0.1, 0.1], turb: "k-epsilon", adv: "tvd", field: "T", ycut: 2, zcut: 0.1 };
+const state = { preset: "window", wy: 2, width: 1.2, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, L: 5, W: 4, H: 2.5, hx: 2.5, hy: 2, hw: 0.8, hd: 0.6, hh: 1.7, heatCentred: true, showCuts: true, showOZ: true, iso: { T: 24, speed: 0.15, DR: 20 }, mesh: [0.1, 0.1, 0.1], turb: "k-epsilon", adv: "tvd", field: "T", ycut: 2, zcut: 0.1 };
 let device = null, sim = null, geo = null, f = null, runId = 0, stopReq = false, done = false, lastProg = null, hist = null, prev = null;
 
 function syncLabels() {
@@ -1351,7 +1358,9 @@ function draw() {
   const { nx, ny, nz, dy, dz } = geo, [y0, y1] = winY();
   const j = Math.min(Math.floor(state.ycut / dy), ny - 1), k = Math.min(Math.floor(state.zcut / dz), nz - 1);
   slice($("sec"), L, H, nx, nz, (i, kk) => (i * ny + j) * nz + kk, f.uc, f.wc, (g, X, Y, sc) => {
-    g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; g.strokeRect(X(0.6), Y(1.8), (L - 1.2) * sc, 1.8 * sc);
+    g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; if (state.showOZ) g.strokeRect(X(0.6), Y(1.8), (L - 1.2) * sc, 1.8 * sc);
+    // height of the plan
+    if (state.showCuts) { g.setLineDash([3, 3]); g.lineWidth = 1; g.beginPath(); g.moveTo(X(0), Y(state.zcut)); g.lineTo(X(L), Y(state.zcut)); g.stroke(); }
     g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; const hb = heatBox(), cut = (state.ycut > hb.y0 && state.ycut < hb.y1);
     g.strokeStyle = cut ? "rgba(20,25,30,0.8)" : "rgba(20,25,30,0.3)"; if (hb.z1 > 0) g.strokeRect(X(hb.x0), Y(hb.z1), (hb.x1 - hb.x0) * sc, hb.z1 * sc);
     else { g.setLineDash([]); g.lineWidth = 5; g.strokeStyle = cut ? "#c0392b" : "rgba(192,57,43,0.35)"; g.beginPath(); g.moveTo(X(hb.x0), Y(0) - 2); g.lineTo(X(hb.x1), Y(0) - 2); g.stroke(); g.lineWidth = 1.4; }
@@ -1362,10 +1371,10 @@ function draw() {
     g.strokeStyle = css("--muted"); g.beginPath(); g.moveTo(X(L) + 2, Y(H - 0.2)); g.lineTo(X(L) + 2, Y(H - 0.1)); g.stroke();
   }, $("iso"));
   slice($("plan"), L, W, nx, ny, (i, jj) => (i * ny + jj) * nz + k, f.uc, f.vc, (g, X, Y, sc) => {
-    g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; g.strokeRect(X(0.6), Y(W - 0.6), (L - 1.2) * sc, (W - 1.2) * sc);
+    g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; if (state.showOZ) g.strokeRect(X(0.6), Y(W - 0.6), (L - 1.2) * sc, (W - 1.2) * sc);
     g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; const hb = heatBox(); g.strokeRect(X(hb.x0), Y(hb.y1), (hb.x1 - hb.x0) * sc, (hb.y1 - hb.y0) * sc); g.setLineDash([]);
     g.lineWidth = 6; g.strokeStyle = "#2f7fd0"; g.beginPath(); g.moveTo(X(0) - 2, Y(y0)); g.lineTo(X(0) - 2, Y(y1)); g.stroke();
-    g.strokeStyle = "rgba(255,255,255,0.9)"; g.setLineDash([3, 3]); g.lineWidth = 1; g.beginPath(); g.moveTo(X(0), Y(state.ycut)); g.lineTo(X(L), Y(state.ycut)); g.stroke(); g.setLineDash([]);
+    if (state.showCuts) { g.strokeStyle = "rgba(255,255,255,0.9)"; g.setLineDash([3, 3]); g.lineWidth = 1; g.beginPath(); g.moveTo(X(0), Y(state.ycut)); g.lineTo(X(L), Y(state.ycut)); g.stroke(); g.setLineDash([]); }
   });
   if (f.preview) {
     $("readouts").innerHTML = ""; $("status").textContent = "Ready. Press Run to start.";
@@ -1423,6 +1432,7 @@ for (const id of ["L", "W", "H"]) {
 }
 $("preset").addEventListener("change", (e) => { state.preset = e.target.value; applyPreset(); applyDims(); syncLabels(); preview(); start(); });
 $("iso").addEventListener("input", (e) => { state.iso[state.field] = +e.target.value; $("isoV").textContent = fieldRange().fmt(state.iso[state.field]); draw(); });
+for (const id of ["showCuts", "showOZ"]) $(id).addEventListener("change", (e) => { state[id] = e.target.checked; draw(); });
 $("run").addEventListener("click", start);
 $("stop").addEventListener("click", () => { stopReq = true; });
 window.addEventListener("resize", draw);
