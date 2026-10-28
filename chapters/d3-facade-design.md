@@ -155,7 +155,7 @@ $$ (eq-d3-sda)
 
 For unobstructed rooms BR18 also accepts a glass area of at least 10 % of the floor area, increased when the light transmittance is below 0.75.
 
-sDA300 increases with window area and head height, light transmittance and a southern orientation, and decreases with overhangs, fins and external obstructions. Daylight penetrates to a depth of about twice the head height. The requirement is a minimum, and sDA above 50 % corresponds to glazing that also admits solar gain. Potin {cite:p}`potin2023` recommends sDA300 > 50 % in bedrooms and sDA500 > 50 % in living rooms. In the optimisation the daylight constraint is therefore normally active, and the optimal design is close to sDA300 = 50 %.
+sDA300 increases with window area and head height, light transmittance and a southern orientation, and decreases with overhangs, fins and external obstructions. Daylight penetrates to a depth of about twice the head height. The requirement is a minimum, and sDA above 50 % corresponds to glazing that also admits solar gain. In the optimisation the daylight constraint is therefore normally active, and the optimal design is close to sDA300 = 50 %.
 
 ## D3.6 Multi-objective optimisation
 
