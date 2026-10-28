@@ -44,6 +44,10 @@ select { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid va
 .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
 .status { font-family: var(--font-data); font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
 canvas { display: block; width: 100%; }
+.plot-row { position: relative; padding-bottom: 6px; }
+.iso { position: absolute; top: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 50px; }
+.iso input[type=range] { writing-mode: vertical-lr; direction: rtl; width: 22px; height: 200px; margin: 0; }
+.iso .isoV { font-family: var(--font-data); font-size: 11.5px; font-variant-numeric: tabular-nums; text-align: center; line-height: 1.2; }
 .readouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
 .ro { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; display: grid; gap: 2px; background: var(--panel); }
 .ro .k { font-size: 11.5px; color: var(--muted); } .ro .v { font-family: var(--font-data); font-size: 17px; }
@@ -77,8 +81,19 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
     </div>
     <div class="group">
       <h2>Window (facade)</h2>
-      <label for="width"><span class="row"><span>Width, centred</span><span class="val" id="widthV"></span></span>
+      <label for="preset">Type
+        <select id="preset">
+          <option value="window">Window, 1.2 m wide, 0.9–2.1 m</option>
+          <option value="wide">Window, full width, 0.9–2.1 m</option>
+          <option value="door">Balcony door, 0.9 m wide, 0–2.1 m</option>
+          <option value="hatch" id="hatchOpt">Top hatch, 1.2 m wide, 2.2–2.4 m</option>
+          <option value="low">Low slot, 1.2 m wide, 0.2–0.3 m</option>
+          <option value="custom">Custom</option>
+        </select></label>
+      <label for="width"><span class="row"><span>Width</span><span class="val" id="widthV"></span></span>
         <input id="width" type="range" min="0.4" max="4" step="0.2" value="1.2"></label>
+      <label for="wy"><span class="row"><span>Position along the facade (centre)</span><span class="val" id="wyV"></span></span>
+        <input id="wy" type="range" min="0.6" max="3.4" step="0.1" value="2"></label>
       <label for="lo"><span class="row"><span>Bottom edge</span><span class="val" id="loV"></span></span>
         <input id="lo" type="range" min="0" max="2.3" step="0.1" value="0.9"></label>
       <label for="hi"><span class="row"><span>Top edge</span><span class="val" id="hiV"></span></span>
@@ -101,11 +116,11 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
       <label for="hy"><span class="row"><span>Position across the room (centre)</span><span class="val" id="hyV"></span></span>
         <input id="hy" type="range" min="0.2" max="3.8" step="0.1" value="2"></label>
       <label for="hw"><span class="row"><span>Width across the room</span><span class="val" id="hwV"></span></span>
-        <input id="hw" type="range" min="0.4" max="4" step="0.2" value="4"></label>
+        <input id="hw" type="range" min="0.4" max="4" step="0.2" value="0.8"></label>
       <label for="hd"><span class="row"><span>Depth</span><span class="val" id="hdV"></span></span>
-        <input id="hd" type="range" min="0.4" max="2" step="0.2" value="0.4"></label>
+        <input id="hd" type="range" min="0.4" max="2" step="0.2" value="0.6"></label>
       <label for="hh"><span class="row"><span>Height</span><span class="val" id="hhV"></span></span>
-        <input id="hh" type="range" min="0" max="2.4" step="0.1" value="1.2"></label>
+        <input id="hh" type="range" min="0" max="2.4" step="0.1" value="1.7"></label>
       <p class="note">Or click in the plan to move it there.</p>
     </div>
     <div class="group">
@@ -145,7 +160,13 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
         </div>
         <span class="status" id="status">Ready</span>
       </div>
-      <canvas id="sec" height="300" aria-label="Vertical section through the room"></canvas>
+      <div class="plot-row">
+        <canvas id="sec" height="300" aria-label="Vertical section through the room"></canvas>
+        <div class="iso">
+          <input id="iso" type="range" title="Isoline value" aria-label="Value of the isoline drawn on the section and the plan">
+          <span class="isoV" id="isoV"></span>
+        </div>
+      </div>
       <label for="ycut" style="margin-top:8px"><span class="row"><span>Section at y (across the width)</span><span class="val" id="ycutV"></span></span>
         <input id="ycut" type="range" min="0" max="4" step="0.05" value="2"></label>
     </div>
@@ -178,7 +199,7 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
     <details class="panel">
       <summary>About the model</summary>
       <p>The solver is room_cfd_3d.py from the course, ported to WebGPU compute shaders: the incompressible Navier–Stokes equations with Boussinesq buoyancy and an energy equation, on a staggered grid, marching in time with a pressure projection. The pressure equation is solved by conjugate gradients with a multigrid preconditioner. Turbulence: standard k-ε with wall functions (default), Chen &amp; Xu (1998), or a constant ν<sub>t</sub> of 0.002 m²/s. The graphics card computes in single precision; on a test case it agrees with the Python version to about 1 part in a million.</p>
-      <p>The heat gains sit in a box from the floor up, by default 0.4 m deep across the full width at x = 2.3–2.7 m and 1.2 m high; move and resize it under Heat source or click in the plan. The occupied zone starts 0.6 m from the facade, back and side walls. The readouts are at ankle height (0.1 m). ISO 7730 DR uses Tu = 40 %; the ASHRAE 55 ankle draught model uses the PMV of the occupied zone at 1.2 met, 0.5 clo, 50 % RH and t<sub>r</sub> = t<sub>a</sub>. Both limits are 20 %.</p>
+      <p>The heat gains sit in a box from the floor up, by default 0.6 m deep, 0.8 m wide and 1.7 m high in the middle of the room; move and resize it under Heat source or click in the plan. The occupied zone starts 0.6 m from the facade, back and side walls. The readouts are at ankle height (0.1 m). ISO 7730 DR uses Tu = 40 %; the ASHRAE 55 ankle draught model uses the PMV of the occupied zone at 1.2 met, 0.5 clo, 50 % RH and t<sub>r</sub> = t<sub>a</sub>. Both limits are 20 %.</p>
     </details>
     <p class="meta">Contact: Christian Hviid, cahv@dtu.dk · <strong>Use at own risk.</strong> A simplified teaching model for comparing cases. Not for design values, and provided without warranty.</p>
   </section>
@@ -1023,11 +1044,12 @@ const $ = (id) => document.getElementById(id);
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const fmt = (x, d = 2) => Number.isFinite(x) ? x.toFixed(d) : "–";
 let L = 5, W = 4, H = 2.5;
-const state = { width: 1.2, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, L: 5, W: 4, H: 2.5, hx: 2.5, hy: 2, hw: 4, hd: 0.4, hh: 1.2, mesh: [0.1, 0.1, 0.1], turb: "k-epsilon", adv: "tvd", field: "T", ycut: 2, zcut: 0.1 };
+const state = { preset: "window", wy: 2, width: 1.2, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, L: 5, W: 4, H: 2.5, hx: 2.5, hy: 2, hw: 0.8, hd: 0.6, hh: 1.7, heatCentred: true, iso: { T: 24, speed: 0.15, DR: 20 }, mesh: [0.1, 0.1, 0.1], turb: "k-epsilon", adv: "tvd", field: "T", ycut: 2, zcut: 0.1 };
 let device = null, sim = null, geo = null, f = null, runId = 0, stopReq = false, done = false, lastProg = null, hist = null, prev = null;
 
 function syncLabels() {
-  $("widthV").textContent = state.width.toFixed(1) + " m"; $("loV").textContent = state.lo.toFixed(1) + " m"; $("hiV").textContent = state.hi.toFixed(1) + " m";
+  $("widthV").textContent = state.width.toFixed(1) + " m"; $("wyV").textContent = state.wy.toFixed(1) + " m";
+  $("hatchOpt").textContent = `Top hatch, 1.2 m wide, ${(H - 0.3).toFixed(1)}–${(H - 0.1).toFixed(1)} m`; $("loV").textContent = state.lo.toFixed(1) + " m"; $("hiV").textContent = state.hi.toFixed(1) + " m";
   $("tinV").textContent = state.tin + " °C"; $("achV").textContent = state.ach + " h⁻¹"; $("troomV").textContent = state.troom + " °C";
   for (const k of ["L", "W", "H"]) $(k + "V").textContent = state[k].toFixed(1) + " m";
   const [mx, my, mz] = meshN(); $("meshNote").textContent = `${mx} × ${my} × ${mz} = ${(mx * my * mz).toLocaleString("en")} cells`;
@@ -1036,15 +1058,41 @@ function syncLabels() {
   $("ycutV").textContent = state.ycut.toFixed(2) + " m"; $("zcutV").textContent = state.zcut.toFixed(2) + " m";
   const q = state.ach * L * W * H / 3600, Q = 1.2 * 1005 * q * (state.troom - state.tin);
   const U = q / (state.width * Math.max(state.hi - state.lo, 0.05));
-  $("gainsNote").textContent = Q > 0 ? `Airflow ${(q * 1000).toFixed(0)} L/s. Heat gains ${Q.toFixed(0)} W (${(Q / (L * W)).toFixed(0)} W/m² floor). Inlet speed ${U.toFixed(2)} m/s.`
+  $("gainsNote").textContent = Q > 0 ? `Airflow ${(q * 1000).toFixed(0)} L/s. Heat gains ${Q.toFixed(0)} W (${(Q / (L * W)).toFixed(0)} W/m² floor). Inlet speed ${U.toFixed(3)} m/s.`
     : "The supply must be colder than the room. Raise the room temperature or lower the supply.";
+  syncIso();
+}
+// window presets: [width, bottom, top]; width null = the full width of the room
+const PRESETS = { window: () => [1.2, 0.9, 2.1], wide: () => [null, 0.9, 2.1], door: () => [0.9, 0, 2.1], hatch: () => [1.2, +(H - 0.3).toFixed(2), +(H - 0.1).toFixed(2)], low: () => [1.2, 0.2, 0.3] };
+function applyPreset() {
+  if (!PRESETS[state.preset]) return;
+  const [w, lo, hi] = PRESETS[state.preset]();
+  state.width = Math.min(w ?? W, W); state.lo = lo; state.hi = hi;
+  for (const k of ["width", "lo", "hi"]) $(k).value = state[k];
+}
+// window opening along the facade, kept inside the wall
+function winY() { const w = Math.min(state.width, W), y0 = Math.min(Math.max(state.wy - w / 2, 0), W - w); return [y0, y0 + w]; }
+// colour scale of each field, shared by the plots and the isoline slider
+function fieldRange() {
+  const [lo, hi, unit, dec] = range();
+  return { lo, hi, step: state.field === "T" ? 0.1 : state.field === "speed" ? 0.01 : 1,
+           fmt: (v) => state.field === "T" ? v.toFixed(1) + " °C" : state.field === "speed" ? v.toFixed(2) + " m/s" : v.toFixed(0) + " %" };
+}
+function syncIso() {
+  const r = fieldRange(), el = $("iso");
+  state.iso[state.field] = Math.min(Math.max(state.iso[state.field], r.lo), r.hi);
+  el.min = r.lo; el.max = r.hi; el.step = r.step; el.value = state.iso[state.field];
+  $("isoV").textContent = r.fmt(state.iso[state.field]);
 }
 // number of cells from the cell size
 const meshN = () => [Math.max(Math.round(L / state.mesh[0]), 4), Math.max(Math.round(W / state.mesh[1]), 4), Math.max(Math.round(H / state.mesh[2]), 6)];
 // room size: rescale the slider ranges and keep the window, heat source and cuts inside the room
 function applyDims() {
   L = state.L; W = state.W; H = state.H;
-  const lim = { width: [0.4, W], lo: [0, H - 0.3], hi: [0.2, H - 0.1], hx: [0.2, L - 0.2], hy: [0.2, W - 0.2], hw: [0.4, W], hd: [0.4, Math.min(L / 2, 4)],
+  if (state.heatCentred) { state.hx = L / 2; state.hy = W / 2; }
+  if (state.preset === "wide") state.width = W;
+  if (state.preset === "hatch") applyPreset();
+  const lim = { width: [0.4, W], wy: [Math.min(state.width, W) / 2, W - Math.min(state.width, W) / 2], lo: [0, H - 0.3], hi: [0.2, H - 0.1], hx: [0.2, L - 0.2], hy: [0.2, W - 0.2], hw: [0.4, W], hd: [0.4, Math.min(L / 2, 4)],
                 hh: [0, H - 0.2], ycut: [0, W], zcut: [0.05, H - 0.05] };
   for (const [k, [lo, hi]] of Object.entries(lim)) {
     $(k).max = hi; state[k] = Math.min(Math.max(state[k], lo), hi); $(k).value = state[k];
@@ -1059,9 +1107,9 @@ function heatBox() {
 }
 function makeCase() {
   const q = state.ach * L * W * H / 3600, Q = Math.max(1.2 * 1005 * q * (state.troom - state.tin), 0);
-  const [nx, ny, nz] = meshN(), y0 = (W - state.width) / 2;
+  const [nx, ny, nz] = meshN(), [y0, y1] = winY();
   return Object.assign(defaultCase(), { L, W, H, nx, ny, nz, ach: state.ach, T_in: state.tin,
-    inlet: { side: "left", start: state.lo, end: state.hi, y0: state.width >= W ? null : y0, y1: state.width >= W ? null : y0 + state.width },
+    inlet: { side: "left", start: state.lo, end: state.hi, y0: state.width >= W ? null : y0, y1: state.width >= W ? null : y1 },
     outlet: { side: "right", start: H - 0.2, end: H - 0.1 },
     // height 0: the heat source collapses to a heated patch of floor (heat flux into the air at the floor)
     heat: state.hh > 0 ? [Object.assign(heatBox(), { power: Q })] : [],
@@ -1076,7 +1124,7 @@ function makeGeo(c) {
   for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) if (bnd.T[i * ny + j] === 2) outCells.push((i * ny + j) * nz + nz - 1);
   const q = c.ach * L * W * H / 3600, Q = [...c.heat, ...c.floor_flux].reduce((s, b) => s + b.power, 0);
   return { nx, ny, nz, dx: L / nx, dy: W / ny, dz: H / nz, c, outCells, q, Q, Tmix: c.T_in + Q / (1.2 * 1005 * q),
-           mon: ((Math.min(Math.floor(1.0 / (L / nx)), nx - 1) * ny + Math.min(Math.floor(W / 2 / (W / ny)), ny - 1)) * nz + Math.min(Math.floor(0.1 / (H / nz)), nz - 1)) };
+           mon: ((Math.min(Math.floor(1.0 / (L / nx)), nx - 1) * ny + Math.min(Math.floor(state.wy / (W / ny)), ny - 1)) * nz + Math.min(Math.floor(0.1 / (H / nz)), nz - 1)) };
 }
 // before a run: the empty room with the window, the exhaust and the heat source at the well-mixed temperature
 function preview() {
@@ -1185,17 +1233,31 @@ function range() {
   return [0, 40, "DR (%)", 0];
 }
 // one slice: a = horizontal axis (0 = x), b = vertical axis (2 = z or 1 = y); idx(i, j) -> cell index
-function slice(cv, A, B, na, nb, idx, va, vb, decor) {
-  const padL = 40, padR = 64, padT = 8, padB = 30;
+// isoline of a cell-centred slice by marching squares; returns segments [x1, y1, x2, y2] in metres
+function isoSegments(val, na, nb, da, db, c) {
+  const seg = [], at = (i, j) => val[i * nb + j] - c;
+  for (let i = 0; i < na - 1; i++) for (let j = 0; j < nb - 1; j++) {
+    const a = at(i, j), b = at(i + 1, j), d = at(i + 1, j + 1), e = at(i, j + 1), pts = [];
+    const x0 = (i + 0.5) * da, x1 = x0 + da, y0 = (j + 0.5) * db, y1 = y0 + db;
+    const cut = (f1, f2, xa, ya, xb, yb) => { if ((f1 < 0) !== (f2 < 0)) { const t = f1 / (f1 - f2); pts.push(xa + (xb - xa) * t, ya + (yb - ya) * t); } };
+    cut(a, b, x0, y0, x1, y0); cut(b, d, x1, y0, x1, y1); cut(d, e, x1, y1, x0, y1); cut(e, a, x0, y1, x0, y0);
+    if (pts.length >= 4) seg.push(pts.slice(0, 4));
+    if (pts.length === 8) seg.push(pts.slice(4, 8));
+  }
+  return seg;
+}
+function slice(cv, A, B, na, nb, idx, va, vb, decor, isoSlider) {
+  const padL = 40, padR = 128, padT = 8, padB = 30;
   const [g, Wc, Hc] = sizeCanvas(cv, (w) => (w - padL - padR) * B / A + padT + padB);
   g.clearRect(0, 0, Wc, Hc);
   const sc = Math.min((Wc - padL - padR) / A, (Hc - padT - padB) / B), pw = A * sc, ph = B * sc;
   const X = (x) => padL + x * sc, Y = (y) => padT + ph - y * sc;
   const [lo, hi, unit, dec] = range();
   const off = document.createElement("canvas"); off.width = na; off.height = nb;
-  const og = off.getContext("2d"), img = og.createImageData(na, nb);
+  const og = off.getContext("2d"), img = og.createImageData(na, nb), vals = new Float32Array(na * nb);
   for (let i = 0; i < na; i++) for (let j = 0; j < nb; j++) {
     const m = idx(i, j), val = state.field === "T" ? f.T[m] : state.field === "speed" ? f.speed[m] : draughtRate(f.T[m], f.speed[m]);
+    vals[i * nb + j] = val;
     const c = ramp(CMAPS[state.field], (val - lo) / (hi - lo)), p = 4 * ((nb - 1 - j) * na + i);
     img.data[p] = c[0]; img.data[p + 1] = c[1]; img.data[p + 2] = c[2]; img.data[p + 3] = 255;
   }
@@ -1209,6 +1271,17 @@ function slice(cv, A, B, na, nb, idx, va, vb, decor) {
     g.beginPath(); g.moveTo(ax, ay); g.lineTo(ex, ey); g.stroke();
     g.beginPath(); g.moveTo(ex, ey); g.lineTo(ex - 4 * Math.cos(an - 0.45), ey - 4 * Math.sin(an - 0.45)); g.lineTo(ex - 4 * Math.cos(an + 0.45), ey - 4 * Math.sin(an + 0.45)); g.fill();
   }
+  // isoline: a light halo under a dark line, so it reads on every colour map (not before a run)
+  if (!f.preview) {
+    const segs = isoSegments(vals, na, nb, A / na, B / nb, state.iso[state.field]);
+    g.lineCap = "round";
+    for (const [lw, col] of [[3.5, "rgba(255,255,255,0.85)"], [1.6, "#111"]]) {
+      g.lineWidth = lw; g.strokeStyle = col; g.beginPath();
+      for (const [x1, y1, x2, y2] of segs) { g.moveTo(X(x1), Y(y1)); g.lineTo(X(x2), Y(y2)); }
+      g.stroke();
+    }
+    g.lineCap = "butt";
+  }
   g.strokeStyle = css("--ink"); g.lineWidth = 1.5; g.strokeRect(padL, padT, pw, ph);
   decor(g, X, Y, sc);
   const muted = css("--muted"); g.fillStyle = muted; g.font = "11px " + css("--font-data"); g.textAlign = "center";
@@ -1218,7 +1291,12 @@ function slice(cv, A, B, na, nb, idx, va, vb, decor) {
   for (let k = 0; k < ph; k++) { const c = ramp(CMAPS[state.field], 1 - k / ph); g.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`; g.fillRect(cbx, padT + k, cbw, 1.5); }
   g.fillStyle = muted; g.textAlign = "left";
   for (let k = 0; k <= 4; k++) g.fillText((lo + (hi - lo) * k / 4).toFixed(dec), cbx + cbw + 4, Y(B * k / 4) + 4);
-  g.save(); g.translate(Wc - 6, padT + ph / 2); g.rotate(-Math.PI / 2); g.textAlign = "center"; g.fillText(unit, 0, 0); g.restore();
+  // isoline value on the colour bar
+  const yi = padT + ph * (1 - Math.min(Math.max((state.iso[state.field] - lo) / (hi - lo), 0), 1));
+  g.strokeStyle = css("--ink"); g.lineWidth = 2; g.beginPath(); g.moveTo(cbx - 3, yi); g.lineTo(cbx + cbw + 3, yi); g.stroke();
+  g.save(); g.translate(cbx + cbw + 40, padT + ph / 2); g.rotate(-Math.PI / 2); g.textAlign = "center"; g.fillText(unit, 0, 0); g.restore();
+  // the slider spans the plot height, so its ends line up with the colour bar
+  if (isoSlider) { isoSlider.style.height = ph + "px"; isoSlider.parentElement.style.top = padT + "px"; isoSlider.parentElement.style.left = (cbx + cbw + 50) + "px"; }
 }
 function chart(cv, xr, yl, yr, series, opts = {}) {
   const [g, Wc, Hc] = sizeCanvas(cv, () => 1e9), muted = css("--muted"), line = css("--line"), ink = css("--ink");
@@ -1270,7 +1348,7 @@ function drawConv() {
 }
 function draw() {
   if (!f || !geo) return;
-  const { nx, ny, nz, dy, dz } = geo, y0 = (W - state.width) / 2;
+  const { nx, ny, nz, dy, dz } = geo, [y0, y1] = winY();
   const j = Math.min(Math.floor(state.ycut / dy), ny - 1), k = Math.min(Math.floor(state.zcut / dz), nz - 1);
   slice($("sec"), L, H, nx, nz, (i, kk) => (i * ny + j) * nz + kk, f.uc, f.wc, (g, X, Y, sc) => {
     g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; g.strokeRect(X(0.6), Y(1.8), (L - 1.2) * sc, 1.8 * sc);
@@ -1278,15 +1356,15 @@ function draw() {
     g.strokeStyle = cut ? "rgba(20,25,30,0.8)" : "rgba(20,25,30,0.3)"; if (hb.z1 > 0) g.strokeRect(X(hb.x0), Y(hb.z1), (hb.x1 - hb.x0) * sc, hb.z1 * sc);
     else { g.setLineDash([]); g.lineWidth = 5; g.strokeStyle = cut ? "#c0392b" : "rgba(192,57,43,0.35)"; g.beginPath(); g.moveTo(X(hb.x0), Y(0) - 2); g.lineTo(X(hb.x1), Y(0) - 2); g.stroke(); g.lineWidth = 1.4; }
     g.setLineDash([]);
-    const inWin = state.width >= W || ((j + 0.5) * dy > y0 && (j + 0.5) * dy < y0 + state.width);
+    const inWin = state.width >= W || ((j + 0.5) * dy > y0 && (j + 0.5) * dy < y1);
     g.lineWidth = 6; g.strokeStyle = inWin ? "#2f7fd0" : "rgba(47,127,208,0.35)";
     g.beginPath(); g.moveTo(X(0) - 2, Y(state.lo)); g.lineTo(X(0) - 2, Y(state.hi)); g.stroke();
     g.strokeStyle = css("--muted"); g.beginPath(); g.moveTo(X(L) + 2, Y(H - 0.2)); g.lineTo(X(L) + 2, Y(H - 0.1)); g.stroke();
-  });
+  }, $("iso"));
   slice($("plan"), L, W, nx, ny, (i, jj) => (i * ny + jj) * nz + k, f.uc, f.vc, (g, X, Y, sc) => {
     g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; g.strokeRect(X(0.6), Y(W - 0.6), (L - 1.2) * sc, (W - 1.2) * sc);
     g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; const hb = heatBox(); g.strokeRect(X(hb.x0), Y(hb.y1), (hb.x1 - hb.x0) * sc, (hb.y1 - hb.y0) * sc); g.setLineDash([]);
-    g.lineWidth = 6; g.strokeStyle = "#2f7fd0"; g.beginPath(); g.moveTo(X(0) - 2, Y(Math.max(y0, 0))); g.lineTo(X(0) - 2, Y(Math.min(y0 + state.width, W))); g.stroke();
+    g.lineWidth = 6; g.strokeStyle = "#2f7fd0"; g.beginPath(); g.moveTo(X(0) - 2, Y(y0)); g.lineTo(X(0) - 2, Y(y1)); g.stroke();
     g.strokeStyle = "rgba(255,255,255,0.9)"; g.setLineDash([3, 3]); g.lineWidth = 1; g.beginPath(); g.moveTo(X(0), Y(state.ycut)); g.lineTo(X(L), Y(state.ycut)); g.stroke(); g.setLineDash([]);
   });
   if (f.preview) {
@@ -1313,13 +1391,16 @@ function draw() {
 function setSeg(id, key) {
   $(id).querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
     $(id).querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
-    state[key] = b.dataset.v; if (key === "field") draw(); else start();
+    state[key] = b.dataset.v; if (key === "field") { syncIso(); draw(); } else start();
   }));
 }
 setSeg("turb", "turb"); setSeg("adv", "adv"); setSeg("fieldSel", "field");
-for (const id of ["width", "lo", "hi", "tin", "ach", "troom", "hx", "hy", "hw", "hd", "hh"]) {
+for (const id of ["width", "wy", "lo", "hi", "tin", "ach", "troom", "hx", "hy", "hw", "hd", "hh"]) {
   $(id).addEventListener("input", (e) => {
     state[id] = +e.target.value;
+    if (id === "hx" || id === "hy") state.heatCentred = false;
+    if (id === "width" || id === "lo" || id === "hi") { state.preset = "custom"; $("preset").value = "custom"; }
+    if (id === "width") applyDims();
     if (id === "lo" && state.hi < state.lo + 0.2) { state.hi = Math.min(state.lo + 0.2, H - 0.1); $("hi").value = state.hi; }
     if (id === "hi" && state.lo > state.hi - 0.2) { state.lo = Math.max(state.hi - 0.2, 0); $("lo").value = state.lo; }
     syncLabels(); preview();
@@ -1329,10 +1410,10 @@ for (const id of ["width", "lo", "hi", "tin", "ach", "troom", "hx", "hy", "hw", 
 for (const id of ["ycut", "zcut"]) $(id).addEventListener("input", (e) => { state[id] = +e.target.value; syncLabels(); draw(); });
 // click in the plan: move the heat source there
 $("plan").addEventListener("click", (e) => {
-  const cv = $("plan"), r = cv.getBoundingClientRect(), sc = Math.min((r.width - 104) / L, (r.height - 38) / W);
+  const cv = $("plan"), r = cv.getBoundingClientRect(), sc = Math.min((r.width - 168) / L, (r.height - 38) / W);
   const x = (e.clientX - r.left - 40) / sc, y = W - (e.clientY - r.top - 8) / sc;
   if (x < 0 || x > L || y < 0 || y > W) return;
-  state.hx = Math.round(x * 10) / 10; state.hy = Math.round(y * 10) / 10;
+  state.hx = Math.round(x * 10) / 10; state.hy = Math.round(y * 10) / 10; state.heatCentred = false;
   $("hx").value = state.hx; $("hy").value = state.hy; syncLabels(); start();
 });
 $("mesh").addEventListener("change", (e) => { state.mesh = e.target.value.split(",").map(Number); syncLabels(); preview(); start(); });
@@ -1340,6 +1421,8 @@ for (const id of ["L", "W", "H"]) {
   $(id).addEventListener("input", (e) => { state[id] = +e.target.value; applyDims(); syncLabels(); preview(); });
   $(id).addEventListener("change", start);
 }
+$("preset").addEventListener("change", (e) => { state.preset = e.target.value; applyPreset(); applyDims(); syncLabels(); preview(); start(); });
+$("iso").addEventListener("input", (e) => { state.iso[state.field] = +e.target.value; $("isoV").textContent = fieldRange().fmt(state.iso[state.field]); draw(); });
 $("run").addEventListener("click", start);
 $("stop").addEventListener("click", () => { stopReq = true; });
 window.addEventListener("resize", draw);
