@@ -469,12 +469,19 @@ const MARKUP = `<div class="wrap">
   <div class="layout">
     <aside class="panel controls" aria-label="Case settings">
       <div class="group">
+        <h2>Room</h2>
+        <label for="rL"><span class="row"><span>Depth from the facade</span><span class="val" id="rLV"></span></span>
+          <input id="rL" type="range" min="3" max="10" step="0.5" value="5"></label>
+        <label for="rH"><span class="row"><span>Ceiling height</span><span class="val" id="rHV"></span></span>
+          <input id="rH" type="range" min="2.4" max="4" step="0.1" value="2.5"></label>
+      </div>
+      <div class="group">
         <h2>Supply opening (facade)</h2>
         <label for="preset">Type
           <select id="preset">
             <option value="window">Window, 0.9–2.1 m</option>
             <option value="door">Balcony door, 0–2.1 m</option>
-            <option value="hatch">Top hatch, 2.2–2.4 m</option>
+            <option value="hatch" id="hatchOpt">Top hatch, 2.2–2.4 m</option>
             <option value="low">Low slot, 0.2–0.3 m</option>
             <option value="custom">Custom</option>
           </select>
@@ -498,11 +505,12 @@ const MARKUP = `<div class="wrap">
         <h2>Numerics</h2>
         <label for="mesh">Mesh
           <select id="mesh">
-            <option value="50">50 × 25 cells (fast)</option>
-            <option value="60" selected>60 × 30 cells</option>
-            <option value="80">80 × 40 cells (slow)</option>
+            <option value="50">10 cm cells (fast)</option>
+            <option value="60" selected>8.3 cm cells</option>
+            <option value="80">6.25 cm cells (slow)</option>
           </select>
         </label>
+        <p class="note" id="meshNote"></p>
         <div class="group"><span style="font-size:13px">Advection scheme</span>
           <div class="seg" id="adv" role="group" aria-label="Advection scheme">
             <button type="button" data-v="tvd" aria-pressed="true">TVD (van Leer)</button>
@@ -580,30 +588,36 @@ const MARKUP = `<div class="wrap">
 
 function app(root, autoRun) {
   const $ = id => root.querySelector("#" + id);
-  const PRESETS = { window: [0.9, 2.1], door: [0, 2.1], hatch: [2.2, 2.4], low: [0.2, 0.3] };
-  const state = { preset: "window", lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, mesh: 60, adv: "tvd", turb: "k-epsilon", field: "T", iso: { T: 24, speed: 0.15, DR: 20 } };
+  // the top hatch sits 0.1 m below the ceiling, whatever the ceiling height
+  const PRESETS = { window: () => [0.9, 2.1], door: () => [0, 2.1], hatch: () => [+(state.H - 0.3).toFixed(2), +(state.H - 0.1).toFixed(2)], low: () => [0.2, 0.3] };
+  const state = { preset: "window", L: 5, H: 2.5, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, mesh: 60, adv: "tvd", turb: "k-epsilon", field: "T", iso: { T: 24, speed: 0.15, DR: 20 } };
   let sim = null, running = false, rafId = 0, lastDraw = 0;
 
   const css = name => getComputedStyle(root).getPropertyValue(name).trim();
   const fmt = (x, d = 2) => Number.isFinite(x) ? x.toFixed(d) : "–";
 
+  // mesh option = cells over 5 m, so the cell size stays the same when the room changes
+  const meshN = () => { const h = 5 / state.mesh; return [Math.round(state.L / h), Math.round(state.H / h)]; };
   function syncLabels() {
+    $("rLV").textContent = state.L.toFixed(1) + " m"; $("rHV").textContent = state.H.toFixed(1) + " m";
+    $("hatchOpt").textContent = `Top hatch, ${(state.H - 0.3).toFixed(1)}–${(state.H - 0.1).toFixed(1)} m`;
+    const [nx, ny] = meshN(); $("meshNote").textContent = `${nx} × ${ny} cells`;
     $("opLoV").textContent = state.lo.toFixed(2) + " m"; $("opHiV").textContent = state.hi.toFixed(2) + " m";
     $("tinV").textContent = state.tin + " °C"; $("achV").textContent = state.ach + " h⁻¹"; $("troomV").textContent = state.troom + " °C";
-    const q = state.ach * 5 * 2.5 * 4 / 3600, Q = 1.2 * 1005 * q * (state.troom - state.tin);
+    const q = state.ach * state.L * state.H * 4 / 3600, Q = 1.2 * 1005 * q * (state.troom - state.tin);
     const Uin = q / 4 / Math.max(state.hi - state.lo, 0.05);
     $("gainsNote").textContent = Q > 0
-      ? `Airflow ${(q * 1000).toFixed(0)} L/s. Heat gains ${Q.toFixed(0)} W (${(Q / 20).toFixed(0)} W/m² floor). Inlet speed ${Uin.toFixed(2)} m/s.`
+      ? `Airflow ${(q * 1000).toFixed(0)} L/s. Heat gains ${Q.toFixed(0)} W (${(Q / (4 * state.L)).toFixed(0)} W/m² floor). Inlet speed ${Uin.toFixed(2)} m/s.`
       : "The supply must be colder than the room. Raise the room temperature or lower the supply.";
     syncIso();
   }
 
   function makeCase() {
-    const q = state.ach * 5 * 2.5 * 4 / 3600;
+    const { L, H } = state, q = state.ach * L * H * 4 / 3600, [nx, ny] = meshN();
     const Q = Math.max(1.2 * 1005 * q * (state.troom - state.tin), 0);
-    return { L: 5, H: 2.5, W: 4, nx: state.mesh, ny: state.mesh / 2, ach: state.ach, T_in: state.tin,
-      inlet: { side: "left", start: state.lo, end: state.hi }, outlet: { side: "right", start: 2.3, end: 2.4 },
-      heat: [{ x0: 2.3, x1: 2.7, y0: 0, y1: 1.2, power: Q / 4 }], turbulence: state.turb, nu_t: 2e-3, Tu_in: 0.04, Pr_t: 0.85,
+    return { L, H, W: 4, nx, ny, ach: state.ach, T_in: state.tin,
+      inlet: { side: "left", start: state.lo, end: state.hi }, outlet: { side: "right", start: H - 0.2, end: H - 0.1 },
+      heat: [{ x0: L / 2 - 0.2, x1: L / 2 + 0.2, y0: 0, y1: 1.2, power: Q / 4 }], turbulence: state.turb, nu_t: 2e-3, Tu_in: 0.04, Pr_t: 0.85,
       advection: state.adv, t_end: 1800, t_avg: 600 };
   }
 
@@ -681,12 +695,14 @@ function app(root, autoRun) {
   }
 
   function drawField(f, useAvg) {
-    const cv = $("field"), [g, W, Hc] = sizeCanvas(cv, w => (w - 168) / 2 + 38);
+    // a tall, shallow room gets more height so it is not drawn tiny
+    const cv = $("field"); cv.dataset.h = sim.H / sim.L > 0.55 ? 460 : 320;
+    const [g, W, Hc] = sizeCanvas(cv, w => (w - 168) * sim.H / sim.L + 38);
     const ink = css("--ink"), muted = css("--muted"), line = css("--line"), panel = css("--panel");
     g.clearRect(0, 0, W, Hc);
     const padL = 40, padR = 128, padT = 8, padB = 30;
-    const sc = Math.min((W - padL - padR) / 5, (Hc - padT - padB) / 2.5);
-    const pw = 5 * sc, ph = 2.5 * sc, x0 = padL, y0 = padT;
+    const { L, H } = sim, sc = Math.min((W - padL - padR) / L, (Hc - padT - padB) / H);
+    const pw = L * sc, ph = H * sc, x0 = padL, y0 = padT;
     const X = x => x0 + x * sc, Y = y => y0 + ph - y * sc;
     const { nx, ny } = sim;
     // field values
@@ -722,20 +738,20 @@ function app(root, autoRun) {
     g.lineCap = "butt";
     // frame, occupied zone, heat block, openings
     g.strokeStyle = ink; g.lineWidth = 1.5; g.strokeRect(x0, y0, pw, ph);
-    g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; g.strokeRect(X(0.6), Y(1.8), 3.8 * sc, 1.8 * sc);
-    g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; g.strokeRect(X(2.3), Y(1.2), 0.4 * sc, 1.2 * sc); g.setLineDash([]);
+    g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; g.strokeRect(X(0.6), Y(1.8), (L - 1.2) * sc, 1.8 * sc);
+    g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; g.strokeRect(X(L / 2 - 0.2), Y(1.2), 0.4 * sc, 1.2 * sc); g.setLineDash([]);
     g.lineWidth = 6; g.strokeStyle = "#2f7fd0"; g.beginPath(); g.moveTo(X(0) - 2, Y(state.lo)); g.lineTo(X(0) - 2, Y(state.hi)); g.stroke();
-    g.strokeStyle = muted; g.beginPath(); g.moveTo(X(5) + 2, Y(2.3)); g.lineTo(X(5) + 2, Y(2.4)); g.stroke();
+    g.strokeStyle = muted; g.beginPath(); g.moveTo(X(L) + 2, Y(H - 0.2)); g.lineTo(X(L) + 2, Y(H - 0.1)); g.stroke();
     // axes labels
     g.fillStyle = muted; g.font = "11px " + css("--font-data"); g.textAlign = "center";
-    for (let x = 0; x <= 5; x++) g.fillText(x + " m", X(x), y0 + ph + 16);
-    g.textAlign = "right"; for (let y = 0; y <= 2.5; y += 0.5) g.fillText(y.toFixed(1), x0 - 6, Y(y) + 4);
+    for (let x = 0; x <= L + 1e-9; x++) g.fillText(x + " m", X(x), y0 + ph + 16);
+    g.textAlign = "right"; for (let y = 0; y <= H + 1e-9; y += 0.5) g.fillText(y.toFixed(1), x0 - 6, Y(y) + 4);
     // colour bar
     const cbx = x0 + pw + 14, cbw = 10;
     for (let k = 0; k < ph; k++) { const c = ramp(CMAPS[state.field], 1 - k / ph); g.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`; g.fillRect(cbx, y0 + k, cbw, 1.5); }
     g.strokeStyle = line; g.lineWidth = 1; g.strokeRect(cbx, y0, cbw, ph);
     g.fillStyle = muted; g.textAlign = "left";
-    const nt = 4; for (let k = 0; k <= nt; k++) { const v = lo + (hi - lo) * k / nt; g.fillText(state.field === "speed" ? v.toFixed(2) : v.toFixed(0), cbx + cbw + 4, Y(2.5 * k / nt) + 4); }
+    const nt = 4; for (let k = 0; k <= nt; k++) { const v = lo + (hi - lo) * k / nt; g.fillText(state.field === "speed" ? v.toFixed(2) : v.toFixed(0), cbx + cbw + 4, Y(H * k / nt) + 4); }
     // isoline value on the colour bar
     const yi = y0 + ph * (1 - Math.min(Math.max((state.iso[state.field] - lo) / (hi - lo), 0), 1));
     g.strokeStyle = ink; g.lineWidth = 2; g.beginPath(); g.moveTo(cbx - 3, yi); g.lineTo(cbx + cbw + 3, yi); g.stroke();
@@ -772,14 +788,14 @@ function app(root, autoRun) {
   }
 
   function drawFloor(f, oz) {
-    const { nx, ny, xc, dy } = sim, j = Math.min(Math.floor(0.1 / dy), ny - 1);
+    const { nx, ny, xc, dy, L } = sim, j = Math.min(Math.floor(0.1 / dy), ny - 1);
     const xs = Array.from(xc), sp = xs.map((_, i) => f.speed[i * ny + j]), t = xs.map((_, i) => f.T[i * ny + j]);
     const dr = xs.map((_, i) => draughtRate(t[i], sp[i])), ad = sp.map(v => ankleDraftPPD(v, oz.TS));
     const vtop = Math.max(0.4, Math.ceil(Math.max(...sp) * 10) / 10);
-    chart($("floor"), [0, 5], { r: [0, vtop], ticks: [0, vtop / 4, vtop / 2, 3 * vtop / 4, vtop], fmt: v => v.toFixed(2) },
+    chart($("floor"), [0, L], { r: [0, vtop], ticks: [0, vtop / 4, vtop / 2, 3 * vtop / 4, vtop], fmt: v => v.toFixed(2) },
       { r: [0, 50], ticks: [0, 10, 20, 30, 40, 50], fmt: v => v.toFixed(0) },
       [{ x: xs, y: sp, color: "#2f7fd0" }, { x: xs, y: dr, color: "#d9622b", right: true }, { x: xs, y: ad, color: "#7b4bb7", right: true }],
-      { xticks: [0, 1, 2, 3, 4, 5], xfmt: v => v, xlabel: "x from the facade (m), grey: outside occupied zone", shades: [[0, 0.6], [4.4, 5]],
+      { xticks: Array.from({ length: Math.floor(L) + 1 }, (_, i) => i), xfmt: v => v, xlabel: "x from the facade (m), grey: outside occupied zone", shades: [[0, 0.6], [L - 0.6, L]],
         hlines: [{ y: 20, right: true, label: "20 % limit" }] });
   }
 
@@ -830,21 +846,33 @@ function app(root, autoRun) {
   setSeg("adv", "adv"); setSeg("turb", "turb"); setSeg("fieldSel", "field");
   $("preset").addEventListener("change", e => {
     state.preset = e.target.value;
-    if (PRESETS[state.preset]) { [state.lo, state.hi] = PRESETS[state.preset]; $("opLo").value = state.lo; $("opHi").value = state.hi; }
+    if (PRESETS[state.preset]) { [state.lo, state.hi] = PRESETS[state.preset](); $("opLo").value = state.lo; $("opHi").value = state.hi; }
     syncLabels(); start();
   });
   for (const [id, key] of [["opLo", "lo"], ["opHi", "hi"], ["tin", "tin"], ["ach", "ach"], ["troom", "troom"]]) {
     $(id).addEventListener("input", e => {
       state[key] = +e.target.value;
-      if (key === "lo" && state.hi < state.lo + 0.1) { state.hi = Math.min(state.lo + 0.1, 2.5); $("opHi").value = state.hi; }
+      if (key === "lo" && state.hi < state.lo + 0.1) { state.hi = Math.min(state.lo + 0.1, state.H); $("opHi").value = state.hi; }
       if (key === "hi" && state.lo > state.hi - 0.1) { state.lo = Math.max(state.hi - 0.1, 0); $("opLo").value = state.lo; }
       if (key === "lo" || key === "hi") { state.preset = "custom"; $("preset").value = "custom"; }
       syncLabels();
     });
     $(id).addEventListener("change", start);
   }
+  // room size: the opening must stay below the ceiling, and the top hatch follows the ceiling
+  for (const [id, key] of [["rL", "L"], ["rH", "H"]]) {
+    $(id).addEventListener("input", e => {
+      state[key] = +e.target.value;
+      $("opLo").max = (state.H - 0.1).toFixed(2); $("opHi").max = state.H.toFixed(2);
+      if (state.preset === "hatch") [state.lo, state.hi] = PRESETS.hatch();
+      state.hi = Math.min(state.hi, state.H); state.lo = Math.min(state.lo, state.hi - 0.1);
+      $("opLo").value = state.lo; $("opHi").value = state.hi;
+      syncLabels();
+    });
+    $(id).addEventListener("change", start);
+  }
   $("iso").addEventListener("input", e => { state.iso[state.field] = +e.target.value; $("isoV").textContent = fieldRange().fmt(state.iso[state.field]); draw(); });
-  $("mesh").addEventListener("change", e => { state.mesh = +e.target.value; start(); });
+  $("mesh").addEventListener("change", e => { state.mesh = +e.target.value; syncLabels(); start(); });
   $("run").addEventListener("click", start);
   $("pause").addEventListener("click", () => {
     if (!sim || sim.s.done) return;
