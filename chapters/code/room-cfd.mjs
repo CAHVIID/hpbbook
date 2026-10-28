@@ -474,6 +474,8 @@ const MARKUP = `<div class="wrap">
           <input id="rL" type="range" min="3" max="10" step="0.5" value="5"></label>
         <label for="rH"><span class="row"><span>Ceiling height</span><span class="val" id="rHV"></span></span>
           <input id="rH" type="range" min="2.4" max="4" step="0.1" value="2.5"></label>
+        <label for="hx"><span class="row"><span>Heat source, centre from the facade</span><span class="val" id="hxV"></span></span>
+          <input id="hx" type="range" min="0.2" max="4.8" step="0.1" value="2.5"></label>
       </div>
       <div class="group">
         <h2>Supply opening (facade)</h2>
@@ -590,7 +592,7 @@ function app(root, autoRun) {
   const $ = id => root.querySelector("#" + id);
   // the top hatch sits 0.1 m below the ceiling, whatever the ceiling height
   const PRESETS = { window: () => [0.9, 2.1], door: () => [0, 2.1], hatch: () => [+(state.H - 0.3).toFixed(2), +(state.H - 0.1).toFixed(2)], low: () => [0.2, 0.3] };
-  const state = { preset: "window", L: 5, H: 2.5, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, mesh: 60, adv: "tvd", turb: "k-epsilon", field: "T", iso: { T: 24, speed: 0.15, DR: 20 } };
+  const state = { preset: "window", L: 5, H: 2.5, hx: 2.5, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, mesh: 60, adv: "tvd", turb: "k-epsilon", field: "T", iso: { T: 24, speed: 0.15, DR: 20 } };
   let sim = null, running = false, rafId = 0, lastDraw = 0;
 
   const css = name => getComputedStyle(root).getPropertyValue(name).trim();
@@ -599,7 +601,7 @@ function app(root, autoRun) {
   // mesh option = cells over 5 m, so the cell size stays the same when the room changes
   const meshN = () => { const h = 5 / state.mesh; return [Math.round(state.L / h), Math.round(state.H / h)]; };
   function syncLabels() {
-    $("rLV").textContent = state.L.toFixed(1) + " m"; $("rHV").textContent = state.H.toFixed(1) + " m";
+    $("rLV").textContent = state.L.toFixed(1) + " m"; $("rHV").textContent = state.H.toFixed(1) + " m"; $("hxV").textContent = state.hx.toFixed(1) + " m";
     $("hatchOpt").textContent = `Top hatch, ${(state.H - 0.3).toFixed(1)}–${(state.H - 0.1).toFixed(1)} m`;
     const [nx, ny] = meshN(); $("meshNote").textContent = `${nx} × ${ny} cells`;
     $("opLoV").textContent = state.lo.toFixed(2) + " m"; $("opHiV").textContent = state.hi.toFixed(2) + " m";
@@ -607,7 +609,7 @@ function app(root, autoRun) {
     const q = state.ach * state.L * state.H * 4 / 3600, Q = 1.2 * 1005 * q * (state.troom - state.tin);
     const Uin = q / 4 / Math.max(state.hi - state.lo, 0.05);
     $("gainsNote").textContent = Q > 0
-      ? `Airflow ${(q * 1000).toFixed(0)} L/s. Heat gains ${Q.toFixed(0)} W (${(Q / (4 * state.L)).toFixed(0)} W/m² floor). Inlet speed ${Uin.toFixed(2)} m/s.`
+      ? `Airflow ${(q * 1000).toFixed(0)} L/s. Heat gains ${Q.toFixed(0)} W (${(Q / (4 * state.L)).toFixed(0)} W/m² floor). Inlet speed ${Uin.toFixed(3)} m/s.`
       : "The supply must be colder than the room. Raise the room temperature or lower the supply.";
     syncIso();
   }
@@ -617,7 +619,7 @@ function app(root, autoRun) {
     const Q = Math.max(1.2 * 1005 * q * (state.troom - state.tin), 0);
     return { L, H, W: 4, nx, ny, ach: state.ach, T_in: state.tin,
       inlet: { side: "left", start: state.lo, end: state.hi }, outlet: { side: "right", start: H - 0.2, end: H - 0.1 },
-      heat: [{ x0: L / 2 - 0.2, x1: L / 2 + 0.2, y0: 0, y1: 1.2, power: Q / 4 }], turbulence: state.turb, nu_t: 2e-3, Tu_in: 0.04, Pr_t: 0.85,
+      heat: [{ x0: state.hx - 0.2, x1: state.hx + 0.2, y0: 0, y1: 1.2, power: Q / 4 }], turbulence: state.turb, nu_t: 2e-3, Tu_in: 0.04, Pr_t: 0.85,
       advection: state.adv, t_end: 1800, t_avg: 600 };
   }
 
@@ -739,7 +741,7 @@ function app(root, autoRun) {
     // frame, occupied zone, heat block, openings
     g.strokeStyle = ink; g.lineWidth = 1.5; g.strokeRect(x0, y0, pw, ph);
     g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; g.strokeRect(X(0.6), Y(1.8), (L - 1.2) * sc, 1.8 * sc);
-    g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; g.strokeRect(X(L / 2 - 0.2), Y(1.2), 0.4 * sc, 1.2 * sc); g.setLineDash([]);
+    g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; g.strokeRect(X(sim.case.heat[0].x0), Y(1.2), 0.4 * sc, 1.2 * sc); g.setLineDash([]);
     g.lineWidth = 6; g.strokeStyle = "#2f7fd0"; g.beginPath(); g.moveTo(X(0) - 2, Y(state.lo)); g.lineTo(X(0) - 2, Y(state.hi)); g.stroke();
     g.strokeStyle = muted; g.beginPath(); g.moveTo(X(L) + 2, Y(H - 0.2)); g.lineTo(X(L) + 2, Y(H - 0.1)); g.stroke();
     // axes labels
@@ -860,9 +862,11 @@ function app(root, autoRun) {
     $(id).addEventListener("change", start);
   }
   // room size: the opening must stay below the ceiling, and the top hatch follows the ceiling
-  for (const [id, key] of [["rL", "L"], ["rH", "H"]]) {
+  for (const [id, key] of [["rL", "L"], ["rH", "H"], ["hx", "hx"]]) {
     $(id).addEventListener("input", e => {
       state[key] = +e.target.value;
+      // the 0.4 m wide heat source stays inside the room
+      $("hx").max = (state.L - 0.2).toFixed(1); state.hx = Math.min(state.hx, state.L - 0.2); $("hx").value = state.hx;
       $("opLo").max = (state.H - 0.1).toFixed(2); $("opHi").max = state.H.toFixed(2);
       if (state.preset === "hatch") [state.lo, state.hi] = PRESETS.hatch();
       state.hi = Math.min(state.hi, state.H); state.lo = Math.min(state.lo, state.hi - 0.1);
