@@ -18,13 +18,15 @@ The model exists in two versions that give the same results:
 
 :::{figure} figures/appendix-cfd/room-cfd-app.*
 :label: fig-room-cfd-app
-:alt: Screenshot of the room CFD app. Inputs for the supply opening, supply temperature, air change rate, room temperature, mesh, advection scheme and turbulence model on the left. On the right, the temperature field and velocity arrows in the 5 m deep room section, key results for floor speed, ISO 7730 draught rate, PMV, ankle draught and exhaust temperature, and charts of the conditions at ankle height and of the convergence.
+:alt: Screenshot of the room CFD app. Inputs for the room depth, ceiling height and heat source position, the supply opening, supply temperature, air change rate, room temperature, mesh, advection scheme and turbulence model on the left. On the right, the temperature field and velocity arrows in the room section, an isoline slider beside the colour bar, key results for floor speed, ISO 7730 draught rate, PMV, ankle draught and exhaust temperature, and charts of the conditions at ankle height and of the convergence.
 :width: 100%
 
 The room CFD app after a run with the default inputs: a window from 0.9 to 2.1 m, 16 °C supply air and 6 air changes per hour. Open the app to change the inputs.
 :::
 
 The app starts a run when it opens. A run simulates 30 minutes of real time and takes under a minute in a browser. The section view shows the instantaneous field while the simulation runs and the time-averaged field when it finishes. Changing a setting starts a new run.
+
+Under Room you can change the depth of the room from the facade (3–10 m) and the ceiling height (2.4–4 m). A third slider moves the 0.4 m wide block of heat gains along the floor. The exhaust slot stays 0.1–0.2 m below the ceiling, and the cells keep the size set under Mesh. The slider beside the colour bar draws one isoline on the section, for example the 0.15 m/s air speed or the 20 % draught rate. Each of the three views keeps its own value.
 
 The app is a single HTML file, {download}`room-cfd.html <code/room-cfd.html>`. Save it anywhere and double-click it to use it offline.
 

@@ -24,7 +24,7 @@ p.sub {{ margin: 0 0 12px; font-size: 14px; opacity: .75; max-width: 70ch; }}
 </style>
 </head><body><main>
 <h1>Room Section CFD</h1>
-<p class="sub">A 2D section through a 5 m deep, 2.5 m high office (4 m wide) cooled by outdoor air through one opening in the facade. The air leaves through an exhaust in the back wall. Watch the cold air enter, fall and spread, then read the draught at ankle height.</p>
+<p class="sub">A 2D section through an office cooled by outdoor air through one opening in the facade. The air leaves through an exhaust in the back wall. The room starts 5 m deep and 2.5 m high; change both under Room. Watch the cold air enter, fall and spread, then read the draught at ankle height.</p>
 <div id="app"></div>
 </main>
 <script type="module">
