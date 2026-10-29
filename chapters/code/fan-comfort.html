@@ -78,7 +78,7 @@ button:disabled { opacity: .5; cursor: default; }
 .tabs button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
 .chartbox { position: relative; height: 300px; }
 .chartbox.small { height: 240px; }
-.charts2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.charts2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr)); gap: 14px; }
 .range { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
 .range input[type=range] { width: 220px; padding: 0; }
 textarea { width: 100%; box-sizing: border-box; height: 90px; font: 11px var(--mono); background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; }
@@ -202,6 +202,10 @@ textarea { width: 100%; box-sizing: border-box; height: 90px; font: 11px var(--m
     </div>
     <div class="sub charts2">
       <div><h3>PMV in occupied hours</h3><div class="chartbox small"><canvas id="cPmv"></canvas></div></div>
+      <div><div class="toolbar"><h3 style="margin:0">Operative temperature in occupied hours</h3><span class="spacer"></span>
+        <select id="tMode" aria-label="Intervals" style="width:auto"><option value="cat">EN 16798-1 categories</option><option value="bins">1 K intervals</option></select></div>
+        <div class="chartbox small"><canvas id="cCat"></canvas></div>
+        <p class="note" id="catNote"></p></div>
       <div><h3>Cooling effect and CFE against t<sub>op</sub></h3><div class="chartbox small"><canvas id="cCe"></canvas></div></div>
     </div>
   </section>
@@ -547,7 +551,24 @@ function adaptiveUpper(out) {
   const daily = []; for (let d = 0; d < 365; d++) daily.push(out.slice(d * 24, d * 24 + 24).reduce((a, b) => a + b) / 24);
   const trm = [daily.slice(-7).reduce((a, b) => a + b) / 7];
   for (let d = 1; d < 365; d++) trm.push(0.2 * daily[d - 1] + 0.8 * trm[d - 1]);
-  return trm.map((t) => 0.33 * Math.min(Math.max(t, 10), 30) + 18.8 + 3);
+  return trm.map(bands);
+}
+// EN 16798-1 category limits of the operative temperature for one day, from the running mean
+// outdoor temperature: adaptive from 10 to 30 °C, ordinary limits for living spaces below 10 °C.
+function bands(trm) {
+  if (trm < 10) return { I: [21, 25.5], II: [20, 26], III: [18, 27] };
+  const tc = 0.33 * Math.min(trm, 30) + 18.8;
+  return { I: [tc - 3, tc + 2], II: [tc - 4, tc + 3], III: [tc - 5, tc + 4] };
+}
+const CAT_LABELS = ["Below III", "III, cool", "II, cool", "I", "II, warm", "III, warm", "Above III"];
+function category(t, b) {
+  if (t < b.III[0]) return 0;
+  if (t < b.II[0]) return 1;
+  if (t < b.I[0]) return 2;
+  if (t <= b.I[1]) return 3;
+  if (t <= b.II[1]) return 4;
+  if (t <= b.III[1]) return 5;
+  return 6;
 }
 const r1 = (x, n = 1) => (x == null || Number.isNaN(x) ? null : Math.round(x * 10 ** n) / 10 ** n);
 
@@ -594,7 +615,8 @@ function runZone(z, S, limit) {
     const pmvStill = pmvFanger(x.tdb, tr, 0.1, x.rh, S.met, clo);
     const o = { h, tdb: x.tdb, top: x.top, rh: x.rh, tr, clo, occupied, setStill, pmvStill,
       speed: "off", v: 0.1, P: 0, pmvFan: pmvStill, setFan: setStill, ce: 0, topEq: x.top, cfe: null,
-      limit: limit ? limit[Math.floor((h - 1) / 24)] : null };
+      band: limit ? limit[Math.floor((h - 1) / 24)] : null, limit: null };
+    if (o.band) o.limit = o.band.II[1];
     if (occupied && pmvStill > S.pmvOn) {
       for (let k = 0; k < spd.length; k++) {
         const r = pmvAshrae(x.tdb, tr, spd[k].v, x.rh, S.met, clo);
@@ -752,10 +774,38 @@ function drawCharts() {
   const labs = ["< −1.5", "−1.5…−1", "−1…−0.5", "−0.5…0.5", "0.5…1", "1…1.5", "> 1.5"];
   const hist = (k) => labs.map((_, i) => all.filter((r) => r[k] > bins[i] && r[k] <= bins[i + 1]).length);
   const o3 = baseOpts("hours"); o3.interaction = { mode: "index", intersect: false };
+  o3.scales.x.ticks.autoSkip = false;
   mkChart("cPmv", { type: "bar", data: { labels: labs, datasets: [
     { label: "No fan", data: hist("pmvStill"), backgroundColor: warm },
     { label: "With fan", data: hist("pmvFan"), backgroundColor: fan },
   ] }, options: o3 });
+
+  // Share of occupied hours in comfort categories or 1 K intervals: t_op without fan, equivalent t_op with fan
+  const useCat = $("tMode").value === "cat" && results.limit;
+  $("tMode").querySelector('[value="cat"]').disabled = !results.limit;
+  if (!results.limit) $("tMode").value = "bins";
+  let tl, tc;
+  if (useCat) {
+    tl = CAT_LABELS;
+    tc = (k) => { const n = Array(7).fill(0); all.forEach((r) => n[category(r[k], r.band)]++); return n; };
+    $("catNote").textContent = "Adaptive limits from the running mean outdoor temperature (EN 16798-1); below 10 °C the ordinary limits for living spaces. With fan: equivalent t_op.";
+  } else {
+    const ts = all.flatMap((r) => [r.top, r.topEq]);
+    const lo = Math.floor(Math.min(...ts)), hi = Math.ceil(Math.max(...ts));
+    const a = Math.max(lo, 20), b = Math.min(Math.max(hi, a + 2), 34);
+    const edges = []; for (let t = a; t <= b; t++) edges.push(t);
+    tl = [`< ${a}`, ...edges.slice(0, -1).map((t) => `${t}–${t + 1}`), `≥ ${b}`];
+    tc = (k) => tl.map((_, i) => all.filter((r) => (i === 0 ? r[k] < a : i === tl.length - 1 ? r[k] >= b : r[k] >= edges[i - 1] && r[k] < edges[i])).length);
+    $("catNote").textContent = results.limit ? "With fan: equivalent t_op = t_op − cooling effect." : "Load the EPW file to see the EN 16798-1 categories. With fan: equivalent t_op.";
+  }
+  const pct = (a) => a.map((n) => (all.length ? (100 * n) / all.length : 0));
+  const o5 = baseOpts("% of occupied hours");
+  o5.scales.x.ticks.autoSkip = false; o5.scales.x.ticks.maxRotation = 40;
+  o5.plugins.tooltip.callbacks.label = (c) => `${c.dataset.label}: ${c.parsed.y.toFixed(1)} % (${Math.round((c.parsed.y * all.length) / 100)} h)`;
+  mkChart("cCat", { type: "bar", data: { labels: tl, datasets: [
+    { label: "No fan (t_op)", data: pct(tc("top")), backgroundColor: warm },
+    { label: "With fan (equivalent t_op)", data: pct(tc("topEq")), backgroundColor: fan },
+  ] }, options: o5 });
 
   const on = results.zones[current].rows.filter((r) => r.speed !== "off");
   const o4 = baseOpts("Cooling effect, K");
@@ -769,6 +819,7 @@ function drawCharts() {
   ] }, options: o4 });
 }
 $("winLen").onchange = () => results && drawCharts();
+$("tMode").onchange = () => results && drawCharts();
 $("winStart").oninput = () => results && drawCharts();
 
 // ---------------------------------------------------------------- CSV

@@ -159,7 +159,8 @@ def adaptive_upper_cat2(epw):
     trm[0] = daily[-7:].mean()                       # start-up from the last week of the year
     for d in range(1, 365):
         trm[d] = 0.2 * daily[d - 1] + 0.8 * trm[d - 1]
-    limit = 0.33 * np.clip(trm, 10, 30) + 18.8 + 3   # the model is defined for 10-30 degC
+    # adaptive from 10 to 30 degC; below 10 degC the ordinary limit for living spaces (26 degC)
+    limit = np.where(trm < 10, 26.0, 0.33 * np.minimum(trm, 30) + 18.8 + 3)
     return np.repeat(limit, 24)                      # index 0 = hour ending 01:00 on 1 January
 
 
