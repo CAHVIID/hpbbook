@@ -636,7 +636,7 @@ function preview() {
   done = false; lastProg = null; hist = null; draw();
 }
 let running = false;
-// the first run waits for the Run button; after that, a changed input restarts the run
+// the first run, and the first after Stop, waits for the Run button; otherwise a changed input restarts the run
 let armed = false;
 const restart = () => { if (armed) start(); };
 async function start() {
@@ -1107,7 +1107,7 @@ $("fileIn").addEventListener("change", async (e) => {
 $("showMesh").addEventListener("click", (e) => { state.showMesh = !state.showMesh; e.currentTarget.setAttribute("aria-pressed", String(state.showMesh)); draw(); });
 for (const id of ["ozF", "ozW", "ozH"]) $(id).addEventListener("input", (e) => { state[id] = +e.target.value; syncLabels(); draw(); });
 $("run").addEventListener("click", () => { armed = true; start(); });
-$("stop").addEventListener("click", () => { stopReq = true; });
+$("stop").addEventListener("click", () => { stopReq = true; armed = false; });
 window.addEventListener("resize", draw);
 applyDims(); loadExample("single"); syncLabels(); preview();
 if (!navigator.gpu) $("nogpu").hidden = false;
