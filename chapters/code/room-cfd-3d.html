@@ -98,7 +98,7 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
         <input id="W" type="range" min="2" max="10" step="0.5" value="4"></label>
       <label for="H"><span class="row"><span>Ceiling height</span><span class="val" id="HV"></span></span>
         <input id="H" type="range" min="2.4" max="8" step="0.1" value="2.5"></label>
-      <p class="note">The exhaust sits in the back wall, 0.1–0.2 m below the ceiling, unless a layout places it.</p>
+      <p class="note">The exhaust is a 30 × 30 cm pressure outlet centred in the back wall, its top 0.1 m below the ceiling, unless a layout places it.</p>
     </div>
     <fieldset class="group" id="winSet">
       <h2>Window (facade)</h2>
@@ -200,7 +200,7 @@ Supply and exhaust:
   - spread tilts the jet outward from the centre of the inlet (negative tilts it inward), and swirl turns it around the centre, both in degrees from the normal. Positive swirl turns anticlockwise when seen from inside the room looking at the inlet. The tangential speeds are normal speed x tan(spread) and normal speed x tan(swirl), so keep the angles well below 90 degrees (e.g. a swirl diffuser: spread 20-30, swirl 45-65; a grille or window: 0, 0).
 
 Mesh:
-  - Everything snaps to the mesh cells (20, 10 or 5 cm). Each object must cover at least one cell (or for a thin plate or an opening, one cell face); make it larger or choose a finer mesh if the app reports that it covers nothing. A thin plate snaps to the nearest grid plane.
+  - Everything snaps to the mesh cells (40, 20, 10, 5, 3.5 or 2.5 cm). Each object must cover at least one cell (or for a thin plate or an opening, one cell face); make it larger or choose a finer mesh if the app reports that it covers nothing. A thin plate snaps to the nearest grid plane.
 
 The app lists the number of objects and the total heat gains under the text box, or the first error with its line number.
 
@@ -235,9 +235,12 @@ inlet, 1.7, 2.3, 1.2, 1.8, 2.7, 2.7, 0, 30, 65</pre>
       <label for="mesh">Mesh</label>
       <div class="meshrow">
         <select id="mesh">
+          <option value="0.4,0.4,0.2">Very coarse: 40 cm (quick look)</option>
           <option value="0.2,0.2,0.1">Coarse: 20 cm (fast)</option>
           <option value="0.1,0.1,0.1" selected>Medium: 10 cm</option>
           <option value="0.05,0.05,0.05">Fine: 5 cm (good GPU)</option>
+          <option value="0.035,0.035,0.035">Finer: 3.5 cm (strong GPU)</option>
+          <option value="0.025,0.025,0.025">Very fine: 2.5 cm (strong GPU, slow)</option>
         </select>
         <button type="button" class="tog" id="showMesh" aria-pressed="false" title="Draw the cell boundaries on the three views">Visualize mesh</button>
       </div>
@@ -1466,13 +1469,30 @@ function loadExample(key) {
 }
 
 const len = (v) => Math.abs(v * 10 - Math.round(v * 10)) < 1e-6 ? v.toFixed(1) : v.toFixed(2);     // 3.6 or 3.65
+// default exhaust: a 0.3 x 0.3 m pressure outlet centred in the back wall, its top 0.1 m below the ceiling;
+// on a mesh too coarse for it, it is widened to the nearest cell
+function defaultExhaust() {
+  const [, ny, nz] = meshN();
+  const span = (c, h, n, size) => {
+    const d = size / n, cc = (Math.min(Math.floor(c / d), n - 1) + 0.5) * d;
+    const hit = [...Array(n).keys()].some((i) => (i + 0.5) * d > c - h && (i + 0.5) * d < c + h);
+    return hit ? [Math.max(c - h, 0), Math.min(c + h, size)] : [Math.max(cc - 0.5 * d, 0), Math.min(cc + 0.5 * d, size)];
+  };
+  const [y0, y1] = span(W / 2, 0.15, ny, W), [z0, z1] = span(H - 0.25, 0.15, nz, H);
+  return { kind: "exhaust", x0: L, x1: L, y0, y1, z0, z1, spread: 0, swirl: 0 };
+}
+// the vents of a run: those of the layout, plus the default exhaust when the layout has none
+function caseVents() {
+  const v = layoutOn() ? state.layout.vents : [];
+  return v.some((o) => o.kind === "exhaust") ? v : [...v, defaultExhaust()];
+}
 // the openings as rectangles on the walls: from the layout, else the window and the back-wall exhaust
 const layoutVents = (kind) => (layoutOn() ? state.layout.vents.filter((v) => v.kind === kind) : []);
 function openings() {
   const [y0, y1] = winY();
   const inl = layoutVents("inlet"), exh = layoutVents("exhaust");
   return [...(inl.length ? inl : [{ kind: "inlet", x0: 0, x1: 0, y0: state.width >= W ? 0 : y0, y1: state.width >= W ? W : y1, z0: state.lo, z1: state.hi }]),
-          ...(exh.length ? exh : [{ kind: "exhaust", x0: L, x1: L, y0: 0, y1: W, z0: H - 0.2, z1: H - 0.1 }])];
+          ...(exh.length ? exh : [defaultExhaust()])];
 }
 function syncLabels() {
   $("widthV").textContent = len(state.width) + " m"; $("wyV").textContent = len(state.wy) + " m";
@@ -1548,11 +1568,11 @@ function makeCase() {
   if (layoutOn()) return Object.assign(defaultCase(), { L, W, H, nx, ny, nz, ach: state.ach, T_in: state.tin,
     inlet: { side: "left", start: state.lo, end: state.hi, y0: state.width >= W ? null : y0, y1: state.width >= W ? null : y1 },
     outlet: { side: "right", start: H - 0.2, end: H - 0.1 },
-    heat: state.layout.heat, floor_flux: state.layout.floor_flux, furniture: state.layout.furniture, vents: state.layout.vents,
+    heat: state.layout.heat, floor_flux: state.layout.floor_flux, furniture: state.layout.furniture, vents: caseVents(),
     turbulence: state.turb, advection: state.adv, t_end: 1800, t_avg: 600 });
   return Object.assign(defaultCase(), { L, W, H, nx, ny, nz, ach: state.ach, T_in: state.tin,
     inlet: { side: "left", start: state.lo, end: state.hi, y0: state.width >= W ? null : y0, y1: state.width >= W ? null : y1 },
-    outlet: { side: "right", start: H - 0.2, end: H - 0.1 },
+    outlet: { side: "right", start: H - 0.2, end: H - 0.1 }, vents: caseVents(),
     // height 0: the heat source collapses to a heated patch of floor (heat flux into the air at the floor)
     heat: state.hh > 0 ? [Object.assign(heatBox(), { power: Q })] : [],
     floor_flux: state.hh > 0 ? [] : [(({ x0, x1, y0, y1 }) => ({ x0, x1, y0, y1, power: Q }))(heatBox())], turbulence: state.turb, advection: state.adv, t_end: 1800, t_avg: 600 });
@@ -1900,6 +1920,7 @@ function drawOpenings(g, X, Y, sc, ax, bx, cax, cv) {
     if (a === undefined) continue;
     const col = o.kind === "inlet" ? [47, 127, 208] : [120, 128, 136], rgba = (al) => `rgba(${col[0]},${col[1]},${col[2]},${al})`;
     const r0 = (k) => Math.min(lo[k], hi[k]), r1 = (k) => Math.max(lo[k], hi[k]);
+    if (o.kind === "inlet") inletArrows(g, X, Y, o, a, lo, hi, size, ax, bx, cax, rgba(0.95));
     if (a === cax) {
       g.setLineDash([4, 3]); g.lineWidth = 1.4; g.strokeStyle = rgba(0.85);
       g.strokeRect(X(r0(ax)), Y(r1(bx)), (r1(ax) - r0(ax)) * sc, (r1(bx) - r0(bx)) * sc); g.setLineDash([]);
@@ -1912,6 +1933,36 @@ function drawOpenings(g, X, Y, sc, ax, bx, cax, cv) {
     g.stroke();
   }
   g.lineWidth = 1.4;
+}
+// small vectors of the supply direction at an inlet: the inward normal tilted by the spread and the swirl,
+// projected on the view; at the centre and near the edges, or (inlet facing the view) the tangential part only
+function inletArrows(g, X, Y, o, a, lo, hi, size, ax, bx, cax, col) {
+  const ts = Math.tan((o.spread || 0) * Math.PI / 180), tw = Math.tan((o.swirl || 0) * Math.PI / 180);
+  const nin = [0, 0, 0]; nin[a] = lo[a] > size[a] / 2 ? -1 : 1;
+  const cen = [0, 1, 2].map((k) => (lo[k] + hi[k]) / 2), half = [0, 1, 2].map((k) => Math.abs(hi[k] - lo[k]) / 2);
+  const dirAt = (r) => {                                      // r: unit vector in the wall plane from the centre
+    const t = [nin[1] * r[2] - nin[2] * r[1], nin[2] * r[0] - nin[0] * r[2], nin[0] * r[1] - nin[1] * r[0]];
+    return [0, 1, 2].map((k) => (a === cax ? 0 : nin[k]) + ts * r[k] + tw * t[k]);
+  };
+  const pts = [];
+  if (a === cax) {
+    if (!ts && !tw) return;
+    for (const [k, sg] of [[ax, 1], [ax, -1], [bx, 1], [bx, -1]]) {
+      const r = [0, 0, 0]; r[k] = sg; const p = [...cen]; p[k] += sg * 0.6 * half[k]; pts.push([p, dirAt(r)]);
+    }
+  } else {
+    const e = a === ax ? bx : ax;                            // the in-plane axis seen in this view
+    pts.push([cen, dirAt([0, 0, 0])]);
+    if (ts || tw) for (const sg of [1, -1]) { const r = [0, 0, 0]; r[e] = sg; const p = [...cen]; p[e] += sg * 0.7 * half[e]; pts.push([p, dirAt(r)]); }
+  }
+  g.strokeStyle = col; g.fillStyle = col; g.lineWidth = 1.5;
+  for (const [p, d] of pts) {
+    const x0 = X(p[ax]), y0 = Y(p[bx]), sx = X(p[ax] + d[ax]) - x0, sy = Y(p[bx] + d[bx]) - y0, m = Math.hypot(sx, sy);
+    if (m < 1e-9) continue;
+    const ux = sx / m, uy = sy / m, len = 14, x1 = x0 + ux * len, y1 = y0 + uy * len;
+    g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x1 - ux * 5 - uy * 3, y1 - uy * 5 + ux * 3); g.lineTo(x1 - ux * 5 + uy * 3, y1 - uy * 5 - ux * 3); g.closePath(); g.fill();
+  }
 }
 function cutLine(g, X, Y, horiz, v, a0, a1) {
   if (!state.showCuts) return;
