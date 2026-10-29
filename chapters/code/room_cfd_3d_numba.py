@@ -1,6 +1,6 @@
 """room_cfd_3d_numba.py: room_cfd_3d.py with the time step compiled by Numba (test version).
 
-Same model, same inputs (Case, Opening, HeatBlock, FloorFlux from room_cfd_3d.py) and the same results
+Same model, same inputs (Case, Opening, HeatBlock, FloorFlux, Furniture from room_cfd_3d.py) and the same results
 to round-off, but each stage of a time step is one compiled loop over the cells, run in parallel on all
 processor cores. The pressure equation uses the same multigrid solver as room_cfd_3d.py.
 Needs the numba package (pip install numba). The first run compiles the loops (some tens of seconds);
@@ -12,7 +12,8 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import splu
 from numba import njit, prange
-from room_cfd_3d import (Case, Opening, HeatBlock, FloorFlux, Multigrid, boundaries, occupied_zone, plot_slices,  # noqa: F401
+from room_cfd_3d import (Case, Opening, HeatBlock, FloorFlux, Furniture, Multigrid, boundaries, occupied_zone,  # noqa: F401
+                         plot_slices, read_layout, obstacles, _pressure_matrix,
                          _lap1, _edge, _sl, RHO, CP, G, NU_AIR, WALL, INLET, OUTLET, CMU, C1, C2, SK, SE, KAP, EWF)
 
 
@@ -142,8 +143,9 @@ def _k_edge_visc12(nu_c, k, ke, wd, out):
 
 
 @njit(inline="always")
-def _mterm(U, Uc, c, a, ne, nu_c, i, j, k, u0, h, tvd):
-    """Advection and viscous term along axis a for velocity component c at the face (i, j, k)."""
+def _mterm(U, Uc, c, a, ne, nu_c, i, j, k, u0, h, tvd, M, obs, kt, ke):
+    """Advection and viscous term along axis a for velocity component c at the face (i, j, k).
+    With furniture (obs), a blocked plane normal to a is a no-slip wall for the faces on either side."""
     if a == c:
         vel = u0
         der = _ddx(_gv(Uc, c, a, i, j, k, -2), _gv(Uc, c, a, i, j, k, -1), u0,
@@ -158,11 +160,24 @@ def _mterm(U, Uc, c, a, ne, nu_c, i, j, k, u0, h, tvd):
                    _gv(Uc, c, a, i, j, k, 1), _gv(Uc, c, a, i, j, k, 2), vel, h, tvd)
         f1 = _at(ne, a, i, j, k, 1) * (_gv(Uc, c, a, i, j, k, 1) - u0) / h       # viscosity on the edges
         f0 = _at(ne, a, i, j, k, 0) * (u0 - _gv(Uc, c, a, i, j, k, -1)) / h
+        if obs:
+            Ma = M[a]
+            blo = _at2(Ma, a, 0, c, -1, i, j, k) == 0 and _at2(Ma, a, 0, c, 0, i, j, k) == 0
+            bhi = _at2(Ma, a, 1, c, -1, i, j, k) == 0 and _at2(Ma, a, 1, c, 0, i, j, k) == 0
+            if blo or bhi:
+                if ke:
+                    nuw = _nu_wall(0.5 * (_at(kt, c, i, j, k, -1) + _at(kt, c, i, j, k, 0)), h / 2)
+                else:
+                    nuw = 0.5 * (_at(nu_c, c, i, j, k, -1) + _at(nu_c, c, i, j, k, 0))
+                if blo:
+                    f0 = nuw * u0 / (h / 2)
+                if bhi:
+                    f1 = -nuw * u0 / (h / 2)
     return -vel * der + (f1 - f0) / h
 
 
 @njit(parallel=True, cache=True)
-def _k_mom_u(U, us, nu_c, ne01, ne02, d, dt, tvd):
+def _k_mom_u(U, us, nu_c, ne01, ne02, d, dt, tvd, M, obs, kt, ke):
     """Predictor for u on the interior x faces: advection (upwind or TVD) and viscous terms along x, y, z."""
     u = U[0]
     n0, n1, n2 = u.shape
@@ -171,14 +186,14 @@ def _k_mom_u(U, us, nu_c, ne01, ne02, d, dt, tvd):
         for j in range(n1):
             for k in range(n2):
                 u0 = u[i, j, k]
-                rhs = 0.0 + _mterm(U, u, 0, 0, ne01, nu_c, i, j, k, u0, d[0], tvd)
-                rhs = rhs + _mterm(U, u, 0, 1, ne01, nu_c, i, j, k, u0, d[1], tvd)
-                rhs = rhs + _mterm(U, u, 0, 2, ne02, nu_c, i, j, k, u0, d[2], tvd)
+                rhs = 0.0 + _mterm(U, u, 0, 0, ne01, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke)
+                rhs = rhs + _mterm(U, u, 0, 1, ne01, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke)
+                rhs = rhs + _mterm(U, u, 0, 2, ne02, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke)
                 us[i, j, k] = u0 + dt * rhs
 
 
 @njit(parallel=True, cache=True)
-def _k_mom_v(U, vs, nu_c, ne01, ne12, d, dt, tvd):
+def _k_mom_v(U, vs, nu_c, ne01, ne12, d, dt, tvd, M, obs, kt, ke):
     """Predictor for v on the interior y faces."""
     v = U[1]
     n0, n1, n2 = v.shape
@@ -187,14 +202,14 @@ def _k_mom_v(U, vs, nu_c, ne01, ne12, d, dt, tvd):
         for j in range(1, n1 - 1):
             for k in range(n2):
                 u0 = v[i, j, k]
-                rhs = 0.0 + _mterm(U, v, 1, 0, ne01, nu_c, i, j, k, u0, d[0], tvd)
-                rhs = rhs + _mterm(U, v, 1, 1, ne01, nu_c, i, j, k, u0, d[1], tvd)
-                rhs = rhs + _mterm(U, v, 1, 2, ne12, nu_c, i, j, k, u0, d[2], tvd)
+                rhs = 0.0 + _mterm(U, v, 1, 0, ne01, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke)
+                rhs = rhs + _mterm(U, v, 1, 1, ne01, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke)
+                rhs = rhs + _mterm(U, v, 1, 2, ne12, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke)
                 vs[i, j, k] = u0 + dt * rhs
 
 
 @njit(parallel=True, cache=True)
-def _k_mom_w(U, ws, nu_c, ne02, ne12, T, d, dt, tvd, gb, Tref):
+def _k_mom_w(U, ws, nu_c, ne02, ne12, T, d, dt, tvd, gb, Tref, M, obs, kt, ke):
     """Predictor for w on the interior z faces, with buoyancy."""
     w = U[2]
     n0, n1, n2 = w.shape
@@ -203,9 +218,9 @@ def _k_mom_w(U, ws, nu_c, ne02, ne12, T, d, dt, tvd, gb, Tref):
         for j in range(n1):
             for k in range(1, n2 - 1):
                 u0 = w[i, j, k]
-                rhs = 0.0 + _mterm(U, w, 2, 0, ne02, nu_c, i, j, k, u0, d[0], tvd)
-                rhs = rhs + _mterm(U, w, 2, 1, ne12, nu_c, i, j, k, u0, d[1], tvd)
-                rhs = rhs + _mterm(U, w, 2, 2, ne12, nu_c, i, j, k, u0, d[2], tvd)
+                rhs = 0.0 + _mterm(U, w, 2, 0, ne02, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke)
+                rhs = rhs + _mterm(U, w, 2, 1, ne12, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke)
+                rhs = rhs + _mterm(U, w, 2, 2, ne12, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke)
                 rhs = rhs + gb * (0.5 * (T[i, j, k - 1] + T[i, j, k]) - Tref)
                 ws[i, j, k] = u0 + dt * rhs
 
@@ -487,9 +502,20 @@ def run(case: Case, verbose=False, monitor_every=50):
     xc, yc, zc = [(np.arange(n[k]) + 0.5) * d[k] for k in range(3)]
     X, Y, Z = np.meshgrid(xc, yc, zc, indexing="ij")
     lwall = np.minimum.reduce([X, case.L - X, Y, case.W - Y, Z, case.H - Z])
+    # furniture: open-face masks and solid cells, as in room_cfd_3d
+    obs = bool(case.furniture)
+    if obs:
+        Mk, solid = obstacles(case)
+    else:
+        Mk, solid = [np.ones((1, 1, 1)) for _ in range(3)], np.zeros(n, bool)
+    Mt = tuple(Mk)
     S = np.zeros(n)
     for b in case.heat:
         cells = (X > b.x0) & (X < b.x1) & (Y > b.y0) & (Y < b.y1) & (Z > b.z0) & (Z < b.z1)
+        if not cells.any():
+            raise ValueError("a heat source covers no cell centres: make it larger or refine the mesh")
+        if (cells & solid).any():
+            raise ValueError("a heat source overlaps furniture: move it out of the furniture")
         S[cells] += b.power / (cells.sum() * dx * dy * dz)
     qfloor = np.zeros((nx, ny))
     for f in case.floor_flux:
@@ -526,14 +552,17 @@ def run(case: Case, verbose=False, monitor_every=50):
     ne = {pq: np.zeros(wd[pq].shape) for pq in pairs}
 
     # pressure Poisson matrix, as in room_cfd_3d
-    I = [sp.identity(m, format="csr") for m in n]
-    Amat = (sp.kron(sp.kron(_lap1(nx, dx), I[1]), I[2]) + sp.kron(sp.kron(I[0], _lap1(ny, dy)), I[2])
-            + sp.kron(sp.kron(I[0], I[1]), _lap1(nz, dz))).tolil()
-    extra = np.zeros(n)
-    extra[0][bL == OUTLET] -= 2.0 / dx ** 2
-    extra[-1][bR == OUTLET] -= 2.0 / dx ** 2
-    extra[:, :, -1][bT == OUTLET] -= 2.0 / dz ** 2
-    Amat = (Amat.tocsr() + sp.diags(extra.ravel())).tocsc()
+    if obs:
+        Amat = _pressure_matrix(n, d, Mk, bnd)
+    else:
+        I = [sp.identity(m, format="csr") for m in n]
+        Amat = (sp.kron(sp.kron(_lap1(nx, dx), I[1]), I[2]) + sp.kron(sp.kron(I[0], _lap1(ny, dy)), I[2])
+                + sp.kron(sp.kron(I[0], I[1]), _lap1(nz, dz))).tolil()
+        extra = np.zeros(n)
+        extra[0][bL == OUTLET] -= 2.0 / dx ** 2
+        extra[-1][bR == OUTLET] -= 2.0 / dx ** 2
+        extra[:, :, -1][bT == OUTLET] -= 2.0 / dz ** 2
+        Amat = (Amat.tocsr() + sp.diags(extra.ravel())).tocsc()
     if case.pressure == "multigrid":
         mgs = FastMultigrid(-Amat, n); p_last = np.zeros(Amat.shape[0])
 
@@ -578,20 +607,29 @@ def run(case: Case, verbose=False, monitor_every=50):
 
         # ---- momentum ----
         Us = tuple(a.copy() for a in U)
-        _k_mom_u(U, Us[0], nu_c, ne[(0, 1)], ne[(0, 2)], da, dt, tvd)
-        _k_mom_v(U, Us[1], nu_c, ne[(0, 1)], ne[(1, 2)], da, dt, tvd)
-        _k_mom_w(U, Us[2], nu_c, ne[(0, 2)], ne[(1, 2)], T, da, dt, tvd, G * beta, Tref)
+        _k_mom_u(U, Us[0], nu_c, ne[(0, 1)], ne[(0, 2)], da, dt, tvd, Mt, obs, k, ke)
+        _k_mom_v(U, Us[1], nu_c, ne[(0, 1)], ne[(1, 2)], da, dt, tvd, Mt, obs, k, ke)
+        _k_mom_w(U, Us[2], nu_c, ne[(0, 2)], ne[(1, 2)], T, da, dt, tvd, G * beta, Tref, Mt, obs, k, ke)
+        if obs:
+            for c in range(3):
+                Us[c][...] *= Mk[c]                            # no flow through furniture
 
         # ---- projection ----
         _k_bc_rhs(Us[0], Us[1], Us[2], bL, bR, bT, U_in, da, dt, rhs)
         p = solve(rhs).reshape(n)
         _k_correct(Us[0], Us[1], Us[2], p, bL, bR, bT, da, dt)
+        if obs:
+            for c in range(3):
+                Us[c][...] *= Mk[c]
         U = Us
         if mon:
             div_max = np.abs(sum(np.diff(U[c], axis=c) / d[c] for c in range(3))).max()
 
         # ---- energy ----
         _k_fluxes(T, U, inL, inR, case.T_in, alpha_c, da, tvd, F[0], F[1], F[2])
+        if obs:
+            for c in range(3):
+                F[c] *= Mk[c]                             # furniture is adiabatic
         F[2][:, :, 0] += qfloor / (RHO * CP)              # heat flux up into the air through the floor
         _k_div(F[0], F[1], F[2], da, div)
         T_old = T
@@ -602,8 +640,14 @@ def run(case: Case, verbose=False, monitor_every=50):
             nut = nu_c - NU_AIR
             _k_production(U, nut, k, wall_cell, ypw, da, P)
             _k_fluxes(k, U, inL, inR, k_in, NU_AIR + nut / SK, da, False, Fk[0], Fk[1], Fk[2])
+            if obs:
+                for c in range(3):
+                    Fk[c] *= Mk[c]
             _k_div(Fk[0], Fk[1], Fk[2], da, div)
             _k_fluxes(eps, U, inL, inR, e_in, NU_AIR + nut / SE, da, False, Fk[0], Fk[1], Fk[2])
+            if obs:
+                for c in range(3):
+                    Fk[c] *= Mk[c]
             _k_div(Fk[0], Fk[1], Fk[2], da, div2)
             kn, en = np.empty(n), np.empty(n)
             _k_keps_update(k, eps, div, div2, P, nut, T_old, wall_cell, ypw, dz, dt, -G * beta, case.Pr_t, kn, en)
@@ -633,7 +677,7 @@ def run(case: Case, verbose=False, monitor_every=50):
         avg[key] /= wa
     q_out = (avg["u"][nx][outR].sum() - avg["u"][0][outL].sum()) * dy * dz + avg["w"][:, :, nz][outT].sum() * dx * dy
     T_out = np.concatenate([avg["T"][-1][outR], avg["T"][0][outL], avg["T"][:, :, -1][outT]]).mean()
-    res = dict(case=case, x=xc, y=yc, z=zc, dx=dx, dy=dy, dz=dz, U_in=U_in, h_in=h_in, steps=step,
+    res = dict(case=case, x=xc, y=yc, z=zc, dx=dx, dy=dy, dz=dz, U_in=U_in, h_in=h_in, steps=step, solid=solid,
                q_in=case.q, q_out=q_out, T_out=T_out, T_out_expected=T_mix,
                cg_iters=mgs.iters if case.pressure == "multigrid" else 0,
                history={key: np.array(a) for key, a in hist.items()})
