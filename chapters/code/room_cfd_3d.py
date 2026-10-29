@@ -26,15 +26,18 @@ Pressure (Case.pressure):
 
 Boundary conditions
   walls   : no slip, adiabatic (floor, ceiling, facade, back wall and both side walls)
-  inlet   : in the facade or back wall, uniform normal speed U = q / A_open, temperature T_in
-  outlet  : in the facade, back wall or ceiling, p = 0, zero-gradient velocity and temperature
+  inlet   : uniform normal speed U = q / A_open, temperature T_in
+  outlet  : p = 0, zero-gradient velocity and temperature
+  Case.inlet and Case.outlet are one opening each in the facade, back wall or ceiling; Vent openings
+  (Case.vents, or inlet and exhaust lines in a layout file) can sit anywhere on any of the six walls.
 Heat sources
   HeatBlock: total power (W) spread over a box; FloorFlux: total power (W) over a floor rectangle
 Furniture (Case.furniture)
   Furniture: a solid box (no air inside), or, with zero thickness along one axis, a thin plate (a table
   top, a partition) that blocks the cell faces in its plane. Both are adiabatic; the air next to them
   feels a no-slip wall (log law with k-epsilon), but the k-epsilon wall cells are only at the room walls.
-  read_layout() reads heat sources, heated floor areas and furniture from a CSV file (one box per line).
+  read_layout() reads heat sources, heated floor areas, furniture, inlets and exhausts from a CSV file
+  (one box per line).
 
 Contact: Christian Hviid, cahv@dtu.dk
 
@@ -80,6 +83,12 @@ class Furniture:
 
 
 @dataclass
+class Vent:
+    kind: str            # "inlet" or "exhaust"
+    x0: float; x1: float; y0: float; y1: float; z0: float; z1: float   # zero size along the axis normal to its wall
+
+
+@dataclass
 class Case:
     L: float = 5.0              # room depth (m), x
     W: float = 4.0              # room width (m), y
@@ -95,6 +104,7 @@ class Case:
     heat: list = field(default_factory=list)
     floor_flux: list = field(default_factory=list)
     furniture: list = field(default_factory=list)
+    vents: list = field(default_factory=list)   # Vent openings; inlets replace `inlet`, exhausts replace `outlet`
     turbulence: str = "k-epsilon"  # "k-epsilon" (default), "chen-xu" or "constant"
     Tu_in: float = 0.04         # inlet turbulence intensity, used by "k-epsilon"
     nu_t: float = 2e-3          # eddy viscosity (m²/s) for "constant"
@@ -231,12 +241,13 @@ def read_layout(src):
 
         type, x0, x1, y0, y1, z0, z1, power_W
 
-    type is heat (a HeatBlock), floor (a FloorFlux; z0 and z1 are ignored) or furniture (a solid box, or a
-    thin plate when one of its sizes is zero). Coordinates in m, as in Case. Blank lines, lines starting
-    with # and a header line are skipped. Returns dict(heat=[...], floor_flux=[...], furniture=[...])."""
+    type is heat (a HeatBlock), floor (a FloorFlux; z0 and z1 are ignored), furniture (a solid box, or a
+    thin plate when one of its sizes is zero), or inlet or exhaust (a Vent: a rectangle on a wall, with zero
+    size along the axis normal to the wall). Coordinates in m, as in Case. Blank lines, lines starting
+    with # and a header line are skipped. Returns dict(heat=[...], floor_flux=[...], furniture=[...], vents=[...])."""
     import os
     text = open(src, encoding="utf-8").read() if "\n" not in src and os.path.exists(src) else src
-    out = dict(heat=[], floor_flux=[], furniture=[])
+    out = dict(heat=[], floor_flux=[], furniture=[], vents=[])
     for no, line in enumerate(text.splitlines(), 1):
         f = [x.strip() for x in line.split("#")[0].replace(";", ",").split(",")]
         if not f[0] or f[0].lower() == "type":
@@ -253,8 +264,10 @@ def read_layout(src):
             out["floor_flux"].append(FloorFlux(x0, x1, y0, y1, pw))
         elif kind == "furniture":
             out["furniture"].append(Furniture(x0, x1, y0, y1, z0, z1))
+        elif kind in ("inlet", "exhaust"):
+            out["vents"].append(Vent(kind, x0, x1, y0, y1, z0, z1))
         else:
-            raise ValueError(f"layout line {no}: unknown type {f[0]!r} (heat, floor or furniture)")
+            raise ValueError(f"layout line {no}: unknown type {f[0]!r} (heat, floor, furniture, inlet or exhaust)")
     return out
 
 
@@ -313,9 +326,8 @@ def _pressure_matrix(n, d, open_, bnd):
         cf = cf.ravel(); m = cf > 0
         rows += [a[m], b[m]]; cols += [b[m], a[m]]; vals += [cf[m], cf[m]]
         np.add.at(diag.ravel(), a[m], -cf[m]); np.add.at(diag.ravel(), b[m], -cf[m])
-    diag[0][bnd[(0, 0)] == OUTLET] -= 2.0 / d[0] ** 2
-    diag[-1][bnd[(0, 1)] == OUTLET] -= 2.0 / d[0] ** 2
-    diag[:, :, -1][bnd[(2, 1)] == OUTLET] -= 2.0 / d[2] ** 2
+    for (a, side), m in bnd.items():
+        _wall(diag, a, side, n[a] - 1)[m == OUTLET] -= 2.0 / d[a] ** 2
     diag[diag == 0] = -1.0 / min(d) ** 2
     rows.append(idx.ravel()); cols.append(idx.ravel()); vals.append(diag.ravel())
     N = nx * ny * nz
@@ -334,7 +346,11 @@ def boundaries(case):
     b = {(0, 0): np.zeros((ny, nz), int), (0, 1): np.zeros((ny, nz), int),
          (1, 0): np.zeros((nx, nz), int), (1, 1): np.zeros((nx, nz), int),
          (2, 0): np.zeros((nx, ny), int), (2, 1): np.zeros((nx, ny), int)}
+    vents = getattr(case, "vents", [])
+    has = {k: any(v.kind == k for v in vents) for k in ("inlet", "exhaust")}
     for op, kind in ((case.inlet, INLET), (case.outlet, OUTLET)):
+        if has["inlet" if kind == INLET else "exhaust"]:
+            continue                                      # replaced by the vents
         y0 = 0.0 if op.y0 is None else op.y0
         y1 = case.W if op.y1 is None else op.y1
         iy = (yc > y0) & (yc < y1)
@@ -342,8 +358,6 @@ def boundaries(case):
             m = iy[:, None] & ((zc > op.start) & (zc < op.end))[None, :]
             key = (0, 0) if op.side == "left" else (0, 1)
         elif op.side == "top":
-            if kind == INLET:
-                raise ValueError("inlets must be in the facade (left) or the back wall (right)")
             m = ((xc > op.start) & (xc < op.end))[:, None] & iy[None, :]
             key = (2, 1)
         else:
@@ -351,7 +365,36 @@ def boundaries(case):
         if not m.any():
             raise ValueError(f"the {op.side} opening covers no cell faces: refine the mesh")
         b[key][m] = kind
+    size, cen = (case.L, case.W, case.H), (xc, yc, zc)
+    for no, v in enumerate(vents, 1):
+        if v.kind not in ("inlet", "exhaust"):
+            raise ValueError(f"vent {no}: kind must be inlet or exhaust, not {v.kind!r}")
+        lo, hi = (v.x0, v.y0, v.z0), (v.x1, v.y1, v.z1)
+        a = [k for k in range(3) if abs(hi[k] - lo[k]) < 1e-9]
+        side = None
+        if len(a) == 1:
+            a = a[0]; side = 0 if abs(lo[a]) < 1e-6 else 1 if abs(lo[a] - size[a]) < 1e-6 else None
+        if side is None:
+            raise ValueError(f"{v.kind} {no} is not on a wall: give it zero size along one axis, at 0 or at the room size")
+        o1, o2 = [k for k in range(3) if k != a]
+        sel = [(cen[k] > min(lo[k], hi[k])) & (cen[k] < max(lo[k], hi[k])) for k in (o1, o2)]
+        m = sel[0][:, None] & sel[1][None, :]
+        if not m.any():
+            raise ValueError(f"{v.kind} {no} covers no cell faces: make it larger or refine the mesh")
+        if (b[(a, side)][m] != WALL).any():
+            raise ValueError(f"{v.kind} {no} overlaps another opening")
+        b[(a, side)][m] = INLET if v.kind == "inlet" else OUTLET
+    if not any((m == INLET).any() for m in b.values()):
+        raise ValueError("the room has no inlet")
+    if not any((m == OUTLET).any() for m in b.values()):
+        raise ValueError("the room has no exhaust")
     return b
+
+
+def _wall(a, axis, side, n):
+    """The boundary layer of a (faces or cells) on one side along axis: index 0 or n."""
+    idx = [slice(None)] * a.ndim; idx[axis] = 0 if side == 0 else n
+    return a[tuple(idx)]
 
 
 def run(case: Case, verbose=False, monitor_every=50):
@@ -361,8 +404,8 @@ def run(case: Case, verbose=False, monitor_every=50):
     nx, ny, nz = n; dx, dy, dz = d
     shp = [tuple(n[k] + (1 if k == c else 0) for k in range(3)) for c in range(3)]
     bnd = boundaries(case)
-    bL, bR, bT = bnd[(0, 0)], bnd[(0, 1)], bnd[(2, 1)]
-    A_in = ((bL == INLET).sum() + (bR == INLET).sum()) * dy * dz
+    area = (dy * dz, dx * dz, dx * dy)                     # face area of the walls normal to x, y, z
+    A_in = sum((m == INLET).sum() * area[a] for (a, side), m in bnd.items())
     U_in = case.q / A_in
     h_in = A_in / case.W                                  # mean opening height (for the k-eps inlet length)
 
@@ -451,32 +494,27 @@ def run(case: Case, verbose=False, monitor_every=50):
         return NU_AIR + 0.03874 * np.sqrt(uc[0] ** 2 + uc[1] ** 2 + uc[2] ** 2) * lwall
 
     def fluxes(phi, phi_in, D, tvd):
-        """Face fluxes (advection + diffusion) of a cell-centred scalar along x, y and z."""
+        """Face fluxes (advection + diffusion) of a cell-centred scalar along x, y and z. Inlet faces carry phi_in."""
         F = []
         for c in range(3):
-            if c == 0:
-                lo = np.where(bL == INLET, phi_in, phi[0])[None]
-                hi = np.where(bR == INLET, phi_in, phi[-1])[None]
-                E = np.concatenate([lo, lo, phi, hi, hi], axis=0)
-            else:
-                E = _edge(phi, c, 2)
+            lo = np.expand_dims(np.where(bnd[(c, 0)] == INLET, phi_in, _wall(phi, c, 0, 0)), c)
+            hi = np.expand_dims(np.where(bnd[(c, 1)] == INLET, phi_in, _wall(phi, c, 1, n[c] - 1)), c)
+            E = np.concatenate([lo, lo, phi, hi, hi], axis=c)
             Fc = U[c] * _faces(E, U[c], tvd, c)
             inner = _sl(Fc, c, 1, -1)
             inner -= 0.5 * (_sl(D, c, 1, None) + _sl(D, c, 0, -1)) * np.diff(phi, axis=c) / d[c]
             F.append(Fc * Mk[c] if obs else Fc)          # nothing passes through furniture
-        F[2][:, :, 0] = 0.0
+        F[2][:, :, 0] = np.where(bnd[(2, 0)] == WALL, 0.0, F[2][:, :, 0])
         return F
 
     def divergence(F):
         return sum(np.diff(F[c], axis=c) / d[c] for c in range(3))
 
     def apply_bc(V):
-        u, v, w = V
-        u[0] = np.where(bL == INLET, U_in, np.where(bL == OUTLET, u[1], 0.0))
-        u[nx] = np.where(bR == INLET, -U_in, np.where(bR == OUTLET, u[nx - 1], 0.0))
-        v[:, 0] = 0.0; v[:, ny] = 0.0
-        w[:, :, 0] = 0.0
-        w[:, :, nz] = np.where(bT == OUTLET, w[:, :, nz - 1], 0.0)
+        # normal velocity on the six walls: inflow at the inlets, zero gradient at the outlets, 0 at the walls
+        for (a, side), m in bnd.items():
+            face, nbr, sgn = (0, 1, 1.0) if side == 0 else (n[a], n[a] - 1, -1.0)
+            _wall(V[a], a, side, face)[...] = np.where(m == INLET, sgn * U_in, np.where(m == OUTLET, _wall(V[a], a, 1, nbr), 0.0))
 
     # pressure Poisson matrix: zero gradient at walls and inlets, p = 0 at the outlet faces
     I = [sp.identity(m, format="csr") for m in n]
@@ -486,9 +524,8 @@ def run(case: Case, verbose=False, monitor_every=50):
         Amat = (sp.kron(sp.kron(_lap1(nx, dx), I[1]), I[2]) + sp.kron(sp.kron(I[0], _lap1(ny, dy)), I[2])
                 + sp.kron(sp.kron(I[0], I[1]), _lap1(nz, dz))).tolil()
         extra = np.zeros(n)
-        extra[0][bL == OUTLET] -= 2.0 / dx ** 2
-        extra[-1][bR == OUTLET] -= 2.0 / dx ** 2
-        extra[:, :, -1][bT == OUTLET] -= 2.0 / dz ** 2
+        for (a, side), m in bnd.items():
+            _wall(extra, a, side, n[a] - 1)[m == OUTLET] -= 2.0 / d[a] ** 2
         Amat = (Amat.tocsr() + sp.diags(extra.ravel())).tocsc()
     if case.pressure == "multigrid":
         mgs = Multigrid(-Amat, n); p_last = np.zeros(Amat.shape[0])
@@ -510,7 +547,15 @@ def run(case: Case, verbose=False, monitor_every=50):
 
     hist = {key: [] for key in ("t", "du", "dv", "dw", "dT", "div", "imb", "v_floor", "T_exh")}
     mon_pt = (min(int(1.0 / dx), nx - 1), ny // 2, min(int(0.1 / dz), nz - 1))
-    outR, outL, outT = bR == OUTLET, bL == OUTLET, bT == OUTLET
+    outs = [(a, side, m == OUTLET) for (a, side), m in bnd.items() if (m == OUTLET).any()]
+
+    def exhaust_T(T_):
+        return np.concatenate([_wall(T_, a, side, n[a] - 1)[o] for a, side, o in outs]).mean()
+
+    def net_out(F_):
+        """Net outflow through the room walls of a face field (u, v, w or the fluxes F), times the face area."""
+        return sum(((-1.0 if side == 0 else 1.0) * _wall(F_[a], a, side, n[a]) * area[a]).sum()
+                   for (a, side) in bnd)
 
     def cell_speed(V):
         uc = [0.5 * (_sl(V[c], c, 1, None) + _sl(V[c], c, 0, -1)) for c in range(3)]
@@ -566,9 +611,9 @@ def run(case: Case, verbose=False, monitor_every=50):
         p = solve((div / dt).ravel()).reshape(n)
         for c in range(3):
             _sl(Us[c], c, 1, -1)[...] -= dt * np.diff(p, axis=c) / d[c]
-        Us[0][0][outL] -= dt * (p[0][outL] - 0.0) / (dx / 2)
-        Us[0][nx][outR] -= dt * (0.0 - p[-1][outR]) / (dx / 2)
-        Us[2][:, :, nz][outT] -= dt * (0.0 - p[:, :, -1][outT]) / (dz / 2)
+        for a, side, o in outs:                           # p = 0 just outside the outlets
+            pw = _wall(p, a, side, n[a] - 1)[o]
+            _wall(Us[a], a, side, 0 if side == 0 else n[a])[o] -= dt * (pw if side == 0 else -pw) / (d[a] / 2)
         if obs:
             for c in range(3):
                 Us[c] *= Mk[c]
@@ -606,8 +651,9 @@ def run(case: Case, verbose=False, monitor_every=50):
 
         if mon:
             rms = lambda a: float(np.sqrt(np.mean(a * a)))
-            q_open = ((F[0][-1].sum() - F[0][0].sum()) * dy * dz + F[2][:, :, -1].sum() * dx * dy)   # K m³/s
-            T_exh = np.concatenate([T[-1][outR], T[0][outL], T[:, :, -1][outT]]).mean()
+            q_open = net_out(F)                           # K m³/s through the openings (the floor flux is a source)
+            q_open += (qfloor / (RHO * CP)).sum() * dx * dy
+            T_exh = exhaust_T(T)
             i_, j_, k_ = mon_pt
             for key, val in (("t", t + dt), ("du", rms(U[0] - U0[0]) / dt), ("dv", rms(U[1] - U0[1]) / dt),
                              ("dw", rms(U[2] - U0[2]) / dt), ("dT", rms(T - T0_) / dt), ("div", div_max),
@@ -626,8 +672,8 @@ def run(case: Case, verbose=False, monitor_every=50):
 
     for key in avg:
         avg[key] /= wa
-    q_out = (avg["u"][nx][outR].sum() - avg["u"][0][outL].sum()) * dy * dz + avg["w"][:, :, nz][outT].sum() * dx * dy
-    T_out = np.concatenate([avg["T"][-1][outR], avg["T"][0][outL], avg["T"][:, :, -1][outT]]).mean()
+    q_out = sum(((-1.0 if side == 0 else 1.0) * _wall(avg["uvw"[a]], a, side, n[a])[o] * area[a]).sum() for a, side, o in outs)
+    T_out = exhaust_T(avg["T"])
     res = dict(case=case, x=xc, y=yc, z=zc, dx=dx, dy=dy, dz=dz, U_in=U_in, h_in=h_in, steps=step, solid=solid,
                q_in=case.q, q_out=q_out, T_out=T_out, T_out_expected=T_mix,
                cg_iters=mgs.iters if case.pressure == "multigrid" else 0,

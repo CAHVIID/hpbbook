@@ -97,13 +97,9 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
         <input id="W" type="range" min="2" max="8" step="0.5" value="4"></label>
       <label for="H"><span class="row"><span>Ceiling height</span><span class="val" id="HV"></span></span>
         <input id="H" type="range" min="2.4" max="4" step="0.1" value="2.5"></label>
-      <label for="exhaust">Exhaust
-        <select id="exhaust">
-          <option value="back">Back wall, 0.1–0.2 m below the ceiling</option>
-          <option value="ceiling">Ceiling, centre, 0.43 × 0.43 m</option>
-        </select></label>
+      <p class="note">The exhaust sits in the back wall, 0.1–0.2 m below the ceiling, unless a layout places it.</p>
     </div>
-    <div class="group">
+    <fieldset class="group" id="winSet">
       <h2>Window (facade)</h2>
       <label for="preset">Type
         <select id="preset">
@@ -122,7 +118,8 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
         <input id="lo" type="range" min="0" max="2.3" step="0.1" value="0.9"></label>
       <label for="hi"><span class="row"><span>Top edge</span><span class="val" id="hiV"></span></span>
         <input id="hi" type="range" min="0.2" max="2.5" step="0.1" value="2.1"></label>
-    </div>
+      <p class="note" id="winNote" hidden>The inlets come from the layout.</p>
+    </fieldset>
     <div class="group">
       <h2>Air and heat</h2>
       <label for="tin"><span class="row"><span>Supply temperature</span><span class="val" id="tinV"></span></span>
@@ -165,7 +162,7 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
           <input type="file" id="fileIn" accept=".csv,.txt,text/csv,text/plain" hidden>
           <textarea id="layoutText" spellcheck="false" aria-label="Layout, one box per line"></textarea>
           <p class="note" id="layoutNote"></p>
-          <p class="note">One box per line: type, x0, x1, y0, y1, z0, z1, power_W, in m from the facade (x), the left wall (y) and the floor (z). Types: heat, floor (heated floor patch, z ignored) and furniture. Furniture with zero size along one axis is a thin plate, such as a table top or a partition.</p>
+          <p class="note">One box per line: type, x0, x1, y0, y1, z0, z1, power_W, in m from the facade (x), the left wall (y) and the floor (z). Types: heat, floor (heated floor patch, z ignored), furniture, inlet and exhaust. Furniture with zero size along one axis is a thin plate, such as a table top or a partition. An inlet or exhaust is a rectangle on a wall, with zero size along the axis normal to it (x = 0 is the facade); inlets in a layout replace the window and exhausts replace the back-wall exhaust.</p>
         </div>
       </details>
     </div>
@@ -310,7 +307,7 @@ const $ = (id) => document.getElementById(id);
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const fmt = (x, d = 2) => Number.isFinite(x) ? x.toFixed(d) : "–";
 let L = 5, W = 4, H = 2.5;
-const state = { preset: "window", wy: 2, width: 1.2, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, L: 5, W: 4, H: 2.5, hx: 2.5, hy: 2, hw: 0.8, hd: 0.6, hh: 1.2, heatCentred: true, showCuts: true, showOZ: true, iso: { T: 24, speed: 0.15, DR: 20 }, mesh: [0.1, 0.1, 0.1], turb: "k-epsilon", adv: "tvd", field: "T", ycut: 2, zcut: 0.1, xcut: 2.5, xcutCentred: true, showMesh: false, exhaust: "back", ozF: 0.6, ozW: 0.6, ozH: 1.8, useLayout: false, layout: null, layoutErr: "" };
+const state = { preset: "window", wy: 2, width: 1.2, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, L: 5, W: 4, H: 2.5, hx: 2.5, hy: 2, hw: 0.8, hd: 0.6, hh: 1.2, heatCentred: true, showCuts: true, showOZ: true, iso: { T: 24, speed: 0.15, DR: 20 }, mesh: [0.1, 0.1, 0.1], turb: "k-epsilon", adv: "tvd", field: "T", ycut: 2, zcut: 0.1, xcut: 2.5, xcutCentred: true, showMesh: false, ozF: 0.6, ozW: 0.6, ozH: 1.8, useLayout: false, layout: null, layoutErr: "" };
 let device = null, sim = null, geo = null, f = null, runId = 0, stopReq = false, done = false, lastProg = null, hist = null, prev = null;
 
 // ---------- layout: several heat sources and furniture ----------
@@ -361,12 +358,13 @@ EXAMPLES.open = { room: [8, 6, 2.7], text: () => {
 // Here the diffuser wall is the facade (x = 0). The paper gives the sizes and powers but places the sources and the
 // furniture only in a figure, so the positions below are approximate.
 EXAMPLES.chen = { room: [3.65, 5.16, 2.43], setup: () => {
-  Object.assign(state, { preset: "custom", width: 0.5, lo: 0, hi: 1.1, wy: 5.16 / 2, tin: 17, ach: 4, exhaust: "ceiling" });
-  for (const k of ["width", "lo", "hi", "wy", "tin", "ach"]) $(k).value = state[k];
-  $("preset").value = "custom"; $("exhaust").value = "ceiling";
+  Object.assign(state, { tin: 17, ach: 4 });
+  for (const k of ["tin", "ach"]) $(k).value = state[k];
 }, text: () => `type, x0, x1, y0, y1, z0, z1, power_W
 # Chen et al. (1998), two-person office with displacement ventilation (AIVC 11494), 3.65 x 5.16 x 2.43 m
 # sizes and powers from the paper; positions approximate (the paper shows them only in a figure)
+inlet, 0, 0, 2.33, 2.83, 0, 1.1, 0            # displacement diffuser 0.5 m wide, 1.1 m high, mid-wall at the floor
+exhaust, 1.61, 2.04, 2.365, 2.795, 2.43, 2.43, 0   # exhaust 0.43 x 0.43 m in the ceiling centre
 heat, 2.0, 2.4, 1.10, 1.45, 0, 1.1, 75        # occupant simulator 1: box 0.4 x 0.35 x 1.1 m, 3 x 25 W bulbs
 heat, 2.0, 2.4, 3.71, 4.06, 0, 1.1, 75        # occupant simulator 2
 heat, 2.75, 3.15, 1.4, 1.8, 0.72, 1.15, 108   # computer 1
@@ -390,7 +388,9 @@ function parseLayout() {
   const plates = lay.furniture.filter((b) => [b.x1 - b.x0, b.y1 - b.y0, b.z1 - b.z0].some((v) => Math.abs(v) < 1e-9)).length;
   const n = (k, a, b) => `${k} ${k === 1 ? a : b}`;
   el.textContent = `${n(lay.heat.length, "heat source", "heat sources")}, ${n(lay.floor_flux.length, "heated floor patch", "heated floor patches")}, `
-    + `${n(lay.furniture.length - plates, "box", "boxes")}, ${n(plates, "thin plate", "thin plates")}. Heat gains ${layoutQ().toFixed(0)} W.`;
+    + `${n(lay.furniture.length - plates, "box", "boxes")}, ${n(plates, "thin plate", "thin plates")}`
+    + (lay.vents.length ? `, ${n(lay.vents.filter((v) => v.kind === "inlet").length, "inlet", "inlets")}, ${n(lay.vents.filter((v) => v.kind === "exhaust").length, "exhaust", "exhausts")}` : "")
+    + `. Heat gains ${layoutQ().toFixed(0)} W.`;
 }
 function loadExample(key) {
   const ex = EXAMPLES[key];
@@ -398,22 +398,24 @@ function loadExample(key) {
     [state.L, state.W, state.H] = ex.room; for (const k of ["L", "W", "H"]) $(k).value = state[k];
     applyDims();
   }
-  // the validation case sets its own diffuser, supply and exhaust; the other examples go back to the default window
+  // the validation case sets its own supply; the other examples go back to the default supply
   if (ex.setup) ex.setup();
   else {
-    Object.assign(state, { preset: "window", wy: W / 2, tin: 16, ach: 6, exhaust: "back" }); applyPreset();
-    for (const k of ["wy", "tin", "ach"]) $(k).value = state[k];
-    $("preset").value = "window"; $("exhaust").value = "back";
+    Object.assign(state, { tin: 16, ach: 6 });
+    for (const k of ["tin", "ach"]) $(k).value = state[k];
   }
   applyDims();
   $("layoutText").value = ex.text(); parseLayout();
 }
 
 const len = (v) => Math.abs(v * 10 - Math.round(v * 10)) < 1e-6 ? v.toFixed(1) : v.toFixed(2);     // 3.6 or 3.65
-// exhaust: in the back wall under the ceiling, or a square in the middle of the ceiling
-function outletOf() {
-  if (state.exhaust === "ceiling") return { side: "top", start: L / 2 - 0.215, end: L / 2 + 0.215, y0: W / 2 - 0.215, y1: W / 2 + 0.215 };
-  return { side: "right", start: H - 0.2, end: H - 0.1 };
+// the openings as rectangles on the walls: from the layout, else the window and the back-wall exhaust
+const layoutVents = (kind) => (layoutOn() ? state.layout.vents.filter((v) => v.kind === kind) : []);
+function openings() {
+  const [y0, y1] = winY();
+  const inl = layoutVents("inlet"), exh = layoutVents("exhaust");
+  return [...(inl.length ? inl : [{ kind: "inlet", x0: 0, x1: 0, y0: state.width >= W ? 0 : y0, y1: state.width >= W ? W : y1, z0: state.lo, z1: state.hi }]),
+          ...(exh.length ? exh : [{ kind: "exhaust", x0: L, x1: L, y0: 0, y1: W, z0: H - 0.2, z1: H - 0.1 }])];
 }
 function syncLabels() {
   $("widthV").textContent = len(state.width) + " m"; $("wyV").textContent = len(state.wy) + " m";
@@ -425,8 +427,13 @@ function syncLabels() {
   if (state.hh === 0) $("hhV").textContent = "0 m, heated floor";
   $("ycutV").textContent = state.ycut.toFixed(2) + " m"; $("zcutV").textContent = state.zcut.toFixed(2) + " m"; $("xcutV").textContent = state.xcut.toFixed(2) + " m";
   const lay = layoutOn(), q = state.ach * L * W * H / 3600, Q = lay ? layoutQ() : 1.2 * 1005 * q * (state.troom - state.tin);
-  const U = q / (state.width * Math.max(state.hi - state.lo, 0.05));
+  // inlet speed from the open area of the inlets (window, or the inlets of the layout)
+  const A = openings().filter((o) => o.kind === "inlet").reduce((s_, o) => {
+    const e = [o.x1 - o.x0, o.y1 - o.y0, o.z1 - o.z0].map(Math.abs).filter((v) => v > 1e-9);
+    return s_ + (e.length === 2 ? e[0] * e[1] : 0);
+  }, 0), U = q / Math.max(A, 0.01);
   $("heatSet").disabled = lay; $("troomSet").disabled = lay;
+  const ownIn = layoutVents("inlet").length > 0; $("winSet").disabled = ownIn; $("winNote").hidden = !ownIn;
   if (lay) $("troomV").textContent = troomEff().toFixed(1) + " °C";
   $("gainsNote").textContent = lay ? `Airflow ${(q * 1000).toFixed(0)} L/s. Heat gains from the layout ${Q.toFixed(0)} W (${(Q / (L * W)).toFixed(0)} W/m² floor), so the well-mixed room temperature is ${troomEff().toFixed(1)} °C. Inlet speed ${U.toFixed(3)} m/s.`
     : Q > 0 ? `Airflow ${(q * 1000).toFixed(0)} L/s. Heat gains ${Q.toFixed(0)} W (${(Q / (L * W)).toFixed(0)} W/m² floor). Inlet speed ${U.toFixed(3)} m/s.`
@@ -483,12 +490,12 @@ function makeCase() {
   const [nx, ny, nz] = meshN(), [y0, y1] = winY();
   if (layoutOn()) return Object.assign(defaultCase(), { L, W, H, nx, ny, nz, ach: state.ach, T_in: state.tin,
     inlet: { side: "left", start: state.lo, end: state.hi, y0: state.width >= W ? null : y0, y1: state.width >= W ? null : y1 },
-    outlet: outletOf(),
-    heat: state.layout.heat, floor_flux: state.layout.floor_flux, furniture: state.layout.furniture,
+    outlet: { side: "right", start: H - 0.2, end: H - 0.1 },
+    heat: state.layout.heat, floor_flux: state.layout.floor_flux, furniture: state.layout.furniture, vents: state.layout.vents,
     turbulence: state.turb, advection: state.adv, t_end: 1800, t_avg: 600 });
   return Object.assign(defaultCase(), { L, W, H, nx, ny, nz, ach: state.ach, T_in: state.tin,
     inlet: { side: "left", start: state.lo, end: state.hi, y0: state.width >= W ? null : y0, y1: state.width >= W ? null : y1 },
-    outlet: outletOf(),
+    outlet: { side: "right", start: H - 0.2, end: H - 0.1 },
     // height 0: the heat source collapses to a heated patch of floor (heat flux into the air at the floor)
     heat: state.hh > 0 ? [Object.assign(heatBox(), { power: Q })] : [],
     floor_flux: state.hh > 0 ? [] : [(({ x0, x1, y0, y1 }) => ({ x0, x1, y0, y1, power: Q }))(heatBox())], turbulence: state.turb, advection: state.adv, t_end: 1800, t_avg: 600 });
@@ -498,8 +505,21 @@ function makeCase() {
 function makeGeo(c) {
   const [nx, ny, nz] = meshN();
   const bnd = boundaries(c), outCells = [];
-  for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++) if (bnd.R[j * nz + k] === 2) outCells.push(((nx - 1) * ny + j) * nz + k);
-  for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) if (bnd.T[i * ny + j] === 2) outCells.push((i * ny + j) * nz + nz - 1);
+  const cellAt = (i, j, k) => (i * ny + j) * nz + k;
+  for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++) {
+    if (bnd.L[j * nz + k] === 2) outCells.push(cellAt(0, j, k));
+    if (bnd.R[j * nz + k] === 2) outCells.push(cellAt(nx - 1, j, k));
+  }
+  for (let i = 0; i < nx; i++) {
+    for (let k = 0; k < nz; k++) {
+      if (bnd.B[i * nz + k] === 2) outCells.push(cellAt(i, 0, k));
+      if (bnd.F[i * nz + k] === 2) outCells.push(cellAt(i, ny - 1, k));
+    }
+    for (let j = 0; j < ny; j++) {
+      if (bnd.D[i * ny + j] === 2) outCells.push(cellAt(i, j, 0));
+      if (bnd.T[i * ny + j] === 2) outCells.push(cellAt(i, j, nz - 1));
+    }
+  }
   const q = c.ach * L * W * H / 3600, Q = [...c.heat, ...c.floor_flux].reduce((s, b) => s + b.power, 0);
   const { solid } = obstacles(c);
   for (const hb of c.heat) for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++) {
@@ -814,6 +834,28 @@ function axes(g, X, Y, ha, va) {
   };
   arrow(1, 0, ha); arrow(0, -1, va);
 }
+// inlets (blue) and exhausts (grey) on the walls: a thick line on the frame where a wall is seen edge-on,
+// dark where the slice cuts the opening; a dashed outline where the wall faces the view
+function drawOpenings(g, X, Y, sc, ax, bx, cax, cv) {
+  const size = [L, W, H];
+  for (const o of openings()) {
+    const lo = [o.x0, o.y0, o.z0], hi = [o.x1, o.y1, o.z1], a = [0, 1, 2].find((k) => Math.abs(hi[k] - lo[k]) < 1e-9);
+    if (a === undefined) continue;
+    const col = o.kind === "inlet" ? [47, 127, 208] : [120, 128, 136], rgba = (al) => `rgba(${col[0]},${col[1]},${col[2]},${al})`;
+    const r0 = (k) => Math.min(lo[k], hi[k]), r1 = (k) => Math.max(lo[k], hi[k]);
+    if (a === cax) {
+      g.setLineDash([4, 3]); g.lineWidth = 1.4; g.strokeStyle = rgba(0.85);
+      g.strokeRect(X(r0(ax)), Y(r1(bx)), (r1(ax) - r0(ax)) * sc, (r1(bx) - r0(bx)) * sc); g.setLineDash([]);
+      continue;
+    }
+    const on = cv > r0(cax) && cv < r1(cax), out = lo[a] > size[a] / 2 ? 2 : -2;
+    g.lineWidth = 6; g.strokeStyle = rgba(on ? 1 : 0.35); g.beginPath();
+    if (a === ax) { const x = X(lo[a]) + out; g.moveTo(x, Y(r0(bx))); g.lineTo(x, Y(r1(bx))); }
+    else { const y = Y(lo[a]) - out; g.moveTo(X(r0(ax)), y); g.lineTo(X(r1(ax)), y); }
+    g.stroke();
+  }
+  g.lineWidth = 1.4;
+}
 function cutLine(g, X, Y, horiz, v, a0, a1) {
   if (!state.showCuts) return;
   g.strokeStyle = "rgba(255,255,255,0.9)"; g.setLineDash([3, 3]); g.lineWidth = 1; g.beginPath();
@@ -831,13 +873,8 @@ function draw() {
   slice($("sec"), L, H, nx, nz, (ii, kk) => (ii * ny + j) * nz + kk, f.uc, f.wc, (g, X, Y, sc) => {
     ozBox(g, X, Y, sc, Z.x0, 0, Z.x1, Z.z1);
     cutLine(g, X, Y, true, state.zcut, 0, L); cutLine(g, X, Y, false, state.xcut, 0, H);
-    drawItems(g, X, Y, sc, 0, 2, 1, state.ycut);
-    const inWin = state.width >= W || ((j + 0.5) * dy > y0 && (j + 0.5) * dy < y1);
-    g.lineWidth = 6; g.strokeStyle = inWin ? "#2f7fd0" : "rgba(47,127,208,0.35)";
-    g.beginPath(); g.moveTo(X(0) - 2, Y(state.lo)); g.lineTo(X(0) - 2, Y(state.hi)); g.stroke();
-    const ex = outletOf();
-    if (ex.side === "top") { const on = state.ycut > ex.y0 && state.ycut < ex.y1; g.strokeStyle = on ? css("--muted") : "rgba(128,128,128,0.35)"; g.beginPath(); g.moveTo(X(ex.start), Y(H) - 2); g.lineTo(X(ex.end), Y(H) - 2); g.stroke(); }
-    else { g.strokeStyle = css("--muted"); g.beginPath(); g.moveTo(X(L) + 2, Y(H - 0.2)); g.lineTo(X(L) + 2, Y(H - 0.1)); g.stroke(); }
+    drawItems(g, X, Y, sc, 0, 2, 1, (j + 0.5) * dy);
+    drawOpenings(g, X, Y, sc, 0, 2, 1, (j + 0.5) * dy);
     axes(g, X, Y, "x", "z");
   }, $("iso"));
   // plan, at z
@@ -845,12 +882,8 @@ function draw() {
     g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; if (state.showOZ) g.strokeRect(X(Z.x0), Y(Z.y1), (Z.x1 - Z.x0) * sc, (Z.y1 - Z.y0) * sc);
     g.setLineDash([]);
     drawItems(g, X, Y, sc, 0, 1, 2, state.zcut);
-    g.lineWidth = 6; g.strokeStyle = "#2f7fd0"; g.beginPath(); g.moveTo(X(0) - 2, Y(y0)); g.lineTo(X(0) - 2, Y(y1)); g.stroke();
+    drawOpenings(g, X, Y, sc, 0, 1, 2, (k + 0.5) * dz);
     cutLine(g, X, Y, true, state.ycut, 0, L); cutLine(g, X, Y, false, state.xcut, 0, W);
-    const ex = outletOf();
-    g.lineWidth = 1.4; g.strokeStyle = css("--muted"); g.setLineDash([4, 3]);
-    if (ex.side === "top") g.strokeRect(X(ex.start), Y(ex.y1), (ex.end - ex.start) * sc, (ex.y1 - ex.y0) * sc);
-    g.setLineDash([]);
     axes(g, X, Y, "x", "y");
   });
   // cross section, at x, seen from the facade
@@ -858,10 +891,7 @@ function draw() {
     ozBox(g, X, Y, sc, Z.y0, 0, Z.y1, Z.z1);
     cutLine(g, X, Y, true, state.zcut, 0, W); cutLine(g, X, Y, false, state.ycut, 0, H);
     drawItems(g, X, Y, sc, 1, 2, 0, state.xcut);
-    // window and exhaust in outline: they lie in the end walls, not in this section
-    g.setLineDash([4, 3]); g.lineWidth = 1.4; g.strokeStyle = "rgba(47,127,208,0.8)"; g.strokeRect(X(y0), Y(state.hi), (y1 - y0) * sc, (state.hi - state.lo) * sc); g.setLineDash([]);
-    const ex = outletOf();
-    if (ex.side === "top") { const on = state.xcut > ex.start && state.xcut < ex.end; g.lineWidth = 6; g.strokeStyle = on ? css("--muted") : "rgba(128,128,128,0.35)"; g.beginPath(); g.moveTo(X(ex.y0), Y(H) - 2); g.lineTo(X(ex.y1), Y(H) - 2); g.stroke(); }
+    drawOpenings(g, X, Y, sc, 1, 2, 0, (i + 0.5) * dx);
     axes(g, X, Y, "y", "z");
   });
   if (f.preview) {
@@ -922,7 +952,6 @@ for (const id of ["L", "W", "H"]) {
   $(id).addEventListener("input", (e) => { state[id] = +e.target.value; applyDims(); syncLabels(); preview(); });
   $(id).addEventListener("change", start);
 }
-$("exhaust").addEventListener("change", (e) => { state.exhaust = e.target.value; preview(); start(); });
 $("preset").addEventListener("change", (e) => { state.preset = e.target.value; applyPreset(); applyDims(); syncLabels(); preview(); start(); });
 $("iso").addEventListener("input", (e) => { state.iso[state.field] = +e.target.value; $("isoV").textContent = fieldRange().fmt(state.iso[state.field]); draw(); });
 for (const id of ["showCuts", "showOZ"]) $(id).addEventListener("change", (e) => { state[id] = e.target.checked; draw(); });
