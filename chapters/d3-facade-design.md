@@ -80,10 +80,9 @@ The shaded strip $d \tan \gamma$ is a larger fraction of a narrow window. Dividi
 
 ```{figure} figures/d3/side-fins-split.*
 :name: fig-d3-side-fins-split
-:class: col-page-right
-:alt: Two rows, east façade on top and west below. Left, plan of one 2.3 m window with a 0.5 m fin on its south side; middle, plan of two 1.15 m windows separated by 0.3 m of wall, each with a 0.5 m fin on its south side, with the sun's rays on 21 June at two hours and the shaded strips. Right, monthly bars of direct radiation on the glass without fins, with one window and fin, and with two windows and fins; the split window cuts the summer radiation about twice as much as the single window.
+:alt: Two rows, east façade on top and west below. Left, plan of two 1.15 m windows separated by 0.3 m of wall, each with a 0.5 m fin on its south side, with the sun's rays on 21 June at two hours and the shaded strips. Right, monthly bars of direct radiation on the glass without fins, with one 2.3 m window and one fin, and with two 1.15 m windows and two fins.
 
-Side fins on the south side of east (top) and west (bottom) windows. (a, d) One 2.3 m window with one 0.5 m fin. (b, e) The same glass split into two 1.15 m windows with 0.3 m of wall between them, each with a 0.5 m fin. Plans with the sun on 21 June (solar time). (c, f) Direct radiation on the glass, Annex 80 Copenhagen TMY 2041–2060. Same assumptions as {numref}`fig-d3-side-fins`.
+Side fins on the south side of east (top) and west (bottom) windows. (a, c) The 2.3 m of glass split into two 1.15 m windows with 0.3 m of wall between them, each with a 0.5 m fin; plan with the sun on 21 June (solar time). (b, d) Direct radiation on the glass without fins, with one 2.3 m window and one fin, and with the two windows, Annex 80 Copenhagen TMY 2041–2060. Same assumptions as {numref}`fig-d3-side-fins`.
 ```
 
 Fixed shading also obstructs part of the sky and reduces the diffuse daylight throughout the year. When sDA300 is a constraint, this usually limits the overhang depth.
