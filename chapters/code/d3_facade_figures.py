@@ -301,18 +301,17 @@ def fins_figure(name, faz, hours, sides, fin='both'):
 
 
 def fins_split_figure(cases):
-    """Rows: façades. Columns: one window with one fin, the same glass as two windows with a fin each,
-    and monthly direct radiation for the three cases."""
-    fig, axs = plt.subplots(len(cases), 3, figsize=(13, 3.9 * len(cases)), facecolor=SURF, layout='constrained',
-                            gridspec_kw={'width_ratios': [1, 1, 1.25]})
+    """Rows: façades. Columns: the glass as two windows with a fin each, and monthly direct radiation
+    without fins, with one window and one fin, and with two windows and two fins."""
+    fig, axs = plt.subplots(len(cases), 2, figsize=(9.5, 3.9 * len(cases)), facecolor=SURF, layout='constrained',
+                            gridspec_kw={'width_ratios': [1, 1.25]})
     letters = iter('abcdefghi')
     for row, (name, faz, hours, sides, fin) in zip(axs, cases):
         m0, m1 = fin_beam(faz, fin, 1)
         _, m2 = fin_beam(faz, fin, 2)
         report(name, 1, m0, m1); report(name, 2, m0, m2)
-        draw_plan(row[0], faz, hours, sides, fin, 1, f'({next(letters)}) {name}: one {W_WIN} m window, {fin_label(fin, 1, sides)}')
-        draw_plan(row[1], faz, hours, sides, fin, 2, f'({next(letters)}) {name}: two windows, {fin_label(fin, 2, sides)}')
-        b = row[2]
+        draw_plan(row[0], faz, hours, sides, fin, 2, f'({next(letters)}) {name}: two windows, {fin_label(fin, 2, sides)}')
+        b = row[1]
         w3 = 0.27
         b.bar(x - w3, m0, w3, color=ORANGE, label='Without fins')
         b.bar(x, m1, w3, color=VIOLET, label=f'One window: −{100 * (1 - m1[4:8].sum() / m0[4:8].sum()):.0f} % May–Aug')
