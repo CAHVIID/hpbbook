@@ -182,10 +182,10 @@ valid for downward flow with at least 0.2 D between blades and ceiling. In a typ
 | Fan | Motor | $S_F$ (m/s) | $S_{O,avg}$ (m/s) | Cooling effect (°C) | Power (W) | CFE (°C per W) |
 | --- | --- | --- | --- | --- | --- | --- |
 | Minka Aire Light Wave | AC | 1.57 | 0.83 | 3.6 | 67.5 | 0.05 |
-| Hunter Erling 52850 | DC | 1.76 | 0.93 | 3.8 | 23.6 | 0.16 |
+| Fanco Breeze AC 132 | AC | 1.83 | 0.97 | 3.9 | 45 | 0.09 |
 :::
 
-The two fans give almost the same cooling effect, but the DC fan has three times the CFE of the AC fan. More fans are compared in the solution to the cooling assignment. Because the cooling effect levels off, extra airflow buys little cooling, so choose a fan by its power at the speed you need, not by its maximum airflow.
+Because the cooling effect levels off, extra airflow buys little cooling, so choose a fan by its power at the speed you need, not by its maximum airflow.
 
 (d6-fans-in-simulation)=
 ## D6.6 Fans in a building simulation
