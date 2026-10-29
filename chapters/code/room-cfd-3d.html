@@ -1935,7 +1935,7 @@ function drawOpenings(g, X, Y, sc, ax, bx, cax, cv) {
   g.lineWidth = 1.4;
 }
 // small vectors of the supply direction at an inlet: the inward normal tilted by the spread and the swirl,
-// projected on the view; at the centre and near the edges, or (inlet facing the view) the tangential part only
+// projected on the view; at the centre (no angles) or near the edges, or (inlet facing the view) the tangential part only
 function inletArrows(g, X, Y, o, a, lo, hi, size, ax, bx, cax, col) {
   const ts = Math.tan((o.spread || 0) * Math.PI / 180), tw = Math.tan((o.swirl || 0) * Math.PI / 180);
   const nin = [0, 0, 0]; nin[a] = lo[a] > size[a] / 2 ? -1 : 1;
@@ -1952,8 +1952,8 @@ function inletArrows(g, X, Y, o, a, lo, hi, size, ax, bx, cax, col) {
     }
   } else {
     const e = a === ax ? bx : ax;                            // the in-plane axis seen in this view
-    pts.push([cen, dirAt([0, 0, 0])]);
-    if (ts || tw) for (const sg of [1, -1]) { const r = [0, 0, 0]; r[e] = sg; const p = [...cen]; p[e] += sg * 0.7 * half[e]; pts.push([p, dirAt(r)]); }
+    if (!ts && !tw) pts.push([cen, dirAt([0, 0, 0])]);        // centre arrow only for a plain inlet
+    else for (const sg of [1, -1]) { const r = [0, 0, 0]; r[e] = sg; const p = [...cen]; p[e] += sg * 0.7 * half[e]; pts.push([p, dirAt(r)]); }
   }
   g.strokeStyle = col; g.fillStyle = col; g.lineWidth = 1.5;
   for (const [p, d] of pts) {
