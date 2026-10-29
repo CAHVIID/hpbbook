@@ -21,7 +21,7 @@ export function defaultCase() {
     L: 5.0, W: 4.0, H: 2.5, nx: 50, ny: 40, nz: 25, ach: 6.0, T_in: 18.0, T_room0: null,
     inlet: { side: "left", start: 0.10, end: 0.30, y0: null, y1: null },
     outlet: { side: "right", start: 2.20, end: 2.40, y0: null, y1: null },
-    heat: [], floor_flux: [], turbulence: "k-epsilon", Tu_in: 0.04, nu_t: 2e-3, Pr_t: 0.85,
+    heat: [], floor_flux: [], furniture: [], turbulence: "k-epsilon", Tu_in: 0.04, nu_t: 2e-3, Pr_t: 0.85,
     advection: "tvd", p_tol: 1e-5, t_end: 900.0, t_avg: 300.0,
   };
 }
@@ -53,13 +53,72 @@ export function boundaries(c) {
   return b;
 }
 
-// pressure operator M = -A (SPD) as face coefficients and diagonal; coarse levels by aggregation
-function fineOperator(n, d, b) {
+// room layout (as room_cfd_3d.read_layout): one box per line, type, x0, x1, y0, y1, z0, z1, power_W
+export function readLayout(text) {
+  const out = { heat: [], floor_flux: [], furniture: [] };
+  text.split(/\r?\n/).forEach((line, no) => {
+    const f = line.split("#")[0].replace(/;/g, ",").split(",").map((x) => x.trim());
+    if (!f[0] || f[0].toLowerCase() === "type") return;
+    const kind = f[0].toLowerCase();
+    const v = f.slice(1, 7).map(Number); v.push(f.length > 7 && f[7] !== "" ? Number(f[7]) : 0);
+    if (v.length < 7 || f.length < 7 || v.some((x) => !Number.isFinite(x)))
+      throw new Error(`layout line ${no + 1}: expected type, x0, x1, y0, y1, z0, z1, power_W`);
+    const [x0, x1, y0, y1, z0, z1, power] = v;
+    if (kind === "heat") out.heat.push({ x0, x1, y0, y1, z0, z1, power });
+    else if (kind === "floor") out.floor_flux.push({ x0, x1, y0, y1, power });
+    else if (kind === "furniture") out.furniture.push({ x0, x1, y0, y1, z0, z1 });
+    else throw new Error(`layout line ${no + 1}: unknown type "${f[0]}" (heat, floor or furniture)`);
+  });
+  return out;
+}
+
+// open-face masks of the furniture (as room_cfd_3d.obstacles): mk = [u, v, w] faces (1 open, 0 blocked), solid cells
+export function obstacles(c) {
+  const n = [c.nx, c.ny, c.nz], d = [c.L / c.nx, c.W / c.ny, c.H / c.nz];
+  const cen = n.map((m, k) => centres(m, d[k]));
+  const shp = [0, 1, 2].map((a) => n.map((m, k) => m + (k === a ? 1 : 0)));
+  const fid = (s, i, j, k) => (i * s[1] + j) * s[2] + k;
+  const blocked = shp.map((s) => new Uint8Array(s[0] * s[1] * s[2]));
+  const solid = new Uint8Array(n[0] * n[1] * n[2]);
+  (c.furniture || []).forEach((fu, no) => {
+    const lo = [fu.x0, fu.y0, fu.z0], hi = [fu.x1, fu.y1, fu.z1];
+    const thin = [0, 1, 2].filter((k) => Math.abs(hi[k] - lo[k]) < 1e-9);
+    if (thin.length > 1) throw new Error(`furniture ${no + 1} has zero size along more than one axis`);
+    const inside = [0, 1, 2].map((k) => cen[k].map((x) => x > Math.min(lo[k], hi[k]) && x < Math.max(lo[k], hi[k])));
+    let any = false;
+    if (thin.length) {
+      const a = thin[0], plane = Math.round(lo[a] / d[a]);
+      if (plane <= 0 || plane >= n[a]) return;                       // on a room wall: nothing to block
+      const s = shp[a], r = [0, 1, 2].map((k) => (k === a ? [plane] : [...Array(n[k]).keys()].filter((i) => inside[k][i])));
+      for (const i of r[0]) for (const j of r[1]) for (const k of r[2]) { blocked[a][fid(s, i, j, k)] = 1; any = true; }
+      if (!any) throw new Error(`furniture ${no + 1} (a thin plate) covers no cell faces: make it larger or refine the mesh`);
+    } else {
+      for (let i = 0; i < n[0]; i++) for (let j = 0; j < n[1]; j++) for (let k = 0; k < n[2]; k++)
+        if (inside[0][i] && inside[1][j] && inside[2][k]) { solid[fid(n, i, j, k)] = 1; any = true; }
+      if (!any) throw new Error(`furniture ${no + 1} covers no cell centres: make it larger, refine the mesh, `
+                                + "or give it zero thickness to make it a thin plate");
+    }
+  });
+  for (let i = 0; i < n[0]; i++) for (let j = 0; j < n[1]; j++) for (let k = 0; k < n[2]; k++) {
+    if (!solid[fid(n, i, j, k)]) continue;                            // every interior face next to a solid cell
+    const p = [i, j, k];
+    for (let a = 0; a < 3; a++) for (const e of [p[a], p[a] + 1]) {
+      if (e === 0 || e === n[a]) continue;                            // the room walls keep their own boundary conditions
+      const q = [...p]; q[a] = e; blocked[a][fid(shp[a], ...q)] = 1;
+    }
+  }
+  return { mk: blocked.map((b) => Float32Array.from(b, (x) => 1 - x)), solid };
+}
+
+// pressure operator M = -A (SPD) as face coefficients and diagonal; coarse levels by aggregation.
+// With furniture, blocked faces carry no coefficient and a solid cell keeps a lone diagonal.
+function fineOperator(n, d, b, mk = null) {
   const [a, bb, c] = n, [dx, dy, dz] = d;
   const cx = new Float64Array((a + 1) * bb * c), cy = new Float64Array(a * (bb + 1) * c), cz = new Float64Array(a * bb * (c + 1));
   for (let i = 1; i < a; i++) for (let j = 0; j < bb; j++) for (let k = 0; k < c; k++) cx[(i * bb + j) * c + k] = 1 / dx ** 2;
   for (let i = 0; i < a; i++) for (let j = 1; j < bb; j++) for (let k = 0; k < c; k++) cy[(i * (bb + 1) + j) * c + k] = 1 / dy ** 2;
   for (let i = 0; i < a; i++) for (let j = 0; j < bb; j++) for (let k = 1; k < c; k++) cz[(i * bb + j) * (c + 1) + k] = 1 / dz ** 2;
+  if (mk) [cx, cy, cz].forEach((cf, ax) => { for (let m = 0; m < cf.length; m++) cf[m] *= mk[ax][m]; });
   const dg = new Float64Array(a * bb * c);
   for (let i = 0; i < a; i++) for (let j = 0; j < bb; j++) for (let k = 0; k < c; k++) {
     let s = cx[(i * bb + j) * c + k] + cx[((i + 1) * bb + j) * c + k] + cy[(i * (bb + 1) + j) * c + k]
@@ -67,7 +126,7 @@ function fineOperator(n, d, b) {
     if (i === 0 && b.L[j * c + k] === OUTLET) s += 2 / dx ** 2;
     if (i === a - 1 && b.R[j * c + k] === OUTLET) s += 2 / dx ** 2;
     if (k === c - 1 && b.T[i * bb + j] === OUTLET) s += 2 / dz ** 2;
-    dg[(i * bb + j) * c + k] = s;
+    dg[(i * bb + j) * c + k] = s > 0 ? s : 1 / Math.min(dx, dy, dz) ** 2;
   }
   return { n, cx, cy, cz, dg };
 }
@@ -154,6 +213,8 @@ export async function createSim(device, c) {
   const ke = c.turbulence === "k-epsilon", tvd = c.advection === "tvd";
   const k_in = 1.5 * (c.Tu_in * U_in) ** 2, e_in = k_in ** 1.5 / (0.1 * h_in);
   const xc = centres(nx, dx), yc = centres(ny, dy), zc = centres(nz, dz);
+  const obs = (c.furniture || []).length > 0;
+  const { mk, solid } = obstacles(c);
 
   // ---- memory layout: one f32 storage buffer, scalars first ----
   const S = { DT: 0, UMAX: 1, NUMAX: 2, RZ: 3, ALPHA: 4, BETA: 5, BB: 6, DONE: 7, STOP: 8, T: 9, WA: 10, AVG: 11,
@@ -174,9 +235,10 @@ export async function createSim(device, c) {
   for (const f of ["F2", "Fk2", "Fe2"]) alloc(f, Nw);
   alloc("au", Nu + Nv + Nw); O.av = O.au + Nu; O.aw = O.av + Nv;           // contiguous like u, v, w
   for (const f of ["aT", "as", "anu", "ak"]) alloc(f, N);
+  if (obs) { alloc("mk", Nu + Nv + Nw); O.mv = O.mk + Nu; O.mw = O.mv + Nv; }    // open-face masks, ordered as u, v, w
 
   // multigrid levels
-  const ops = [fineOperator(n, d, bnd)];
+  const ops = [fineOperator(n, d, bnd, obs ? mk : null)];
   while (ops[ops.length - 1].dg.length > 128) ops.push(coarsen(ops[ops.length - 1]));
   const nl = ops.length;
   ops.forEach((op, l) => {
@@ -217,6 +279,7 @@ export async function createSim(device, c) {
     for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++)
       if (xc[i] > hb.x0 && xc[i] < hb.x1 && yc[j] > hb.y0 && yc[j] < hb.y1 && zc[k] > hb.z0 && zc[k] < hb.z1) cells.push(id(i, j, k));
     if (!cells.length) throw new Error("the heat source covers no cell centres: make it larger or refine the mesh");
+    if (cells.some((r) => solid[r])) throw new Error("a heat source overlaps furniture: move it out of the furniture");
     for (const r of cells) Sv[r] += hb.power / (cells.length * dx * dy * dz);
   }
   const qf = new Float32Array(nx * ny);
@@ -257,6 +320,7 @@ export async function createSim(device, c) {
   }
   ops.forEach((op, l) => { put(`cx${l}`, op.cx); put(`cy${l}`, op.cy); put(`cz${l}`, op.cz); put(`dg${l}`, op.dg); });
   put("Minv", Minv);
+  if (obs) { put("mk", mk[0]); put("mv", mk[1]); put("mw", mk[2]); }
 
   // ---- WGSL ----
   const f = (x) => { const s = Number(x).toExponential(9); return s; };
@@ -289,6 +353,7 @@ fn sh(a: i32, s: i32) -> vec3<i32> { if (a == 0) { return vec3<i32>(s, 0, 0); } 
 fn ushp(c: i32) -> vec3<i32> { return NC + sh(c, 1); }
 fn uoff(c: i32) -> i32 { if (c == 0) { return O_u; } if (c == 1) { return O_v; } return O_w; }
 fn usoff(c: i32) -> i32 { if (c == 0) { return O_us; } if (c == 1) { return O_vs; } return O_ws; }
+${obs ? "fn mkoff(c: i32) -> i32 { if (c == 0) { return O_mk; } if (c == 1) { return O_mv; } return O_mw; }" : ""}
 fn Uat(c: i32, p: vec3<i32>) -> f32 { return at(uoff(c), ushp(c), p); }
 fn cell(o: i32, p: vec3<i32>) -> f32 { return F[o + ix(NC, p)]; }
 fn neshp(p: i32, q: i32) -> vec3<i32> { return NC + sh(p, 1) + sh(q, 1); }
@@ -333,6 +398,15 @@ fn mterm(c: i32, a: i32, p: vec3<i32>, u0: f32, h: f32) -> f32 {
     let ns = neshp(lo, hi); let no = neoff(lo, hi);
     f1 = at(no, ns, p + sh(a, 1)) * (g1 - u0) / h;
     f0 = at(no, ns, p) * (u0 - gm1) / h;
+    ${obs ? `// a blocked plane normal to a is a no-slip wall for the faces on either side of it
+    let ma = mkoff(a); let pm = p + sh(c, -1);
+    let blo = at(ma, sa_, pm) == 0.0 && at(ma, sa_, p) == 0.0;
+    let bhi = at(ma, sa_, pm + sh(a, 1)) == 0.0 && at(ma, sa_, p + sh(a, 1)) == 0.0;
+    if (blo || bhi) {
+      ${ke ? "let nuw = nu_wall(0.5 * (cell(O_k, pm) + cell(O_k, p)), 0.5 * h);" : "let nuw = 0.5 * (cell(O_nuc, pm) + cell(O_nuc, p));"}
+      if (blo) { f0 = nuw * u0 / (0.5 * h); }
+      if (bhi) { f1 = -nuw * u0 / (0.5 * h); }
+    }` : ""}
   }
   let der = ddx(gv(c, a, p, -2), gm1, u0, g1, gv(c, a, p, 2), vel, h);
   return -vel * der + (f1 - f0) / h;
@@ -405,7 +479,7 @@ fn mterm(c: i32, a: i32, p: vec3<i32>, u0: f32, h: f32) -> f32 {
   let u0 = F[uoff(${cc}) + i32(g.x)];
   var rhs = mterm(${cc}, 0, p, u0, DX) + mterm(${cc}, 1, p, u0, DY) + mterm(${cc}, 2, p, u0, DZ);
   ${cc === 2 ? "rhs += GB * 0.5 * (cell(O_T, p - sh(2, 1)) + cell(O_T, p));" : ""}
-  F[usoff(${cc}) + i32(g.x)] = u0 + F[S_DT] * rhs;
+  F[usoff(${cc}) + i32(g.x)] = (u0 + F[S_DT] * rhs)${obs ? ` * F[mkoff(${cc}) + i32(g.x)]` : ""};
 }`;
   }
   code += `
@@ -554,16 +628,16 @@ ${red2("cg_rz2", "F[S_BETA] = A / F[S_RZ]; F[S_RZ] = A;", true)}
     if (p.x > 0 && p.x < NX) { u -= dt * (cell(O_p, p) - cell(O_p, p - sh(0, 1))) / DX; }
     else if (p.x == 0 && F[O_bL + p.y * NZ + p.z] == 2.0) { u -= dt * cell(O_p, p) / (0.5 * DX); }
     else if (p.x == NX && F[O_bR + p.y * NZ + p.z] == 2.0) { u -= dt * (-cell(O_p, p - sh(0, 1))) / (0.5 * DX); }
-    F[O_u + m] = u;
+    F[O_u + m] = u${obs ? ' * F[O_mk + m]' : ''};
   } else if (m < ${Nu + Nv}) {
     let mm = m - ${Nu}; let p = id3(u32(mm), ushp(1)); var v = F[O_vs + mm];
     if (p.y > 0 && p.y < NY) { v -= dt * (cell(O_p, p) - cell(O_p, p - sh(1, 1))) / DY; }
-    F[O_v + mm] = v;
+    F[O_v + mm] = v${obs ? ' * F[O_mk + m]' : ''};
   } else {
     let mm = m - ${Nu + Nv}; let p = id3(u32(mm), ushp(2)); var w = F[O_ws + mm];
     if (p.z > 0 && p.z < NZ) { w -= dt * (cell(O_p, p) - cell(O_p, p - sh(2, 1))) / DZ; }
     else if (p.z == NZ && F[O_bT + p.x * NY + p.y] == 2.0) { w -= dt * (-cell(O_p, p - sh(2, 1))) / (0.5 * DZ); }
-    F[O_w + mm] = w;
+    F[O_w + mm] = w${obs ? ' * F[O_mk + m]' : ''};
   }
 }
 
@@ -615,7 +689,7 @@ fn fout(o0: i32, o1: i32, o2: i32, m: i32) -> i32 {
 }
 @compute @workgroup_size(64) fn fluxT(@builtin(global_invocation_id) g: vec3<u32>) {
   let m = i32(g.x); if (stopped() || m >= ${Nu + Nv + Nw}) { return; }
-  F[fout(O_F0, O_F1, O_F2, m)] = flux(O_T, m, TIN, ${tvd}, 0);
+  F[fout(O_F0, O_F1, O_F2, m)] = flux(O_T, m, TIN, ${tvd}, 0)${obs ? " * F[O_mk + m]" : ""};
 }
 @compute @workgroup_size(64) fn energy(@builtin(global_invocation_id) g: vec3<u32>) {
   let m = i32(g.x); if (stopped() || m >= N) { return; }
@@ -661,8 +735,8 @@ fn shear_c(p: i32, q: i32, c: vec3<i32>) -> f32 {
 }
 @compute @workgroup_size(64) fn fluxKE(@builtin(global_invocation_id) g: vec3<u32>) {
   let m = i32(g.x); if (stopped() || m >= ${Nu + Nv + Nw}) { return; }
-  F[fout(O_Fk0, O_Fk1, O_Fk2, m)] = flux(O_k, m, KIN, false, 1);
-  F[fout(O_Fe0, O_Fe1, O_Fe2, m)] = flux(O_e, m, EIN, false, 2);
+  F[fout(O_Fk0, O_Fk1, O_Fk2, m)] = flux(O_k, m, KIN, false, 1)${obs ? " * F[O_mk + m]" : ""};
+  F[fout(O_Fe0, O_Fe1, O_Fe2, m)] = flux(O_e, m, EIN, false, 2)${obs ? " * F[O_mk + m]" : ""};
 }
 @compute @workgroup_size(64) fn keps(@builtin(global_invocation_id) g: vec3<u32>) {
   let m = i32(g.x); if (stopped() || m >= N) { return; }
@@ -792,7 +866,7 @@ fn shear_c(p: i32, q: i32, c: vec3<i32>) -> f32 {
   async function results() {
     const sc = await scalars(), wa = sc[S.WA];
     const r = { case: c, nx, ny, nz, dx, dy, dz, U_in, h_in, T_mix, T0, steps: sc[S.STEPS], cg_iters: sc[S.ITS], t: sc[S.T],
-                levels: ops.map((o) => o.n) };
+                levels: ops.map((o) => o.n), solid };
     const sc_ = (a, s, add = 0) => { const o = new Float64Array(a.length); for (let m = 0; m < a.length; m++) o[m] = a[m] / s + add; return o; };
     r.u = sc_(await readField("au", Nu), wa); r.v = sc_(await readField("av", Nv), wa); r.w = sc_(await readField("aw", Nw), wa);
     r.T = sc_(await readField("aT", N), wa, T0); r.speed = sc_(await readField("as", N), wa);
