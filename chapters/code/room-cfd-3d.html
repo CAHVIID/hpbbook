@@ -1624,14 +1624,14 @@ function axes(g, X, Y, ha, va) {
   const ox = X(0) + 4, oy = Y(0) - 4, len = 11;              // just inside the frame, so they do not merge with it
   const arrow = (dx, dy, name) => {
     const ex = ox + dx * len, ey = oy + dy * len, an = Math.atan2(dy, dx);
-    for (const [lw, col] of [[2.4, "rgba(255,255,255,0.85)"], [1, "#111"]]) {
+    for (const [lw, col] of [[1, css("--muted")]]) {               // grey, as the axis values
       g.strokeStyle = col; g.fillStyle = col; g.lineWidth = lw; g.beginPath(); g.moveTo(ox, oy); g.lineTo(ex, ey); g.stroke();
       g.beginPath(); g.moveTo(ex + dx, ey + dy);
       g.lineTo(ex - 2.5 * Math.cos(an - 0.6), ey - 2.5 * Math.sin(an - 0.6)); g.lineTo(ex - 2.5 * Math.cos(an + 0.6), ey - 2.5 * Math.sin(an + 0.6)); g.closePath(); g.fill();
     }
-    g.font = "5px " + css("--font-data"); g.textAlign = "center"; g.lineWidth = 1.5; g.strokeStyle = "rgba(255,255,255,0.85)"; g.fillStyle = "#111";
+    g.font = "5px " + css("--font-data"); g.textAlign = "center"; g.fillStyle = css("--muted");
     const tx = dx ? ex + 3.5 : ox + 3.5, ty = dx ? oy - 2 : ey + 1;
-    g.strokeText(name, tx, ty); g.fillText(name, tx, ty);
+    g.fillText(name, tx, ty);
   };
   arrow(1, 0, ha); arrow(0, -1, va);
 }
