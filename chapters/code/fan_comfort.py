@@ -137,7 +137,7 @@ def arr(x):
 def set_temp(tdb, tr, v, rh, clo):
     """Standard Effective Temperature (degC), ASHRAE 55 two-node model, as used for the cooling effect."""
     return arr(set_tmp(tdb=tdb, tr=tr, v=v, rh=rh, met=MET, clo=clo,
-                       calculate_ce=True, limit_inputs=False).set)
+                       calculate_ce=True, limit_inputs=False, round_output=False).set)
 
 
 def ce(tdb, tr, v, rh, clo):
@@ -147,7 +147,8 @@ def ce(tdb, tr, v, rh, clo):
 
 def pmv(tdb, tr, v, rh, clo):
     """PMV with the ASHRAE 55 elevated air speed method (SET-based)."""
-    return arr(pmv_ppd_ashrae(tdb=tdb, tr=tr, vr=v, rh=rh, met=MET, clo=clo, limit_inputs=False).pmv)
+    return arr(pmv_ppd_ashrae(tdb=tdb, tr=tr, vr=v, rh=rh, met=MET, clo=clo, limit_inputs=False,
+                              round_output=False).pmv)
 
 
 def adaptive_upper_cat2(epw):
