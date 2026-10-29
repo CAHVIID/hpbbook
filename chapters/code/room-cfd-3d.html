@@ -73,6 +73,7 @@ canvas { display: block; width: 100%; }
 .charts h3 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
 .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 6px; }
 .legend i { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 5px; border-radius: 2px; }
+.spec { margin: 0; max-height: 320px; overflow: auto; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-family: var(--font-data); font-size: 11px; line-height: 1.4; white-space: pre-wrap; }
 textarea { width: 100%; min-height: 150px; resize: vertical; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-family: var(--font-data); font-size: 11.5px; line-height: 1.4; white-space: pre; }
 .group details summary { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 .group details[open] summary { margin-bottom: 8px; }
@@ -94,9 +95,9 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
       <label for="L"><span class="row"><span>Depth from the facade</span><span class="val" id="LV"></span></span>
         <input id="L" type="range" min="3" max="10" step="0.5" value="5"></label>
       <label for="W"><span class="row"><span>Width along the facade</span><span class="val" id="WV"></span></span>
-        <input id="W" type="range" min="2" max="8" step="0.5" value="4"></label>
+        <input id="W" type="range" min="2" max="10" step="0.5" value="4"></label>
       <label for="H"><span class="row"><span>Ceiling height</span><span class="val" id="HV"></span></span>
-        <input id="H" type="range" min="2.4" max="4" step="0.1" value="2.5"></label>
+        <input id="H" type="range" min="2.4" max="8" step="0.1" value="2.5"></label>
       <p class="note">The exhaust sits in the back wall, 0.1–0.2 m below the ceiling, unless a layout places it.</p>
     </div>
     <fieldset class="group" id="winSet">
@@ -157,6 +158,7 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
               <option value="meeting">Meeting room, 8 people, 6 × 4 × 2.7 m</option>
               <option value="open">Open office with screens, 8 × 6 × 2.7 m</option>
               <option value="swirl">Office with four ceiling swirl diffusers, 8 × 6 × 2.7 m</option>
+          <option value="hall">Sports hall with four ceiling swirl diffusers, 10 × 10 × 8 m</option>
           <option value="chen">Validation: two-person office, Chen et al. (AIVC)</option>
             </select></label>
           <div class="btns"><button class="btn ghost" id="openFile" type="button">Open file …</button></div>
@@ -164,6 +166,57 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
           <textarea id="layoutText" spellcheck="false" aria-label="Layout, one box per line"></textarea>
           <p class="note" id="layoutNote"></p>
           <p class="note">One box per line: type, x0, x1, y0, y1, z0, z1, power_W, in m from the facade (x), the left wall (y) and the floor (z). Types: heat, floor (heated floor patch, z ignored), furniture, inlet and exhaust. Furniture with zero size along one axis is a thin plate, such as a table top or a partition. An inlet or exhaust is a rectangle on a wall, with zero size along the axis normal to it (x = 0 is the facade); inlets in a layout replace the window and exhausts replace the back-wall exhaust. An inlet line can end with two angles in degrees from the wall normal: spread (outward from the centre of the inlet) and swirl (around it), as in a swirl diffuser.</p>
+          <details id="specBox"><summary>Full file format</summary>
+            <p class="note">The full description of the file. Copy it into Claude or another AI assistant together with a description of your room to have it write a layout.</p>
+            <div class="btns"><button class="btn ghost" id="copySpec" type="button">Copy format description</button></div>
+            <pre id="layoutSpec" class="spec">Room CFD 3D layout file: format
+
+The file is plain text (CSV), one object per line. It places heat sources, heated floor patches, furniture, supply inlets and exhausts in a box-shaped room. The room size, supply temperature, air change rate and mesh are set in the app, not in the file (depth 3-10 m, width 2-10 m, height 2.4-8 m).
+
+Coordinates, all in metres:
+  x = distance from the facade (0 to the room depth L); x = 0 is the facade, x = L the back wall
+  y = distance from the left wall (0 to the room width W)
+  z = height above the floor (0 to the ceiling height H); z = 0 is the floor, z = H the ceiling
+
+Each line: type, x0, x1, y0, y1, z0, z1, power_W[, spread, swirl]
+  type       heat, floor, furniture, inlet or exhaust (lower or upper case)
+  x0 ... z1  the box from x0 to x1, y0 to y1 and z0 to z1, with x0 &lt;= x1, y0 &lt;= y1 and z0 &lt;= z1
+  power_W    heat output in W; write 0 for furniture, inlets and exhausts
+  spread     inlets only, optional, degrees (default 0)
+  swirl      inlets only, optional, degrees (default 0)
+Fields are separated by commas (semicolons also work). Text after # is a comment. Empty lines and a header line starting with "type" are skipped.
+
+Types:
+  heat       A heat source: the power is released evenly in the air inside the box, e.g. a person (0.4 x 0.4 x 1.2 m, 100 W seated), a PC (60 W), a lamp or a projector. It must not overlap furniture.
+  floor      A heated patch of floor: the power enters the air through the floor surface, e.g. a sun patch or floor heating. z0 and z1 are ignored (write 0, 0).
+  furniture  A solid box that blocks the air, e.g. a cupboard. With zero size along exactly one axis it is a thin plate that sits between two rows of cells, e.g. a table top (z0 = z1 = 0.72) or a partition or screen (x0 = x1 or y0 = y1).
+  inlet      A supply opening: a rectangle on one of the six room surfaces, with zero size along the axis normal to it, placed at 0 or at the room size on that axis. Examples: in the facade x0 = x1 = 0; in the back wall x0 = x1 = L; in the left wall y0 = y1 = 0; in the ceiling z0 = z1 = H; in the floor z0 = z1 = 0.
+  exhaust    An extract opening, placed in the same way as an inlet.
+
+Supply and exhaust:
+  - If the file has one or more inlets, they replace the window; if it has one or more exhausts, they replace the default exhaust in the back wall. A file without inlets keeps the window, and a file without exhausts keeps the back-wall exhaust.
+  - The airflow (air change rate x room volume) is shared between the inlets in proportion to their area. All inlets get the same speed normal to the surface: airflow / total inlet area.
+  - Openings must not overlap each other.
+  - spread tilts the jet outward from the centre of the inlet (negative tilts it inward), and swirl turns it around the centre, both in degrees from the normal. Positive swirl turns anticlockwise when seen from inside the room looking at the inlet. The tangential speeds are normal speed x tan(spread) and normal speed x tan(swirl), so keep the angles well below 90 degrees (e.g. a swirl diffuser: spread 20-30, swirl 45-65; a grille or window: 0, 0).
+
+Mesh:
+  - Everything snaps to the mesh cells (20, 10 or 5 cm). Each object must cover at least one cell (or for a thin plate or an opening, one cell face); make it larger or choose a finer mesh if the app reports that it covers nothing. A thin plate snaps to the nearest grid plane.
+
+The app lists the number of objects and the total heat gains under the text box, or the first error with its line number.
+
+Example: an office 5 x 4 x 2.5 m
+type, x0, x1, y0, y1, z0, z1, power_W, spread, swirl
+inlet, 0, 0, 1.4, 2.6, 0.9, 2.1, 0          # window opening in the facade, 1.2 x 1.2 m
+exhaust, 2.3, 2.7, 1.8, 2.2, 2.5, 2.5, 0    # exhaust 0.4 x 0.4 m in the ceiling
+furniture, 1.0, 1.8, 0.4, 1.8, 0.72, 0.72, 0  # desk (thin table top)
+heat, 2.0, 2.4, 0.9, 1.3, 0, 1.2, 100       # seated person
+heat, 1.3, 1.6, 0.9, 1.3, 0.72, 1.15, 60    # PC on the desk
+furniture, 4.4, 4.8, 0.0, 1.2, 0, 2.0, 0    # bookshelf
+floor, 0.2, 1.6, 0.8, 3.2, 0, 0, 300        # sun patch on the floor
+
+Example: a ceiling swirl diffuser 0.6 x 0.6 m in a 2.7 m high room
+inlet, 1.7, 2.3, 1.2, 1.8, 2.7, 2.7, 0, 30, 65</pre>
+          </details>
         </div>
       </details>
     </div>
@@ -1346,6 +1399,16 @@ EXAMPLES.swirl = { room: [8, 6, 2.7], text: () => {
   }
   return t;
 } };
+// sports hall, 10 x 10 x 8 m: four swirl diffusers in the ceiling, 2 h-1, and the gains as a heated patch of floor
+EXAMPLES.hall = { room: [10, 10, 8], setup: () => {
+  Object.assign(state, { tin: 16, ach: 2 });
+  for (const k of ["tin", "ach"]) $(k).value = state[k];
+}, text: () => {
+  let t = "type, x0, x1, y0, y1, z0, z1, power_W, spread, swirl\n# sports hall, 10 x 10 x 8 m: four ceiling swirl diffusers 0.6 x 0.6 m, an exhaust in the ceiling centre, the gains on the floor\n";
+  for (const x of [2.2, 7.2]) for (const y of [2.2, 7.2]) t += `inlet, ${x.toFixed(1)}, ${(x + 0.6).toFixed(1)}, ${y.toFixed(1)}, ${(y + 0.6).toFixed(1)}, 8, 8, 0, 20, 45   # swirl diffuser\n`;
+  return t + "exhaust, 4.7, 5.3, 4.7, 5.3, 8, 8, 0   # exhaust 0.6 x 0.6 m in the ceiling centre\n"
+    + "floor, 2, 8, 2, 8, 0, 0, 3000   # heat source on the floor: 3 kW over the 6 x 6 m court centre\n";
+} };
 // Chen, Yuan, Hu, Glicksman & Yang (1998), Detailed experimental data of room airflow with displacement ventilation,
 // Roomvent 98 (AIVC 11494): the two-person office in the MIT test chamber, 5.16 x 3.65 x 2.43 m, with a displacement
 // diffuser 0.5 m wide and 1.1 m high mid-wall at the floor, 4 h-1 at 17 °C and an exhaust 0.43 x 0.43 m in the ceiling centre.
@@ -1956,6 +2019,12 @@ let layoutTimer = 0;
 $("layoutText").addEventListener("input", () => { clearTimeout(layoutTimer); layoutTimer = setTimeout(() => { parseLayout(); syncLabels(); preview(); }, 300); });
 $("layoutText").addEventListener("change", () => { parseLayout(); syncLabels(); preview(); if (layoutOn()) start(); });
 $("openFile").addEventListener("click", () => $("fileIn").click());
+$("copySpec").addEventListener("click", async () => {
+  const b = $("copySpec");
+  try { await navigator.clipboard.writeText($("layoutSpec").textContent); b.textContent = "Copied"; }
+  catch (e) { getSelection().selectAllChildren($("layoutSpec")); b.textContent = "Select and copy (Ctrl+C)"; }
+  setTimeout(() => { b.textContent = "Copy format description"; }, 2000);
+});
 $("fileIn").addEventListener("change", async (e) => {
   const file = e.target.files[0]; if (!file) return;
   $("layoutText").value = await file.text(); e.target.value = "";
