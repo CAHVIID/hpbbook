@@ -737,20 +737,19 @@ function drawItems(g, X, Y, sc, ax, bx, cax, cv) {
   }
   g.setLineDash([]);
 }
-// axis arrows from the origin (bottom left corner), named after the two axes of the view
+// small axis arrows from the origin (bottom left corner), named after the two axes of the view
 function axes(g, X, Y, ha, va) {
-  const ox = X(0) + 8, oy = Y(0) - 8, len = 46;
+  const ox = X(0) + 5, oy = Y(0) - 5, len = 22;              // just inside the frame, so they do not merge with it
   const arrow = (dx, dy, name) => {
-    const ex = ox + dx * len, ey = oy + dy * len;
-    for (const [lw, col] of [[4.5, "rgba(255,255,255,0.9)"], [2, "#111"]]) {
-      g.strokeStyle = col; g.fillStyle = col; g.lineWidth = lw; g.lineCap = "round"; g.beginPath(); g.moveTo(ox, oy); g.lineTo(ex, ey); g.stroke();
-      const an = Math.atan2(dy, dx), hl = lw > 3 ? 11 : 9, hw = lw > 3 ? 0.55 : 0.45;
-      g.beginPath(); g.moveTo(ex + dx * (lw > 3 ? 2 : 0), ey + dy * (lw > 3 ? 2 : 0));
-      g.lineTo(ex - hl * Math.cos(an - hw), ey - hl * Math.sin(an - hw)); g.lineTo(ex - hl * Math.cos(an + hw), ey - hl * Math.sin(an + hw)); g.closePath(); g.fill();
+    const ex = ox + dx * len, ey = oy + dy * len, an = Math.atan2(dy, dx);
+    for (const [lw, col] of [[3, "rgba(255,255,255,0.85)"], [1.2, "#111"]]) {
+      g.strokeStyle = col; g.fillStyle = col; g.lineWidth = lw; g.beginPath(); g.moveTo(ox, oy); g.lineTo(ex, ey); g.stroke();
+      g.beginPath(); g.moveTo(ex + dx * 2, ey + dy * 2);
+      g.lineTo(ex - 5 * Math.cos(an - 0.5), ey - 5 * Math.sin(an - 0.5)); g.lineTo(ex - 5 * Math.cos(an + 0.5), ey - 5 * Math.sin(an + 0.5)); g.closePath(); g.fill();
     }
-    g.lineCap = "butt"; g.font = "600 13px " + css("--font-body"); g.textAlign = "center"; g.lineWidth = 3; g.strokeStyle = "rgba(255,255,255,0.9)"; g.fillStyle = "#111";
-    const tx = ex + dx * 10 + dy * 0, ty = ey + dy * 10 + 4 + (dy ? 0 : -9);
-    g.strokeText(name, tx + (dx ? 2 : 9), ty); g.fillText(name, tx + (dx ? 2 : 9), ty);
+    g.font = "10px " + css("--font-data"); g.textAlign = "center"; g.lineWidth = 2.5; g.strokeStyle = "rgba(255,255,255,0.85)"; g.fillStyle = "#111";
+    const tx = dx ? ex + 7 : ox + 7, ty = dx ? oy - 4 : ey + 2;
+    g.strokeText(name, tx, ty); g.fillText(name, tx, ty);
   };
   arrow(1, 0, ha); arrow(0, -1, va);
 }
