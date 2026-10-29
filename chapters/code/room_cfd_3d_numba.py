@@ -13,7 +13,7 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import splu
 from numba import njit, prange
 from room_cfd_3d import (Case, Opening, HeatBlock, FloorFlux, Furniture, Vent, Multigrid, boundaries, occupied_zone,  # noqa: F401
-                         plot_slices, read_layout, obstacles, _pressure_matrix, _wall,
+                         plot_slices, read_layout, obstacles, _pressure_matrix, _wall, inlet_tangential,
                          _lap1, _edge, _sl, RHO, CP, G, NU_AIR, WALL, INLET, OUTLET, CMU, C1, C2, SK, SE, KAP, EWF)
 
 
@@ -55,9 +55,11 @@ def _nu_wall(kw, y):
 
 
 @njit(inline="always")
-def _gv(U, c, a, i, j, k, s):
-    """U_c at (i, j, k) shifted s along axis a: zero-gradient ends along its own axis, mirrored (no slip) across walls."""
+def _gv(U, c, a, i, j, k, s, UT, sw):
+    """U_c at (i, j, k) shifted s along axis a: zero-gradient ends along its own axis, mirrored (no slip) across
+    walls; with sw, the no-slip value on inlet faces is the tangential inlet speed UT[c, a, side, p, q]."""
     n0, n1, n2 = U.shape
+    p, q = (j, k) if a == 0 else ((i, k) if a == 1 else (i, j))
     if a == 0:
         i += s
     elif a == 1:
@@ -66,10 +68,13 @@ def _gv(U, c, a, i, j, k, s):
         k += s
     if a == c:
         return U[min(max(i, 0), n0 - 1), min(max(j, 0), n1 - 1), min(max(k, 0), n2 - 1)]
-    sign = 1.0
+    v = U[min(max(i, 0), n0 - 1), min(max(j, 0), n1 - 1), min(max(k, 0), n2 - 1)]
     if i < 0 or j < 0 or k < 0 or i > n0 - 1 or j > n1 - 1 or k > n2 - 1:
-        sign = -1.0
-    return sign * U[min(max(i, 0), n0 - 1), min(max(j, 0), n1 - 1), min(max(k, 0), n2 - 1)]
+        if sw:
+            side = 0 if (i < 0 or j < 0 or k < 0) else 1
+            return 2.0 * UT[c, a, side, p, q] - v
+        return -v
+    return v
 
 
 @njit(inline="always")
@@ -143,23 +148,23 @@ def _k_edge_visc12(nu_c, k, ke, wd, out):
 
 
 @njit(inline="always")
-def _mterm(U, Uc, c, a, ne, nu_c, i, j, k, u0, h, tvd, M, obs, kt, ke):
+def _mterm(U, Uc, c, a, ne, nu_c, i, j, k, u0, h, tvd, M, obs, kt, ke, UT, sw):
     """Advection and viscous term along axis a for velocity component c at the face (i, j, k).
     With furniture (obs), a blocked plane normal to a is a no-slip wall for the faces on either side."""
     if a == c:
         vel = u0
-        der = _ddx(_gv(Uc, c, a, i, j, k, -2), _gv(Uc, c, a, i, j, k, -1), u0,
-                   _gv(Uc, c, a, i, j, k, 1), _gv(Uc, c, a, i, j, k, 2), vel, h, tvd)
+        der = _ddx(_gv(Uc, c, a, i, j, k, -2, UT, sw), _gv(Uc, c, a, i, j, k, -1, UT, sw), u0,
+                   _gv(Uc, c, a, i, j, k, 1, UT, sw), _gv(Uc, c, a, i, j, k, 2, UT, sw), vel, h, tvd)
         f1 = _at(nu_c, a, i, j, k, 0) * (_at(Uc, a, i, j, k, 1) - u0) / h       # viscosity at the cell centres
         f0 = _at(nu_c, a, i, j, k, -1) * (u0 - _at(Uc, a, i, j, k, -1)) / h
     else:
         Ua = U[a]                                                   # velocity a averaged to this c face
         vel = 0.25 * (_at2(Ua, c, -1, a, 0, i, j, k) + _at2(Ua, c, 0, a, 0, i, j, k)
                       + _at2(Ua, c, -1, a, 1, i, j, k) + _at2(Ua, c, 0, a, 1, i, j, k))
-        der = _ddx(_gv(Uc, c, a, i, j, k, -2), _gv(Uc, c, a, i, j, k, -1), u0,
-                   _gv(Uc, c, a, i, j, k, 1), _gv(Uc, c, a, i, j, k, 2), vel, h, tvd)
-        f1 = _at(ne, a, i, j, k, 1) * (_gv(Uc, c, a, i, j, k, 1) - u0) / h       # viscosity on the edges
-        f0 = _at(ne, a, i, j, k, 0) * (u0 - _gv(Uc, c, a, i, j, k, -1)) / h
+        der = _ddx(_gv(Uc, c, a, i, j, k, -2, UT, sw), _gv(Uc, c, a, i, j, k, -1, UT, sw), u0,
+                   _gv(Uc, c, a, i, j, k, 1, UT, sw), _gv(Uc, c, a, i, j, k, 2, UT, sw), vel, h, tvd)
+        f1 = _at(ne, a, i, j, k, 1) * (_gv(Uc, c, a, i, j, k, 1, UT, sw) - u0) / h       # viscosity on the edges
+        f0 = _at(ne, a, i, j, k, 0) * (u0 - _gv(Uc, c, a, i, j, k, -1, UT, sw)) / h
         if obs:
             Ma = M[a]
             blo = _at2(Ma, a, 0, c, -1, i, j, k) == 0 and _at2(Ma, a, 0, c, 0, i, j, k) == 0
@@ -177,7 +182,7 @@ def _mterm(U, Uc, c, a, ne, nu_c, i, j, k, u0, h, tvd, M, obs, kt, ke):
 
 
 @njit(parallel=True, cache=True)
-def _k_mom_u(U, us, nu_c, ne01, ne02, d, dt, tvd, M, obs, kt, ke):
+def _k_mom_u(U, us, nu_c, ne01, ne02, d, dt, tvd, M, obs, kt, ke, UT, sw):
     """Predictor for u on the interior x faces: advection (upwind or TVD) and viscous terms along x, y, z."""
     u = U[0]
     n0, n1, n2 = u.shape
@@ -186,14 +191,14 @@ def _k_mom_u(U, us, nu_c, ne01, ne02, d, dt, tvd, M, obs, kt, ke):
         for j in range(n1):
             for k in range(n2):
                 u0 = u[i, j, k]
-                rhs = 0.0 + _mterm(U, u, 0, 0, ne01, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke)
-                rhs = rhs + _mterm(U, u, 0, 1, ne01, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke)
-                rhs = rhs + _mterm(U, u, 0, 2, ne02, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke)
+                rhs = 0.0 + _mterm(U, u, 0, 0, ne01, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke, UT, sw)
+                rhs = rhs + _mterm(U, u, 0, 1, ne01, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke, UT, sw)
+                rhs = rhs + _mterm(U, u, 0, 2, ne02, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke, UT, sw)
                 us[i, j, k] = u0 + dt * rhs
 
 
 @njit(parallel=True, cache=True)
-def _k_mom_v(U, vs, nu_c, ne01, ne12, d, dt, tvd, M, obs, kt, ke):
+def _k_mom_v(U, vs, nu_c, ne01, ne12, d, dt, tvd, M, obs, kt, ke, UT, sw):
     """Predictor for v on the interior y faces."""
     v = U[1]
     n0, n1, n2 = v.shape
@@ -202,14 +207,14 @@ def _k_mom_v(U, vs, nu_c, ne01, ne12, d, dt, tvd, M, obs, kt, ke):
         for j in range(1, n1 - 1):
             for k in range(n2):
                 u0 = v[i, j, k]
-                rhs = 0.0 + _mterm(U, v, 1, 0, ne01, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke)
-                rhs = rhs + _mterm(U, v, 1, 1, ne01, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke)
-                rhs = rhs + _mterm(U, v, 1, 2, ne12, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke)
+                rhs = 0.0 + _mterm(U, v, 1, 0, ne01, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke, UT, sw)
+                rhs = rhs + _mterm(U, v, 1, 1, ne01, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke, UT, sw)
+                rhs = rhs + _mterm(U, v, 1, 2, ne12, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke, UT, sw)
                 vs[i, j, k] = u0 + dt * rhs
 
 
 @njit(parallel=True, cache=True)
-def _k_mom_w(U, ws, nu_c, ne02, ne12, T, d, dt, tvd, gb, Tref, M, obs, kt, ke):
+def _k_mom_w(U, ws, nu_c, ne02, ne12, T, d, dt, tvd, gb, Tref, M, obs, kt, ke, UT, sw):
     """Predictor for w on the interior z faces, with buoyancy."""
     w = U[2]
     n0, n1, n2 = w.shape
@@ -218,9 +223,9 @@ def _k_mom_w(U, ws, nu_c, ne02, ne12, T, d, dt, tvd, gb, Tref, M, obs, kt, ke):
         for j in range(n1):
             for k in range(1, n2 - 1):
                 u0 = w[i, j, k]
-                rhs = 0.0 + _mterm(U, w, 2, 0, ne02, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke)
-                rhs = rhs + _mterm(U, w, 2, 1, ne12, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke)
-                rhs = rhs + _mterm(U, w, 2, 2, ne12, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke)
+                rhs = 0.0 + _mterm(U, w, 2, 0, ne02, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke, UT, sw)
+                rhs = rhs + _mterm(U, w, 2, 1, ne12, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke, UT, sw)
+                rhs = rhs + _mterm(U, w, 2, 2, ne12, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke, UT, sw)
                 rhs = rhs + gb * (0.5 * (T[i, j, k - 1] + T[i, j, k]) - Tref)
                 ws[i, j, k] = u0 + dt * rhs
 
@@ -520,6 +525,9 @@ def run(case: Case, verbose=False, monitor_every=50):
     A_in = sum((m == INLET).sum() * area[a] for (a, side), m in bnd.items())
     U_in = case.q / A_in
     h_in = A_in / case.W
+    ut = inlet_tangential(case)                       # inlets that blow at an angle
+    sw = ut is not None
+    UT = U_in * ut if sw else np.zeros((3, 3, 2, 1, 1))
 
     U = tuple(np.zeros(s) for s in shp)
     Q_tot = sum(b.power for b in case.heat) + sum(f.power for f in case.floor_flux)
@@ -636,9 +644,9 @@ def run(case: Case, verbose=False, monitor_every=50):
 
         # ---- momentum ----
         Us = tuple(a.copy() for a in U)
-        _k_mom_u(U, Us[0], nu_c, ne[(0, 1)], ne[(0, 2)], da, dt, tvd, Mt, obs, k, ke)
-        _k_mom_v(U, Us[1], nu_c, ne[(0, 1)], ne[(1, 2)], da, dt, tvd, Mt, obs, k, ke)
-        _k_mom_w(U, Us[2], nu_c, ne[(0, 2)], ne[(1, 2)], T, da, dt, tvd, G * beta, Tref, Mt, obs, k, ke)
+        _k_mom_u(U, Us[0], nu_c, ne[(0, 1)], ne[(0, 2)], da, dt, tvd, Mt, obs, k, ke, UT, sw)
+        _k_mom_v(U, Us[1], nu_c, ne[(0, 1)], ne[(1, 2)], da, dt, tvd, Mt, obs, k, ke, UT, sw)
+        _k_mom_w(U, Us[2], nu_c, ne[(0, 2)], ne[(1, 2)], T, da, dt, tvd, G * beta, Tref, Mt, obs, k, ke, UT, sw)
         if obs:
             for c in range(3):
                 Us[c][...] *= Mk[c]                            # no flow through furniture

@@ -156,13 +156,14 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
               <option value="classroom">Classroom, 8 × 7 × 3 m</option>
               <option value="meeting">Meeting room, 8 people, 6 × 4 × 2.7 m</option>
               <option value="open">Open office with screens, 8 × 6 × 2.7 m</option>
-              <option value="chen">Validation: two-person office, Chen et al. (AIVC)</option>
+              <option value="swirl">Office with four ceiling swirl diffusers, 8 × 6 × 2.7 m</option>
+          <option value="chen">Validation: two-person office, Chen et al. (AIVC)</option>
             </select></label>
           <div class="btns"><button class="btn ghost" id="openFile" type="button">Open file …</button></div>
           <input type="file" id="fileIn" accept=".csv,.txt,text/csv,text/plain" hidden>
           <textarea id="layoutText" spellcheck="false" aria-label="Layout, one box per line"></textarea>
           <p class="note" id="layoutNote"></p>
-          <p class="note">One box per line: type, x0, x1, y0, y1, z0, z1, power_W, in m from the facade (x), the left wall (y) and the floor (z). Types: heat, floor (heated floor patch, z ignored), furniture, inlet and exhaust. Furniture with zero size along one axis is a thin plate, such as a table top or a partition. An inlet or exhaust is a rectangle on a wall, with zero size along the axis normal to it (x = 0 is the facade); inlets in a layout replace the window and exhausts replace the back-wall exhaust.</p>
+          <p class="note">One box per line: type, x0, x1, y0, y1, z0, z1, power_W, in m from the facade (x), the left wall (y) and the floor (z). Types: heat, floor (heated floor patch, z ignored), furniture, inlet and exhaust. Furniture with zero size along one axis is a thin plate, such as a table top or a partition. An inlet or exhaust is a rectangle on a wall, with zero size along the axis normal to it (x = 0 is the facade); inlets in a layout replace the window and exhausts replace the back-wall exhaust. An inlet line can end with two angles in degrees from the wall normal: spread (outward from the centre of the inlet) and swirl (around it), as in a swirl diffuser.</p>
         </div>
       </details>
     </div>
@@ -351,6 +352,19 @@ EXAMPLES.open = { room: [8, 6, 2.7], text: () => {
       + `heat, ${x.toFixed(1)}, ${(x + 0.4).toFixed(1)}, ${(y + 1.6).toFixed(1)}, ${(y + 2.0).toFixed(1)}, 0, 1.2, 100\n`;
   }
   return t + "furniture, 7.4, 8.0, 0.0, 6.0, 0, 2.0, 0   # cupboards along the back wall\n";
+} };
+// mixing ventilation from four 0.6 x 0.6 m swirl diffusers in the ceiling; columns 9-10 of an inlet line are the
+// spread (outward from the diffuser centre) and the swirl (around it) of the jet, in degrees from the wall normal
+EXAMPLES.swirl = { room: [8, 6, 2.7], text: () => {
+  let t = "type, x0, x1, y0, y1, z0, z1, power_W, spread, swirl\n# office, 8 x 6 x 2.7 m: four ceiling swirl diffusers 0.6 x 0.6 m, an exhaust in the ceiling centre, 8 people with PCs\n";
+  for (const x of [1.7, 5.7]) for (const y of [1.2, 4.2]) t += `inlet, ${x.toFixed(1)}, ${(x + 0.6).toFixed(1)}, ${y.toFixed(1)}, ${(y + 0.6).toFixed(1)}, 2.7, 2.7, 0, 30, 65   # swirl diffuser\n`;
+  t += "exhaust, 3.8, 4.2, 2.8, 3.2, 2.7, 2.7, 0   # exhaust 0.4 x 0.4 m in the ceiling centre\n";
+  for (const y of [1.0, 4.2]) {
+    t += `furniture, 1.5, 6.3, ${y.toFixed(1)}, ${(y + 0.8).toFixed(1)}, 0.72, 0.72, 0   # row of desks\n`;
+    for (const x of [2.1, 3.7, 4.5, 5.3]) t += `heat, ${x.toFixed(1)}, ${(x + 0.4).toFixed(1)}, ${(y === 1.0 ? y - 0.4 : y + 0.8).toFixed(1)}, ${(y === 1.0 ? y : y + 1.2).toFixed(1)}, 0, 1.2, 100\n`
+      + `heat, ${x.toFixed(1)}, ${(x + 0.3).toFixed(1)}, ${(y + 0.25).toFixed(1)}, ${(y + 0.55).toFixed(1)}, 0.72, 1.15, 60   # PC\n`;
+  }
+  return t;
 } };
 // Chen, Yuan, Hu, Glicksman & Yang (1998), Detailed experimental data of room airflow with displacement ventilation,
 // Roomvent 98 (AIVC 11494): the two-person office in the MIT test chamber, 5.16 x 3.65 x 2.43 m, with a displacement

@@ -30,6 +30,10 @@ Boundary conditions
   outlet  : p = 0, zero-gradient velocity and temperature
   Case.inlet and Case.outlet are one opening each in the facade, back wall or ceiling; Vent openings
   (Case.vents, or inlet and exhaust lines in a layout file) can sit anywhere on any of the six walls.
+  An inlet Vent can blow at an angle: `spread` turns the air outwards from the vent centre and `swirl`
+  turns it around the centre (a swirl diffuser), both in degrees from the wall normal. The normal speed,
+  and so the airflow, is the same; the tangential speed U tan(angle) is the no-slip value of the
+  velocity along the wall on the inlet faces.
 Heat sources
   HeatBlock: total power (W) spread over a box; FloorFlux: total power (W) over a floor rectangle
 Furniture (Case.furniture)
@@ -86,6 +90,8 @@ class Furniture:
 class Vent:
     kind: str            # "inlet" or "exhaust"
     x0: float; x1: float; y0: float; y1: float; z0: float; z1: float   # zero size along the axis normal to its wall
+    spread: float = 0.0  # inlets: degrees from the wall normal, outwards from the vent centre
+    swirl: float = 0.0   # inlets: degrees from the wall normal, around the vent centre
 
 
 @dataclass
@@ -255,8 +261,9 @@ def read_layout(src):
         kind = f[0].lower()
         try:
             v = [float(x) for x in f[1:7]] + [float(f[7]) if len(f) > 7 and f[7] else 0.0]
+            ang = [float(f[k]) if len(f) > k and f[k] else 0.0 for k in (8, 9)]   # inlets: spread, swirl
         except (ValueError, IndexError):
-            raise ValueError(f"layout line {no}: expected type, x0, x1, y0, y1, z0, z1, power_W") from None
+            raise ValueError(f"layout line {no}: expected type, x0, x1, y0, y1, z0, z1, power_W[, spread, swirl]") from None
         x0, x1, y0, y1, z0, z1, pw = v
         if kind == "heat":
             out["heat"].append(HeatBlock(x0, x1, y0, y1, z0, z1, pw))
@@ -265,7 +272,7 @@ def read_layout(src):
         elif kind == "furniture":
             out["furniture"].append(Furniture(x0, x1, y0, y1, z0, z1))
         elif kind in ("inlet", "exhaust"):
-            out["vents"].append(Vent(kind, x0, x1, y0, y1, z0, z1))
+            out["vents"].append(Vent(kind, x0, x1, y0, y1, z0, z1, *(ang if kind == "inlet" else (0.0, 0.0))))
         else:
             raise ValueError(f"layout line {no}: unknown type {f[0]!r} (heat, floor, furniture, inlet or exhaust)")
     return out
@@ -369,16 +376,7 @@ def boundaries(case):
     for no, v in enumerate(vents, 1):
         if v.kind not in ("inlet", "exhaust"):
             raise ValueError(f"vent {no}: kind must be inlet or exhaust, not {v.kind!r}")
-        lo, hi = (v.x0, v.y0, v.z0), (v.x1, v.y1, v.z1)
-        a = [k for k in range(3) if abs(hi[k] - lo[k]) < 1e-9]
-        side = None
-        if len(a) == 1:
-            a = a[0]; side = 0 if abs(lo[a]) < 1e-6 else 1 if abs(lo[a] - size[a]) < 1e-6 else None
-        if side is None:
-            raise ValueError(f"{v.kind} {no} is not on a wall: give it zero size along one axis, at 0 or at the room size")
-        o1, o2 = [k for k in range(3) if k != a]
-        sel = [(cen[k] > min(lo[k], hi[k])) & (cen[k] < max(lo[k], hi[k])) for k in (o1, o2)]
-        m = sel[0][:, None] & sel[1][None, :]
+        a, side, m = _vent_faces(v, no, size, cen)
         if not m.any():
             raise ValueError(f"{v.kind} {no} covers no cell faces: make it larger or refine the mesh")
         if (b[(a, side)][m] != WALL).any():
@@ -389,6 +387,53 @@ def boundaries(case):
     if not any((m == OUTLET).any() for m in b.values()):
         raise ValueError("the room has no exhaust")
     return b
+
+
+def _vent_faces(v, no, size, cen):
+    """The wall of a vent (axis, side) and its faces on that wall (a mask over the other two axes)."""
+    lo, hi = (v.x0, v.y0, v.z0), (v.x1, v.y1, v.z1)
+    a = [k for k in range(3) if abs(hi[k] - lo[k]) < 1e-9]
+    side = None
+    if len(a) == 1:
+        a = a[0]; side = 0 if abs(lo[a]) < 1e-6 else 1 if abs(lo[a] - size[a]) < 1e-6 else None
+    if side is None:
+        raise ValueError(f"{v.kind} {no} is not on a wall: give it zero size along one axis, at 0 or at the room size")
+    o1, o2 = [k for k in range(3) if k != a]
+    sel = [(cen[k] > min(lo[k], hi[k])) & (cen[k] < max(lo[k], hi[k])) for k in (o1, o2)]
+    return a, side, sel[0][:, None] & sel[1][None, :]
+
+
+def inlet_tangential(case):
+    """Tangential inlet velocity per unit normal speed, for the momentum ghost values: an array
+    ut[c, a, side, p, q] for velocity c on the wall (a, side), at the U_c faces next to the wall (p, q index
+    the two axes other than a, in order; along c over the n_c + 1 faces). None when no inlet blows at an angle."""
+    vents = [v for v in getattr(case, "vents", []) if v.kind == "inlet" and (v.spread or v.swirl)]
+    if not vents:
+        return None
+    n = (case.nx, case.ny, case.nz)
+    size = (case.L, case.W, case.H)
+    cen = [(np.arange(n[k]) + 0.5) * size[k] / n[k] for k in range(3)]
+    nm = max(n) + 1
+    ut = np.zeros((3, 3, 2, nm, nm))
+    for no, v in enumerate(vents, 1):
+        a, side, m = _vent_faces(v, no, size, cen)
+        o1, o2 = [k for k in range(3) if k != a]
+        lo, hi = (v.x0, v.y0, v.z0), (v.x1, v.y1, v.z1)
+        c1, c2 = 0.5 * (lo[o1] + hi[o1]), 0.5 * (lo[o2] + hi[o2])
+        r1, r2 = cen[o1][:, None] - c1, cen[o2][None, :] - c2
+        rr = np.hypot(r1, r2); rr = np.where(rr > 0, rr, np.inf)
+        e1, e2 = r1 / rr, r2 / rr                         # unit vector outwards from the centre (0 at the centre)
+        # around the centre: the inward normal crossed with the outward vector (o1, o2 in cyclic order with a)
+        sgn = (1.0 if side == 0 else -1.0) * (1.0 if (o1 - a) % 3 == 1 else -1.0)
+        t1, t2 = -sgn * e2, sgn * e1
+        ts, tw = np.tan(np.radians(v.spread)), np.tan(np.radians(v.swirl))
+        vt = [np.where(m, ts * e1 + tw * t1, 0.0), np.where(m, ts * e2 + tw * t2, 0.0)]
+        for c, f in ((o1, vt[0]), (o2, vt[1])):
+            ax = 0 if c == o1 else 1                      # axis of c in the wall array
+            pad = np.concatenate([np.zeros_like(_sl(f, ax, 0, 1)), f, np.zeros_like(_sl(f, ax, 0, 1))], axis=ax)
+            avg = 0.5 * (_sl(pad, ax, 0, -1) + _sl(pad, ax, 1, None))   # at the U_c faces along the wall
+            ut[c, a, side, :avg.shape[0], :avg.shape[1]] += avg
+    return ut
 
 
 def _wall(a, axis, side, n):
@@ -405,6 +450,7 @@ def run(case: Case, verbose=False, monitor_every=50):
     shp = [tuple(n[k] + (1 if k == c else 0) for k in range(3)) for c in range(3)]
     bnd = boundaries(case)
     area = (dy * dz, dx * dz, dx * dy)                     # face area of the walls normal to x, y, z
+    ut = inlet_tangential(case)                            # inlets that blow at an angle (None: all straight)
     A_in = sum((m == INLET).sum() * area[a] for (a, side), m in bnd.items())
     U_in = case.q / A_in
     h_in = A_in / case.W                                  # mean opening height (for the k-eps inlet length)
@@ -587,7 +633,16 @@ def run(case: Case, verbose=False, monitor_every=50):
                     Ua = U[a]                                                  # velocity a at the c faces
                     vel = 0.25 * (_sl(_sl(Ua, c, 0, -1), a, 0, -1) + _sl(_sl(Ua, c, 1, None), a, 0, -1)
                                   + _sl(_sl(Ua, c, 0, -1), a, 1, None) + _sl(_sl(Ua, c, 1, None), a, 1, None))
-                    G_ = _mirror(inner, a)
+                    if ut is None:
+                        G_ = _mirror(inner, a)
+                    else:                                  # no slip, but at the tangential inlet speed on inlet faces
+                        o1, o2 = [kk for kk in range(3) if kk != a]
+                        g = []
+                        for side in (0, 1):
+                            u2 = U_in * ut[c, a, side, :n[o1] + (o1 == c), :n[o2] + (o2 == c)]
+                            u2 = np.expand_dims(_sl(u2, 0 if c == o1 else 1, 1, -1), a)
+                            g.append(2 * u2 - _sl(inner, a, 0, 1) if side == 0 else 2 * u2 - _sl(inner, a, -1, None))
+                        G_ = np.concatenate([g[0], inner, g[1]], axis=a)
                     deriv = _ddx(_edge(G_, a), vel, d[a], tvd, a)
                     ne = nu_e[(min(a, c), max(a, c))]                         # on the edges
                     flux = _sl(ne, c, 1, -1) * np.diff(G_, axis=a) / d[a]

@@ -55,15 +55,10 @@ export function boundaries(c) {
   // vents (as room_cfd_3d.boundaries): a rectangle on any wall, zero size along the axis normal to it
   const size = [c.L, c.W, c.H], cen = [xc, yc, zc], key = [["L", "R"], ["B", "F"], ["D", "T"]];
   vents.forEach((v, no) => {
-    const lo = [v.x0, v.y0, v.z0], hi = [v.x1, v.y1, v.z1], thin = [0, 1, 2].filter((k) => Math.abs(hi[k] - lo[k]) < 1e-9);
-    let side = null, a = thin[0];
-    if (thin.length === 1) side = Math.abs(lo[a]) < 1e-6 ? 0 : Math.abs(lo[a] - size[a]) < 1e-6 ? 1 : null;
-    if (side === null) throw new Error(`${v.kind} ${no + 1} is not on a wall: give it zero size along one axis, at 0 or at the room size`);
-    const [o1, o2] = [0, 1, 2].filter((k) => k !== a), m = b[key[a][side]], n2 = cen[o2].length;
-    const ins = (k, i) => cen[k][i] > Math.min(lo[k], hi[k]) && cen[k][i] < Math.max(lo[k], hi[k]);
+    const { a, side, o1, o2, ins } = ventFaces(v, no, size, cen), m = b[key[a][side]], n2 = cen[o2].length;
     let any = false;
     for (let i = 0; i < cen[o1].length; i++) for (let j = 0; j < n2; j++) {
-      if (!ins(o1, i) || !ins(o2, j)) continue;
+      if (!ins(i, j)) continue;
       if (m[i * n2 + j] !== WALL) throw new Error(`${v.kind} ${no + 1} overlaps another opening`);
       m[i * n2 + j] = v.kind === "inlet" ? INLET : OUTLET; any = true;
     }
@@ -89,7 +84,11 @@ export function readLayout(text) {
     if (kind === "heat") out.heat.push({ x0, x1, y0, y1, z0, z1, power });
     else if (kind === "floor") out.floor_flux.push({ x0, x1, y0, y1, power });
     else if (kind === "furniture") out.furniture.push({ x0, x1, y0, y1, z0, z1 });
-    else if (kind === "inlet" || kind === "exhaust") out.vents.push({ kind, x0, x1, y0, y1, z0, z1 });
+    else if (kind === "inlet" || kind === "exhaust") {
+      const ang = [8, 9].map((k) => (f.length > k && f[k] !== "" ? Number(f[k]) : 0));   // inlets: spread, swirl
+      if (ang.some((x) => !Number.isFinite(x))) throw new Error(`layout line ${no + 1}: spread and swirl must be numbers`);
+      out.vents.push({ kind, x0, x1, y0, y1, z0, z1, spread: kind === "inlet" ? ang[0] : 0, swirl: kind === "inlet" ? ang[1] : 0 });
+    }
     else throw new Error(`layout line ${no + 1}: unknown type "${f[0]}" (heat, floor, furniture, inlet or exhaust)`);
   });
   return out;
@@ -131,6 +130,46 @@ export function obstacles(c) {
     }
   }
   return { mk: blocked.map((b) => Float32Array.from(b, (x) => 1 - x)), solid };
+}
+
+// the wall of a vent (axis a, side) and which of its faces it covers (ins(i, j) over the other two axes o1 < o2)
+function ventFaces(v, no, size, cen) {
+  const lo = [v.x0, v.y0, v.z0], hi = [v.x1, v.y1, v.z1], thin = [0, 1, 2].filter((k) => Math.abs(hi[k] - lo[k]) < 1e-9);
+  let side = null; const a = thin[0];
+  if (thin.length === 1) side = Math.abs(lo[a]) < 1e-6 ? 0 : Math.abs(lo[a] - size[a]) < 1e-6 ? 1 : null;
+  if (side === null) throw new Error(`${v.kind} ${no + 1} is not on a wall: give it zero size along one axis, at 0 or at the room size`);
+  const [o1, o2] = [0, 1, 2].filter((k) => k !== a);
+  const inn = (k, i) => cen[k][i] > Math.min(lo[k], hi[k]) && cen[k][i] < Math.max(lo[k], hi[k]);
+  return { a, side, o1, o2, lo, hi, ins: (i, j) => inn(o1, i) && inn(o2, j) };
+}
+
+// tangential inlet velocity per unit normal speed (as room_cfd_3d.inlet_tangential): ut[c, a, side, p, q], or null
+export function inletTangential(c) {
+  const vents = (c.vents || []).filter((v) => v.kind === "inlet" && (v.spread || v.swirl));
+  if (!vents.length) return null;
+  const n = [c.nx, c.ny, c.nz], size = [c.L, c.W, c.H], cen = n.map((m, k) => centres(m, size[k] / m)), NM = Math.max(...n) + 1;
+  const ut = new Float64Array(3 * 3 * 2 * NM * NM);
+  vents.forEach((v, no) => {
+    const { a, side, o1, o2, lo, hi, ins } = ventFaces(v, no, size, cen), N1 = n[o1], N2 = n[o2];
+    const c1 = 0.5 * (lo[o1] + hi[o1]), c2 = 0.5 * (lo[o2] + hi[o2]);
+    const sgn = (side === 0 ? 1 : -1) * ((o1 - a + 3) % 3 === 1 ? 1 : -1);
+    const ts = Math.tan(v.spread * Math.PI / 180), tw = Math.tan(v.swirl * Math.PI / 180);
+    const vt = [new Float64Array(N1 * N2), new Float64Array(N1 * N2)];
+    for (let i = 0; i < N1; i++) for (let j = 0; j < N2; j++) {
+      if (!ins(i, j)) continue;
+      const r1 = cen[o1][i] - c1, r2 = cen[o2][j] - c2, rr = Math.hypot(r1, r2), e1 = rr > 0 ? r1 / rr : 0, e2 = rr > 0 ? r2 / rr : 0;
+      vt[0][i * N2 + j] = ts * e1 + tw * (-sgn * e2); vt[1][i * N2 + j] = ts * e2 + tw * (sgn * e1);
+    }
+    for (const [cc, f] of [[o1, vt[0]], [o2, vt[1]]]) {
+      const P = N1 + (cc === o1 ? 1 : 0), Q = N2 + (cc === o2 ? 1 : 0);
+      const fv = (i, j) => (i >= 0 && i < N1 && j >= 0 && j < N2 ? f[i * N2 + j] : 0);
+      for (let i = 0; i < P; i++) for (let j = 0; j < Q; j++) {
+        const avg = cc === o1 ? 0.5 * (fv(i - 1, j) + fv(i, j)) : 0.5 * (fv(i, j - 1) + fv(i, j));
+        ut[(((cc * 3 + a) * 2 + side) * NM + i) * NM + j] += avg;
+      }
+    }
+  });
+  return { ut, NM };
 }
 
 // pressure operator M = -A (SPD) as face coefficients and diagonal; coarse levels by aggregation.
@@ -240,6 +279,7 @@ export async function createSim(device, c) {
   const k_in = 1.5 * (c.Tu_in * U_in) ** 2, e_in = k_in ** 1.5 / (0.1 * h_in);
   const xc = centres(nx, dx), yc = centres(ny, dy), zc = centres(nz, dz);
   const obs = (c.furniture || []).length > 0;
+  const tg = inletTangential(c), swl = tg !== null;           // inlets that blow at an angle
   const { mk, solid } = obstacles(c);
 
   // ---- memory layout: one f32 storage buffer, scalars first ----
@@ -262,6 +302,7 @@ export async function createSim(device, c) {
   for (const f of ["F2", "Fk2", "Fe2"]) alloc(f, Nw);
   alloc("au", Nu + Nv + Nw); O.av = O.au + Nu; O.aw = O.av + Nv;           // contiguous like u, v, w
   for (const f of ["aT", "as", "anu", "ak"]) alloc(f, N);
+  if (swl) alloc("ut", tg.ut.length);
   if (obs) { alloc("mk", Nu + Nv + Nw); O.mv = O.mk + Nu; O.mw = O.mv + Nv; }    // open-face masks, ordered as u, v, w
 
   // multigrid levels
@@ -358,6 +399,7 @@ export async function createSim(device, c) {
   }
   ops.forEach((op, l) => { put(`cx${l}`, op.cx); put(`cy${l}`, op.cy); put(`cz${l}`, op.cz); put(`dg${l}`, op.dg); });
   put("Minv", Minv);
+  if (swl) put("ut", tg.ut.map((x) => x * U_in));
   if (obs) { put("mk", mk[0]); put("mv", mk[1]); put("mw", mk[2]); }
 
   // ---- WGSL ----
@@ -419,7 +461,12 @@ fn gv(c: i32, a: i32, p: vec3<i32>, s: i32) -> f32 {
   let n = ushp(c); let q = p + sh(a, s);
   let qc = clamp(q, vec3<i32>(0), n - vec3<i32>(1));
   let v = at(uoff(c), n, qc);
-  if (a != c && any(q != qc)) { return -v; }
+  if (a != c && any(q != qc)) {
+    ${swl ? `// no slip at the tangential inlet speed on inlet faces
+    var pi = p.x; var qi = p.z; if (a == 0) { pi = p.y; } if (a == 2) { qi = p.y; }
+    let side = select(1, 0, any(q < vec3<i32>(0)));
+    return 2.0 * F[O_ut + (((c * 3 + a) * 2 + side) * ${tg.NM} + pi) * ${tg.NM} + qi] - v;` : "return -v;"}
+  }
   return v;
 }
 fn mterm(c: i32, a: i32, p: vec3<i32>, u0: f32, h: f32) -> f32 {
