@@ -97,7 +97,11 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
         <input id="W" type="range" min="2" max="8" step="0.5" value="4"></label>
       <label for="H"><span class="row"><span>Ceiling height</span><span class="val" id="HV"></span></span>
         <input id="H" type="range" min="2.4" max="4" step="0.1" value="2.5"></label>
-      <p class="note">The exhaust sits in the back wall, 0.1–0.2 m below the ceiling.</p>
+      <label for="exhaust">Exhaust
+        <select id="exhaust">
+          <option value="back">Back wall, 0.1–0.2 m below the ceiling</option>
+          <option value="ceiling">Ceiling, centre, 0.43 × 0.43 m</option>
+        </select></label>
     </div>
     <div class="group">
       <h2>Window (facade)</h2>
@@ -153,6 +157,9 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
               <option value="single">One heat source (as the sliders)</option>
               <option value="office">Two-person office</option>
               <option value="classroom">Classroom, 8 × 7 × 3 m</option>
+              <option value="meeting">Meeting room, 8 people, 6 × 4 × 2.7 m</option>
+              <option value="open">Open office with screens, 8 × 6 × 2.7 m</option>
+              <option value="chen">Validation: two-person office, Chen et al. (AIVC)</option>
             </select></label>
           <div class="btns"><button class="btn ghost" id="openFile" type="button">Open file …</button></div>
           <input type="file" id="fileIn" accept=".csv,.txt,text/csv,text/plain" hidden>
@@ -303,7 +310,7 @@ const $ = (id) => document.getElementById(id);
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const fmt = (x, d = 2) => Number.isFinite(x) ? x.toFixed(d) : "–";
 let L = 5, W = 4, H = 2.5;
-const state = { preset: "window", wy: 2, width: 1.2, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, L: 5, W: 4, H: 2.5, hx: 2.5, hy: 2, hw: 0.8, hd: 0.6, hh: 1.2, heatCentred: true, showCuts: true, showOZ: true, iso: { T: 24, speed: 0.15, DR: 20 }, mesh: [0.1, 0.1, 0.1], turb: "k-epsilon", adv: "tvd", field: "T", ycut: 2, zcut: 0.1, xcut: 2.5, xcutCentred: true, showMesh: false, ozF: 0.6, ozW: 0.6, ozH: 1.8, useLayout: false, layout: null, layoutErr: "" };
+const state = { preset: "window", wy: 2, width: 1.2, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, L: 5, W: 4, H: 2.5, hx: 2.5, hy: 2, hw: 0.8, hd: 0.6, hh: 1.2, heatCentred: true, showCuts: true, showOZ: true, iso: { T: 24, speed: 0.15, DR: 20 }, mesh: [0.1, 0.1, 0.1], turb: "k-epsilon", adv: "tvd", field: "T", ycut: 2, zcut: 0.1, xcut: 2.5, xcutCentred: true, showMesh: false, exhaust: "back", ozF: 0.6, ozW: 0.6, ozH: 1.8, useLayout: false, layout: null, layoutErr: "" };
 let device = null, sim = null, geo = null, f = null, runId = 0, stopReq = false, done = false, lastProg = null, hist = null, prev = null;
 
 // ---------- layout: several heat sources and furniture ----------
@@ -331,6 +338,46 @@ floor, 0.2, 1.6, 0.8, 3.2, 0, 0, 300           # sun patch on the floor` },
     return t + "heat, 0.6, 1.0, 3.3, 3.7, 0, 1.7, 100   # teacher, standing\nheat, 3.8, 4.2, 3.3, 3.7, 2.6, 2.8, 200   # projector under the ceiling\n";
   } },
 };
+EXAMPLES.meeting = { room: [6, 4, 2.7], text: () => {
+  let t = "type, x0, x1, y0, y1, z0, z1, power_W\n# meeting room, 6 x 4 x 2.7 m: 8 seated people around a table, a screen on the back wall\n";
+  t += "furniture, 1.5, 4.5, 1.4, 2.6, 0.72, 0.72, 0   # meeting table (thin top)\n";
+  for (const x of [1.9, 2.9, 3.9]) t += `heat, ${x.toFixed(1)}, ${(x + 0.4).toFixed(1)}, 0.8, 1.2, 0, 1.2, 100\nheat, ${x.toFixed(1)}, ${(x + 0.4).toFixed(1)}, 2.8, 3.2, 0, 1.2, 100\n`;
+  t += "heat, 0.9, 1.3, 1.8, 2.2, 0, 1.2, 100   # chair at the table end\nheat, 4.7, 5.1, 1.8, 2.2, 0, 1.2, 100\n";
+  return t + "heat, 5.8, 5.9, 1.4, 2.6, 1.0, 1.8, 150   # screen on the back wall\n";
+} };
+EXAMPLES.open = { room: [8, 6, 2.7], text: () => {
+  let t = "type, x0, x1, y0, y1, z0, z1, power_W\n# open office, 8 x 6 x 2.7 m: three pairs of facing desks with 1.2 m screens between them\n";
+  for (const y of [1.0, 2.6, 4.2]) {
+    t += `furniture, 1.5, 6.3, ${y.toFixed(1)}, ${(y + 1.6).toFixed(1)}, 0.72, 0.72, 0   # pair of desks\n`;
+    t += `furniture, 1.5, 6.3, ${(y + 0.8).toFixed(1)}, ${(y + 0.8).toFixed(1)}, 0.72, 1.2, 0   # screen between them\n`;
+    for (const x of [2.1, 3.7, 5.3]) t += `heat, ${x.toFixed(1)}, ${(x + 0.4).toFixed(1)}, ${(y - 0.4).toFixed(1)}, ${y.toFixed(1)}, 0, 1.2, 100\n`
+      + `heat, ${x.toFixed(1)}, ${(x + 0.4).toFixed(1)}, ${(y + 1.6).toFixed(1)}, ${(y + 2.0).toFixed(1)}, 0, 1.2, 100\n`;
+  }
+  return t + "furniture, 7.4, 8.0, 0.0, 6.0, 0, 2.0, 0   # cupboards along the back wall\n";
+} };
+// Chen, Yuan, Hu, Glicksman & Yang (1998), Detailed experimental data of room airflow with displacement ventilation,
+// Roomvent 98 (AIVC 11494): the two-person office in the MIT test chamber, 5.16 x 3.65 x 2.43 m, with a displacement
+// diffuser 0.5 m wide and 1.1 m high mid-wall at the floor, 4 h-1 at 17 °C and an exhaust 0.43 x 0.43 m in the ceiling centre.
+// Here the diffuser wall is the facade (x = 0). The paper gives the sizes and powers but places the sources and the
+// furniture only in a figure, so the positions below are approximate.
+EXAMPLES.chen = { room: [3.65, 5.16, 2.43], setup: () => {
+  Object.assign(state, { preset: "custom", width: 0.5, lo: 0, hi: 1.1, wy: 5.16 / 2, tin: 17, ach: 4, exhaust: "ceiling" });
+  for (const k of ["width", "lo", "hi", "wy", "tin", "ach"]) $(k).value = state[k];
+  $("preset").value = "custom"; $("exhaust").value = "ceiling";
+}, text: () => `type, x0, x1, y0, y1, z0, z1, power_W
+# Chen et al. (1998), two-person office with displacement ventilation (AIVC 11494), 3.65 x 5.16 x 2.43 m
+# sizes and powers from the paper; positions approximate (the paper shows them only in a figure)
+heat, 2.0, 2.4, 1.10, 1.45, 0, 1.1, 75        # occupant simulator 1: box 0.4 x 0.35 x 1.1 m, 3 x 25 W bulbs
+heat, 2.0, 2.4, 3.71, 4.06, 0, 1.1, 75        # occupant simulator 2
+heat, 2.75, 3.15, 1.4, 1.8, 0.72, 1.15, 108   # computer 1
+heat, 2.75, 3.15, 3.36, 3.76, 0.72, 1.15, 173 # computer 2
+heat, 1.0, 1.3, 0.8, 4.36, 2.30, 2.43, 102    # overhead lights, 3 x 34 W
+heat, 2.35, 2.65, 0.8, 4.36, 2.30, 2.43, 102  # overhead lights, 3 x 34 W
+furniture, 2.5, 3.25, 0.6, 2.0, 0.72, 0.72, 0     # table 1 (thin top)
+furniture, 2.5, 3.25, 3.16, 4.56, 0.72, 0.72, 0   # table 2
+furniture, 3.05, 3.65, 0.0, 0.45, 0, 0.72, 0      # file cabinet 1
+furniture, 3.05, 3.65, 4.71, 5.16, 0, 0.72, 0     # file cabinet 2
+` };
 const layoutOn = () => state.useLayout && !!state.layout;
 const layoutQ = () => [...state.layout.heat, ...state.layout.floor_flux].reduce((s, b) => s + b.power, 0);
 // well-mixed room temperature: the slider, or from the heat gains in the layout
@@ -351,14 +398,28 @@ function loadExample(key) {
     [state.L, state.W, state.H] = ex.room; for (const k of ["L", "W", "H"]) $(k).value = state[k];
     applyDims();
   }
+  // the validation case sets its own diffuser, supply and exhaust; the other examples go back to the default window
+  if (ex.setup) ex.setup();
+  else {
+    Object.assign(state, { preset: "window", wy: W / 2, tin: 16, ach: 6, exhaust: "back" }); applyPreset();
+    for (const k of ["wy", "tin", "ach"]) $(k).value = state[k];
+    $("preset").value = "window"; $("exhaust").value = "back";
+  }
+  applyDims();
   $("layoutText").value = ex.text(); parseLayout();
 }
 
+const len = (v) => Math.abs(v * 10 - Math.round(v * 10)) < 1e-6 ? v.toFixed(1) : v.toFixed(2);     // 3.6 or 3.65
+// exhaust: in the back wall under the ceiling, or a square in the middle of the ceiling
+function outletOf() {
+  if (state.exhaust === "ceiling") return { side: "top", start: L / 2 - 0.215, end: L / 2 + 0.215, y0: W / 2 - 0.215, y1: W / 2 + 0.215 };
+  return { side: "right", start: H - 0.2, end: H - 0.1 };
+}
 function syncLabels() {
-  $("widthV").textContent = state.width.toFixed(1) + " m"; $("wyV").textContent = state.wy.toFixed(1) + " m";
+  $("widthV").textContent = len(state.width) + " m"; $("wyV").textContent = len(state.wy) + " m";
   $("hatchOpt").textContent = `Top hatch, 1.2 m wide, ${(H - 0.3).toFixed(1)}–${(H - 0.1).toFixed(1)} m`; $("loV").textContent = state.lo.toFixed(1) + " m"; $("hiV").textContent = state.hi.toFixed(1) + " m";
   $("tinV").textContent = state.tin + " °C"; $("achV").textContent = state.ach + " h⁻¹"; $("troomV").textContent = state.troom + " °C";
-  for (const k of ["L", "W", "H"]) $(k + "V").textContent = state[k].toFixed(1) + " m";
+  for (const k of ["L", "W", "H"]) $(k + "V").textContent = len(state[k]) + " m";
   const [mx, my, mz] = meshN(); $("meshNote").textContent = `${mx} × ${my} × ${mz} = ${(mx * my * mz).toLocaleString("en")} cells`;
   for (const k of ["hx", "hy", "hw", "hd", "hh"]) $(k + "V").textContent = state[k].toFixed(1) + " m";
   if (state.hh === 0) $("hhV").textContent = "0 m, heated floor";
@@ -422,12 +483,12 @@ function makeCase() {
   const [nx, ny, nz] = meshN(), [y0, y1] = winY();
   if (layoutOn()) return Object.assign(defaultCase(), { L, W, H, nx, ny, nz, ach: state.ach, T_in: state.tin,
     inlet: { side: "left", start: state.lo, end: state.hi, y0: state.width >= W ? null : y0, y1: state.width >= W ? null : y1 },
-    outlet: { side: "right", start: H - 0.2, end: H - 0.1 },
+    outlet: outletOf(),
     heat: state.layout.heat, floor_flux: state.layout.floor_flux, furniture: state.layout.furniture,
     turbulence: state.turb, advection: state.adv, t_end: 1800, t_avg: 600 });
   return Object.assign(defaultCase(), { L, W, H, nx, ny, nz, ach: state.ach, T_in: state.tin,
     inlet: { side: "left", start: state.lo, end: state.hi, y0: state.width >= W ? null : y0, y1: state.width >= W ? null : y1 },
-    outlet: { side: "right", start: H - 0.2, end: H - 0.1 },
+    outlet: outletOf(),
     // height 0: the heat source collapses to a heated patch of floor (heat flux into the air at the floor)
     heat: state.hh > 0 ? [Object.assign(heatBox(), { power: Q })] : [],
     floor_flux: state.hh > 0 ? [] : [(({ x0, x1, y0, y1 }) => ({ x0, x1, y0, y1, power: Q }))(heatBox())], turbulence: state.turb, advection: state.adv, t_end: 1800, t_avg: 600 });
@@ -774,7 +835,9 @@ function draw() {
     const inWin = state.width >= W || ((j + 0.5) * dy > y0 && (j + 0.5) * dy < y1);
     g.lineWidth = 6; g.strokeStyle = inWin ? "#2f7fd0" : "rgba(47,127,208,0.35)";
     g.beginPath(); g.moveTo(X(0) - 2, Y(state.lo)); g.lineTo(X(0) - 2, Y(state.hi)); g.stroke();
-    g.strokeStyle = css("--muted"); g.beginPath(); g.moveTo(X(L) + 2, Y(H - 0.2)); g.lineTo(X(L) + 2, Y(H - 0.1)); g.stroke();
+    const ex = outletOf();
+    if (ex.side === "top") { const on = state.ycut > ex.y0 && state.ycut < ex.y1; g.strokeStyle = on ? css("--muted") : "rgba(128,128,128,0.35)"; g.beginPath(); g.moveTo(X(ex.start), Y(H) - 2); g.lineTo(X(ex.end), Y(H) - 2); g.stroke(); }
+    else { g.strokeStyle = css("--muted"); g.beginPath(); g.moveTo(X(L) + 2, Y(H - 0.2)); g.lineTo(X(L) + 2, Y(H - 0.1)); g.stroke(); }
     axes(g, X, Y, "x", "z");
   }, $("iso"));
   // plan, at z
@@ -784,6 +847,10 @@ function draw() {
     drawItems(g, X, Y, sc, 0, 1, 2, state.zcut);
     g.lineWidth = 6; g.strokeStyle = "#2f7fd0"; g.beginPath(); g.moveTo(X(0) - 2, Y(y0)); g.lineTo(X(0) - 2, Y(y1)); g.stroke();
     cutLine(g, X, Y, true, state.ycut, 0, L); cutLine(g, X, Y, false, state.xcut, 0, W);
+    const ex = outletOf();
+    g.lineWidth = 1.4; g.strokeStyle = css("--muted"); g.setLineDash([4, 3]);
+    if (ex.side === "top") g.strokeRect(X(ex.start), Y(ex.y1), (ex.end - ex.start) * sc, (ex.y1 - ex.y0) * sc);
+    g.setLineDash([]);
     axes(g, X, Y, "x", "y");
   });
   // cross section, at x, seen from the facade
@@ -793,6 +860,8 @@ function draw() {
     drawItems(g, X, Y, sc, 1, 2, 0, state.xcut);
     // window and exhaust in outline: they lie in the end walls, not in this section
     g.setLineDash([4, 3]); g.lineWidth = 1.4; g.strokeStyle = "rgba(47,127,208,0.8)"; g.strokeRect(X(y0), Y(state.hi), (y1 - y0) * sc, (state.hi - state.lo) * sc); g.setLineDash([]);
+    const ex = outletOf();
+    if (ex.side === "top") { const on = state.xcut > ex.start && state.xcut < ex.end; g.lineWidth = 6; g.strokeStyle = on ? css("--muted") : "rgba(128,128,128,0.35)"; g.beginPath(); g.moveTo(X(ex.y0), Y(H) - 2); g.lineTo(X(ex.y1), Y(H) - 2); g.stroke(); }
     axes(g, X, Y, "y", "z");
   });
   if (f.preview) {
@@ -853,6 +922,7 @@ for (const id of ["L", "W", "H"]) {
   $(id).addEventListener("input", (e) => { state[id] = +e.target.value; applyDims(); syncLabels(); preview(); });
   $(id).addEventListener("change", start);
 }
+$("exhaust").addEventListener("change", (e) => { state.exhaust = e.target.value; preview(); start(); });
 $("preset").addEventListener("change", (e) => { state.preset = e.target.value; applyPreset(); applyDims(); syncLabels(); preview(); start(); });
 $("iso").addEventListener("input", (e) => { state.iso[state.field] = +e.target.value; $("isoV").textContent = fieldRange().fmt(state.iso[state.field]); draw(); });
 for (const id of ["showCuts", "showOZ"]) $(id).addEventListener("change", (e) => { state[id] = e.target.checked; draw(); });
