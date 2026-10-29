@@ -30,6 +30,11 @@ Boundary conditions
   outlet  : in the facade, back wall or ceiling, p = 0, zero-gradient velocity and temperature
 Heat sources
   HeatBlock: total power (W) spread over a box; FloorFlux: total power (W) over a floor rectangle
+Furniture (Case.furniture)
+  Furniture: a solid box (no air inside), or, with zero thickness along one axis, a thin plate (a table
+  top, a partition) that blocks the cell faces in its plane. Both are adiabatic; the air next to them
+  feels a no-slip wall (log law with k-epsilon), but the k-epsilon wall cells are only at the room walls.
+  read_layout() reads heat sources, heated floor areas and furniture from a CSV file (one box per line).
 
 Contact: Christian Hviid, cahv@dtu.dk
 
@@ -70,6 +75,11 @@ class FloorFlux:
 
 
 @dataclass
+class Furniture:
+    x0: float; x1: float; y0: float; y1: float; z0: float; z1: float   # zero thickness = a thin plate
+
+
+@dataclass
 class Case:
     L: float = 5.0              # room depth (m), x
     W: float = 4.0              # room width (m), y
@@ -84,6 +94,7 @@ class Case:
     outlet: Opening = field(default_factory=lambda: Opening("right", 2.20, 2.40))
     heat: list = field(default_factory=list)
     floor_flux: list = field(default_factory=list)
+    furniture: list = field(default_factory=list)
     turbulence: str = "k-epsilon"  # "k-epsilon" (default), "chen-xu" or "constant"
     Tu_in: float = 0.04         # inlet turbulence intensity, used by "k-epsilon"
     nu_t: float = 2e-3          # eddy viscosity (m²/s) for "constant"
@@ -213,6 +224,105 @@ def _lap1(n, h):
 
 
 # ---------------------------------------------------------------------------------------------
+# room layout: heat sources and furniture from a CSV file
+# ---------------------------------------------------------------------------------------------
+def read_layout(src):
+    """Read a room layout: a file name or the text itself, one box per line,
+
+        type, x0, x1, y0, y1, z0, z1, power_W
+
+    type is heat (a HeatBlock), floor (a FloorFlux; z0 and z1 are ignored) or furniture (a solid box, or a
+    thin plate when one of its sizes is zero). Coordinates in m, as in Case. Blank lines, lines starting
+    with # and a header line are skipped. Returns dict(heat=[...], floor_flux=[...], furniture=[...])."""
+    import os
+    text = open(src, encoding="utf-8").read() if "\n" not in src and os.path.exists(src) else src
+    out = dict(heat=[], floor_flux=[], furniture=[])
+    for no, line in enumerate(text.splitlines(), 1):
+        f = [x.strip() for x in line.split("#")[0].replace(";", ",").split(",")]
+        if not f[0] or f[0].lower() == "type":
+            continue
+        kind = f[0].lower()
+        try:
+            v = [float(x) for x in f[1:7]] + [float(f[7]) if len(f) > 7 and f[7] else 0.0]
+        except (ValueError, IndexError):
+            raise ValueError(f"layout line {no}: expected type, x0, x1, y0, y1, z0, z1, power_W") from None
+        x0, x1, y0, y1, z0, z1, pw = v
+        if kind == "heat":
+            out["heat"].append(HeatBlock(x0, x1, y0, y1, z0, z1, pw))
+        elif kind == "floor":
+            out["floor_flux"].append(FloorFlux(x0, x1, y0, y1, pw))
+        elif kind == "furniture":
+            out["furniture"].append(Furniture(x0, x1, y0, y1, z0, z1))
+        else:
+            raise ValueError(f"layout line {no}: unknown type {f[0]!r} (heat, floor or furniture)")
+    return out
+
+
+def obstacles(case):
+    """Open-face masks of the furniture: [mu, mv, mw] (1 = open, 0 = blocked) on the u, v, w faces, and the
+    solid cells. A box blocks every face of the cells whose centres are inside it; a thin plate blocks the
+    faces in the grid plane nearest to it, over the cells whose centres fall inside its outline."""
+    n = (case.nx, case.ny, case.nz)
+    d = (case.L / case.nx, case.W / case.ny, case.H / case.nz)
+    size = (case.L, case.W, case.H)
+    cen = [(np.arange(n[k]) + 0.5) * d[k] for k in range(3)]
+    solid = np.zeros(n, bool)
+    shp = [tuple(n[k] + (1 if k == c else 0) for k in range(3)) for c in range(3)]
+    blocked = [np.zeros(s, bool) for s in shp]
+    for no, f in enumerate(case.furniture, 1):
+        lo, hi = (f.x0, f.y0, f.z0), (f.x1, f.y1, f.z1)
+        thin = [k for k in range(3) if abs(hi[k] - lo[k]) < 1e-9]
+        if len(thin) > 1:
+            raise ValueError(f"furniture {no} has zero size along more than one axis")
+        inside = [(cen[k] > min(lo[k], hi[k])) & (cen[k] < max(lo[k], hi[k])) for k in range(3)]
+        if thin:
+            a = thin[0]
+            plane = int(np.floor(lo[a] / d[a] + 0.5))          # nearest grid plane (as Math.round in the app)
+            if plane <= 0 or plane >= n[a]:
+                continue                                  # on a room wall: nothing to block
+            sel = [inside[k] if k != a else np.zeros(n[a] + 1, bool) for k in range(3)]
+            sel[a][plane] = True
+            m = sel[0][:, None, None] & sel[1][None, :, None] & sel[2][None, None, :]
+            if not m.any():
+                raise ValueError(f"furniture {no} (a thin plate) covers no cell faces: make it larger or refine the mesh")
+            blocked[a] |= m
+        else:
+            m = inside[0][:, None, None] & inside[1][None, :, None] & inside[2][None, None, :]
+            if not m.any():
+                raise ValueError(f"furniture {no} covers no cell centres: make it larger, refine the mesh, "
+                                 "or give it zero thickness to make it a thin plate")
+            solid |= m
+    for c in range(3):                                   # every interior face next to a solid cell
+        e = np.concatenate([np.zeros_like(_sl(solid, c, 0, 1)), solid, np.zeros_like(_sl(solid, c, 0, 1))], axis=c)
+        blocked[c] |= _sl(e, c, 0, -1) | _sl(e, c, 1, None)
+        idx = [slice(None)] * 3; idx[c] = [0, n[c]]
+        blocked[c][tuple(idx)] = False                    # the room walls keep their own boundary conditions
+    return [(~b).astype(float) for b in blocked], solid
+
+
+def _pressure_matrix(n, d, open_, bnd):
+    """The pressure Poisson matrix assembled from face coefficients (blocked faces carry none); a solid
+    cell, cut off from all its neighbours, gets a lone diagonal entry."""
+    nx, ny, nz = n
+    idx = np.arange(nx * ny * nz).reshape(n)
+    rows, cols, vals = [], [], []
+    diag = np.zeros(n)
+    for c in range(3):
+        cf = _sl(open_[c], c, 1, -1) / d[c] ** 2          # interior faces
+        a, b = _sl(idx, c, 0, -1).ravel(), _sl(idx, c, 1, None).ravel()
+        cf = cf.ravel(); m = cf > 0
+        rows += [a[m], b[m]]; cols += [b[m], a[m]]; vals += [cf[m], cf[m]]
+        np.add.at(diag.ravel(), a[m], -cf[m]); np.add.at(diag.ravel(), b[m], -cf[m])
+    diag[0][bnd[(0, 0)] == OUTLET] -= 2.0 / d[0] ** 2
+    diag[-1][bnd[(0, 1)] == OUTLET] -= 2.0 / d[0] ** 2
+    diag[:, :, -1][bnd[(2, 1)] == OUTLET] -= 2.0 / d[2] ** 2
+    diag[diag == 0] = -1.0 / min(d) ** 2
+    rows.append(idx.ravel()); cols.append(idx.ravel()); vals.append(diag.ravel())
+    N = nx * ny * nz
+    return sp.csc_matrix((np.concatenate(vals), (np.concatenate(rows), np.concatenate(cols))), shape=(N, N))
+
+
+# ---------------------------------------------------------------------------------------------
 # the solver
 # ---------------------------------------------------------------------------------------------
 def boundaries(case):
@@ -267,10 +377,24 @@ def run(case: Case, verbose=False, monitor_every=50):
     X, Y, Z = np.meshgrid(xc, yc, zc, indexing="ij")
     lwall = np.minimum.reduce([X, case.L - X, Y, case.W - Y, Z, case.H - Z])
 
+    # furniture: open-face masks and solid cells (None without furniture)
+    obs = bool(case.furniture)
+    if obs:
+        Mk, solid = obstacles(case)
+        # edges where the momentum of U_c meets a blocked plane normal to a: the a-faces on both sides are blocked
+        Eb = {(c, a): (_sl(Mk[a], c, 0, -1) == 0) & (_sl(Mk[a], c, 1, None) == 0)
+              for c in range(3) for a in range(3) if a != c}
+    else:
+        solid = np.zeros(n, bool)
+
     # heat sources (W/m³) and floor fluxes (W/m²)
     S = np.zeros(n)
     for b in case.heat:
         cells = (X > b.x0) & (X < b.x1) & (Y > b.y0) & (Y < b.y1) & (Z > b.z0) & (Z < b.z1)
+        if not cells.any():
+            raise ValueError("a heat source covers no cell centres: make it larger or refine the mesh")
+        if (cells & solid).any():
+            raise ValueError("a heat source overlaps furniture: move it out of the furniture")
         S[cells] += b.power / (cells.sum() * dx * dy * dz)
     qfloor = np.zeros((nx, ny))
     for f in case.floor_flux:
@@ -339,7 +463,7 @@ def run(case: Case, verbose=False, monitor_every=50):
             Fc = U[c] * _faces(E, U[c], tvd, c)
             inner = _sl(Fc, c, 1, -1)
             inner -= 0.5 * (_sl(D, c, 1, None) + _sl(D, c, 0, -1)) * np.diff(phi, axis=c) / d[c]
-            F.append(Fc)
+            F.append(Fc * Mk[c] if obs else Fc)          # nothing passes through furniture
         F[2][:, :, 0] = 0.0
         return F
 
@@ -356,13 +480,16 @@ def run(case: Case, verbose=False, monitor_every=50):
 
     # pressure Poisson matrix: zero gradient at walls and inlets, p = 0 at the outlet faces
     I = [sp.identity(m, format="csr") for m in n]
-    Amat = (sp.kron(sp.kron(_lap1(nx, dx), I[1]), I[2]) + sp.kron(sp.kron(I[0], _lap1(ny, dy)), I[2])
-            + sp.kron(sp.kron(I[0], I[1]), _lap1(nz, dz))).tolil()
-    extra = np.zeros(n)
-    extra[0][bL == OUTLET] -= 2.0 / dx ** 2
-    extra[-1][bR == OUTLET] -= 2.0 / dx ** 2
-    extra[:, :, -1][bT == OUTLET] -= 2.0 / dz ** 2
-    Amat = (Amat.tocsr() + sp.diags(extra.ravel())).tocsc()
+    if obs:
+        Amat = _pressure_matrix(n, d, Mk, bnd)
+    else:
+        Amat = (sp.kron(sp.kron(_lap1(nx, dx), I[1]), I[2]) + sp.kron(sp.kron(I[0], _lap1(ny, dy)), I[2])
+                + sp.kron(sp.kron(I[0], I[1]), _lap1(nz, dz))).tolil()
+        extra = np.zeros(n)
+        extra[0][bL == OUTLET] -= 2.0 / dx ** 2
+        extra[-1][bR == OUTLET] -= 2.0 / dx ** 2
+        extra[:, :, -1][bT == OUTLET] -= 2.0 / dz ** 2
+        Amat = (Amat.tocsr() + sp.diags(extra.ravel())).tocsc()
     if case.pressure == "multigrid":
         mgs = Multigrid(-Amat, n); p_last = np.zeros(Amat.shape[0])
 
@@ -419,10 +546,19 @@ def run(case: Case, verbose=False, monitor_every=50):
                     deriv = _ddx(_edge(G_, a), vel, d[a], tvd, a)
                     ne = nu_e[(min(a, c), max(a, c))]                         # on the edges
                     flux = _sl(ne, c, 1, -1) * np.diff(G_, axis=a) / d[a]
-                    rhs += -vel * deriv + np.diff(flux, axis=a) / d[a]
+                    if obs and Eb[(c, a)].any():
+                        # a blocked plane is a no-slip wall for the faces on either side of it
+                        eb = Eb[(c, a)]
+                        kf = 0.5 * (_sl(k, c, 0, -1) + _sl(k, c, 1, None))
+                        nuw = nu_wall(kf, d[a] / 2) if ke else 0.5 * (_sl(nu_c, c, 0, -1) + _sl(nu_c, c, 1, None))
+                        f_lo = np.where(_sl(eb, a, 0, -1), nuw * inner / (d[a] / 2), _sl(flux, a, 0, -1))
+                        f_hi = np.where(_sl(eb, a, 1, None), -nuw * inner / (d[a] / 2), _sl(flux, a, 1, None))
+                        rhs += -vel * deriv + (f_hi - f_lo) / d[a]
+                    else:
+                        rhs += -vel * deriv + np.diff(flux, axis=a) / d[a]
             if c == 2:
                 rhs += G * beta * (0.5 * (T[:, :, :-1] + T[:, :, 1:]) - Tref)
-            _sl(Us[c], c, 1, -1)[...] = inner + dt * rhs
+            _sl(Us[c], c, 1, -1)[...] = (inner + dt * rhs) * (_sl(Mk[c], c, 1, -1) if obs else 1.0)
 
         # ---- projection ----
         apply_bc(Us)
@@ -433,6 +569,9 @@ def run(case: Case, verbose=False, monitor_every=50):
         Us[0][0][outL] -= dt * (p[0][outL] - 0.0) / (dx / 2)
         Us[0][nx][outR] -= dt * (0.0 - p[-1][outR]) / (dx / 2)
         Us[2][:, :, nz][outT] -= dt * (0.0 - p[:, :, -1][outT]) / (dz / 2)
+        if obs:
+            for c in range(3):
+                Us[c] *= Mk[c]
         U = Us
         if mon:
             div_max = np.abs(sum(np.diff(U[c], axis=c) / d[c] for c in range(3))).max()
@@ -489,7 +628,7 @@ def run(case: Case, verbose=False, monitor_every=50):
         avg[key] /= wa
     q_out = (avg["u"][nx][outR].sum() - avg["u"][0][outL].sum()) * dy * dz + avg["w"][:, :, nz][outT].sum() * dx * dy
     T_out = np.concatenate([avg["T"][-1][outR], avg["T"][0][outL], avg["T"][:, :, -1][outT]]).mean()
-    res = dict(case=case, x=xc, y=yc, z=zc, dx=dx, dy=dy, dz=dz, U_in=U_in, h_in=h_in, steps=step,
+    res = dict(case=case, x=xc, y=yc, z=zc, dx=dx, dy=dy, dz=dz, U_in=U_in, h_in=h_in, steps=step, solid=solid,
                q_in=case.q, q_out=q_out, T_out=T_out, T_out_expected=T_mix,
                cg_iters=mgs.iters if case.pressure == "multigrid" else 0,
                history={key: np.array(a) for key, a in hist.items()})
@@ -512,10 +651,11 @@ def occupied_zone(res, x_min=0.6, y_min=0.6, h=0.1, h_max=1.8, rh=50.0, met=1.2,
     sx = (res["x"] > x_min) & (res["x"] < c.L - x_min)
     sy = (res["y"] > y_min) & (res["y"] < c.W - y_min)
     sel = sx[:, None] & sy[None, :]
+    solid = res.get("solid", np.zeros(res["T"].shape, bool))
     s, t = res["speed"][:, :, kz], res["T"][:, :, kz]
-    s_sel = np.where(sel, s, -1.0)
+    s_sel = np.where(sel & ~solid[:, :, kz], s, -1.0)
     i, j = np.unravel_index(np.argmax(s_sel), s.shape)
-    oz = sel[:, :, None] & (res["z"] < h_max)[None, None, :]
+    oz = sel[:, :, None] & (res["z"] < h_max)[None, None, :] & ~solid
     t_oz, v_oz = res["T"][oz].mean(), res["speed"][oz].mean()
     ts = pmv(t_oz, max(v_oz, 0.05), rh=rh, met=met, clo=clo) if ts is None else ts
     return dict(v_max=s[i, j], x_at=res["x"][i], y_at=res["y"][j], T=t[i, j], DR=draught_rate(t[i, j], s[i, j]),
