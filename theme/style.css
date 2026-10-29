@@ -19,20 +19,20 @@
 
 /* Pick the part from the active page in the table of contents.
    Later rules win, so appendix-* must come after the Part A rule. */
-html:has(.myst-toc-item-exact[href*='/a']) { --hpb-part: var(--hpb-a); --hpb-part-name: 'Part A: Compactness and envelope'; }
-html:has(.myst-toc-item-exact[href*='/b']),
-html:has(.myst-toc-item-exact[href*='/part-b']) { --hpb-part: var(--hpb-b); --hpb-part-name: 'Part B: Ventilation'; }
-html:has(.myst-toc-item-exact[href*='/c']),
-html:has(.myst-toc-item-exact[href*='/part-c']) { --hpb-part: var(--hpb-c); --hpb-part-name: 'Part C: Heating systems and domestic hot water'; }
-html:has(.myst-toc-item-exact[href*='/d']),
-html:has(.myst-toc-item-exact[href*='/part-d']) { --hpb-part: var(--hpb-d); --hpb-part-name: 'Part D: Cooling'; }
-html:has(.myst-toc-item-exact[href*='/e']),
-html:has(.myst-toc-item-exact[href*='/part-e']) { --hpb-part: var(--hpb-e); --hpb-part-name: 'Part E: Prefabrication of type houses'; }
-html:has(.myst-toc-item-exact[href*='/part-a']) { --hpb-part: var(--hpb-a); --hpb-part-name: 'Part A: Compactness and envelope'; }
-html:has(.myst-toc-item-exact[href*='/appendix']) { --hpb-part: var(--hpb-x); --hpb-part-name: 'Appendices'; }
+:root:has(.myst-toc-item-exact[href*='/a']) { --hpb-part: var(--hpb-a); --hpb-part-name: 'Part A: Compactness and envelope'; }
+:root:has(.myst-toc-item-exact[href*='/b']),
+:root:has(.myst-toc-item-exact[href*='/part-b']) { --hpb-part: var(--hpb-b); --hpb-part-name: 'Part B: Ventilation'; }
+:root:has(.myst-toc-item-exact[href*='/c']),
+:root:has(.myst-toc-item-exact[href*='/part-c']) { --hpb-part: var(--hpb-c); --hpb-part-name: 'Part C: Heating systems and domestic hot water'; }
+:root:has(.myst-toc-item-exact[href*='/d']),
+:root:has(.myst-toc-item-exact[href*='/part-d']) { --hpb-part: var(--hpb-d); --hpb-part-name: 'Part D: Cooling'; }
+:root:has(.myst-toc-item-exact[href*='/e']),
+:root:has(.myst-toc-item-exact[href*='/part-e']) { --hpb-part: var(--hpb-e); --hpb-part-name: 'Part E: Prefabrication of type houses'; }
+:root:has(.myst-toc-item-exact[href*='/part-a']) { --hpb-part: var(--hpb-a); --hpb-part-name: 'Part A: Compactness and envelope'; }
+:root:has(.myst-toc-item-exact[href*='/appendix']) { --hpb-part: var(--hpb-x); --hpb-part-name: 'Appendices'; }
 
 /* Derived colours, light mode */
-html {
+:root {
   --hpb-tint: color-mix(in srgb, var(--hpb-part) 10%, transparent);
   --hpb-wash: color-mix(in srgb, var(--hpb-part) 22%, transparent);
   --hpb-text: color-mix(in srgb, var(--hpb-part) 65%, var(--hpb-ink));
@@ -56,7 +56,7 @@ html {
   --myst-color-warning-bg: color-mix(in srgb, #f6d04d 16%, transparent);
   --myst-color-warning-text: #9c7a00;
 }
-html.dark {
+:root.dark {
   --hpb-ink: #dbe3e8;
   --hpb-text: color-mix(in srgb, var(--hpb-part) 70%, white);
   --hpb-bg-wash: color-mix(in srgb, var(--hpb-part) 14%, #1c1917);
