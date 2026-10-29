@@ -742,13 +742,13 @@ function axes(g, X, Y, ha, va) {
   const ox = X(0), oy = Y(0), len = 11;                      // on the frame edges, letters outside the plot
   const arrow = (dx, dy, name) => {
     const ex = ox + dx * len, ey = oy + dy * len, an = Math.atan2(dy, dx);
-    for (const [lw, col] of [[1, css("--muted")]]) {               // grey, as the axis values
+    for (const [lw, col] of [[1.5, css("--muted")]]) {               // grey, as the axis values
       g.strokeStyle = col; g.fillStyle = col; g.lineWidth = lw; g.beginPath(); g.moveTo(ox, oy); g.lineTo(ex, ey); g.stroke();
       g.beginPath(); g.moveTo(ex + dx, ey + dy);
-      g.lineTo(ex - 2.5 * Math.cos(an - 0.6), ey - 2.5 * Math.sin(an - 0.6)); g.lineTo(ex - 2.5 * Math.cos(an + 0.6), ey - 2.5 * Math.sin(an + 0.6)); g.closePath(); g.fill();
+      g.lineTo(ex - 3.5 * Math.cos(an - 0.6), ey - 3.5 * Math.sin(an - 0.6)); g.lineTo(ex - 3.5 * Math.cos(an + 0.6), ey - 3.5 * Math.sin(an + 0.6)); g.closePath(); g.fill();
     }
-    g.font = "5px " + css("--font-data"); g.textAlign = dx ? "center" : "right"; g.fillStyle = css("--muted");
-    const tx = dx ? ex + 2 : ox - 3, ty = dx ? oy + 6 : ey + 2;
+    g.font = "7px " + css("--font-data"); g.textAlign = dx ? "center" : "right"; g.fillStyle = css("--muted");
+    const tx = dx ? ex + 2 : ox - 3, ty = dx ? oy + 8 : ey + 3;
     g.fillText(name, tx, ty);
   };
   arrow(1, 0, ha); arrow(0, -1, va);
