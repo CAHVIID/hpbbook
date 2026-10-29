@@ -1,0 +1,102 @@
+/* User Provided Stylesheet */
+
+/* HPB book style: "Botanical wash".
+   One accent colour per part. The colour is picked from the active page in
+   the table of contents (chapter slugs start with their part letter), and
+   used as a soft wash behind the page header, on headings rules, boxes and
+   links. Text stays in the dark ink colour. */
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap');
+
+:root {
+  --hpb-ink: #34424d;
+  --hpb-a: #8e6bbf; /* Part A  Envelope        lavender */
+  --hpb-b: #43aa8b; /* Part B  Ventilation     sea green */
+  --hpb-c: #f3722c; /* Part C  Heating + DHW   orange */
+  --hpb-d: #277da1; /* Part D  Cooling         blue */
+  --hpb-e: #f6d04d; /* Part E  Prefabrication  DTU yellow */
+  --hpb-x: #8a9aa5; /* Appendices              grey */
+  --hpb-part: var(--hpb-ink);
+  --hpb-part-name: '';
+}
+
+/* Pick the part from the active page in the table of contents.
+   Later rules win, so appendix-* must come after the Part A rule. */
+:root:has(.myst-toc-item-exact[href*='/a']) { --hpb-part: var(--hpb-a); --hpb-part-name: 'Part A: Compactness and envelope'; }
+:root:has(.myst-toc-item-exact[href*='/b']),
+:root:has(.myst-toc-item-exact[href*='/part-b']) { --hpb-part: var(--hpb-b); --hpb-part-name: 'Part B: Ventilation'; }
+:root:has(.myst-toc-item-exact[href*='/c']),
+:root:has(.myst-toc-item-exact[href*='/part-c']) { --hpb-part: var(--hpb-c); --hpb-part-name: 'Part C: Heating systems and domestic hot water'; }
+:root:has(.myst-toc-item-exact[href*='/d']),
+:root:has(.myst-toc-item-exact[href*='/part-d']) { --hpb-part: var(--hpb-d); --hpb-part-name: 'Part D: Cooling'; }
+:root:has(.myst-toc-item-exact[href*='/e']),
+:root:has(.myst-toc-item-exact[href*='/part-e']) { --hpb-part: var(--hpb-e); --hpb-part-name: 'Part E: Prefabrication of type houses'; }
+:root:has(.myst-toc-item-exact[href*='/part-a']) { --hpb-part: var(--hpb-a); --hpb-part-name: 'Part A: Compactness and envelope'; }
+:root:has(.myst-toc-item-exact[href*='/appendix']) { --hpb-part: var(--hpb-x); --hpb-part-name: 'Appendices'; }
+
+/* Derived colours, light mode */
+:root {
+  --hpb-tint: color-mix(in srgb, var(--hpb-part) 10%, transparent);
+  --hpb-wash: color-mix(in srgb, var(--hpb-part) 22%, transparent);
+  --hpb-text: color-mix(in srgb, var(--hpb-part) 65%, var(--hpb-ink));
+  --hpb-bg-wash: color-mix(in srgb, var(--hpb-part) 10%, white);
+
+  --myst-color-link: var(--hpb-text);
+  --myst-color-link-hover: var(--hpb-part);
+  --myst-color-link-underline: color-mix(in srgb, var(--hpb-part) 40%, white);
+  --myst-color-active: var(--hpb-text);
+  --myst-color-active-bg: var(--hpb-wash);
+  --myst-color-active-surface: var(--hpb-tint);
+  --myst-color-primary: var(--hpb-part);
+  --myst-color-accent-text: var(--hpb-ink);
+  --myst-color-focus-ring: var(--hpb-part);
+  --myst-color-text: var(--hpb-ink);
+  --myst-color-prose-body: #2c3640;
+  --myst-color-info: color-mix(in srgb, var(--hpb-part) 60%, white);
+  --myst-color-info-bg: var(--hpb-tint);
+  --myst-color-info-text: var(--hpb-text);
+  --myst-color-warning: #e2b93b;
+  --myst-color-warning-bg: color-mix(in srgb, #f6d04d 16%, transparent);
+  --myst-color-warning-text: #9c7a00;
+}
+:root.dark {
+  --hpb-ink: #dbe3e8;
+  --hpb-text: color-mix(in srgb, var(--hpb-part) 70%, white);
+  --hpb-bg-wash: color-mix(in srgb, var(--hpb-part) 14%, #1c1917);
+  --myst-color-link-underline: color-mix(in srgb, var(--hpb-part) 60%, black);
+  --myst-color-prose-body: #d6d3d1;
+  --myst-color-warning-bg: color-mix(in srgb, #f6d04d 10%, transparent);
+  --myst-color-warning-text: #f6d04d;
+}
+
+/* Yellow is too light for text, so Part E uses more ink in its text shade */
+:root:has(.myst-toc-item-exact[href*='/e']),
+:root:has(.myst-toc-item-exact[href*='/part-e']) { --hpb-text: color-mix(in srgb, var(--hpb-part) 40%, var(--hpb-ink)); }
+
+body { font-family: 'Source Sans 3', Arial, sans-serif; }
+
+/* Wash: a soft colour field behind the top of the page */
+body { background: linear-gradient(var(--hpb-bg-wash) 0, var(--myst-color-bg) 380px) no-repeat, var(--myst-color-bg); }
+.myst-top-nav { background-color: var(--hpb-bg-wash); box-shadow: none; }
+
+/* Page title, with the part name as a small tinted tag above it */
+.myst-fm-block-title { font-weight: 800; letter-spacing: -0.01em; color: var(--hpb-ink); }
+.myst-fm-block-title::before {
+  content: var(--hpb-part-name);
+  display: table; margin-bottom: 0.6rem; padding: 0.15em 0.6em; border-radius: 3px;
+  font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  background: var(--hpb-wash); color: var(--hpb-ink);
+}
+
+/* Headings */
+.article h2 { font-weight: 700; color: var(--hpb-ink); padding-left: 0.7rem; border-left: 5px solid var(--hpb-wash); }
+.article h3 { font-weight: 700; color: var(--hpb-ink); }
+
+/* Boxes: flat and tinted, no shadow */
+.myst-admonition { box-shadow: none !important; border-radius: 0; }
+.myst-admonition-header { background: transparent !important; font-weight: 700; }
+
+/* Figure captions */
+figure figcaption { border-left: 2px solid var(--hpb-wash); padding-left: 0.8rem; }
+
+/* Table of contents: active page in the part colour */
+.myst-toc-item-exact { color: var(--hpb-text); font-weight: 600; }

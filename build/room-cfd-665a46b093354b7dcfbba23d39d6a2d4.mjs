@@ -1,0 +1,901 @@
+// Interactive 2D room section CFD (anywidget module for MyST).
+// Same solver as room_cfd.py (the documented reference version): MAC grid, Boussinesq buoyancy,
+// Chorin projection, TVD (van Leer) or upwind advection, k-epsilon or Chen & Xu zero-equation turbulence.
+// The stand-alone page room-cfd.html is built from this file by build_room_cfd_html.py.
+
+// ---- room CFD solver (port of room_cfd.py) ----
+const RHO = 1.2, CP = 1005, G = 9.81, NU_AIR = 1.5e-5;
+const WALL = 0, INLET = 1, OUTLET = 2;
+
+function lim(a, b) { // van Leer limiter in product form
+  const s = Math.abs(a) + Math.abs(b);
+  return s > 1e-30 ? (a * Math.abs(b) + Math.abs(a) * b) / s : 0;
+}
+// derivative from five values p(-2..2), upwind-biased on the sign of vel
+function ddx(pm2, pm1, p0, p1, p2, vel, h, tvd) {
+  const Dm2 = pm1 - pm2, Dm1 = p0 - pm1, D0 = p1 - p0, D1 = p2 - p1;
+  if (!tvd) return (vel > 0 ? Dm1 : D0) / h;
+  if (vel > 0) return (Dm1 + 0.5 * lim(Dm1, D0) - 0.5 * lim(Dm2, Dm1)) / h;
+  return (D0 - 0.5 * lim(D0, D1) + 0.5 * lim(Dm1, D0)) / h;
+}
+function face(ll, l, r, rr, vel, tvd) {
+  if (!tvd) return vel > 0 ? l : r;
+  return vel > 0 ? l + 0.5 * lim(l - ll, r - l) : r - 0.5 * lim(r - l, rr - r);
+}
+
+function mask(op, side, kind, n, h) {
+  const m = new Int8Array(n);
+  if (op.side === side) for (let k = 0; k < n; k++) { const s = (k + 0.5) * h; if (s > op.start && s < op.end) m[k] = kind; }
+  return m;
+}
+
+// banded Cholesky of an SPD matrix given by rows of (col, val); bandwidth b
+function bandedCholesky(N, b, entries) {
+  const L = new Float64Array(N * (b + 1));          // L[k*(b+1)+d] = L(k, k-d)
+  const A = new Float64Array(N * (b + 1));
+  for (const [r, c, v] of entries) if (c <= r) A[r * (b + 1) + (r - c)] += v;
+  for (let k = 0; k < N; k++) {
+    for (let d = b; d >= 0; d--) {
+      const c = k - d; if (c < 0) continue;
+      let s = A[k * (b + 1) + d];
+      const lo = Math.max(0, k - b, c - b);
+      for (let m = lo; m < c; m++) s -= L[k * (b + 1) + (k - m)] * L[c * (b + 1) + (c - m)];
+      if (d === 0) L[k * (b + 1)] = Math.sqrt(s);
+      else L[k * (b + 1) + d] = s / L[c * (b + 1)];
+    }
+  }
+  const w = b + 1;
+  return function solve(rhs, x) {             // solves (L L^T) x = rhs
+    for (let k = 0; k < N; k++) {
+      let s = rhs[k]; const r = k * w, dmax = k < b ? k : b;
+      for (let d = 1; d <= dmax; d++) s -= L[r + d] * x[k - d];
+      x[k] = s / L[r];
+    }
+    for (let k = N - 1; k >= 0; k--) {
+      let s = x[k]; const dmax = N - 1 - k < b ? N - 1 - k : b;
+      for (let d = 1, r = (k + 1) * w + 1; d <= dmax; d++, r += w + 1) s -= L[r] * x[k + d];
+      x[k] = s / L[k * w];
+    }
+    return x;
+  };
+}
+
+export function createSim(c) {
+  // c: {L,H,W,nx,ny,ach,T_in,inlet,outlet,heat:[{x0,x1,y0,y1,power}],turbulence,nu_t,Tu_in,Pr_t,advection,t_end,t_avg}
+  const nx = c.nx, ny = c.ny, L = c.L, H = c.H, dx = L / nx, dy = H / ny, h = Math.min(dx, dy);
+  const q = c.ach * L * H * c.W / 3600;
+  const bL = new Int8Array(ny), bR = new Int8Array(ny);
+  const mLi = mask(c.inlet, "left", INLET, ny, dy), mLo = mask(c.outlet, "left", OUTLET, ny, dy);
+  const mRi = mask(c.inlet, "right", INLET, ny, dy), mRo = mask(c.outlet, "right", OUTLET, ny, dy);
+  for (let j = 0; j < ny; j++) { bL[j] = Math.max(mLi[j], mLo[j]); bR[j] = Math.max(mRi[j], mRo[j]); }
+  const bT = mask(c.outlet, "top", OUTLET, nx, dx);
+  let nIn = 0; for (let j = 0; j < ny; j++) nIn += (bL[j] === INLET) + (bR[j] === INLET);
+  const h_in = nIn * dy, U_in = q / c.W / h_in;
+
+  const U = (i, j) => i * ny + j, V = (i, j) => i * (ny + 1) + j, C = (i, j) => i * ny + j;
+  let u = new Float64Array((nx + 1) * ny), v = new Float64Array(nx * (ny + 1));
+  let us = new Float64Array(u.length), vs = new Float64Array(v.length);
+  const Q_tot = c.heat.reduce((s, b) => s + b.power, 0);
+  const T_mix = c.T_in + Q_tot / (RHO * CP * q / c.W);
+  const T0 = c.T_room0 ?? T_mix, Tref = T0, beta = 1 / (273.15 + Tref);
+  let T = new Float64Array(nx * ny).fill(T0), Tn = new Float64Array(nx * ny);
+
+  const xc = Float64Array.from({ length: nx }, (_, i) => (i + 0.5) * dx);
+  const yc = Float64Array.from({ length: ny }, (_, j) => (j + 0.5) * dy);
+  const lwall = new Float64Array(nx * ny), S = new Float64Array(nx * ny);
+  for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++)
+    lwall[C(i, j)] = Math.min(xc[i], L - xc[i], yc[j], H - yc[j]);
+  for (const b of c.heat) {
+    let n = 0; for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) if (xc[i] > b.x0 && xc[i] < b.x1 && yc[j] > b.y0 && yc[j] < b.y1) n++;
+    for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) if (xc[i] > b.x0 && xc[i] < b.x1 && yc[j] > b.y0 && yc[j] < b.y1) S[C(i, j)] += b.power / (n * dx * dy);
+  }
+
+  // pressure matrix, negated so it is SPD; unknown index k = i*ny + j (bandwidth ny)
+  const N = nx * ny, ent = [];
+  for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
+    const k = C(i, j); let diag = 0;
+    const nb = [[-1, 0, dx * dx, i === 0 ? bL[j] : null], [1, 0, dx * dx, i === nx - 1 ? bR[j] : null],
+                [0, -1, dy * dy, j === 0 ? WALL : null], [0, 1, dy * dy, j === ny - 1 ? bT[i] : null]];
+    for (const [di, dj, h2, bnd] of nb) {
+      if (bnd === null) { ent.push([k, C(i + di, j + dj), -1 / h2]); diag += 1 / h2; }
+      else if (bnd === OUTLET) diag += 2 / h2;
+    }
+    ent.push([k, k, diag]);
+  }
+  const solve = bandedCholesky(N, ny, ent);
+  const p = new Float64Array(N), rhs = new Float64Array(N);
+
+  function applyBC(u, v) {
+    for (let j = 0; j < ny; j++) {
+      u[U(0, j)] = bL[j] === INLET ? U_in : bL[j] === OUTLET ? u[U(1, j)] : 0;
+      u[U(nx, j)] = bR[j] === INLET ? -U_in : bR[j] === OUTLET ? u[U(nx - 1, j)] : 0;
+    }
+    for (let i = 0; i < nx; i++) { v[V(i, 0)] = 0; v[V(i, ny)] = bT[i] === OUTLET ? v[V(i, ny - 1)] : 0; }
+  }
+  applyBC(u, v);
+
+  const nu_c = new Float64Array(nx * ny), nu_k = new Float64Array((nx + 1) * (ny + 1));
+  const tvd = c.advection === "tvd", cfl = tvd ? 0.25 : 0.4;
+  const Fx = new Float64Array((nx + 1) * ny), Fy = new Float64Array(nx * (ny + 1));
+  const avg = { u: new Float64Array(u.length), v: new Float64Array(v.length), T: new Float64Array(N), speed: new Float64Array(N), w: 0 };
+  const hist = { t: [], du: [], dv: [], dT: [], div: [], imb: [], v_floor: [], T_exh: [] };
+  const iMon = Math.min(Math.floor(1.0 / dx), nx - 1), jMon = Math.min(Math.floor(0.1 / dy), ny - 1);
+  const s = { t: 0, n: 0, dt: 0, done: false };
+
+  // k-epsilon: inlet values, wall cells, wall distance, wall corner masks
+  const ke = c.turbulence === "k-epsilon";
+  const CMU = 0.09, C1 = 1.44, C2 = 1.92, SK = 1.0, SE = 1.3, KAP = 0.41, EWF = 9.0, CMU4 = Math.pow(CMU, 0.25), CMU34 = Math.pow(CMU, 0.75);
+  const k_in = 1.5 * ((c.Tu_in ?? 0.04) * U_in) ** 2, e_in = Math.pow(k_in, 1.5) / (0.1 * h_in);
+  let tk = new Float64Array(N).fill(k_in), te = new Float64Array(N).fill(e_in);
+  let tkn = new Float64Array(N), ten = new Float64Array(N);
+  const yp = new Float64Array(N).fill(0);                    // 0 = not a wall cell
+  for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
+    let y = Infinity;
+    if (j === 0 || (j === ny - 1 && bT[i] === WALL)) y = dy / 2;
+    if ((i === 0 && bL[j] === WALL) || (i === nx - 1 && bR[j] === WALL)) y = Math.min(y, dx / 2);
+    if (y < Infinity) yp[C(i, j)] = y;
+  }
+  const cornerWall = (b, n, i) => b[Math.max(i - 1, 0)] === WALL && b[Math.min(i, n - 1)] === WALL;
+  const nuWall = (kw, y) => {                                 // tau_w * y / U_p from the log law
+    const ys = CMU4 * Math.sqrt(kw) * y / NU_AIR;
+    return ys > 11.2 ? KAP * ys * NU_AIR / Math.log(EWF * Math.max(ys, 1)) : NU_AIR;
+  };
+  const Gx = new Float64Array((nx + 1) * ny), Gy = new Float64Array(nx * (ny + 1));
+  const Pk = new Float64Array(N), Gb = new Float64Array(N), Rk = new Float64Array(N), Re = new Float64Array(N);
+  function transport(phi, phiIn, sig, out) {                  // upwind advection + diffusion, returns -div(F)
+    for (let j = 0; j < ny; j++) {
+      const eL = bL[j] === INLET ? phiIn : phi[C(0, j)], eR = bR[j] === INLET ? phiIn : phi[C(nx - 1, j)];
+      for (let i = 0; i <= nx; i++) {
+        const uf = u[U(i, j)];
+        let f = uf * (uf > 0 ? (i > 0 ? phi[C(i - 1, j)] : eL) : (i < nx ? phi[C(i, j)] : eR));
+        if (i > 0 && i < nx) f -= 0.5 * (2 * NU_AIR + (nu_c[C(i, j)] - NU_AIR + nu_c[C(i - 1, j)] - NU_AIR) / sig) * (phi[C(i, j)] - phi[C(i - 1, j)]) / dx;
+        Gx[U(i, j)] = f;
+      }
+    }
+    for (let i = 0; i < nx; i++) for (let j = 0; j <= ny; j++) {
+      const vf = v[V(i, j)];
+      let f = 0;
+      if (j > 0) f = vf * (vf > 0 ? phi[C(i, j - 1)] : phi[C(i, j < ny ? j : ny - 1)]);
+      if (j > 0 && j < ny) f -= 0.5 * (2 * NU_AIR + (nu_c[C(i, j)] - NU_AIR + nu_c[C(i, j - 1)] - NU_AIR) / sig) * (phi[C(i, j)] - phi[C(i, j - 1)]) / dy;
+      Gy[V(i, j)] = f;
+    }
+    for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++)
+      out[C(i, j)] = -((Gx[U(i + 1, j)] - Gx[U(i, j)]) / dx + (Gy[V(i, j + 1)] - Gy[V(i, j)]) / dy);
+  }
+
+  const ug = (i, j) => j < 0 ? -u[U(i, 0)] : j >= ny ? -u[U(i, ny - 1)] : u[U(i, j)];
+  const vg = (i, j) => i < 0 ? -v[V(0, j)] : i >= nx ? -v[V(nx - 1, j)] : v[V(i, j)];
+  const cl = (a, lo, hi) => a < lo ? lo : a > hi ? hi : a;
+
+  function step(monitor) {
+    // eddy viscosity at cells and corners
+    let numax = 0, umax = Math.max(U_in, 0.05);
+    for (let k = 0; k < u.length; k++) umax = Math.max(umax, Math.abs(u[k]));
+    for (let k = 0; k < v.length; k++) umax = Math.max(umax, Math.abs(v[k]));
+    for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
+      let nu;
+      if (ke) nu = NU_AIR + CMU * tk[C(i, j)] * tk[C(i, j)] / te[C(i, j)];
+      else if (c.turbulence === "constant") nu = NU_AIR + c.nu_t;
+      else { const a = 0.5 * (u[U(i, j)] + u[U(i + 1, j)]), b2 = 0.5 * (v[V(i, j)] + v[V(i, j + 1)]); nu = NU_AIR + 0.03874 * Math.sqrt(a * a + b2 * b2) * lwall[C(i, j)]; }
+      nu_c[C(i, j)] = nu; if (nu > numax) numax = nu;
+    }
+    for (let i = 0; i <= nx; i++) for (let j = 0; j <= ny; j++) {
+      const i0 = cl(i - 1, 0, nx - 1), i1 = cl(i, 0, nx - 1), j0 = cl(j - 1, 0, ny - 1), j1 = cl(j, 0, ny - 1);
+      nu_k[i * (ny + 1) + j] = 0.25 * (nu_c[C(i0, j0)] + nu_c[C(i1, j0)] + nu_c[C(i0, j1)] + nu_c[C(i1, j1)]);
+    }
+    if (ke) {                                                // wall shear from the log law at wall corners
+      const kc = (i, j) => { const i0 = cl(i - 1, 0, nx - 1), i1 = cl(i, 0, nx - 1), j0 = cl(j - 1, 0, ny - 1), j1 = cl(j, 0, ny - 1);
+        return 0.25 * (tk[C(i0, j0)] + tk[C(i1, j0)] + tk[C(i0, j1)] + tk[C(i1, j1)]); };
+      for (let i = 0; i <= nx; i++) {
+        nu_k[i * (ny + 1)] = nuWall(kc(i, 0), dy / 2);
+        if (cornerWall(bT, nx, i)) nu_k[i * (ny + 1) + ny] = nuWall(kc(i, ny), dy / 2);
+      }
+      for (let j = 0; j <= ny; j++) {
+        if (cornerWall(bL, ny, j)) nu_k[j] = nuWall(kc(0, j), dx / 2);
+        if (cornerWall(bR, ny, j)) nu_k[nx * (ny + 1) + j] = nuWall(kc(nx, j), dx / 2);
+      }
+    }
+    const dt = Math.min(cfl * h / umax, 0.2 * h * h / numax, 0.5);
+    const NK = (i, j) => nu_k[i * (ny + 1) + j];
+    let u0, v0, T0m;
+    if (monitor) { u0 = u.slice(); v0 = v.slice(); T0m = T.slice(); }
+
+    // u momentum
+    us.set(u);
+    for (let i = 1; i < nx; i++) for (let j = 0; j < ny; j++) {
+      const uc = u[U(i, j)];
+      const va = 0.25 * (v[V(i - 1, j)] + v[V(i, j)] + v[V(i - 1, j + 1)] + v[V(i, j + 1)]);
+      const b = i * ny;
+      const uxm2 = u[(i > 1 ? i - 2 : 0) * ny + j], uxm1 = u[b - ny + j], uxp1 = u[b + ny + j], uxp2 = u[(i < nx - 1 ? i + 2 : nx) * ny + j];
+      const g0 = -u[b], gN = -u[b + ny - 1];
+      const uym1 = j > 0 ? u[b + j - 1] : g0, uym2 = j > 1 ? u[b + j - 2] : g0;
+      const uyp1 = j < ny - 1 ? u[b + j + 1] : gN, uyp2 = j < ny - 2 ? u[b + j + 2] : gN;
+      const dudx = ddx(uxm2, uxm1, uc, uxp1, uxp2, uc, dx, tvd);
+      const dudy = ddx(uym2, uym1, uc, uyp1, uyp2, va, dy, tvd);
+      const txp = nu_c[b + j] * (uxp1 - uc) / dx, txm = nu_c[b - ny + j] * (uc - uxm1) / dx;
+      const kb = i * (ny + 1) + j;
+      const typ = nu_k[kb + 1] * (uyp1 - uc) / dy, tym = nu_k[kb] * (uc - uym1) / dy;
+      us[U(i, j)] = uc + dt * (-uc * dudx - va * dudy + (txp - txm) / dx + (typ - tym) / dy);
+    }
+    // v momentum
+    vs.set(v);
+    for (let i = 0; i < nx; i++) for (let j = 1; j < ny; j++) {
+      const vc = v[V(i, j)];
+      const ua = 0.25 * (u[U(i, j - 1)] + u[U(i + 1, j - 1)] + u[U(i, j)] + u[U(i + 1, j)]);
+      const n1 = ny + 1, b = i * n1;
+      const vym1 = v[b + j - 1], vyp1 = v[b + j + 1], vym2 = v[b + (j > 1 ? j - 2 : 0)], vyp2 = v[b + (j < ny - 1 ? j + 2 : ny)];
+      const g0 = -v[j], gN = -v[(nx - 1) * n1 + j];
+      const vxm1 = i > 0 ? v[b - n1 + j] : g0, vxm2 = i > 1 ? v[b - 2 * n1 + j] : g0;
+      const vxp1 = i < nx - 1 ? v[b + n1 + j] : gN, vxp2 = i < nx - 2 ? v[b + 2 * n1 + j] : gN;
+      const dvdy = ddx(vym2, vym1, vc, vyp1, vyp2, vc, dy, tvd);
+      const dvdx = ddx(vxm2, vxm1, vc, vxp1, vxp2, ua, dx, tvd);
+      const syp = nu_c[i * ny + j] * (vyp1 - vc) / dy, sym = nu_c[i * ny + j - 1] * (vc - vym1) / dy;
+      const sxp = nu_k[b + n1 + j] * (vxp1 - vc) / dx, sxm = nu_k[b + j] * (vc - vxm1) / dx;
+      const buoy = G * beta * (0.5 * (T[C(i, j - 1)] + T[C(i, j)]) - Tref);
+      vs[V(i, j)] = vc + dt * (-ua * dvdx - vc * dvdy + (syp - sym) / dy + (sxp - sxm) / dx + buoy);
+    }
+    // projection
+    applyBC(us, vs);
+    for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++)
+      rhs[C(i, j)] = -((us[U(i + 1, j)] - us[U(i, j)]) / dx + (vs[V(i, j + 1)] - vs[V(i, j)]) / dy) / dt;
+    solve(rhs, p);
+    for (let i = 1; i < nx; i++) for (let j = 0; j < ny; j++) us[U(i, j)] -= dt * (p[C(i, j)] - p[C(i - 1, j)]) / dx;
+    for (let i = 0; i < nx; i++) for (let j = 1; j < ny; j++) vs[V(i, j)] -= dt * (p[C(i, j)] - p[C(i, j - 1)]) / dy;
+    for (let j = 0; j < ny; j++) {
+      if (bL[j] === OUTLET) us[U(0, j)] -= dt * p[C(0, j)] / (dx / 2);
+      if (bR[j] === OUTLET) us[U(nx, j)] -= dt * (0 - p[C(nx - 1, j)]) / (dx / 2);
+    }
+    for (let i = 0; i < nx; i++) if (bT[i] === OUTLET) vs[V(i, ny)] -= dt * (0 - p[C(i, ny - 1)]) / (dy / 2);
+    [u, us] = [us, u]; [v, vs] = [vs, v];
+
+    let divMax = 0;
+    if (monitor) for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++)
+      divMax = Math.max(divMax, Math.abs((u[U(i + 1, j)] - u[U(i, j)]) / dx + (v[V(i, j + 1)] - v[V(i, j)]) / dy));
+
+    // energy
+    for (let j = 0; j < ny; j++) {
+      const tl = bL[j] === INLET ? c.T_in : T[C(0, j)], tr = bR[j] === INLET ? c.T_in : T[C(nx - 1, j)];
+      for (let i = 0; i <= nx; i++) {
+        const uf = u[U(i, j)];
+        const e0 = i >= 2 ? T[(i - 2) * ny + j] : tl, e1 = i >= 1 ? T[(i - 1) * ny + j] : tl;
+        const e2 = i < nx ? T[i * ny + j] : tr, e3 = i + 1 < nx ? T[(i + 1) * ny + j] : tr;
+        let f = uf * face(e0, e1, e2, e3, uf, tvd);
+        if (i > 0 && i < nx) f -= 0.5 * (nu_c[C(i, j)] + nu_c[C(i - 1, j)]) / c.Pr_t * (T[C(i, j)] - T[C(i - 1, j)]) / dx;
+        Fx[U(i, j)] = f;
+      }
+    }
+    for (let i = 0; i < nx; i++) {
+      const b = i * ny;
+      for (let j = 0; j <= ny; j++) {
+        const vf = v[V(i, j)];
+        let f = 0;
+        if (j > 0) f = vf * face(T[b + (j >= 2 ? j - 2 : 0)], T[b + j - 1], T[b + (j < ny ? j : ny - 1)], T[b + (j + 1 < ny ? j + 1 : ny - 1)], vf, tvd);
+        if (j > 0 && j < ny) f -= 0.5 * (nu_c[C(i, j)] + nu_c[C(i, j - 1)]) / c.Pr_t * (T[C(i, j)] - T[C(i, j - 1)]) / dy;
+        Fy[V(i, j)] = f;
+      }
+    }
+    for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++)
+      Tn[C(i, j)] = T[C(i, j)] - dt * ((Fx[U(i + 1, j)] - Fx[U(i, j)]) / dx + (Fy[V(i, j + 1)] - Fy[V(i, j)]) / dy) + dt * S[C(i, j)] / (RHO * CP);
+    [T, Tn] = [Tn, T];
+
+    if (monitor) {
+      const rms = (a, b) => { let s2 = 0; for (let k = 0; k < a.length; k++) s2 += (a[k] - b[k]) ** 2; return Math.sqrt(s2 / a.length); };
+      let qo = 0, te = 0, ne = 0;
+      for (let j = 0; j < ny; j++) {
+        qo += (Fx[U(nx, j)] - Fx[U(0, j)]) * dy;
+        if (bR[j] === OUTLET) { te += T[C(nx - 1, j)]; ne++; }
+        if (bL[j] === OUTLET) { te += T[C(0, j)]; ne++; }
+      }
+      for (let i = 0; i < nx; i++) { qo += Fy[V(i, ny)] * dx; if (bT[i] === OUTLET) { te += T[C(i, ny - 1)]; ne++; } }
+      hist.t.push(s.t + dt); hist.du.push(rms(u, u0) / dt); hist.dv.push(rms(v, v0) / dt); hist.dT.push(rms(T, T0m) / dt);
+      hist.div.push(divMax); hist.imb.push(100 * (RHO * CP * qo - Q_tot) / Math.max(Q_tot, 1));
+      hist.v_floor.push(Math.hypot(0.5 * (u[U(iMon, jMon)] + u[U(iMon + 1, jMon)]), 0.5 * (v[V(iMon, jMon)] + v[V(iMon, jMon + 1)])));
+      hist.T_exh.push(te / ne);
+    }
+    // k and epsilon (sink terms implicit, so both stay positive); Tn holds T before this step
+    if (ke) {
+      for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
+        const k = C(i, j), nut = nu_c[k] - NU_AIR;
+        let sh = 0;
+        for (const [a, b] of [[i, j], [i + 1, j], [i, j + 1], [i + 1, j + 1]]) sh += (ug(a, b) - ug(a, b - 1)) / dy + (vg(a, b) - vg(a - 1, b)) / dx;
+        sh *= 0.25;
+        const sxx = (u[U(i + 1, j)] - u[U(i, j)]) / dx, syy = (v[V(i, j + 1)] - v[V(i, j)]) / dy;
+        let P = nut * (2 * (sxx * sxx + syy * syy) + sh * sh);
+        if (yp[k] > 0) {
+          const a = 0.5 * (u[U(i, j)] + u[U(i + 1, j)]), b = 0.5 * (v[V(i, j)] + v[V(i, j + 1)]);
+          const tau = nuWall(tk[k], yp[k]) * Math.sqrt(a * a + b * b) / yp[k];
+          P = tau * CMU4 * Math.sqrt(tk[k]) / (KAP * yp[k]);
+        }
+        Pk[k] = P;
+        const dTdy = ny === 1 ? 0 : j === 0 ? (Tn[k + 1] - Tn[k]) / dy : j === ny - 1 ? (Tn[k] - Tn[k - 1]) / dy : (Tn[k + 1] - Tn[k - 1]) / (2 * dy);
+        Gb[k] = -G * beta * nut / c.Pr_t * dTdy;
+      }
+      transport(tk, k_in, SK, Rk); transport(te, e_in, SE, Re);
+      for (let k = 0; k < N; k++) {
+        const kk = tk[k], ee = te[k], gp = Math.max(Gb[k], 0), gm = Math.max(-Gb[k], 0);
+        const kn = (kk + dt * (Rk[k] + Pk[k] + gp)) / (1 + dt * (ee + gm) / kk);
+        const en = (ee + dt * (Re[k] + C1 * ee / kk * (Pk[k] + gp))) / (1 + dt * C2 * ee / kk);
+        tkn[k] = Math.max(kn, 1e-10); ten[k] = Math.max(en, 1e-12);
+        if (yp[k] > 0) ten[k] = CMU34 * Math.pow(tkn[k], 1.5) / (KAP * yp[k]);
+      }
+      [tk, tkn] = [tkn, tk]; [te, ten] = [ten, te];
+    }
+    s.t += dt; s.n++; s.dt = dt;
+    if (s.t >= c.t_end - c.t_avg) {
+      for (let k = 0; k < u.length; k++) avg.u[k] += dt * u[k];
+      for (let k = 0; k < v.length; k++) avg.v[k] += dt * v[k];
+      for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
+        avg.T[C(i, j)] += dt * T[C(i, j)];
+        avg.speed[C(i, j)] += dt * Math.hypot(0.5 * (u[U(i, j)] + u[U(i + 1, j)]), 0.5 * (v[V(i, j)] + v[V(i, j + 1)]));
+      }
+      avg.w += dt;
+    }
+    if (s.t >= c.t_end) s.done = true;
+  }
+
+  // instantaneous or averaged fields at cell centres
+  function fields(useAvg) {
+    const a = useAvg && avg.w > 0, w = a ? avg.w : 1;
+    const uu = a ? avg.u : u, vv = a ? avg.v : v, TT = a ? avg.T : T;
+    const out = { T: new Float64Array(N), speed: new Float64Array(N), uc: new Float64Array(N), vc: new Float64Array(N) };
+    for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
+      const k = C(i, j);
+      out.uc[k] = 0.5 * (uu[U(i, j)] + uu[U(i + 1, j)]) / w; out.vc[k] = 0.5 * (vv[V(i, j)] + vv[V(i, j + 1)]) / w;
+      out.T[k] = TT[k] / w;
+      out.speed[k] = a ? avg.speed[k] / w : Math.hypot(out.uc[k], out.vc[k]);
+    }
+    return out;
+  }
+  return { step, fields, hist, s, nx, ny, dx, dy, xc, yc, L, H, U_in, h_in, q, Q_tot, T_mix, avg, case: c };
+}
+
+// ---- comfort ----
+export function draughtRate(ta, v, tu = 40) {
+  v = Math.max(v, 0.05);
+  return Math.min(Math.max((34 - ta) * Math.pow(v - 0.05, 0.62) * (0.37 * v * tu + 3.14), 0), 100);
+}
+export function pmv(ta, v, rh = 50, met = 1.2, clo = 0.5) {
+  const tr = ta, pa = rh * 10 * Math.exp(16.6536 - 4030.183 / (ta + 235));
+  const icl = 0.155 * clo, m = met * 58.15, mw = m;
+  const fcl = icl <= 0.078 ? 1 + 1.29 * icl : 1.05 + 0.645 * icl, hcf = 12.1 * Math.sqrt(v);
+  const taa = ta + 273, tra = tr + 273, tcla = taa + (35.5 - ta) / (3.5 * icl + 0.1);
+  const p1 = icl * fcl, p2 = p1 * 3.96, p3 = p1 * 100, p4 = p1 * taa, p5 = 308.7 - 0.028 * mw + p2 * (tra / 100) ** 4;
+  let xn = tcla / 100, xf = tcla / 50, hc = hcf;
+  for (let it = 0; it < 150 && Math.abs(xn - xf) >= 1.5e-5; it++) {
+    xf = (xf + xn) / 2; hc = Math.max(hcf, 2.38 * Math.abs(100 * xf - taa) ** 0.25);
+    xn = (p5 + p4 * hc - p2 * xf ** 4) / (100 + p3 * hc);
+  }
+  const tcl = 100 * xn - 273;
+  const hl = 3.05e-3 * (5733 - 6.99 * mw - pa) + (mw > 58.15 ? 0.42 * (mw - 58.15) : 0) + 1.7e-5 * m * (5867 - pa)
+    + 0.0014 * m * (34 - ta) + 3.96 * fcl * (xn ** 4 - (tra / 100) ** 4) + fcl * hc * (tcl - ta);
+  return (0.303 * Math.exp(-0.036 * m) + 0.028) * (mw - hl);
+}
+export function ankleDraftPPD(v, ts) { const z = -2.58 + 3.05 * v - 1.06 * ts; return 100 * Math.exp(z) / (1 + Math.exp(z)); }
+export function ankleLimit(ts) { return (Math.log(0.25) + 2.58 + 1.06 * ts) / 3.05; }
+export function occupiedZone(sim, f, xMin = 0.6, h = 0.1, hMax = 1.8) {
+  const { nx, ny, xc, yc, L, dy } = sim, j = Math.min(Math.floor(h / dy), ny - 1);
+  let vmax = -1, at = 0, tAt = 0, tSum = 0, vSum = 0, n = 0;
+  for (let i = 0; i < nx; i++) {
+    if (xc[i] <= xMin || xc[i] >= L - xMin) continue;
+    const sp = f.speed[i * ny + j]; if (sp > vmax) { vmax = sp; at = xc[i]; tAt = f.T[i * ny + j]; }
+    for (let jj = 0; jj < ny; jj++) if (yc[jj] < hMax) { tSum += f.T[i * ny + jj]; vSum += f.speed[i * ny + jj]; n++; }
+  }
+  const ts = pmv(tSum / n, Math.max(vSum / n, 0.05));
+  return { v_max: vmax, x_at: at, T: tAt, DR: draughtRate(tAt, vmax), TS: ts, PPD_AD: ankleDraftPPD(vmax, ts), v_limit: ankleLimit(ts), T_oz: tSum / n };
+}
+
+
+// ---------------------------------------------------------------- user interface
+
+const CSS = `
+/* Layout: lab instrument. Controls rail on the left, the room section as the main plate, readouts and two charts beneath. */
+.rcfd {
+  --bg: #f3f5f7;
+  --panel: #ffffff;
+  --ink: #17212b;
+  --muted: #5b6875;
+  --line: #d5dce3;
+  --accent: #1f6fb2;
+  --accent-ink: #ffffff;
+  --good: #1f8a5b;
+  --warn: #b7791f;
+  --bad: #c0392b;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .rcfd {
+    --bg: #11161b; --panel: #182029; --ink: #e5ebf0; --muted: #94a2af; --line: #2b3742;
+    --accent: #5aa6e6; --accent-ink: #0d1318; --good: #4cc38a; --warn: #e0a84a; --bad: #ef6b5b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] .rcfd {
+  --bg: #11161b; --panel: #182029; --ink: #e5ebf0; --muted: #94a2af; --line: #2b3742;
+  --accent: #5aa6e6; --accent-ink: #0d1318; --good: #4cc38a; --warn: #e0a84a; --bad: #ef6b5b; color-scheme: dark;
+}
+.rcfd, .rcfd * { box-sizing: border-box; }
+.rcfd { container: rcfd / inline-size; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 14px; line-height: 1.45; }
+.rcfd .wrap { padding-block: 4px; display: grid; gap: 16px; }
+.rcfd .layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 16px; align-items: start; }
+@container rcfd (max-width: 820px) { .rcfd .layout { grid-template-columns: minmax(0, 1fr); } .rcfd .controls { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); align-items: start; } }
+.rcfd .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; min-width: 0; }
+.rcfd .controls { display: grid; gap: 14px; }
+.rcfd .group { display: grid; gap: 8px; }
+.rcfd .group h2 { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; font-weight: 600; }
+.rcfd label { display: grid; gap: 4px; font-size: 13px; }
+.rcfd .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.rcfd .val { font-family: var(--font-data); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.rcfd input[type=range] { width: 100%; accent-color: var(--accent); }
+.rcfd select { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; }
+.rcfd .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.rcfd .seg button { border: 0; background: transparent; color: var(--ink); padding: 6px 4px; font: inherit; font-size: 12.5px; cursor: pointer; }
+.rcfd .seg button + button { border-left: 1px solid var(--line); }
+.rcfd .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.rcfd .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.rcfd .btn { flex: 1; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); border-radius: 6px; padding: 8px 10px; font: inherit; font-weight: 600; cursor: pointer; }
+.rcfd .btn.ghost { background: transparent; color: var(--accent); }
+.rcfd button:focus-visible, .rcfd select:focus-visible, .rcfd input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rcfd .note { color: var(--muted); font-size: 12px; margin: 0; }
+.rcfd .main { display: grid; gap: 16px; min-width: 0; }
+.rcfd .plate-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.rcfd .plot-row { position: relative; padding-bottom: 6px; }
+.rcfd .iso { position: absolute; top: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 50px; }
+.rcfd .iso input[type=range] { writing-mode: vertical-lr; direction: rtl; width: 22px; height: 200px; margin: 0; }
+.rcfd .iso .isoV { font-family: var(--font-data); font-size: 11.5px; font-variant-numeric: tabular-nums; text-align: center; line-height: 1.2; }
+.rcfd .plate-head .status { font-family: var(--font-data); font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.rcfd canvas { display: block; width: 100%; }
+.rcfd .meta { margin: 10px 2px 0; color: var(--muted); font-size: 12px; }
+.rcfd .meta strong { color: var(--ink); font-weight: 600; }
+.rcfd .readouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.rcfd .ro { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; display: grid; gap: 2px; background: var(--panel); }
+.rcfd .ro .k { font-size: 11.5px; color: var(--muted); }
+.rcfd .ro .v { font-family: var(--font-data); font-size: 17px; font-variant-numeric: tabular-nums; }
+.rcfd .ro .s { font-size: 11.5px; font-weight: 600; }
+.rcfd .ro[data-state="pass"] { border-left: 4px solid var(--good); } .rcfd .ro[data-state="pass"] .s { color: var(--good); }
+.rcfd .ro[data-state="fail"] { border-left: 4px solid var(--bad); } .rcfd .ro[data-state="fail"] .s { color: var(--bad); }
+.rcfd .charts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@container rcfd (max-width: 820px) { .rcfd .charts { grid-template-columns: minmax(0, 1fr); } }
+.rcfd .charts h3 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
+.rcfd .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.rcfd .legend i { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 5px; border-radius: 2px; }
+.rcfd details { color: var(--muted); font-size: 13px; }
+.rcfd details p { max-width: 80ch; }
+.rcfd summary { cursor: pointer; color: var(--ink); font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { .rcfd * { transition: none !important; } }
+`;
+
+const MARKUP = `<div class="wrap">
+
+  <div class="layout">
+    <aside class="panel controls" aria-label="Case settings">
+      <div class="group">
+        <h2>Room</h2>
+        <label for="rL"><span class="row"><span>Depth from the facade</span><span class="val" id="rLV"></span></span>
+          <input id="rL" type="range" min="3" max="10" step="0.5" value="5"></label>
+        <label for="rH"><span class="row"><span>Ceiling height</span><span class="val" id="rHV"></span></span>
+          <input id="rH" type="range" min="2.4" max="4" step="0.1" value="2.5"></label>
+        <label for="hx"><span class="row"><span>Heat source, centre from the facade</span><span class="val" id="hxV"></span></span>
+          <input id="hx" type="range" min="0.2" max="4.8" step="0.1" value="2.5"></label>
+      </div>
+      <div class="group">
+        <h2>Supply opening (facade)</h2>
+        <label for="preset">Type
+          <select id="preset">
+            <option value="window">Window, 0.9–2.1 m</option>
+            <option value="door">Balcony door, 0–2.1 m</option>
+            <option value="hatch" id="hatchOpt">Top hatch, 2.2–2.4 m</option>
+            <option value="low">Low slot, 0.2–0.3 m</option>
+            <option value="custom">Custom</option>
+          </select>
+        </label>
+        <label for="opLo"><span class="row"><span>Bottom edge</span><span class="val" id="opLoV"></span></span>
+          <input id="opLo" type="range" min="0" max="2.4" step="0.05" value="0.9"></label>
+        <label for="opHi"><span class="row"><span>Top edge</span><span class="val" id="opHiV"></span></span>
+          <input id="opHi" type="range" min="0.1" max="2.5" step="0.05" value="2.1"></label>
+      </div>
+      <div class="group">
+        <h2>Air and heat</h2>
+        <label for="tin"><span class="row"><span>Supply temperature</span><span class="val" id="tinV"></span></span>
+          <input id="tin" type="range" min="4" max="24" step="1" value="16"></label>
+        <label for="ach"><span class="row"><span>Air change rate</span><span class="val" id="achV"></span></span>
+          <input id="ach" type="range" min="1" max="12" step="0.5" value="6"></label>
+        <label for="troom"><span class="row"><span>Well-mixed room temperature</span><span class="val" id="troomV"></span></span>
+          <input id="troom" type="range" min="22" max="30" step="0.5" value="26"></label>
+        <p class="note" id="gainsNote"></p>
+      </div>
+      <div class="group">
+        <h2>Numerics</h2>
+        <label for="mesh">Mesh
+          <select id="mesh">
+            <option value="50">10 cm cells (fast)</option>
+            <option value="60" selected>8.3 cm cells</option>
+            <option value="80">6.25 cm cells (slow)</option>
+          </select>
+        </label>
+        <p class="note" id="meshNote"></p>
+        <div class="group"><span style="font-size:13px">Advection scheme</span>
+          <div class="seg" id="adv" role="group" aria-label="Advection scheme">
+            <button type="button" data-v="tvd" aria-pressed="true">TVD (van Leer)</button>
+            <button type="button" data-v="upwind" aria-pressed="false">Upwind</button>
+          </div></div>
+        <div class="group"><span style="font-size:13px">Turbulence</span>
+          <div class="seg" id="turb" role="group" aria-label="Turbulence model">
+            <button type="button" data-v="k-epsilon" aria-pressed="true">k-ε</button>
+            <button type="button" data-v="chen-xu" aria-pressed="false">Chen &amp; Xu</button>
+            <button type="button" data-v="constant" aria-pressed="false">Constant ν<sub>t</sub></button>
+          </div></div>
+      </div>
+      <div class="btns">
+        <button class="btn" id="run" type="button">Run</button>
+        <button class="btn ghost" id="pause" type="button">Pause</button>
+      </div>
+      <p class="note">Each run simulates 30 minutes and averages the last 10. Changing a setting starts a new run.</p>
+    </aside>
+
+    <section class="main">
+      <div class="panel">
+        <div class="plate-head">
+          <div class="seg" id="fieldSel" role="group" aria-label="Field shown" style="min-width:0">
+            <button type="button" data-v="T" aria-pressed="true">Temperature</button>
+            <button type="button" data-v="speed" aria-pressed="false">Air speed</button>
+            <button type="button" data-v="DR" aria-pressed="false">ISO 7730 DR</button>
+          </div>
+          <span class="status" id="status">Ready</span>
+        </div>
+        <div class="plot-row">
+          <canvas id="field" height="320" aria-label="Room section with the selected field and velocity arrows"></canvas>
+          <div class="iso">
+            <input id="iso" type="range" title="Isoline value" aria-label="Value of the isoline drawn on the section">
+            <span class="isoV" id="isoV"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="readouts" id="readouts"></div>
+
+      <div class="charts">
+        <div class="panel">
+          <h3>At ankle height, 0.1 m above the floor</h3>
+          <canvas id="floor" height="230" aria-label="Air speed and draught along the floor"></canvas>
+          <div class="legend">
+            <span><i style="background:#2f7fd0"></i>Air speed (m/s, left)</span>
+            <span><i style="background:#d9622b"></i>ISO 7730 DR (%, right)</span>
+            <span><i style="background:#7b4bb7"></i>ASHRAE 55 ankle PPD<sub>AD</sub> (%, right)</span>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Convergence</h3>
+          <canvas id="conv" height="230" aria-label="Rate of change of velocity and temperature and the floor speed monitor"></canvas>
+          <div class="legend">
+            <span><i style="background:#2f7fd0"></i>Rate of change of u</span>
+            <span><i style="background:#1f9e77"></i>of v</span>
+            <span><i style="background:#d9622b"></i>of T</span>
+            <span><i style="background:var(--muted)"></i>Floor speed at x = 1 m (right)</span>
+          </div>
+        </div>
+      </div>
+
+      <details class="panel">
+        <summary>About the model</summary>
+        <p>The solver is the same as room_cfd.py from the course. It solves the incompressible Navier–Stokes equations with Boussinesq buoyancy and an energy equation, on a staggered grid, marching in time with a pressure projection. Turbulence is an eddy viscosity: the standard k-ε model with wall functions (default), Chen &amp; Xu (1998) ν<sub>t</sub> = 0.03874·V·ℓ, or a constant 0.002 m²/s. Only k-ε reproduces the IEA Annex 20 test room. The heat gains sit in the dotted block and are set so the well-mixed room reaches the chosen temperature.</p>
+        <p>The occupied zone (dashed) starts 0.6 m from the facade and the back wall and reaches 1.8 m up. ISO 7730 DR uses Tu = 40 %. The ASHRAE 55-2020 ankle draught model (Liu et al. 2017) uses the whole-body thermal sensation TS, here the PMV of the occupied zone at 1.2 met, 0.5 clo, 50 % RH and t<sub>r</sub> = t<sub>a</sub>. Both limits are 20 %.</p>
+        <p>Limits: a 2D section treats the opening as running the full room width, and a 2D jet decays more slowly than a real 3D one. The opening is an inlet only, so a large opening does not also let warm air out at the top, as a real window would. Use it to compare cases, not to get design values.</p>
+      </details>
+      <p class="meta">Contact: Christian Hviid, cahv@dtu.dk · <strong>Use at own risk.</strong> A simplified 2D teaching model for comparing cases, validated only against the isothermal IEA Annex 20 test room. Not for design values, and provided without warranty.</p>
+    </section>
+  </div>
+</div>
+
+`;
+
+function app(root, autoRun) {
+  const $ = id => root.querySelector("#" + id);
+  // the top hatch sits 0.1 m below the ceiling, whatever the ceiling height
+  const PRESETS = { window: () => [0.9, 2.1], door: () => [0, 2.1], hatch: () => [+(state.H - 0.3).toFixed(2), +(state.H - 0.1).toFixed(2)], low: () => [0.2, 0.3] };
+  const state = { preset: "window", L: 5, H: 2.5, hx: 2.5, lo: 0.9, hi: 2.1, tin: 16, ach: 6, troom: 26, mesh: 60, adv: "tvd", turb: "k-epsilon", field: "T", iso: { T: 24, speed: 0.15, DR: 20 } };
+  let sim = null, running = false, rafId = 0, lastDraw = 0;
+
+  const css = name => getComputedStyle(root).getPropertyValue(name).trim();
+  const fmt = (x, d = 2) => Number.isFinite(x) ? x.toFixed(d) : "–";
+
+  // mesh option = cells over 5 m, so the cell size stays the same when the room changes
+  const meshN = () => { const h = 5 / state.mesh; return [Math.round(state.L / h), Math.round(state.H / h)]; };
+  function syncLabels() {
+    $("rLV").textContent = state.L.toFixed(1) + " m"; $("rHV").textContent = state.H.toFixed(1) + " m"; $("hxV").textContent = state.hx.toFixed(1) + " m";
+    $("hatchOpt").textContent = `Top hatch, ${(state.H - 0.3).toFixed(1)}–${(state.H - 0.1).toFixed(1)} m`;
+    const [nx, ny] = meshN(); $("meshNote").textContent = `${nx} × ${ny} cells`;
+    $("opLoV").textContent = state.lo.toFixed(2) + " m"; $("opHiV").textContent = state.hi.toFixed(2) + " m";
+    $("tinV").textContent = state.tin + " °C"; $("achV").textContent = state.ach + " h⁻¹"; $("troomV").textContent = state.troom + " °C";
+    const q = state.ach * state.L * state.H * 4 / 3600, Q = 1.2 * 1005 * q * (state.troom - state.tin);
+    const Uin = q / 4 / Math.max(state.hi - state.lo, 0.05);
+    $("gainsNote").textContent = Q > 0
+      ? `Airflow ${(q * 1000).toFixed(0)} L/s. Heat gains ${Q.toFixed(0)} W (${(Q / (4 * state.L)).toFixed(0)} W/m² floor). Inlet speed ${Uin.toFixed(3)} m/s.`
+      : "The supply must be colder than the room. Raise the room temperature or lower the supply.";
+    syncIso();
+  }
+
+  function makeCase() {
+    const { L, H } = state, q = state.ach * L * H * 4 / 3600, [nx, ny] = meshN();
+    const Q = Math.max(1.2 * 1005 * q * (state.troom - state.tin), 0);
+    return { L, H, W: 4, nx, ny, ach: state.ach, T_in: state.tin,
+      inlet: { side: "left", start: state.lo, end: state.hi }, outlet: { side: "right", start: H - 0.2, end: H - 0.1 },
+      heat: [{ x0: state.hx - 0.2, x1: state.hx + 0.2, y0: 0, y1: 1.2, power: Q / 4 }], turbulence: state.turb, nu_t: 2e-3, Tu_in: 0.04, Pr_t: 0.85,
+      advection: state.adv, t_end: 1800, t_avg: 600 };
+  }
+
+  function start() {
+    cancelAnimationFrame(rafId);
+    if (state.hi - state.lo < 0.04) { $("status").textContent = "The opening needs a height of at least one cell."; return; }
+    sim = createSim(makeCase()); running = true; $("pause").textContent = "Pause";
+    loop();
+  }
+  function loop() {
+    if (!sim) return;
+    if (running && !sim.s.done) {
+      const t0 = performance.now();
+      while (performance.now() - t0 < 28 && !sim.s.done) sim.step(sim.s.n % 25 === 0);
+    }
+    const now = performance.now();
+    if (now - lastDraw > 120 || sim.s.done) { draw(); lastDraw = now; }
+    if (running && !sim.s.done) rafId = requestAnimationFrame(loop);
+    else draw();
+  }
+
+  // ---------- colour maps ----------
+  const lerp = (a, b, t) => a + (b - a) * t;
+  function ramp(stops, t) {
+    t = Math.min(Math.max(t, 0), 1);
+    const n = stops.length - 1, k = Math.min(Math.floor(t * n), n - 1), f = t * n - k;
+    const a = stops[k], b = stops[k + 1];
+    return [lerp(a[0], b[0], f), lerp(a[1], b[1], f), lerp(a[2], b[2], f)];
+  }
+  const CMAPS = {
+    T: [[59, 76, 192], [124, 159, 249], [192, 212, 245], [242, 203, 183], [238, 132, 104], [180, 4, 38]],
+    speed: [[247, 251, 255], [198, 219, 239], [107, 174, 214], [33, 113, 181], [8, 48, 107]],
+    DR: [[252, 253, 191], [254, 176, 120], [241, 96, 93], [183, 55, 121], [114, 31, 129], [44, 17, 95]]
+  };
+
+  // ---------- section plot ----------
+  function sizeCanvas(cv, hFit) {
+    // the CSS height comes from the markup's height attribute, kept in data-h because setting cv.height
+    // (the pixel buffer) overwrites that attribute; reading it back would grow the canvas by devicePixelRatio per draw
+    if (!cv.dataset.h) cv.dataset.h = cv.getAttribute("height");
+    const r = window.devicePixelRatio || 1, w = cv.clientWidth, h0 = +cv.dataset.h, h = hFit ? Math.min(h0, hFit(w)) : h0;
+    if (cv.width !== Math.round(w * r) || cv.height !== Math.round(h * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); }
+    cv.style.height = h + "px";
+    const g = cv.getContext("2d"); g.setTransform(r, 0, 0, r, 0, 0); return [g, w, h];
+  }
+  let off = document.createElement("canvas");
+
+  // colour scale of each field, shared by the section plot and the isoline slider
+  function fieldRange() {
+    if (state.field === "DR") return { lo: 0, hi: 40, step: 1, unit: "DR (%)", fmt: v => v.toFixed(0) + " %" };
+    if (state.field === "T") return { lo: Math.floor(Math.min(state.tin, state.troom - 6)), hi: Math.ceil(state.troom + 2), step: 0.1, unit: "Temperature (°C)", fmt: v => v.toFixed(1) + " °C" };
+    return { lo: 0, hi: 0.5, step: 0.01, unit: "Air speed (m/s)", fmt: v => v.toFixed(2) + " m/s" };
+  }
+  function syncIso() {
+    const r = fieldRange(), el = $("iso");
+    state.iso[state.field] = Math.min(Math.max(state.iso[state.field], r.lo), r.hi);
+    el.min = r.lo; el.max = r.hi; el.step = r.step; el.value = state.iso[state.field];
+    $("isoV").textContent = r.fmt(state.iso[state.field]);
+  }
+  // isoline of a cell-centred field by marching squares; returns segments [x1, y1, x2, y2] in metres
+  function isoSegments(vals, c) {
+    const { nx, ny, xc, yc } = sim, seg = [];
+    const at = (i, j) => vals[i * ny + j] - c;
+    for (let i = 0; i < nx - 1; i++) for (let j = 0; j < ny - 1; j++) {
+      const a = at(i, j), b = at(i + 1, j), d = at(i + 1, j + 1), e = at(i, j + 1), pts = [];
+      const cut = (f1, f2, x1, y1, x2, y2) => { if ((f1 < 0) !== (f2 < 0)) { const t = f1 / (f1 - f2); pts.push(x1 + (x2 - x1) * t, y1 + (y2 - y1) * t); } };
+      cut(a, b, xc[i], yc[j], xc[i + 1], yc[j]);
+      cut(b, d, xc[i + 1], yc[j], xc[i + 1], yc[j + 1]);
+      cut(d, e, xc[i + 1], yc[j + 1], xc[i], yc[j + 1]);
+      cut(e, a, xc[i], yc[j + 1], xc[i], yc[j]);
+      if (pts.length >= 4) seg.push(pts.slice(0, 4));
+      if (pts.length === 8) seg.push(pts.slice(4, 8));
+    }
+    return seg;
+  }
+
+  function drawField(f, useAvg) {
+    // a tall, shallow room gets more height so it is not drawn tiny
+    const cv = $("field"); cv.dataset.h = sim.H / sim.L > 0.55 ? 460 : 320;
+    const [g, W, Hc] = sizeCanvas(cv, w => (w - 168) * sim.H / sim.L + 38);
+    const ink = css("--ink"), muted = css("--muted"), line = css("--line"), panel = css("--panel");
+    g.clearRect(0, 0, W, Hc);
+    const padL = 40, padR = 128, padT = 8, padB = 30;
+    const { L, H } = sim, sc = Math.min((W - padL - padR) / L, (Hc - padT - padB) / H);
+    const pw = L * sc, ph = H * sc, x0 = padL, y0 = padT;
+    const X = x => x0 + x * sc, Y = y => y0 + ph - y * sc;
+    const { nx, ny } = sim;
+    // field values
+    let vals = state.field === "T" ? f.T : state.field === "speed" ? f.speed : null;
+    const { lo, hi, unit } = fieldRange();
+    if (state.field === "DR") { vals = new Float64Array(nx * ny); for (let k = 0; k < vals.length; k++) vals[k] = draughtRate(f.T[k], f.speed[k]); }
+    off.width = nx; off.height = ny;
+    const og = off.getContext("2d"), img = og.createImageData(nx, ny);
+    for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
+      const c = ramp(CMAPS[state.field], (vals[i * ny + j] - lo) / (hi - lo)), p = 4 * ((ny - 1 - j) * nx + i);
+      img.data[p] = c[0]; img.data[p + 1] = c[1]; img.data[p + 2] = c[2]; img.data[p + 3] = 255;
+    }
+    og.putImageData(img, 0, 0);
+    g.imageSmoothingEnabled = true; g.drawImage(off, x0, y0, pw, ph);
+    // arrows
+    const step = Math.max(1, Math.round(0.25 / sim.dx));
+    g.strokeStyle = "rgba(20,25,30,0.75)"; g.fillStyle = "rgba(20,25,30,0.75)"; g.lineWidth = 1;
+    for (let i = Math.floor(step / 2); i < nx; i += step) for (let j = Math.floor(step / 2); j < ny; j += step) {
+      const k = i * ny + j, u = f.uc[k], v = f.vc[k], sp = Math.hypot(u, v); if (sp < 0.01) continue;
+      const len = Math.min(sp / 0.4, 1) * 0.22 * sc + 3, ax = X(sim.xc[i]), ay = Y(sim.yc[j]);
+      const ex = ax + u / sp * len, ey = ay - v / sp * len, a = Math.atan2(ey - ay, ex - ax);
+      g.beginPath(); g.moveTo(ax, ay); g.lineTo(ex, ey); g.stroke();
+      g.beginPath(); g.moveTo(ex, ey); g.lineTo(ex - 4 * Math.cos(a - 0.45), ey - 4 * Math.sin(a - 0.45)); g.lineTo(ex - 4 * Math.cos(a + 0.45), ey - 4 * Math.sin(a + 0.45)); g.fill();
+    }
+    // isoline: a light halo under a dark line, so it reads on every colour map
+    const segs = isoSegments(vals, state.iso[state.field]);
+    g.lineCap = "round";
+    for (const [w, col] of [[3.5, "rgba(255,255,255,0.85)"], [1.6, "#111"]]) {
+      g.lineWidth = w; g.strokeStyle = col; g.beginPath();
+      for (const [x1, y1, x2, y2] of segs) { g.moveTo(X(x1), Y(y1)); g.lineTo(X(x2), Y(y2)); }
+      g.stroke();
+    }
+    g.lineCap = "butt";
+    // frame, occupied zone, heat block, openings
+    g.strokeStyle = ink; g.lineWidth = 1.5; g.strokeRect(x0, y0, pw, ph);
+    g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; g.strokeRect(X(0.6), Y(1.8), (L - 1.2) * sc, 1.8 * sc);
+    g.setLineDash([2, 3]); g.strokeStyle = "rgba(20,25,30,0.8)"; g.strokeRect(X(sim.case.heat[0].x0), Y(1.2), 0.4 * sc, 1.2 * sc); g.setLineDash([]);
+    g.lineWidth = 6; g.strokeStyle = "#2f7fd0"; g.beginPath(); g.moveTo(X(0) - 2, Y(state.lo)); g.lineTo(X(0) - 2, Y(state.hi)); g.stroke();
+    g.strokeStyle = muted; g.beginPath(); g.moveTo(X(L) + 2, Y(H - 0.2)); g.lineTo(X(L) + 2, Y(H - 0.1)); g.stroke();
+    // axes labels
+    g.fillStyle = muted; g.font = "11px " + css("--font-data"); g.textAlign = "center";
+    for (let x = 0; x <= L + 1e-9; x++) g.fillText(x + " m", X(x), y0 + ph + 16);
+    g.textAlign = "right"; for (let y = 0; y <= H + 1e-9; y += 0.5) g.fillText(y.toFixed(1), x0 - 6, Y(y) + 4);
+    // colour bar
+    const cbx = x0 + pw + 14, cbw = 10;
+    for (let k = 0; k < ph; k++) { const c = ramp(CMAPS[state.field], 1 - k / ph); g.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`; g.fillRect(cbx, y0 + k, cbw, 1.5); }
+    g.strokeStyle = line; g.lineWidth = 1; g.strokeRect(cbx, y0, cbw, ph);
+    g.fillStyle = muted; g.textAlign = "left";
+    const nt = 4; for (let k = 0; k <= nt; k++) { const v = lo + (hi - lo) * k / nt; g.fillText(state.field === "speed" ? v.toFixed(2) : v.toFixed(0), cbx + cbw + 4, Y(H * k / nt) + 4); }
+    // isoline value on the colour bar
+    const yi = y0 + ph * (1 - Math.min(Math.max((state.iso[state.field] - lo) / (hi - lo), 0), 1));
+    g.strokeStyle = ink; g.lineWidth = 2; g.beginPath(); g.moveTo(cbx - 3, yi); g.lineTo(cbx + cbw + 3, yi); g.stroke();
+    // the slider spans the plot height, so its ends line up with the colour bar
+    const sl = $("iso"); sl.style.height = ph + "px"; sl.parentElement.style.top = y0 + "px"; sl.parentElement.style.left = (cbx + cbw + 50) + "px";
+    g.save(); g.translate(cbx + cbw + 40, y0 + ph / 2); g.rotate(-Math.PI / 2); g.textAlign = "center"; g.fillText(unit, 0, 0); g.restore();
+  }
+
+  // ---------- small chart helper ----------
+  function chart(cv, xr, yl, yr, series, opts = {}) {
+    const [g, W, Hc] = sizeCanvas(cv), muted = css("--muted"), line = css("--line"), ink = css("--ink");
+    g.clearRect(0, 0, W, Hc);
+    const pl = 46, pr = 44, pt = 8, pb = 32, w = W - pl - pr, h = Hc - pt - pb;
+    const X = x => pl + (x - xr[0]) / (xr[1] - xr[0]) * w;
+    const Yf = (r, logy) => y => {
+      const t = logy ? (Math.log10(Math.max(y, 1e-30)) - Math.log10(r[0])) / (Math.log10(r[1]) - Math.log10(r[0])) : (y - r[0]) / (r[1] - r[0]);
+      return pt + h - Math.min(Math.max(t, -0.02), 1.02) * h;
+    };
+    const YL = Yf(yl.r, yl.log), YR = yr ? Yf(yr.r, false) : null;
+    for (const sh of opts.shades || []) { g.fillStyle = line; g.globalAlpha = 0.5; g.fillRect(X(sh[0]), pt, X(sh[1]) - X(sh[0]), h); g.globalAlpha = 1; }
+    g.strokeStyle = line; g.lineWidth = 1; g.font = "10.5px " + css("--font-data"); g.fillStyle = muted;
+    for (const t of yl.ticks) { const y = YL(t); g.beginPath(); g.moveTo(pl, y); g.lineTo(pl + w, y); g.stroke(); g.textAlign = "right"; g.fillText(yl.fmt(t), pl - 5, y + 3.5); }
+    if (yr) for (const t of yr.ticks) { g.textAlign = "left"; g.fillText(yr.fmt(t), pl + w + 5, YR(t) + 3.5); }
+    for (const t of opts.xticks) { g.textAlign = "center"; g.fillText(opts.xfmt(t), X(t), pt + h + 15); }
+    for (const l of opts.hlines || []) { g.strokeStyle = ink; g.setLineDash([4, 3]); g.beginPath(); const y = (l.right ? YR : YL)(l.y); g.moveTo(pl, y); g.lineTo(pl + w, y); g.stroke(); g.setLineDash([]); g.fillStyle = ink; g.textAlign = "right"; g.fillText(l.label, pl + w - 4, y - 4); }
+    for (const s of series) {
+      const Y = s.right ? YR : YL; g.strokeStyle = s.color; g.lineWidth = 1.8; g.beginPath();
+      let first = true;
+      for (let k = 0; k < s.x.length; k++) { const px = X(s.x[k]), py = Y(s.y[k]); if (first) { g.moveTo(px, py); first = false; } else g.lineTo(px, py); }
+      g.stroke();
+    }
+    g.strokeStyle = muted; g.strokeRect(pl, pt, w, h);
+    g.fillStyle = muted; g.textAlign = "center"; g.fillText(opts.xlabel, pl + w / 2, Hc - 2);
+  }
+
+  function drawFloor(f, oz) {
+    const { nx, ny, xc, dy, L } = sim, j = Math.min(Math.floor(0.1 / dy), ny - 1);
+    const xs = Array.from(xc), sp = xs.map((_, i) => f.speed[i * ny + j]), t = xs.map((_, i) => f.T[i * ny + j]);
+    const dr = xs.map((_, i) => draughtRate(t[i], sp[i])), ad = sp.map(v => ankleDraftPPD(v, oz.TS));
+    const vtop = Math.max(0.4, Math.ceil(Math.max(...sp) * 10) / 10);
+    chart($("floor"), [0, L], { r: [0, vtop], ticks: [0, vtop / 4, vtop / 2, 3 * vtop / 4, vtop], fmt: v => v.toFixed(2) },
+      { r: [0, 50], ticks: [0, 10, 20, 30, 40, 50], fmt: v => v.toFixed(0) },
+      [{ x: xs, y: sp, color: "#2f7fd0" }, { x: xs, y: dr, color: "#d9622b", right: true }, { x: xs, y: ad, color: "#7b4bb7", right: true }],
+      { xticks: Array.from({ length: Math.floor(L) + 1 }, (_, i) => i), xfmt: v => v, xlabel: "x from the facade (m), grey: outside occupied zone", shades: [[0, 0.6], [L - 0.6, L]],
+        hlines: [{ y: 20, right: true, label: "20 % limit" }] });
+  }
+
+  function drawConv() {
+    const hst = sim.hist; if (hst.t.length < 2) return;
+    const tm = hst.t.map(t => t / 60);
+    const all = [...hst.du, ...hst.dv, ...hst.dT].filter(v => v > 0);
+    const lo = Math.pow(10, Math.floor(Math.log10(Math.max(Math.min(...all), 1e-9)))), hi = Math.pow(10, Math.ceil(Math.log10(Math.max(...all))));
+    const ticks = []; for (let e = Math.log10(lo); e <= Math.log10(hi); e++) ticks.push(Math.pow(10, e));
+    const vmax = Math.max(0.2, Math.ceil(Math.max(...hst.v_floor) * 10) / 10);
+    chart($("conv"), [0, 30], { r: [lo, hi], log: true, ticks, fmt: v => "1e" + Math.round(Math.log10(v)) },
+      { r: [0, vmax], ticks: [0, vmax / 2, vmax], fmt: v => v.toFixed(2) },
+      [{ x: tm, y: hst.du, color: "#2f7fd0" }, { x: tm, y: hst.dv, color: "#1f9e77" }, { x: tm, y: hst.dT, color: "#d9622b" },
+       { x: tm, y: hst.v_floor, color: css("--muted"), right: true }],
+      { xticks: [0, 5, 10, 15, 20, 25, 30], xfmt: v => v, xlabel: "Time (min), grey: averaging window", shades: [[20, 30]] });
+  }
+
+  function readouts(oz) {
+    const imb = sim.hist.imb.at(-1);
+    const items = [
+      ["Floor speed, max", fmt(oz.v_max) + " m/s", `at x = ${fmt(oz.x_at, 1)} m`],
+      ["ISO 7730 DR", fmt(oz.DR, 0) + " %", oz.DR <= 20 ? "Pass" : "Fail", oz.DR <= 20 ? "pass" : "fail"],
+      ["TS (PMV), occupied zone", (oz.TS >= 0 ? "+" : "") + fmt(oz.TS), `zone mean ${fmt(oz.T_oz, 1)} °C`],
+      ["Ankle PPD_AD (ASHRAE 55)", fmt(oz.PPD_AD, 0) + " %", oz.PPD_AD <= 20 ? `Pass, limit ${fmt(oz.v_limit)} m/s` : `Fail, limit ${fmt(oz.v_limit)} m/s`, oz.PPD_AD <= 20 ? "pass" : "fail"],
+      ["Exhaust temperature", fmt(sim.hist.T_exh.at(-1), 1) + " °C", `well-mixed ${fmt(sim.T_mix, 1)} °C`],
+      ["Energy imbalance", fmt(imb, 1) + " %", "0 at steady state"]
+    ];
+    $("readouts").innerHTML = items.map(([k, v, s, st]) =>
+      `<div class="ro"${st ? ` data-state="${st}"` : ""}><span class="k">${k}</span><span class="v">${v}</span><span class="s">${s}</span></div>`).join("");
+  }
+
+  function draw() {
+    if (!sim) return;
+    const useAvg = sim.s.done && sim.avg.w > 0, f = sim.fields(useAvg), oz = occupiedZone(sim, f);
+    drawField(f, useAvg); drawFloor(f, oz); drawConv(); readouts(oz);
+    $("status").textContent = sim.s.done ? `Done in ${sim.s.n} steps. Showing the 20–30 min average.`
+      : `${running ? "Running" : "Paused"}, instantaneous. t = ${(sim.s.t / 60).toFixed(1)} of 30 min, Δt = ${sim.s.dt.toFixed(3)} s`;
+  }
+
+  // ---------- controls ----------
+  function setSeg(id, key) {
+    $(id).querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+      $(id).querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+      state[key] = b.dataset.v;
+      if (key === "field") { syncIso(); draw(); } else start();
+    }));
+  }
+  setSeg("adv", "adv"); setSeg("turb", "turb"); setSeg("fieldSel", "field");
+  $("preset").addEventListener("change", e => {
+    state.preset = e.target.value;
+    if (PRESETS[state.preset]) { [state.lo, state.hi] = PRESETS[state.preset](); $("opLo").value = state.lo; $("opHi").value = state.hi; }
+    syncLabels(); start();
+  });
+  for (const [id, key] of [["opLo", "lo"], ["opHi", "hi"], ["tin", "tin"], ["ach", "ach"], ["troom", "troom"]]) {
+    $(id).addEventListener("input", e => {
+      state[key] = +e.target.value;
+      if (key === "lo" && state.hi < state.lo + 0.1) { state.hi = Math.min(state.lo + 0.1, state.H); $("opHi").value = state.hi; }
+      if (key === "hi" && state.lo > state.hi - 0.1) { state.lo = Math.max(state.hi - 0.1, 0); $("opLo").value = state.lo; }
+      if (key === "lo" || key === "hi") { state.preset = "custom"; $("preset").value = "custom"; }
+      syncLabels();
+    });
+    $(id).addEventListener("change", start);
+  }
+  // room size: the opening must stay below the ceiling, and the top hatch follows the ceiling
+  for (const [id, key] of [["rL", "L"], ["rH", "H"], ["hx", "hx"]]) {
+    $(id).addEventListener("input", e => {
+      state[key] = +e.target.value;
+      // the 0.4 m wide heat source stays inside the room
+      $("hx").max = (state.L - 0.2).toFixed(1); state.hx = Math.min(state.hx, state.L - 0.2); $("hx").value = state.hx;
+      $("opLo").max = (state.H - 0.1).toFixed(2); $("opHi").max = state.H.toFixed(2);
+      if (state.preset === "hatch") [state.lo, state.hi] = PRESETS.hatch();
+      state.hi = Math.min(state.hi, state.H); state.lo = Math.min(state.lo, state.hi - 0.1);
+      $("opLo").value = state.lo; $("opHi").value = state.hi;
+      syncLabels();
+    });
+    $(id).addEventListener("change", start);
+  }
+  $("iso").addEventListener("input", e => { state.iso[state.field] = +e.target.value; $("isoV").textContent = fieldRange().fmt(state.iso[state.field]); draw(); });
+  $("mesh").addEventListener("change", e => { state.mesh = +e.target.value; syncLabels(); start(); });
+  $("run").addEventListener("click", start);
+  $("pause").addEventListener("click", () => {
+    if (!sim || sim.s.done) return;
+    running = !running; $("pause").textContent = running ? "Pause" : "Resume";
+    if (running) loop(); else draw();
+  });
+  window.addEventListener("resize", () => draw());
+  syncLabels();
+  if (autoRun) start();
+  else { sim = createSim(makeCase()); running = false; draw(); $("status").textContent = "Ready. Press Run to start."; }
+  return () => { cancelAnimationFrame(rafId); sim = null; };
+}
+
+export function render({ model, el }) {
+  const style = document.createElement("style"); style.textContent = CSS;
+  const root = document.createElement("div"); root.className = "rcfd"; root.innerHTML = MARKUP;
+  el.appendChild(style); el.appendChild(root);
+  const auto = model && model.get ? model.get("autorun") : null;
+  return app(root, auto === true);
+}
+
+export default { render };
