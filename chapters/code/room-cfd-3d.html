@@ -1619,6 +1619,23 @@ function drawItems(g, X, Y, sc, ax, bx, cax, cv) {
   }
   g.setLineDash([]);
 }
+// axis arrows from the origin (bottom left corner), named after the two axes of the view
+function axes(g, X, Y, ha, va) {
+  const ox = X(0) + 8, oy = Y(0) - 8, len = 46;
+  const arrow = (dx, dy, name) => {
+    const ex = ox + dx * len, ey = oy + dy * len;
+    for (const [lw, col] of [[4.5, "rgba(255,255,255,0.9)"], [2, "#111"]]) {
+      g.strokeStyle = col; g.fillStyle = col; g.lineWidth = lw; g.lineCap = "round"; g.beginPath(); g.moveTo(ox, oy); g.lineTo(ex, ey); g.stroke();
+      const an = Math.atan2(dy, dx), hl = lw > 3 ? 11 : 9, hw = lw > 3 ? 0.55 : 0.45;
+      g.beginPath(); g.moveTo(ex + dx * (lw > 3 ? 2 : 0), ey + dy * (lw > 3 ? 2 : 0));
+      g.lineTo(ex - hl * Math.cos(an - hw), ey - hl * Math.sin(an - hw)); g.lineTo(ex - hl * Math.cos(an + hw), ey - hl * Math.sin(an + hw)); g.closePath(); g.fill();
+    }
+    g.lineCap = "butt"; g.font = "600 13px " + css("--font-body"); g.textAlign = "center"; g.lineWidth = 3; g.strokeStyle = "rgba(255,255,255,0.9)"; g.fillStyle = "#111";
+    const tx = ex + dx * 10 + dy * 0, ty = ey + dy * 10 + 4 + (dy ? 0 : -9);
+    g.strokeText(name, tx + (dx ? 2 : 9), ty); g.fillText(name, tx + (dx ? 2 : 9), ty);
+  };
+  arrow(1, 0, ha); arrow(0, -1, va);
+}
 function cutLine(g, X, Y, horiz, v, a0, a1) {
   if (!state.showCuts) return;
   g.strokeStyle = "rgba(255,255,255,0.9)"; g.setLineDash([3, 3]); g.lineWidth = 1; g.beginPath();
@@ -1641,6 +1658,7 @@ function draw() {
     g.lineWidth = 6; g.strokeStyle = inWin ? "#2f7fd0" : "rgba(47,127,208,0.35)";
     g.beginPath(); g.moveTo(X(0) - 2, Y(state.lo)); g.lineTo(X(0) - 2, Y(state.hi)); g.stroke();
     g.strokeStyle = css("--muted"); g.beginPath(); g.moveTo(X(L) + 2, Y(H - 0.2)); g.lineTo(X(L) + 2, Y(H - 0.1)); g.stroke();
+    axes(g, X, Y, "x", "z");
   }, $("iso"));
   // plan, at z
   slice($("plan"), L, W, nx, ny, (ii, jj) => (ii * ny + jj) * nz + k, f.uc, f.vc, (g, X, Y, sc) => {
@@ -1649,6 +1667,7 @@ function draw() {
     drawItems(g, X, Y, sc, 0, 1, 2, state.zcut);
     g.lineWidth = 6; g.strokeStyle = "#2f7fd0"; g.beginPath(); g.moveTo(X(0) - 2, Y(y0)); g.lineTo(X(0) - 2, Y(y1)); g.stroke();
     cutLine(g, X, Y, true, state.ycut, 0, L); cutLine(g, X, Y, false, state.xcut, 0, W);
+    axes(g, X, Y, "x", "y");
   });
   // cross section, at x, seen from the facade
   slice($("xsec"), W, H, ny, nz, (jj, kk) => (i * ny + jj) * nz + kk, f.vc, f.wc, (g, X, Y, sc) => {
@@ -1657,6 +1676,7 @@ function draw() {
     drawItems(g, X, Y, sc, 1, 2, 0, state.xcut);
     // window and exhaust in outline: they lie in the end walls, not in this section
     g.setLineDash([4, 3]); g.lineWidth = 1.4; g.strokeStyle = "rgba(47,127,208,0.8)"; g.strokeRect(X(y0), Y(state.hi), (y1 - y0) * sc, (state.hi - state.lo) * sc); g.setLineDash([]);
+    axes(g, X, Y, "y", "z");
   });
   if (f.preview) {
     $("readouts").innerHTML = ""; $("status").textContent = "Ready. Press Run to start.";
