@@ -60,7 +60,7 @@ canvas { display: block; width: 100%; }
 .warn { border-left: 4px solid var(--bad); }
 .charts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
 @container app (max-width: 820px) { .charts { grid-template-columns: minmax(0, 1fr); } }
-.charts3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 12px; }
+.charts3 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 12px; }
 @container app (max-width: 820px) { .charts3 { grid-template-columns: minmax(0, 1fr); } }
 .charts3 h3, .conv h3 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
 .panel > h2 { margin: 0 0 10px; font-size: 15px; font-weight: 600; }
@@ -73,6 +73,7 @@ canvas { display: block; width: 100%; }
 .charts h3 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
 .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 6px; }
 .legend i { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 5px; border-radius: 2px; }
+.spec { margin: 0; max-height: 320px; overflow: auto; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-family: var(--font-data); font-size: 11px; line-height: 1.4; white-space: pre-wrap; }
 textarea { width: 100%; min-height: 150px; resize: vertical; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-family: var(--font-data); font-size: 11.5px; line-height: 1.4; white-space: pre; }
 .group details summary { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 .group details[open] summary { margin-bottom: 8px; }
@@ -94,12 +95,12 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
       <label for="L"><span class="row"><span>Depth from the facade</span><span class="val" id="LV"></span></span>
         <input id="L" type="range" min="3" max="10" step="0.5" value="5"></label>
       <label for="W"><span class="row"><span>Width along the facade</span><span class="val" id="WV"></span></span>
-        <input id="W" type="range" min="2" max="8" step="0.5" value="4"></label>
+        <input id="W" type="range" min="2" max="10" step="0.5" value="4"></label>
       <label for="H"><span class="row"><span>Ceiling height</span><span class="val" id="HV"></span></span>
-        <input id="H" type="range" min="2.4" max="4" step="0.1" value="2.5"></label>
-      <p class="note">The exhaust sits in the back wall, 0.1–0.2 m below the ceiling.</p>
+        <input id="H" type="range" min="2.4" max="8" step="0.1" value="2.5"></label>
+      <p class="note">The exhaust is a 30 × 30 cm pressure outlet centred in the back wall, its top 0.1 m below the ceiling, unless a layout places it.</p>
     </div>
-    <div class="group">
+    <fieldset class="group" id="winSet">
       <h2>Window (facade)</h2>
       <label for="preset">Type
         <select id="preset">
@@ -118,7 +119,8 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
         <input id="lo" type="range" min="0" max="2.3" step="0.1" value="0.9"></label>
       <label for="hi"><span class="row"><span>Top edge</span><span class="val" id="hiV"></span></span>
         <input id="hi" type="range" min="0.2" max="2.5" step="0.1" value="2.1"></label>
-    </div>
+      <p class="note" id="winNote" hidden>The inlets come from the layout.</p>
+    </fieldset>
     <div class="group">
       <h2>Air and heat</h2>
       <label for="tin"><span class="row"><span>Supply temperature</span><span class="val" id="tinV"></span></span>
@@ -153,12 +155,68 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
               <option value="single">One heat source (as the sliders)</option>
               <option value="office">Two-person office</option>
               <option value="classroom">Classroom, 8 × 7 × 3 m</option>
+              <option value="meeting">Meeting room, 8 people, 6 × 4 × 2.7 m</option>
+              <option value="open">Open office with screens, 8 × 6 × 2.7 m</option>
+              <option value="swirl">Office with four ceiling swirl diffusers, 8 × 6 × 2.7 m</option>
+          <option value="hall">Sports hall with four ceiling swirl diffusers, 10 × 10 × 8 m</option>
+          <option value="chen">Validation: two-person office, Chen et al. (AIVC)</option>
             </select></label>
           <div class="btns"><button class="btn ghost" id="openFile" type="button">Open file …</button></div>
           <input type="file" id="fileIn" accept=".csv,.txt,text/csv,text/plain" hidden>
           <textarea id="layoutText" spellcheck="false" aria-label="Layout, one box per line"></textarea>
           <p class="note" id="layoutNote"></p>
-          <p class="note">One box per line: type, x0, x1, y0, y1, z0, z1, power_W, in m from the facade (x), the left wall (y) and the floor (z). Types: heat, floor (heated floor patch, z ignored) and furniture. Furniture with zero size along one axis is a thin plate, such as a table top or a partition.</p>
+          <p class="note">One box per line: type, x0, x1, y0, y1, z0, z1, power_W, in m from the facade (x), the left wall (y) and the floor (z). Types: heat, floor (heated floor patch, z ignored), furniture, inlet and exhaust. Furniture with zero size along one axis is a thin plate, such as a table top or a partition. An inlet or exhaust is a rectangle on a wall, with zero size along the axis normal to it (x = 0 is the facade); inlets in a layout replace the window and exhausts replace the back-wall exhaust. An inlet line can end with two angles in degrees from the wall normal: spread (outward from the centre of the inlet) and swirl (around it), as in a swirl diffuser.</p>
+          <details id="specBox"><summary>Full file format</summary>
+            <p class="note">The full description of the file. Copy it into Claude or another AI assistant together with a description of your room to have it write a layout.</p>
+            <div class="btns"><button class="btn ghost" id="copySpec" type="button">Copy format description</button></div>
+            <pre id="layoutSpec" class="spec">Room CFD 3D layout file: format
+
+The file is plain text (CSV), one object per line. It places heat sources, heated floor patches, furniture, supply inlets and exhausts in a box-shaped room. The room size, supply temperature, air change rate and mesh are set in the app, not in the file (depth 3-10 m, width 2-10 m, height 2.4-8 m).
+
+Coordinates, all in metres:
+  x = distance from the facade (0 to the room depth L); x = 0 is the facade, x = L the back wall
+  y = distance from the left wall (0 to the room width W)
+  z = height above the floor (0 to the ceiling height H); z = 0 is the floor, z = H the ceiling
+
+Each line: type, x0, x1, y0, y1, z0, z1, power_W[, spread, swirl]
+  type       heat, floor, furniture, inlet or exhaust (lower or upper case)
+  x0 ... z1  the box from x0 to x1, y0 to y1 and z0 to z1, with x0 &lt;= x1, y0 &lt;= y1 and z0 &lt;= z1
+  power_W    heat output in W; write 0 for furniture, inlets and exhausts
+  spread     inlets only, optional, degrees (default 0)
+  swirl      inlets only, optional, degrees (default 0)
+Fields are separated by commas (semicolons also work). Text after # is a comment. Empty lines and a header line starting with "type" are skipped.
+
+Types:
+  heat       A heat source: the power is released evenly in the air inside the box, e.g. a person (0.4 x 0.4 x 1.2 m, 100 W seated), a PC (60 W), a lamp or a projector. It must not overlap furniture.
+  floor      A heated patch of floor: the power enters the air through the floor surface, e.g. a sun patch or floor heating. z0 and z1 are ignored (write 0, 0).
+  furniture  A solid box that blocks the air, e.g. a cupboard. With zero size along exactly one axis it is a thin plate that sits between two rows of cells, e.g. a table top (z0 = z1 = 0.72) or a partition or screen (x0 = x1 or y0 = y1).
+  inlet      A supply opening: a rectangle on one of the six room surfaces, with zero size along the axis normal to it, placed at 0 or at the room size on that axis. Examples: in the facade x0 = x1 = 0; in the back wall x0 = x1 = L; in the left wall y0 = y1 = 0; in the ceiling z0 = z1 = H; in the floor z0 = z1 = 0.
+  exhaust    An extract opening, placed in the same way as an inlet.
+
+Supply and exhaust:
+  - If the file has one or more inlets, they replace the window; if it has one or more exhausts, they replace the default exhaust in the back wall. A file without inlets keeps the window, and a file without exhausts keeps the back-wall exhaust.
+  - The airflow (air change rate x room volume) is shared between the inlets in proportion to their area. All inlets get the same speed normal to the surface: airflow / total inlet area.
+  - Openings must not overlap each other.
+  - spread tilts the jet outward from the centre of the inlet (negative tilts it inward), and swirl turns it around the centre, both in degrees from the normal. Positive swirl turns anticlockwise when seen from inside the room looking at the inlet. The tangential speeds are normal speed x tan(spread) and normal speed x tan(swirl), so keep the angles well below 90 degrees (e.g. a swirl diffuser: spread 20-30, swirl 45-65; a grille or window: 0, 0).
+
+Mesh:
+  - Everything snaps to the mesh cells (40, 20, 10, 5, 3.5 or 2.5 cm). Each object must cover at least one cell (or for a thin plate or an opening, one cell face); make it larger or choose a finer mesh if the app reports that it covers nothing. A thin plate snaps to the nearest grid plane.
+
+The app lists the number of objects and the total heat gains under the text box, or the first error with its line number.
+
+Example: an office 5 x 4 x 2.5 m
+type, x0, x1, y0, y1, z0, z1, power_W, spread, swirl
+inlet, 0, 0, 1.4, 2.6, 0.9, 2.1, 0          # window opening in the facade, 1.2 x 1.2 m
+exhaust, 2.3, 2.7, 1.8, 2.2, 2.5, 2.5, 0    # exhaust 0.4 x 0.4 m in the ceiling
+furniture, 1.0, 1.8, 0.4, 1.8, 0.72, 0.72, 0  # desk (thin table top)
+heat, 2.0, 2.4, 0.9, 1.3, 0, 1.2, 100       # seated person
+heat, 1.3, 1.6, 0.9, 1.3, 0.72, 1.15, 60    # PC on the desk
+furniture, 4.4, 4.8, 0.0, 1.2, 0, 2.0, 0    # bookshelf
+floor, 0.2, 1.6, 0.8, 3.2, 0, 0, 300        # sun patch on the floor
+
+Example: a ceiling swirl diffuser 0.6 x 0.6 m in a 2.7 m high room
+inlet, 1.7, 2.3, 1.2, 1.8, 2.7, 2.7, 0, 30, 65</pre>
+          </details>
         </div>
       </details>
     </div>
@@ -177,9 +235,12 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
       <label for="mesh">Mesh</label>
       <div class="meshrow">
         <select id="mesh">
+          <option value="0.4,0.4,0.2">Very coarse: 40 cm (quick look)</option>
           <option value="0.2,0.2,0.1">Coarse: 20 cm (fast)</option>
           <option value="0.1,0.1,0.1" selected>Medium: 10 cm</option>
           <option value="0.05,0.05,0.05">Fine: 5 cm (good GPU)</option>
+          <option value="0.035,0.035,0.035">Finer: 3.5 cm (strong GPU)</option>
+          <option value="0.025,0.025,0.025">Very fine: 2.5 cm (strong GPU, slow)</option>
         </select>
         <button type="button" class="tog" id="showMesh" aria-pressed="false" title="Draw the cell boundaries on the three views">Visualize mesh</button>
       </div>
@@ -242,13 +303,12 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
       <div class="charts3">
         <div><h3 id="floorXTitle"></h3><canvas id="floorX" height="210" aria-label="Air speed and draught along x at ankle height"></canvas></div>
         <div><h3 id="floorYTitle"></h3><canvas id="floorY" height="210" aria-label="Air speed and draught along y at ankle height"></canvas></div>
-        <div><h3 id="floorZTitle"></h3><canvas id="floorZ" height="210" aria-label="Air speed and draught up through the room"></canvas></div>
       </div>
       <div class="legend">
         <span><i style="background:#2f7fd0"></i>Air speed (m/s, left)</span>
         <span><i style="background:#d9622b"></i>ISO 7730 DR (%, right)</span>
         <span><i style="background:#7b4bb7"></i>ASHRAE 55 ankle PPD<sub>AD</sub> (%, right)</span>
-        <span>Grey: outside the occupied zone. The two horizontal lines are at ankle height; the third runs from the floor to the ceiling where the x and y sections cross.</span>
+        <span>Grey: outside the occupied zone.</span>
       </div>
     </div>
     <div class="panel conv">
@@ -312,7 +372,10 @@ function boundaries(c) {
   const xc = centres(nx, c.L / nx), yc = centres(ny, c.W / ny), zc = centres(nz, c.H / nz);
   const b = { L: new Int32Array(ny * nz), R: new Int32Array(ny * nz), B: new Int32Array(nx * nz),
               F: new Int32Array(nx * nz), D: new Int32Array(nx * ny), T: new Int32Array(nx * ny) };
+  const vents = c.vents || [];
+  const has = { inlet: vents.some((v) => v.kind === "inlet"), exhaust: vents.some((v) => v.kind === "exhaust") };
   for (const [op, kind] of [[c.inlet, INLET], [c.outlet, OUTLET]]) {
+    if (has[kind === INLET ? "inlet" : "exhaust"]) continue;          // replaced by the vents
     const y0 = op.y0 ?? 0.0, y1 = op.y1 ?? c.W;
     let any = false;
     if (op.side === "left" || op.side === "right") {
@@ -320,18 +383,32 @@ function boundaries(c) {
       for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++)
         if (yc[j] > y0 && yc[j] < y1 && zc[k] > op.start && zc[k] < op.end) { m[j * nz + k] = kind; any = true; }
     } else if (op.side === "top") {
-      if (kind === INLET) throw new Error("inlets must be in the facade (left) or the back wall (right)");
       for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++)
         if (xc[i] > op.start && xc[i] < op.end && yc[j] > y0 && yc[j] < y1) { b.T[i * ny + j] = kind; any = true; }
     } else throw new Error(`unknown side ${op.side}`);
     if (!any) throw new Error(`the ${op.side} opening covers no cell faces: refine the mesh`);
   }
+  // vents (as room_cfd_3d.boundaries): a rectangle on any wall, zero size along the axis normal to it
+  const size = [c.L, c.W, c.H], cen = [xc, yc, zc], key = [["L", "R"], ["B", "F"], ["D", "T"]];
+  vents.forEach((v, no) => {
+    const { a, side, o1, o2, ins } = ventFaces(v, no, size, cen), m = b[key[a][side]], n2 = cen[o2].length;
+    let any = false;
+    for (let i = 0; i < cen[o1].length; i++) for (let j = 0; j < n2; j++) {
+      if (!ins(i, j)) continue;
+      if (m[i * n2 + j] !== WALL) throw new Error(`${v.kind} ${no + 1} overlaps another opening`);
+      m[i * n2 + j] = v.kind === "inlet" ? INLET : OUTLET; any = true;
+    }
+    if (!any) throw new Error(`${v.kind} ${no + 1} covers no cell faces: make it larger or refine the mesh`);
+  });
+  const all = Object.values(b);
+  if (!all.some((m) => m.includes(INLET))) throw new Error("the room has no inlet");
+  if (!all.some((m) => m.includes(OUTLET))) throw new Error("the room has no exhaust");
   return b;
 }
 
 // room layout (as room_cfd_3d.read_layout): one box per line, type, x0, x1, y0, y1, z0, z1, power_W
 function readLayout(text) {
-  const out = { heat: [], floor_flux: [], furniture: [] };
+  const out = { heat: [], floor_flux: [], furniture: [], vents: [] };
   text.split(/\r?\n/).forEach((line, no) => {
     const f = line.split("#")[0].replace(/;/g, ",").split(",").map((x) => x.trim());
     if (!f[0] || f[0].toLowerCase() === "type") return;
@@ -343,7 +420,12 @@ function readLayout(text) {
     if (kind === "heat") out.heat.push({ x0, x1, y0, y1, z0, z1, power });
     else if (kind === "floor") out.floor_flux.push({ x0, x1, y0, y1, power });
     else if (kind === "furniture") out.furniture.push({ x0, x1, y0, y1, z0, z1 });
-    else throw new Error(`layout line ${no + 1}: unknown type "${f[0]}" (heat, floor or furniture)`);
+    else if (kind === "inlet" || kind === "exhaust") {
+      const ang = [8, 9].map((k) => (f.length > k && f[k] !== "" ? Number(f[k]) : 0));   // inlets: spread, swirl
+      if (ang.some((x) => !Number.isFinite(x))) throw new Error(`layout line ${no + 1}: spread and swirl must be numbers`);
+      out.vents.push({ kind, x0, x1, y0, y1, z0, z1, spread: kind === "inlet" ? ang[0] : 0, swirl: kind === "inlet" ? ang[1] : 0 });
+    }
+    else throw new Error(`layout line ${no + 1}: unknown type "${f[0]}" (heat, floor, furniture, inlet or exhaust)`);
   });
   return out;
 }
@@ -386,6 +468,46 @@ function obstacles(c) {
   return { mk: blocked.map((b) => Float32Array.from(b, (x) => 1 - x)), solid };
 }
 
+// the wall of a vent (axis a, side) and which of its faces it covers (ins(i, j) over the other two axes o1 < o2)
+function ventFaces(v, no, size, cen) {
+  const lo = [v.x0, v.y0, v.z0], hi = [v.x1, v.y1, v.z1], thin = [0, 1, 2].filter((k) => Math.abs(hi[k] - lo[k]) < 1e-9);
+  let side = null; const a = thin[0];
+  if (thin.length === 1) side = Math.abs(lo[a]) < 1e-6 ? 0 : Math.abs(lo[a] - size[a]) < 1e-6 ? 1 : null;
+  if (side === null) throw new Error(`${v.kind} ${no + 1} is not on a wall: give it zero size along one axis, at 0 or at the room size`);
+  const [o1, o2] = [0, 1, 2].filter((k) => k !== a);
+  const inn = (k, i) => cen[k][i] > Math.min(lo[k], hi[k]) && cen[k][i] < Math.max(lo[k], hi[k]);
+  return { a, side, o1, o2, lo, hi, ins: (i, j) => inn(o1, i) && inn(o2, j) };
+}
+
+// tangential inlet velocity per unit normal speed (as room_cfd_3d.inlet_tangential): ut[c, a, side, p, q], or null
+function inletTangential(c) {
+  const vents = (c.vents || []).filter((v) => v.kind === "inlet" && (v.spread || v.swirl));
+  if (!vents.length) return null;
+  const n = [c.nx, c.ny, c.nz], size = [c.L, c.W, c.H], cen = n.map((m, k) => centres(m, size[k] / m)), NM = Math.max(...n) + 1;
+  const ut = new Float64Array(3 * 3 * 2 * NM * NM);
+  vents.forEach((v, no) => {
+    const { a, side, o1, o2, lo, hi, ins } = ventFaces(v, no, size, cen), N1 = n[o1], N2 = n[o2];
+    const c1 = 0.5 * (lo[o1] + hi[o1]), c2 = 0.5 * (lo[o2] + hi[o2]);
+    const sgn = (side === 0 ? 1 : -1) * ((o1 - a + 3) % 3 === 1 ? 1 : -1);
+    const ts = Math.tan(v.spread * Math.PI / 180), tw = Math.tan(v.swirl * Math.PI / 180);
+    const vt = [new Float64Array(N1 * N2), new Float64Array(N1 * N2)];
+    for (let i = 0; i < N1; i++) for (let j = 0; j < N2; j++) {
+      if (!ins(i, j)) continue;
+      const r1 = cen[o1][i] - c1, r2 = cen[o2][j] - c2, rr = Math.hypot(r1, r2), e1 = rr > 0 ? r1 / rr : 0, e2 = rr > 0 ? r2 / rr : 0;
+      vt[0][i * N2 + j] = ts * e1 + tw * (-sgn * e2); vt[1][i * N2 + j] = ts * e2 + tw * (sgn * e1);
+    }
+    for (const [cc, f] of [[o1, vt[0]], [o2, vt[1]]]) {
+      const P = N1 + (cc === o1 ? 1 : 0), Q = N2 + (cc === o2 ? 1 : 0);
+      const fv = (i, j) => (i >= 0 && i < N1 && j >= 0 && j < N2 ? f[i * N2 + j] : 0);
+      for (let i = 0; i < P; i++) for (let j = 0; j < Q; j++) {
+        const avg = cc === o1 ? 0.5 * (fv(i - 1, j) + fv(i, j)) : 0.5 * (fv(i, j - 1) + fv(i, j));
+        ut[(((cc * 3 + a) * 2 + side) * NM + i) * NM + j] += avg;
+      }
+    }
+  });
+  return { ut, NM };
+}
+
 // pressure operator M = -A (SPD) as face coefficients and diagonal; coarse levels by aggregation.
 // With furniture, blocked faces carry no coefficient and a solid cell keeps a lone diagonal.
 function fineOperator(n, d, b, mk = null) {
@@ -401,6 +523,9 @@ function fineOperator(n, d, b, mk = null) {
           + cy[(i * (bb + 1) + j + 1) * c + k] + cz[(i * bb + j) * (c + 1) + k] + cz[(i * bb + j) * (c + 1) + k + 1];
     if (i === 0 && b.L[j * c + k] === OUTLET) s += 2 / dx ** 2;
     if (i === a - 1 && b.R[j * c + k] === OUTLET) s += 2 / dx ** 2;
+    if (j === 0 && b.B[i * c + k] === OUTLET) s += 2 / dy ** 2;
+    if (j === bb - 1 && b.F[i * c + k] === OUTLET) s += 2 / dy ** 2;
+    if (k === 0 && b.D[i * bb + j] === OUTLET) s += 2 / dz ** 2;
     if (k === c - 1 && b.T[i * bb + j] === OUTLET) s += 2 / dz ** 2;
     dg[(i * bb + j) * c + k] = s > 0 ? s : 1 / Math.min(dx, dy, dz) ** 2;
   }
@@ -480,8 +605,8 @@ async function createSim(device, c) {
   const N = nx * ny * nz, Nu = (nx + 1) * ny * nz, Nv = nx * (ny + 1) * nz, Nw = nx * ny * (nz + 1);
   const bnd = boundaries(c);
   const q = c.ach * c.L * c.H * c.W / 3600.0;
-  let nIn = 0; for (const m of [bnd.L, bnd.R]) for (const v of m) if (v === INLET) nIn++;
-  const A_in = nIn * dy * dz, U_in = q / A_in, h_in = A_in / c.W;
+  const cnt = (m) => m.reduce((s, v) => s + (v === INLET ? 1 : 0), 0);
+  const A_in = (cnt(bnd.L) + cnt(bnd.R)) * dy * dz + (cnt(bnd.B) + cnt(bnd.F)) * dx * dz + (cnt(bnd.D) + cnt(bnd.T)) * dx * dy, U_in = q / A_in, h_in = A_in / c.W;
   const Q_tot = c.heat.reduce((s, b) => s + b.power, 0) + c.floor_flux.reduce((s, f) => s + f.power, 0);
   const T_mix = c.T_in + Q_tot / (RHO * CP * q);
   const T0 = c.T_room0 ?? T_mix;
@@ -490,6 +615,7 @@ async function createSim(device, c) {
   const k_in = 1.5 * (c.Tu_in * U_in) ** 2, e_in = k_in ** 1.5 / (0.1 * h_in);
   const xc = centres(nx, dx), yc = centres(ny, dy), zc = centres(nz, dz);
   const obs = (c.furniture || []).length > 0;
+  const tg = inletTangential(c), swl = tg !== null;           // inlets that blow at an angle
   const { mk, solid } = obstacles(c);
 
   // ---- memory layout: one f32 storage buffer, scalars first ----
@@ -507,10 +633,12 @@ async function createSim(device, c) {
   alloc("ne01", (nx + 1) * (ny + 1) * nz); alloc("ne02", (nx + 1) * ny * (nz + 1)); alloc("ne12", nx * (ny + 1) * (nz + 1));
   alloc("wd01", (nx + 1) * (ny + 1) * nz); alloc("wd02", (nx + 1) * ny * (nz + 1)); alloc("wd12", nx * (ny + 1) * (nz + 1));
   alloc("qfl", nx * ny); alloc("bL", ny * nz); alloc("bR", ny * nz); alloc("bT", nx * ny);
+  alloc("bB", nx * nz); alloc("bF", nx * nz); alloc("bD", nx * ny);
   for (const f of ["F0", "Fk0", "Fe0"]) alloc(f, Nu); for (const f of ["F1", "Fk1", "Fe1"]) alloc(f, Nv);
   for (const f of ["F2", "Fk2", "Fe2"]) alloc(f, Nw);
   alloc("au", Nu + Nv + Nw); O.av = O.au + Nu; O.aw = O.av + Nv;           // contiguous like u, v, w
   for (const f of ["aT", "as", "anu", "ak"]) alloc(f, N);
+  if (swl) alloc("ut", tg.ut.length);
   if (obs) { alloc("mk", Nu + Nv + Nw); O.mv = O.mk + Nu; O.mw = O.mv + Nv; }    // open-face masks, ordered as u, v, w
 
   // multigrid levels
@@ -568,6 +696,7 @@ async function createSim(device, c) {
   }
   put("ypw", ypw); put("lwall", lw); put("S", Sv); put("qfl", qf);
   put("bL", Float32Array.from(bnd.L)); put("bR", Float32Array.from(bnd.R)); put("bT", Float32Array.from(bnd.T));
+  put("bB", Float32Array.from(bnd.B)); put("bF", Float32Array.from(bnd.F)); put("bD", Float32Array.from(bnd.D));
   // wall distance on the edges that get the log-law viscosity (as room_cfd_3d_numba.run)
   const wall2 = { "0,0": [bnd.L, [ny, nz]], "0,1": [bnd.R, [ny, nz]], "1,0": [bnd.B, [nx, nz]], "1,1": [bnd.F, [nx, nz]],
                   "2,0": [bnd.D, [nx, ny]], "2,1": [bnd.T, [nx, ny]] };
@@ -594,8 +723,19 @@ async function createSim(device, c) {
     if (bnd.L[j * nz + k] === INLET) init[O.u + (0 * ny + j) * nz + k] = U_in;
     if (bnd.R[j * nz + k] === INLET) init[O.u + (nx * ny + j) * nz + k] = -U_in;
   }
+  for (let i = 0; i < nx; i++) {
+    for (let k = 0; k < nz; k++) {
+      if (bnd.B[i * nz + k] === INLET) init[O.v + (i * (ny + 1) + 0) * nz + k] = U_in;
+      if (bnd.F[i * nz + k] === INLET) init[O.v + (i * (ny + 1) + ny) * nz + k] = -U_in;
+    }
+    for (let j = 0; j < ny; j++) {
+      if (bnd.D[i * ny + j] === INLET) init[O.w + (i * ny + j) * (nz + 1)] = U_in;
+      if (bnd.T[i * ny + j] === INLET) init[O.w + (i * ny + j) * (nz + 1) + nz] = -U_in;
+    }
+  }
   ops.forEach((op, l) => { put(`cx${l}`, op.cx); put(`cy${l}`, op.cy); put(`cz${l}`, op.cz); put(`dg${l}`, op.dg); });
   put("Minv", Minv);
+  if (swl) put("ut", tg.ut.map((x) => x * U_in));
   if (obs) { put("mk", mk[0]); put("mv", mk[1]); put("mw", mk[2]); }
 
   // ---- WGSL ----
@@ -657,7 +797,12 @@ fn gv(c: i32, a: i32, p: vec3<i32>, s: i32) -> f32 {
   let n = ushp(c); let q = p + sh(a, s);
   let qc = clamp(q, vec3<i32>(0), n - vec3<i32>(1));
   let v = at(uoff(c), n, qc);
-  if (a != c && any(q != qc)) { return -v; }
+  if (a != c && any(q != qc)) {
+    ${swl ? `// no slip at the tangential inlet speed on inlet faces
+    var pi = p.x; var qi = p.z; if (a == 0) { pi = p.y; } if (a == 2) { qi = p.y; }
+    let side = select(1, 0, any(q < vec3<i32>(0)));
+    return 2.0 * F[O_ut + (((c * 3 + a) * 2 + side) * ${tg.NM} + pi) * ${tg.NM} + qi] - v;` : "return -v;"}
+  }
   return v;
 }
 fn mterm(c: i32, a: i32, p: vec3<i32>, u0: f32, h: f32) -> f32 {
@@ -759,6 +904,8 @@ fn mterm(c: i32, a: i32, p: vec3<i32>, u0: f32, h: f32) -> f32 {
 }`;
   }
   code += `
+// normal velocity on a wall face: inflow at an inlet (1), the inner value at an outlet (2), 0 on a wall
+fn bcv(b: f32, inflow: f32, inner: f32) -> f32 { if (b == 1.0) { return inflow; } if (b == 2.0) { return inner; } return 0.0; }
 // boundary values of the predicted velocity
 @compute @workgroup_size(64) fn bc(@builtin(global_invocation_id) g: vec3<u32>) {
   if (stopped()) { return; }
@@ -773,12 +920,13 @@ fn mterm(c: i32, a: i32, p: vec3<i32>, u0: f32, h: f32) -> f32 {
   }
   if (m < NX * NZ) {
     let i = m / NZ; let k = m % NZ;
-    F[O_vs + (i * (NY + 1) + 0) * NZ + k] = 0.0; F[O_vs + (i * (NY + 1) + NY) * NZ + k] = 0.0;
+    F[O_vs + (i * (NY + 1) + 0) * NZ + k] = bcv(F[O_bB + m], UIN, F[O_vs + (i * (NY + 1) + 1) * NZ + k]);
+    F[O_vs + (i * (NY + 1) + NY) * NZ + k] = bcv(F[O_bF + m], -UIN, F[O_vs + (i * (NY + 1) + NY - 1) * NZ + k]);
   }
   if (m < NX * NY) {
     let i = m / NY; let j = m % NY;
-    F[O_ws + (i * NY + j) * (NZ + 1)] = 0.0;
-    F[O_ws + (i * NY + j) * (NZ + 1) + NZ] = select(0.0, F[O_ws + (i * NY + j) * (NZ + 1) + NZ - 1], F[O_bT + m] == 2.0);
+    F[O_ws + (i * NY + j) * (NZ + 1)] = bcv(F[O_bD + m], UIN, F[O_ws + (i * NY + j) * (NZ + 1) + 1]);
+    F[O_ws + (i * NY + j) * (NZ + 1) + NZ] = bcv(F[O_bT + m], -UIN, F[O_ws + (i * NY + j) * (NZ + 1) + NZ - 1]);
   }
 }
 // right-hand side of M p = b (M = -A): b = -div(U*) / dt
@@ -908,15 +1056,24 @@ ${red2("cg_rz2", "F[S_BETA] = A / F[S_RZ]; F[S_RZ] = A;", true)}
   } else if (m < ${Nu + Nv}) {
     let mm = m - ${Nu}; let p = id3(u32(mm), ushp(1)); var v = F[O_vs + mm];
     if (p.y > 0 && p.y < NY) { v -= dt * (cell(O_p, p) - cell(O_p, p - sh(1, 1))) / DY; }
+    else if (p.y == 0 && F[O_bB + p.x * NZ + p.z] == 2.0) { v -= dt * cell(O_p, p) / (0.5 * DY); }
+    else if (p.y == NY && F[O_bF + p.x * NZ + p.z] == 2.0) { v -= dt * (-cell(O_p, p - sh(1, 1))) / (0.5 * DY); }
     F[O_v + mm] = v${obs ? ' * F[O_mk + m]' : ''};
   } else {
     let mm = m - ${Nu + Nv}; let p = id3(u32(mm), ushp(2)); var w = F[O_ws + mm];
     if (p.z > 0 && p.z < NZ) { w -= dt * (cell(O_p, p) - cell(O_p, p - sh(2, 1))) / DZ; }
+    else if (p.z == 0 && F[O_bD + p.x * NY + p.y] == 2.0) { w -= dt * cell(O_p, p) / (0.5 * DZ); }
     else if (p.z == NZ && F[O_bT + p.x * NY + p.y] == 2.0) { w -= dt * (-cell(O_p, p - sh(2, 1))) / (0.5 * DZ); }
     F[O_w + mm] = w${obs ? ' * F[O_mk + m]' : ''};
   }
 }
 
+// a cell value where the index along a may lie outside the room: the inlet value on an inlet face, else the end value
+fn gh(o: i32, a: i32, q: vec3<i32>, lo: f32, hi: f32, phin: f32) -> f32 {
+  if (q[a] < 0 && lo == 1.0) { return phin; }
+  if (q[a] > NC[a] - 1 && hi == 1.0) { return phin; }
+  return F[o + ix(NC, clamp(q, vec3<i32>(0), NC - vec3<i32>(1)))];
+}
 // face fluxes (advection + diffusion) of a cell-centred scalar
 fn flux(o: i32, m: i32, phin: f32, tv: bool, kind: i32) -> f32 {
   var f: f32;
@@ -935,18 +1092,19 @@ fn flux(o: i32, m: i32, phin: f32, tv: bool, kind: i32) -> f32 {
   } else if (m < ${Nu + Nv}) {
     let p = id3(u32(m - ${Nu}), ushp(1));
     let vel = F[O_v + m - ${Nu}];
-    let a0 = F[o + ix(NC, vec3<i32>(p.x, clamp(p.y - 2, 0, NY - 1), p.z))]; let a1 = F[o + ix(NC, vec3<i32>(p.x, clamp(p.y - 1, 0, NY - 1), p.z))];
-    let a2 = F[o + ix(NC, vec3<i32>(p.x, min(p.y, NY - 1), p.z))]; let a3 = F[o + ix(NC, vec3<i32>(p.x, min(p.y + 1, NY - 1), p.z))];
-    f = vel * face(a0, a1, a2, a3, vel, tv);
+    let lo = F[O_bB + p.x * NZ + p.z]; let hi = F[O_bF + p.x * NZ + p.z];
+    f = vel * face(gh(o, 1, p + sh(1, -2), lo, hi, phin), gh(o, 1, p + sh(1, -1), lo, hi, phin), gh(o, 1, p, lo, hi, phin),
+                   gh(o, 1, p + sh(1, 1), lo, hi, phin), vel, tv);
     if (p.y > 0 && p.y < NY) { let pm = p - sh(1, 1); f -= 0.5 * (D(kind, p) + D(kind, pm)) * (F[o + ix(NC, p)] - F[o + ix(NC, pm)]) / DY; }
   } else {
     let p = id3(u32(m - ${Nu + Nv}), ushp(2));
-    if (p.z == 0) { return select(0.0, F[O_qfl + p.x * NY + p.y] / RCP, kind == 0); }   // heat flux up through the floor
+    let lo = F[O_bD + p.x * NY + p.y]; let hi = F[O_bT + p.x * NY + p.y];
+    let qf = select(0.0, F[O_qfl + p.x * NY + p.y] / RCP, kind == 0 && p.z == 0);   // heat flux up through the floor
+    if (p.z == 0 && lo == 0.0) { return qf; }
     let vel = F[O_w + m - ${Nu + Nv}];
-    let a0 = F[o + ix(NC, vec3<i32>(p.x, p.y, max(p.z - 2, 0)))]; let a1 = F[o + ix(NC, vec3<i32>(p.x, p.y, p.z - 1))];
-    let a2 = F[o + ix(NC, vec3<i32>(p.x, p.y, min(p.z, NZ - 1)))]; let a3 = F[o + ix(NC, vec3<i32>(p.x, p.y, min(p.z + 1, NZ - 1)))];
-    f = vel * face(a0, a1, a2, a3, vel, tv);
-    if (p.z < NZ) { let pm = p - sh(2, 1); f -= 0.5 * (D(kind, p) + D(kind, pm)) * (F[o + ix(NC, p)] - F[o + ix(NC, pm)]) / DZ; }
+    f = vel * face(gh(o, 2, p + sh(2, -2), lo, hi, phin), gh(o, 2, p + sh(2, -1), lo, hi, phin), gh(o, 2, p, lo, hi, phin),
+                   gh(o, 2, p + sh(2, 1), lo, hi, phin), vel, tv) + qf;
+    if (p.z > 0 && p.z < NZ) { let pm = p - sh(2, 1); f -= 0.5 * (D(kind, p) + D(kind, pm)) * (F[o + ix(NC, p)] - F[o + ix(NC, pm)]) / DZ; }
   }
   return f;
 }
@@ -1214,6 +1372,70 @@ floor, 0.2, 1.6, 0.8, 3.2, 0, 0, 300           # sun patch on the floor` },
     return t + "heat, 0.6, 1.0, 3.3, 3.7, 0, 1.7, 100   # teacher, standing\nheat, 3.8, 4.2, 3.3, 3.7, 2.6, 2.8, 200   # projector under the ceiling\n";
   } },
 };
+EXAMPLES.meeting = { room: [6, 4, 2.7], text: () => {
+  let t = "type, x0, x1, y0, y1, z0, z1, power_W\n# meeting room, 6 x 4 x 2.7 m: 8 seated people around a table, a screen on the back wall\n";
+  t += "furniture, 1.5, 4.5, 1.4, 2.6, 0.72, 0.72, 0   # meeting table (thin top)\n";
+  for (const x of [1.9, 2.9, 3.9]) t += `heat, ${x.toFixed(1)}, ${(x + 0.4).toFixed(1)}, 0.8, 1.2, 0, 1.2, 100\nheat, ${x.toFixed(1)}, ${(x + 0.4).toFixed(1)}, 2.8, 3.2, 0, 1.2, 100\n`;
+  t += "heat, 0.9, 1.3, 1.8, 2.2, 0, 1.2, 100   # chair at the table end\nheat, 4.7, 5.1, 1.8, 2.2, 0, 1.2, 100\n";
+  return t + "heat, 5.8, 5.9, 1.4, 2.6, 1.0, 1.8, 150   # screen on the back wall\n";
+} };
+EXAMPLES.open = { room: [8, 6, 2.7], text: () => {
+  let t = "type, x0, x1, y0, y1, z0, z1, power_W\n# open office, 8 x 6 x 2.7 m: three pairs of facing desks with 1.2 m screens between them\n";
+  for (const y of [1.0, 2.6, 4.2]) {
+    t += `furniture, 1.5, 6.3, ${y.toFixed(1)}, ${(y + 1.6).toFixed(1)}, 0.72, 0.72, 0   # pair of desks\n`;
+    t += `furniture, 1.5, 6.3, ${(y + 0.8).toFixed(1)}, ${(y + 0.8).toFixed(1)}, 0.72, 1.2, 0   # screen between them\n`;
+    for (const x of [2.1, 3.7, 5.3]) t += `heat, ${x.toFixed(1)}, ${(x + 0.4).toFixed(1)}, ${(y - 0.4).toFixed(1)}, ${y.toFixed(1)}, 0, 1.2, 100\n`
+      + `heat, ${x.toFixed(1)}, ${(x + 0.4).toFixed(1)}, ${(y + 1.6).toFixed(1)}, ${(y + 2.0).toFixed(1)}, 0, 1.2, 100\n`;
+  }
+  return t + "furniture, 7.4, 8.0, 0.0, 6.0, 0, 2.0, 0   # cupboards along the back wall\n";
+} };
+// mixing ventilation from four 0.6 x 0.6 m swirl diffusers in the ceiling; columns 9-10 of an inlet line are the
+// spread (outward from the diffuser centre) and the swirl (around it) of the jet, in degrees from the wall normal
+EXAMPLES.swirl = { room: [8, 6, 2.7], text: () => {
+  let t = "type, x0, x1, y0, y1, z0, z1, power_W, spread, swirl\n# office, 8 x 6 x 2.7 m: four ceiling swirl diffusers 0.6 x 0.6 m, an exhaust in the ceiling centre, 8 people with PCs\n";
+  for (const x of [1.7, 5.7]) for (const y of [1.2, 4.2]) t += `inlet, ${x.toFixed(1)}, ${(x + 0.6).toFixed(1)}, ${y.toFixed(1)}, ${(y + 0.6).toFixed(1)}, 2.7, 2.7, 0, 30, 65   # swirl diffuser\n`;
+  t += "exhaust, 3.8, 4.2, 2.8, 3.2, 2.7, 2.7, 0   # exhaust 0.4 x 0.4 m in the ceiling centre\n";
+  for (const y of [1.0, 4.2]) {
+    t += `furniture, 1.5, 6.3, ${y.toFixed(1)}, ${(y + 0.8).toFixed(1)}, 0.72, 0.72, 0   # row of desks\n`;
+    for (const x of [2.1, 3.7, 4.5, 5.3]) t += `heat, ${x.toFixed(1)}, ${(x + 0.4).toFixed(1)}, ${(y === 1.0 ? y - 0.4 : y + 0.8).toFixed(1)}, ${(y === 1.0 ? y : y + 1.2).toFixed(1)}, 0, 1.2, 100\n`
+      + `heat, ${x.toFixed(1)}, ${(x + 0.3).toFixed(1)}, ${(y + 0.25).toFixed(1)}, ${(y + 0.55).toFixed(1)}, 0.72, 1.15, 60   # PC\n`;
+  }
+  return t;
+} };
+// sports hall, 10 x 10 x 8 m: four swirl diffusers in the ceiling, 2 h-1, and the gains as a heated patch of floor
+EXAMPLES.hall = { room: [10, 10, 8], setup: () => {
+  Object.assign(state, { tin: 16, ach: 2 });
+  for (const k of ["tin", "ach"]) $(k).value = state[k];
+}, text: () => {
+  let t = "type, x0, x1, y0, y1, z0, z1, power_W, spread, swirl\n# sports hall, 10 x 10 x 8 m: four ceiling swirl diffusers 0.6 x 0.6 m, an exhaust in the ceiling centre, the gains on the floor\n";
+  for (const x of [2.2, 7.2]) for (const y of [2.2, 7.2]) t += `inlet, ${x.toFixed(1)}, ${(x + 0.6).toFixed(1)}, ${y.toFixed(1)}, ${(y + 0.6).toFixed(1)}, 8, 8, 0, 20, 45   # swirl diffuser\n`;
+  return t + "exhaust, 4.7, 5.3, 4.7, 5.3, 8, 8, 0   # exhaust 0.6 x 0.6 m in the ceiling centre\n"
+    + "floor, 2, 8, 2, 8, 0, 0, 3000   # heat source on the floor: 3 kW over the 6 x 6 m court centre\n";
+} };
+// Chen, Yuan, Hu, Glicksman & Yang (1998), Detailed experimental data of room airflow with displacement ventilation,
+// Roomvent 98 (AIVC 11494): the two-person office in the MIT test chamber, 5.16 x 3.65 x 2.43 m, with a displacement
+// diffuser 0.5 m wide and 1.1 m high mid-wall at the floor, 4 h-1 at 17 °C and an exhaust 0.43 x 0.43 m in the ceiling centre.
+// Here the diffuser wall is the facade (x = 0). The paper gives the sizes and powers but places the sources and the
+// furniture only in a figure, so the positions below are approximate.
+EXAMPLES.chen = { room: [3.65, 5.16, 2.43], setup: () => {
+  Object.assign(state, { tin: 17, ach: 4 });
+  for (const k of ["tin", "ach"]) $(k).value = state[k];
+}, text: () => `type, x0, x1, y0, y1, z0, z1, power_W
+# Chen et al. (1998), two-person office with displacement ventilation (AIVC 11494), 3.65 x 5.16 x 2.43 m
+# sizes and powers from the paper; positions approximate (the paper shows them only in a figure)
+inlet, 0, 0, 2.33, 2.83, 0, 1.1, 0            # displacement diffuser 0.5 m wide, 1.1 m high, mid-wall at the floor
+exhaust, 1.61, 2.04, 2.365, 2.795, 2.43, 2.43, 0   # exhaust 0.43 x 0.43 m in the ceiling centre
+heat, 2.0, 2.4, 1.10, 1.45, 0, 1.1, 75        # occupant simulator 1: box 0.4 x 0.35 x 1.1 m, 3 x 25 W bulbs
+heat, 2.0, 2.4, 3.71, 4.06, 0, 1.1, 75        # occupant simulator 2
+heat, 2.75, 3.15, 1.4, 1.8, 0.72, 1.15, 108   # computer 1
+heat, 2.75, 3.15, 3.36, 3.76, 0.72, 1.15, 173 # computer 2
+heat, 1.0, 1.3, 0.8, 4.36, 2.30, 2.43, 102    # overhead lights, 3 x 34 W
+heat, 2.35, 2.65, 0.8, 4.36, 2.30, 2.43, 102  # overhead lights, 3 x 34 W
+furniture, 2.5, 3.25, 0.6, 2.0, 0.72, 0.72, 0     # table 1 (thin top)
+furniture, 2.5, 3.25, 3.16, 4.56, 0.72, 0.72, 0   # table 2
+furniture, 3.05, 3.65, 0.0, 0.45, 0, 0.72, 0      # file cabinet 1
+furniture, 3.05, 3.65, 4.71, 5.16, 0, 0.72, 0     # file cabinet 2
+` };
 const layoutOn = () => state.useLayout && !!state.layout;
 const layoutQ = () => [...state.layout.heat, ...state.layout.floor_flux].reduce((s, b) => s + b.power, 0);
 // well-mixed room temperature: the slider, or from the heat gains in the layout
@@ -1226,7 +1448,9 @@ function parseLayout() {
   const plates = lay.furniture.filter((b) => [b.x1 - b.x0, b.y1 - b.y0, b.z1 - b.z0].some((v) => Math.abs(v) < 1e-9)).length;
   const n = (k, a, b) => `${k} ${k === 1 ? a : b}`;
   el.textContent = `${n(lay.heat.length, "heat source", "heat sources")}, ${n(lay.floor_flux.length, "heated floor patch", "heated floor patches")}, `
-    + `${n(lay.furniture.length - plates, "box", "boxes")}, ${n(plates, "thin plate", "thin plates")}. Heat gains ${layoutQ().toFixed(0)} W.`;
+    + `${n(lay.furniture.length - plates, "box", "boxes")}, ${n(plates, "thin plate", "thin plates")}`
+    + (lay.vents.length ? `, ${n(lay.vents.filter((v) => v.kind === "inlet").length, "inlet", "inlets")}, ${n(lay.vents.filter((v) => v.kind === "exhaust").length, "exhaust", "exhausts")}` : "")
+    + `. Heat gains ${layoutQ().toFixed(0)} W.`;
 }
 function loadExample(key) {
   const ex = EXAMPLES[key];
@@ -1234,21 +1458,59 @@ function loadExample(key) {
     [state.L, state.W, state.H] = ex.room; for (const k of ["L", "W", "H"]) $(k).value = state[k];
     applyDims();
   }
+  // the validation case sets its own supply; the other examples go back to the default supply
+  if (ex.setup) ex.setup();
+  else {
+    Object.assign(state, { tin: 16, ach: 6 });
+    for (const k of ["tin", "ach"]) $(k).value = state[k];
+  }
+  applyDims();
   $("layoutText").value = ex.text(); parseLayout();
 }
 
+const len = (v) => Math.abs(v * 10 - Math.round(v * 10)) < 1e-6 ? v.toFixed(1) : v.toFixed(2);     // 3.6 or 3.65
+// default exhaust: a 0.3 x 0.3 m pressure outlet centred in the back wall, its top 0.1 m below the ceiling;
+// on a mesh too coarse for it, it is widened to the nearest cell
+function defaultExhaust() {
+  const [, ny, nz] = meshN();
+  const span = (c, h, n, size) => {
+    const d = size / n, cc = (Math.min(Math.floor(c / d), n - 1) + 0.5) * d;
+    const hit = [...Array(n).keys()].some((i) => (i + 0.5) * d > c - h && (i + 0.5) * d < c + h);
+    return hit ? [Math.max(c - h, 0), Math.min(c + h, size)] : [Math.max(cc - 0.5 * d, 0), Math.min(cc + 0.5 * d, size)];
+  };
+  const [y0, y1] = span(W / 2, 0.15, ny, W), [z0, z1] = span(H - 0.25, 0.15, nz, H);
+  return { kind: "exhaust", x0: L, x1: L, y0, y1, z0, z1, spread: 0, swirl: 0 };
+}
+// the vents of a run: those of the layout, plus the default exhaust when the layout has none
+function caseVents() {
+  const v = layoutOn() ? state.layout.vents : [];
+  return v.some((o) => o.kind === "exhaust") ? v : [...v, defaultExhaust()];
+}
+// the openings as rectangles on the walls: from the layout, else the window and the back-wall exhaust
+const layoutVents = (kind) => (layoutOn() ? state.layout.vents.filter((v) => v.kind === kind) : []);
+function openings() {
+  const [y0, y1] = winY();
+  const inl = layoutVents("inlet"), exh = layoutVents("exhaust");
+  return [...(inl.length ? inl : [{ kind: "inlet", x0: 0, x1: 0, y0: state.width >= W ? 0 : y0, y1: state.width >= W ? W : y1, z0: state.lo, z1: state.hi }]),
+          ...(exh.length ? exh : [defaultExhaust()])];
+}
 function syncLabels() {
-  $("widthV").textContent = state.width.toFixed(1) + " m"; $("wyV").textContent = state.wy.toFixed(1) + " m";
+  $("widthV").textContent = len(state.width) + " m"; $("wyV").textContent = len(state.wy) + " m";
   $("hatchOpt").textContent = `Top hatch, 1.2 m wide, ${(H - 0.3).toFixed(1)}–${(H - 0.1).toFixed(1)} m`; $("loV").textContent = state.lo.toFixed(1) + " m"; $("hiV").textContent = state.hi.toFixed(1) + " m";
   $("tinV").textContent = state.tin + " °C"; $("achV").textContent = state.ach + " h⁻¹"; $("troomV").textContent = state.troom + " °C";
-  for (const k of ["L", "W", "H"]) $(k + "V").textContent = state[k].toFixed(1) + " m";
+  for (const k of ["L", "W", "H"]) $(k + "V").textContent = len(state[k]) + " m";
   const [mx, my, mz] = meshN(); $("meshNote").textContent = `${mx} × ${my} × ${mz} = ${(mx * my * mz).toLocaleString("en")} cells`;
   for (const k of ["hx", "hy", "hw", "hd", "hh"]) $(k + "V").textContent = state[k].toFixed(1) + " m";
   if (state.hh === 0) $("hhV").textContent = "0 m, heated floor";
   $("ycutV").textContent = state.ycut.toFixed(2) + " m"; $("zcutV").textContent = state.zcut.toFixed(2) + " m"; $("xcutV").textContent = state.xcut.toFixed(2) + " m";
   const lay = layoutOn(), q = state.ach * L * W * H / 3600, Q = lay ? layoutQ() : 1.2 * 1005 * q * (state.troom - state.tin);
-  const U = q / (state.width * Math.max(state.hi - state.lo, 0.05));
+  // inlet speed from the open area of the inlets (window, or the inlets of the layout)
+  const A = openings().filter((o) => o.kind === "inlet").reduce((s_, o) => {
+    const e = [o.x1 - o.x0, o.y1 - o.y0, o.z1 - o.z0].map(Math.abs).filter((v) => v > 1e-9);
+    return s_ + (e.length === 2 ? e[0] * e[1] : 0);
+  }, 0), U = q / Math.max(A, 0.01);
   $("heatSet").disabled = lay; $("troomSet").disabled = lay;
+  const ownIn = layoutVents("inlet").length > 0; $("winSet").disabled = ownIn; $("winNote").hidden = !ownIn;
   if (lay) $("troomV").textContent = troomEff().toFixed(1) + " °C";
   $("gainsNote").textContent = lay ? `Airflow ${(q * 1000).toFixed(0)} L/s. Heat gains from the layout ${Q.toFixed(0)} W (${(Q / (L * W)).toFixed(0)} W/m² floor), so the well-mixed room temperature is ${troomEff().toFixed(1)} °C. Inlet speed ${U.toFixed(3)} m/s.`
     : Q > 0 ? `Airflow ${(q * 1000).toFixed(0)} L/s. Heat gains ${Q.toFixed(0)} W (${(Q / (L * W)).toFixed(0)} W/m² floor). Inlet speed ${U.toFixed(3)} m/s.`
@@ -1306,11 +1568,11 @@ function makeCase() {
   if (layoutOn()) return Object.assign(defaultCase(), { L, W, H, nx, ny, nz, ach: state.ach, T_in: state.tin,
     inlet: { side: "left", start: state.lo, end: state.hi, y0: state.width >= W ? null : y0, y1: state.width >= W ? null : y1 },
     outlet: { side: "right", start: H - 0.2, end: H - 0.1 },
-    heat: state.layout.heat, floor_flux: state.layout.floor_flux, furniture: state.layout.furniture,
+    heat: state.layout.heat, floor_flux: state.layout.floor_flux, furniture: state.layout.furniture, vents: caseVents(),
     turbulence: state.turb, advection: state.adv, t_end: 1800, t_avg: 600 });
   return Object.assign(defaultCase(), { L, W, H, nx, ny, nz, ach: state.ach, T_in: state.tin,
     inlet: { side: "left", start: state.lo, end: state.hi, y0: state.width >= W ? null : y0, y1: state.width >= W ? null : y1 },
-    outlet: { side: "right", start: H - 0.2, end: H - 0.1 },
+    outlet: { side: "right", start: H - 0.2, end: H - 0.1 }, vents: caseVents(),
     // height 0: the heat source collapses to a heated patch of floor (heat flux into the air at the floor)
     heat: state.hh > 0 ? [Object.assign(heatBox(), { power: Q })] : [],
     floor_flux: state.hh > 0 ? [] : [(({ x0, x1, y0, y1 }) => ({ x0, x1, y0, y1, power: Q }))(heatBox())], turbulence: state.turb, advection: state.adv, t_end: 1800, t_avg: 600 });
@@ -1320,8 +1582,21 @@ function makeCase() {
 function makeGeo(c) {
   const [nx, ny, nz] = meshN();
   const bnd = boundaries(c), outCells = [];
-  for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++) if (bnd.R[j * nz + k] === 2) outCells.push(((nx - 1) * ny + j) * nz + k);
-  for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) if (bnd.T[i * ny + j] === 2) outCells.push((i * ny + j) * nz + nz - 1);
+  const cellAt = (i, j, k) => (i * ny + j) * nz + k;
+  for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++) {
+    if (bnd.L[j * nz + k] === 2) outCells.push(cellAt(0, j, k));
+    if (bnd.R[j * nz + k] === 2) outCells.push(cellAt(nx - 1, j, k));
+  }
+  for (let i = 0; i < nx; i++) {
+    for (let k = 0; k < nz; k++) {
+      if (bnd.B[i * nz + k] === 2) outCells.push(cellAt(i, 0, k));
+      if (bnd.F[i * nz + k] === 2) outCells.push(cellAt(i, ny - 1, k));
+    }
+    for (let j = 0; j < ny; j++) {
+      if (bnd.D[i * ny + j] === 2) outCells.push(cellAt(i, j, 0));
+      if (bnd.T[i * ny + j] === 2) outCells.push(cellAt(i, j, nz - 1));
+    }
+  }
   const q = c.ach * L * W * H / 3600, Q = [...c.heat, ...c.floor_flux].reduce((s, b) => s + b.power, 0);
   const { solid } = obstacles(c);
   for (const hb of c.heat) for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++) {
@@ -1341,6 +1616,9 @@ function preview() {
   done = false; lastProg = null; hist = null; draw();
 }
 let running = false;
+// the first run, and the first after Stop, waits for the Run button; otherwise a changed input restarts the run
+let armed = false;
+const restart = () => { if (armed) start(); };
 async function start() {
   const id = ++runId; stopReq = false; done = false; running = true;
   if (!device) {
@@ -1544,7 +1822,7 @@ function chart(cv, xr, yl, yr, series, opts = {}) {
   g.strokeStyle = muted; g.strokeRect(pl, pt, w, h);
   g.fillStyle = muted; g.textAlign = "center"; g.fillText(opts.xlabel, pl + w / 2, Hc - 2);
 }
-// air speed and draught along a line of cells: along x (at y), along y (at x), or up through the room (at x, y)
+// air speed and draught at ankle height along a line of cells: along x (at y) or along y (at x)
 function drawFloor(oz) {
   const { nx, ny, nz, dx, dy, dz } = geo, Z = OZ();
   const i = Math.min(Math.floor(state.xcut / dx), nx - 1), j = Math.min(Math.floor(state.ycut / dy), ny - 1), k = Math.min(Math.floor(0.1 / dz), nz - 1);
@@ -1567,8 +1845,6 @@ function drawFloor(oz) {
       "x from the facade (m)", [[0, Z.x0], [Z.x1, L]], true);
   one("floorY", ny, dy, (a) => (i * ny + a) * nz + k, W, `Along y, at x = ${xc.toFixed(2)} m` + (outX ? " (outside the zone)" : ""),
       "y across the room (m)", [[0, Z.y0], [Z.y1, W]], true);
-  one("floorZ", nz, dz, (a) => (i * ny + j) * nz + a, H, `Up through the room, at x = ${xc.toFixed(2)}, y = ${yc.toFixed(2)} m`,
-      "z, height above the floor (m)", [[Z.z1, H]], false);
 }
 function drawConv() {
   if (!hist || hist.t.length < 2) return;
@@ -1622,6 +1898,75 @@ function drawItems(g, X, Y, sc, ax, bx, cax, cv) {
   }
   g.setLineDash([]);
 }
+// small axis arrows from the origin (bottom left corner), named after the two axes of the view
+function axes(g, X, Y, ha, va) {
+  const ox = X(0), oy = Y(0), len = 11;                      // on the frame edges, letters outside the plot
+  const arrow = (dx, dy, name) => {
+    const ex = ox + dx * len, ey = oy + dy * len, an = Math.atan2(dy, dx);
+    for (const [lw, col] of [[1.5, css("--muted")]]) {               // grey, as the axis values
+      g.strokeStyle = col; g.fillStyle = col; g.lineWidth = lw; g.beginPath(); g.moveTo(ox, oy); g.lineTo(ex, ey); g.stroke();
+      g.beginPath(); g.moveTo(ex + dx, ey + dy);
+      g.lineTo(ex - 3.5 * Math.cos(an - 0.6), ey - 3.5 * Math.sin(an - 0.6)); g.lineTo(ex - 3.5 * Math.cos(an + 0.6), ey - 3.5 * Math.sin(an + 0.6)); g.closePath(); g.fill();
+    }
+    g.font = "7px " + css("--font-data"); g.textAlign = dx ? "center" : "right"; g.fillStyle = css("--muted");
+    const tx = dx ? ex + 2 : ox - 3, ty = dx ? oy + 8 : ey + 3;
+    g.fillText(name, tx, ty);
+  };
+  arrow(1, 0, ha); arrow(0, -1, va);
+}
+// inlets (blue) and exhausts (grey) on the walls: a thick line on the frame where a wall is seen edge-on,
+// dark where the slice cuts the opening; a dashed outline where the wall faces the view
+function drawOpenings(g, X, Y, sc, ax, bx, cax, cv) {
+  const size = [L, W, H];
+  for (const o of openings()) {
+    const lo = [o.x0, o.y0, o.z0], hi = [o.x1, o.y1, o.z1], a = [0, 1, 2].find((k) => Math.abs(hi[k] - lo[k]) < 1e-9);
+    if (a === undefined) continue;
+    const col = o.kind === "inlet" ? [47, 127, 208] : [120, 128, 136], rgba = (al) => `rgba(${col[0]},${col[1]},${col[2]},${al})`;
+    const r0 = (k) => Math.min(lo[k], hi[k]), r1 = (k) => Math.max(lo[k], hi[k]);
+    if (o.kind === "inlet") inletArrows(g, X, Y, o, a, lo, hi, size, ax, bx, cax, rgba(0.95));
+    if (a === cax) {
+      g.setLineDash([4, 3]); g.lineWidth = 1.4; g.strokeStyle = rgba(0.85);
+      g.strokeRect(X(r0(ax)), Y(r1(bx)), (r1(ax) - r0(ax)) * sc, (r1(bx) - r0(bx)) * sc); g.setLineDash([]);
+      continue;
+    }
+    const on = cv > r0(cax) && cv < r1(cax), out = lo[a] > size[a] / 2 ? 2 : -2;
+    g.lineWidth = 6; g.strokeStyle = rgba(on ? 1 : 0.35); g.beginPath();
+    if (a === ax) { const x = X(lo[a]) + out; g.moveTo(x, Y(r0(bx))); g.lineTo(x, Y(r1(bx))); }
+    else { const y = Y(lo[a]) - out; g.moveTo(X(r0(ax)), y); g.lineTo(X(r1(ax)), y); }
+    g.stroke();
+  }
+  g.lineWidth = 1.4;
+}
+// small vectors of the supply direction at an inlet: the inward normal tilted by the spread and the swirl,
+// projected on the view; at the centre (no angles) or near the edges, or (inlet facing the view) the tangential part only
+function inletArrows(g, X, Y, o, a, lo, hi, size, ax, bx, cax, col) {
+  const ts = Math.tan((o.spread || 0) * Math.PI / 180), tw = Math.tan((o.swirl || 0) * Math.PI / 180);
+  const nin = [0, 0, 0]; nin[a] = lo[a] > size[a] / 2 ? -1 : 1;
+  const cen = [0, 1, 2].map((k) => (lo[k] + hi[k]) / 2), half = [0, 1, 2].map((k) => Math.abs(hi[k] - lo[k]) / 2);
+  const dirAt = (r) => {                                      // r: unit vector in the wall plane from the centre
+    const t = [nin[1] * r[2] - nin[2] * r[1], nin[2] * r[0] - nin[0] * r[2], nin[0] * r[1] - nin[1] * r[0]];
+    return [0, 1, 2].map((k) => (a === cax ? 0 : nin[k]) + ts * r[k] + tw * t[k]);
+  };
+  const pts = [];
+  if (a === cax) {
+    if (!ts && !tw) return;
+    for (const [k, sg] of [[ax, 1], [ax, -1], [bx, 1], [bx, -1]]) {
+      const r = [0, 0, 0]; r[k] = sg; const p = [...cen]; p[k] += sg * 0.6 * half[k]; pts.push([p, dirAt(r)]);
+    }
+  } else {
+    const e = a === ax ? bx : ax;                            // the in-plane axis seen in this view
+    if (!ts && !tw) pts.push([cen, dirAt([0, 0, 0])]);        // centre arrow only for a plain inlet
+    else for (const sg of [1, -1]) { const r = [0, 0, 0]; r[e] = sg; const p = [...cen]; p[e] += sg * 0.7 * half[e]; pts.push([p, dirAt(r)]); }
+  }
+  g.strokeStyle = col; g.fillStyle = col; g.lineWidth = 1.5;
+  for (const [p, d] of pts) {
+    const x0 = X(p[ax]), y0 = Y(p[bx]), sx = X(p[ax] + d[ax]) - x0, sy = Y(p[bx] + d[bx]) - y0, m = Math.hypot(sx, sy);
+    if (m < 1e-9) continue;
+    const ux = sx / m, uy = sy / m, len = 14, x1 = x0 + ux * len, y1 = y0 + uy * len;
+    g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x1 - ux * 5 - uy * 3, y1 - uy * 5 + ux * 3); g.lineTo(x1 - ux * 5 + uy * 3, y1 - uy * 5 - ux * 3); g.closePath(); g.fill();
+  }
+}
 function cutLine(g, X, Y, horiz, v, a0, a1) {
   if (!state.showCuts) return;
   g.strokeStyle = "rgba(255,255,255,0.9)"; g.setLineDash([3, 3]); g.lineWidth = 1; g.beginPath();
@@ -1639,32 +1984,31 @@ function draw() {
   slice($("sec"), L, H, nx, nz, (ii, kk) => (ii * ny + j) * nz + kk, f.uc, f.wc, (g, X, Y, sc) => {
     ozBox(g, X, Y, sc, Z.x0, 0, Z.x1, Z.z1);
     cutLine(g, X, Y, true, state.zcut, 0, L); cutLine(g, X, Y, false, state.xcut, 0, H);
-    drawItems(g, X, Y, sc, 0, 2, 1, state.ycut);
-    const inWin = state.width >= W || ((j + 0.5) * dy > y0 && (j + 0.5) * dy < y1);
-    g.lineWidth = 6; g.strokeStyle = inWin ? "#2f7fd0" : "rgba(47,127,208,0.35)";
-    g.beginPath(); g.moveTo(X(0) - 2, Y(state.lo)); g.lineTo(X(0) - 2, Y(state.hi)); g.stroke();
-    g.strokeStyle = css("--muted"); g.beginPath(); g.moveTo(X(L) + 2, Y(H - 0.2)); g.lineTo(X(L) + 2, Y(H - 0.1)); g.stroke();
+    drawItems(g, X, Y, sc, 0, 2, 1, (j + 0.5) * dy);
+    drawOpenings(g, X, Y, sc, 0, 2, 1, (j + 0.5) * dy);
+    axes(g, X, Y, "x", "z");
   }, $("iso"));
   // plan, at z
   slice($("plan"), L, W, nx, ny, (ii, jj) => (ii * ny + jj) * nz + k, f.uc, f.vc, (g, X, Y, sc) => {
     g.setLineDash([5, 4]); g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 1.4; if (state.showOZ) g.strokeRect(X(Z.x0), Y(Z.y1), (Z.x1 - Z.x0) * sc, (Z.y1 - Z.y0) * sc);
     g.setLineDash([]);
     drawItems(g, X, Y, sc, 0, 1, 2, state.zcut);
-    g.lineWidth = 6; g.strokeStyle = "#2f7fd0"; g.beginPath(); g.moveTo(X(0) - 2, Y(y0)); g.lineTo(X(0) - 2, Y(y1)); g.stroke();
+    drawOpenings(g, X, Y, sc, 0, 1, 2, (k + 0.5) * dz);
     cutLine(g, X, Y, true, state.ycut, 0, L); cutLine(g, X, Y, false, state.xcut, 0, W);
+    axes(g, X, Y, "x", "y");
   });
   // cross section, at x, seen from the facade
   slice($("xsec"), W, H, ny, nz, (jj, kk) => (i * ny + jj) * nz + kk, f.vc, f.wc, (g, X, Y, sc) => {
     ozBox(g, X, Y, sc, Z.y0, 0, Z.y1, Z.z1);
     cutLine(g, X, Y, true, state.zcut, 0, W); cutLine(g, X, Y, false, state.ycut, 0, H);
     drawItems(g, X, Y, sc, 1, 2, 0, state.xcut);
-    // window and exhaust in outline: they lie in the end walls, not in this section
-    g.setLineDash([4, 3]); g.lineWidth = 1.4; g.strokeStyle = "rgba(47,127,208,0.8)"; g.strokeRect(X(y0), Y(state.hi), (y1 - y0) * sc, (state.hi - state.lo) * sc); g.setLineDash([]);
+    drawOpenings(g, X, Y, sc, 1, 2, 0, (i + 0.5) * dx);
+    axes(g, X, Y, "y", "z");
   });
   if (f.preview) {
     $("readouts").innerHTML = ""; $("status").textContent = "Ready. Press Run to start.";
     $("readouts2").innerHTML = "";
-    for (const id of ["floorX", "floorY", "floorZ", "conv"]) { const [g, w, h] = sizeCanvas($(id), () => 1e9); g.clearRect(0, 0, w, h); }
+    for (const id of ["floorX", "floorY", "conv"]) { const [g, w, h] = sizeCanvas($(id), () => 1e9); g.clearRect(0, 0, w, h); }
     return;
   }
   const oz = occupied();
@@ -1689,7 +2033,7 @@ function draw() {
 function setSeg(id, key) {
   $(id).querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
     $(id).querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
-    state[key] = b.dataset.v; if (key === "field") { syncIso(); draw(); } else start();
+    state[key] = b.dataset.v; if (key === "field") { syncIso(); draw(); } else restart();
   }));
 }
 setSeg("turb", "turb"); setSeg("adv", "adv"); setSeg("fieldSel", "field");
@@ -1703,7 +2047,7 @@ for (const id of ["width", "wy", "lo", "hi", "tin", "ach", "troom", "hx", "hy", 
     if (id === "hi" && state.lo > state.hi - 0.2) { state.lo = Math.max(state.hi - 0.2, 0); $("lo").value = state.lo; }
     syncLabels(); preview();
   });
-  $(id).addEventListener("change", start);
+  $(id).addEventListener("change", restart);
 }
 for (const id of ["ycut", "zcut", "xcut"]) $(id).addEventListener("input", (e) => { state[id] = +e.target.value; if (id === "xcut") state.xcutCentred = false; syncLabels(); draw(); });
 // click in the plan: move the heat source there
@@ -1712,32 +2056,38 @@ $("plan").addEventListener("click", (e) => {
   const x = (e.clientX - r.left - 40) / sc, y = W - (e.clientY - r.top - 8) / sc;
   if (x < 0 || x > L || y < 0 || y > W || layoutOn()) return;
   state.hx = Math.round(x * 10) / 10; state.hy = Math.round(y * 10) / 10; state.heatCentred = false;
-  $("hx").value = state.hx; $("hy").value = state.hy; syncLabels(); start();
+  $("hx").value = state.hx; $("hy").value = state.hy; syncLabels(); preview(); restart();
 });
-$("mesh").addEventListener("change", (e) => { state.mesh = e.target.value.split(",").map(Number); syncLabels(); preview(); start(); });
+$("mesh").addEventListener("change", (e) => { state.mesh = e.target.value.split(",").map(Number); syncLabels(); preview(); restart(); });
 for (const id of ["L", "W", "H"]) {
   $(id).addEventListener("input", (e) => { state[id] = +e.target.value; applyDims(); syncLabels(); preview(); });
-  $(id).addEventListener("change", start);
+  $(id).addEventListener("change", restart);
 }
-$("preset").addEventListener("change", (e) => { state.preset = e.target.value; applyPreset(); applyDims(); syncLabels(); preview(); start(); });
+$("preset").addEventListener("change", (e) => { state.preset = e.target.value; applyPreset(); applyDims(); syncLabels(); preview(); restart(); });
 $("iso").addEventListener("input", (e) => { state.iso[state.field] = +e.target.value; $("isoV").textContent = fieldRange().fmt(state.iso[state.field]); draw(); });
 for (const id of ["showCuts", "showOZ"]) $(id).addEventListener("change", (e) => { state[id] = e.target.checked; draw(); });
 // layout
-$("useLayout").addEventListener("change", (e) => { state.useLayout = e.target.checked; syncLabels(); preview(); start(); });
-$("example").addEventListener("change", (e) => { loadExample(e.target.value); state.useLayout = true; $("useLayout").checked = true; syncLabels(); preview(); start(); });
+$("useLayout").addEventListener("change", (e) => { state.useLayout = e.target.checked; syncLabels(); preview(); restart(); });
+$("example").addEventListener("change", (e) => { loadExample(e.target.value); state.useLayout = true; $("useLayout").checked = true; syncLabels(); preview(); restart(); });
 let layoutTimer = 0;
 $("layoutText").addEventListener("input", () => { clearTimeout(layoutTimer); layoutTimer = setTimeout(() => { parseLayout(); syncLabels(); preview(); }, 300); });
-$("layoutText").addEventListener("change", () => { parseLayout(); syncLabels(); preview(); if (layoutOn()) start(); });
+$("layoutText").addEventListener("change", () => { parseLayout(); syncLabels(); preview(); if (layoutOn()) restart(); });
 $("openFile").addEventListener("click", () => $("fileIn").click());
+$("copySpec").addEventListener("click", async () => {
+  const b = $("copySpec");
+  try { await navigator.clipboard.writeText($("layoutSpec").textContent); b.textContent = "Copied"; }
+  catch (e) { getSelection().selectAllChildren($("layoutSpec")); b.textContent = "Select and copy (Ctrl+C)"; }
+  setTimeout(() => { b.textContent = "Copy format description"; }, 2000);
+});
 $("fileIn").addEventListener("change", async (e) => {
   const file = e.target.files[0]; if (!file) return;
   $("layoutText").value = await file.text(); e.target.value = "";
-  parseLayout(); state.useLayout = true; $("useLayout").checked = true; syncLabels(); preview(); if (layoutOn()) start();
+  parseLayout(); state.useLayout = true; $("useLayout").checked = true; syncLabels(); preview(); if (layoutOn()) restart();
 });
 $("showMesh").addEventListener("click", (e) => { state.showMesh = !state.showMesh; e.currentTarget.setAttribute("aria-pressed", String(state.showMesh)); draw(); });
 for (const id of ["ozF", "ozW", "ozH"]) $(id).addEventListener("input", (e) => { state[id] = +e.target.value; syncLabels(); draw(); });
-$("run").addEventListener("click", start);
-$("stop").addEventListener("click", () => { stopReq = true; });
+$("run").addEventListener("click", () => { armed = true; start(); });
+$("stop").addEventListener("click", () => { stopReq = true; armed = false; });
 window.addEventListener("resize", draw);
 applyDims(); loadExample("single"); syncLabels(); preview();
 if (!navigator.gpu) $("nogpu").hidden = false;

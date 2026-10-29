@@ -12,8 +12,8 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import splu
 from numba import njit, prange
-from room_cfd_3d import (Case, Opening, HeatBlock, FloorFlux, Furniture, Multigrid, boundaries, occupied_zone,  # noqa: F401
-                         plot_slices, read_layout, obstacles, _pressure_matrix,
+from room_cfd_3d import (Case, Opening, HeatBlock, FloorFlux, Furniture, Vent, Multigrid, boundaries, occupied_zone,  # noqa: F401
+                         plot_slices, read_layout, obstacles, _pressure_matrix, _wall, inlet_tangential,
                          _lap1, _edge, _sl, RHO, CP, G, NU_AIR, WALL, INLET, OUTLET, CMU, C1, C2, SK, SE, KAP, EWF)
 
 
@@ -55,9 +55,11 @@ def _nu_wall(kw, y):
 
 
 @njit(inline="always")
-def _gv(U, c, a, i, j, k, s):
-    """U_c at (i, j, k) shifted s along axis a: zero-gradient ends along its own axis, mirrored (no slip) across walls."""
+def _gv(U, c, a, i, j, k, s, UT, sw):
+    """U_c at (i, j, k) shifted s along axis a: zero-gradient ends along its own axis, mirrored (no slip) across
+    walls; with sw, the no-slip value on inlet faces is the tangential inlet speed UT[c, a, side, p, q]."""
     n0, n1, n2 = U.shape
+    p, q = (j, k) if a == 0 else ((i, k) if a == 1 else (i, j))
     if a == 0:
         i += s
     elif a == 1:
@@ -66,10 +68,13 @@ def _gv(U, c, a, i, j, k, s):
         k += s
     if a == c:
         return U[min(max(i, 0), n0 - 1), min(max(j, 0), n1 - 1), min(max(k, 0), n2 - 1)]
-    sign = 1.0
+    v = U[min(max(i, 0), n0 - 1), min(max(j, 0), n1 - 1), min(max(k, 0), n2 - 1)]
     if i < 0 or j < 0 or k < 0 or i > n0 - 1 or j > n1 - 1 or k > n2 - 1:
-        sign = -1.0
-    return sign * U[min(max(i, 0), n0 - 1), min(max(j, 0), n1 - 1), min(max(k, 0), n2 - 1)]
+        if sw:
+            side = 0 if (i < 0 or j < 0 or k < 0) else 1
+            return 2.0 * UT[c, a, side, p, q] - v
+        return -v
+    return v
 
 
 @njit(inline="always")
@@ -143,23 +148,23 @@ def _k_edge_visc12(nu_c, k, ke, wd, out):
 
 
 @njit(inline="always")
-def _mterm(U, Uc, c, a, ne, nu_c, i, j, k, u0, h, tvd, M, obs, kt, ke):
+def _mterm(U, Uc, c, a, ne, nu_c, i, j, k, u0, h, tvd, M, obs, kt, ke, UT, sw):
     """Advection and viscous term along axis a for velocity component c at the face (i, j, k).
     With furniture (obs), a blocked plane normal to a is a no-slip wall for the faces on either side."""
     if a == c:
         vel = u0
-        der = _ddx(_gv(Uc, c, a, i, j, k, -2), _gv(Uc, c, a, i, j, k, -1), u0,
-                   _gv(Uc, c, a, i, j, k, 1), _gv(Uc, c, a, i, j, k, 2), vel, h, tvd)
+        der = _ddx(_gv(Uc, c, a, i, j, k, -2, UT, sw), _gv(Uc, c, a, i, j, k, -1, UT, sw), u0,
+                   _gv(Uc, c, a, i, j, k, 1, UT, sw), _gv(Uc, c, a, i, j, k, 2, UT, sw), vel, h, tvd)
         f1 = _at(nu_c, a, i, j, k, 0) * (_at(Uc, a, i, j, k, 1) - u0) / h       # viscosity at the cell centres
         f0 = _at(nu_c, a, i, j, k, -1) * (u0 - _at(Uc, a, i, j, k, -1)) / h
     else:
         Ua = U[a]                                                   # velocity a averaged to this c face
         vel = 0.25 * (_at2(Ua, c, -1, a, 0, i, j, k) + _at2(Ua, c, 0, a, 0, i, j, k)
                       + _at2(Ua, c, -1, a, 1, i, j, k) + _at2(Ua, c, 0, a, 1, i, j, k))
-        der = _ddx(_gv(Uc, c, a, i, j, k, -2), _gv(Uc, c, a, i, j, k, -1), u0,
-                   _gv(Uc, c, a, i, j, k, 1), _gv(Uc, c, a, i, j, k, 2), vel, h, tvd)
-        f1 = _at(ne, a, i, j, k, 1) * (_gv(Uc, c, a, i, j, k, 1) - u0) / h       # viscosity on the edges
-        f0 = _at(ne, a, i, j, k, 0) * (u0 - _gv(Uc, c, a, i, j, k, -1)) / h
+        der = _ddx(_gv(Uc, c, a, i, j, k, -2, UT, sw), _gv(Uc, c, a, i, j, k, -1, UT, sw), u0,
+                   _gv(Uc, c, a, i, j, k, 1, UT, sw), _gv(Uc, c, a, i, j, k, 2, UT, sw), vel, h, tvd)
+        f1 = _at(ne, a, i, j, k, 1) * (_gv(Uc, c, a, i, j, k, 1, UT, sw) - u0) / h       # viscosity on the edges
+        f0 = _at(ne, a, i, j, k, 0) * (u0 - _gv(Uc, c, a, i, j, k, -1, UT, sw)) / h
         if obs:
             Ma = M[a]
             blo = _at2(Ma, a, 0, c, -1, i, j, k) == 0 and _at2(Ma, a, 0, c, 0, i, j, k) == 0
@@ -177,7 +182,7 @@ def _mterm(U, Uc, c, a, ne, nu_c, i, j, k, u0, h, tvd, M, obs, kt, ke):
 
 
 @njit(parallel=True, cache=True)
-def _k_mom_u(U, us, nu_c, ne01, ne02, d, dt, tvd, M, obs, kt, ke):
+def _k_mom_u(U, us, nu_c, ne01, ne02, d, dt, tvd, M, obs, kt, ke, UT, sw):
     """Predictor for u on the interior x faces: advection (upwind or TVD) and viscous terms along x, y, z."""
     u = U[0]
     n0, n1, n2 = u.shape
@@ -186,14 +191,14 @@ def _k_mom_u(U, us, nu_c, ne01, ne02, d, dt, tvd, M, obs, kt, ke):
         for j in range(n1):
             for k in range(n2):
                 u0 = u[i, j, k]
-                rhs = 0.0 + _mterm(U, u, 0, 0, ne01, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke)
-                rhs = rhs + _mterm(U, u, 0, 1, ne01, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke)
-                rhs = rhs + _mterm(U, u, 0, 2, ne02, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke)
+                rhs = 0.0 + _mterm(U, u, 0, 0, ne01, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke, UT, sw)
+                rhs = rhs + _mterm(U, u, 0, 1, ne01, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke, UT, sw)
+                rhs = rhs + _mterm(U, u, 0, 2, ne02, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke, UT, sw)
                 us[i, j, k] = u0 + dt * rhs
 
 
 @njit(parallel=True, cache=True)
-def _k_mom_v(U, vs, nu_c, ne01, ne12, d, dt, tvd, M, obs, kt, ke):
+def _k_mom_v(U, vs, nu_c, ne01, ne12, d, dt, tvd, M, obs, kt, ke, UT, sw):
     """Predictor for v on the interior y faces."""
     v = U[1]
     n0, n1, n2 = v.shape
@@ -202,14 +207,14 @@ def _k_mom_v(U, vs, nu_c, ne01, ne12, d, dt, tvd, M, obs, kt, ke):
         for j in range(1, n1 - 1):
             for k in range(n2):
                 u0 = v[i, j, k]
-                rhs = 0.0 + _mterm(U, v, 1, 0, ne01, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke)
-                rhs = rhs + _mterm(U, v, 1, 1, ne01, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke)
-                rhs = rhs + _mterm(U, v, 1, 2, ne12, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke)
+                rhs = 0.0 + _mterm(U, v, 1, 0, ne01, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke, UT, sw)
+                rhs = rhs + _mterm(U, v, 1, 1, ne01, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke, UT, sw)
+                rhs = rhs + _mterm(U, v, 1, 2, ne12, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke, UT, sw)
                 vs[i, j, k] = u0 + dt * rhs
 
 
 @njit(parallel=True, cache=True)
-def _k_mom_w(U, ws, nu_c, ne02, ne12, T, d, dt, tvd, gb, Tref, M, obs, kt, ke):
+def _k_mom_w(U, ws, nu_c, ne02, ne12, T, d, dt, tvd, gb, Tref, M, obs, kt, ke, UT, sw):
     """Predictor for w on the interior z faces, with buoyancy."""
     w = U[2]
     n0, n1, n2 = w.shape
@@ -218,32 +223,39 @@ def _k_mom_w(U, ws, nu_c, ne02, ne12, T, d, dt, tvd, gb, Tref, M, obs, kt, ke):
         for j in range(n1):
             for k in range(1, n2 - 1):
                 u0 = w[i, j, k]
-                rhs = 0.0 + _mterm(U, w, 2, 0, ne02, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke)
-                rhs = rhs + _mterm(U, w, 2, 1, ne12, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke)
-                rhs = rhs + _mterm(U, w, 2, 2, ne12, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke)
+                rhs = 0.0 + _mterm(U, w, 2, 0, ne02, nu_c, i, j, k, u0, d[0], tvd, M, obs, kt, ke, UT, sw)
+                rhs = rhs + _mterm(U, w, 2, 1, ne12, nu_c, i, j, k, u0, d[1], tvd, M, obs, kt, ke, UT, sw)
+                rhs = rhs + _mterm(U, w, 2, 2, ne12, nu_c, i, j, k, u0, d[2], tvd, M, obs, kt, ke, UT, sw)
                 rhs = rhs + gb * (0.5 * (T[i, j, k - 1] + T[i, j, k]) - Tref)
                 ws[i, j, k] = u0 + dt * rhs
 
 
+@njit(inline="always")
+def _ghost(phi, a, i, j, k, lo, hi, phi_in):
+    """phi at cell (i, j, k), where the index along a may lie outside the room: then the inlet value on an
+    inlet face (lo / hi = the wall masks at this face), else the end value (zero gradient)."""
+    n0, n1, n2 = phi.shape
+    na = (n0, n1, n2)[a]; q = (i, j, k)[a]
+    if q < 0 and lo == INLET:
+        return phi_in
+    if q > na - 1 and hi == INLET:
+        return phi_in
+    return phi[min(max(i, 0), n0 - 1), min(max(j, 0), n1 - 1), min(max(k, 0), n2 - 1)]
+
+
 @njit(parallel=True, cache=True)
-def _k_fluxes(phi, U, inL, inR, phi_in, D, d, tvd, F0, F1, F2):
-    """Face fluxes (advection + diffusion) of a cell-centred scalar. Inlet faces carry phi_in."""
+def _k_fluxes(phi, U, bw, phi_in, D, d, tvd, F0, F1, F2):
+    """Face fluxes (advection + diffusion) of a cell-centred scalar. Inlet faces carry phi_in.
+    bw = the six wall masks (x low, x high, y low, y high, z low, z high)."""
     n0, n1, n2 = phi.shape
     for i_ in prange(n0 + 1):
         i = np.int64(i_)            # prange gives an unsigned index
         for j in range(n1):
             for k in range(n2):
-                e = [0.0, 0.0, 0.0, 0.0]
-                for s in range(4):
-                    ii = i - 2 + s
-                    if ii < 0:
-                        e[s] = phi_in if inL[j, k] else phi[0, j, k]
-                    elif ii > n0 - 1:
-                        e[s] = phi_in if inR[j, k] else phi[n0 - 1, j, k]
-                    else:
-                        e[s] = phi[ii, j, k]
+                lo, hi = bw[0][j, k], bw[1][j, k]
                 vel = U[0][i, j, k]
-                f = vel * _face(e[0], e[1], e[2], e[3], vel, tvd)
+                f = vel * _face(_ghost(phi, 0, i - 2, j, k, lo, hi, phi_in), _ghost(phi, 0, i - 1, j, k, lo, hi, phi_in),
+                                _ghost(phi, 0, i, j, k, lo, hi, phi_in), _ghost(phi, 0, i + 1, j, k, lo, hi, phi_in), vel, tvd)
                 if 0 < i < n0:
                     f = f - 0.5 * (D[i, j, k] + D[i - 1, j, k]) * (phi[i, j, k] - phi[i - 1, j, k]) / d[0]
                 F0[i, j, k] = f
@@ -251,20 +263,23 @@ def _k_fluxes(phi, U, inL, inR, phi_in, D, d, tvd, F0, F1, F2):
         i = np.int64(i_)            # prange gives an unsigned index
         for j in range(n1 + 1):
             for k in range(n2):
+                lo, hi = bw[2][i, k], bw[3][i, k]
                 vel = U[1][i, j, k]
-                f = vel * _face(phi[i, min(max(j - 2, 0), n1 - 1), k], phi[i, min(max(j - 1, 0), n1 - 1), k],
-                                phi[i, min(j, n1 - 1), k], phi[i, min(j + 1, n1 - 1), k], vel, tvd)
+                f = vel * _face(_ghost(phi, 1, i, j - 2, k, lo, hi, phi_in), _ghost(phi, 1, i, j - 1, k, lo, hi, phi_in),
+                                _ghost(phi, 1, i, j, k, lo, hi, phi_in), _ghost(phi, 1, i, j + 1, k, lo, hi, phi_in), vel, tvd)
                 if 0 < j < n1:
                     f = f - 0.5 * (D[i, j, k] + D[i, j - 1, k]) * (phi[i, j, k] - phi[i, j - 1, k]) / d[1]
                 F1[i, j, k] = f
         for j in range(n1):
-            F2[i, j, 0] = 0.0
-            for k in range(1, n2 + 1):
+            lo, hi = bw[4][i, j], bw[5][i, j]
+            for k in range(n2 + 1):
                 vel = U[2][i, j, k]
-                f = vel * _face(phi[i, j, max(k - 2, 0)], phi[i, j, k - 1], phi[i, j, min(k, n2 - 1)],
-                                phi[i, j, min(k + 1, n2 - 1)], vel, tvd)
-                if k < n2:
+                f = vel * _face(_ghost(phi, 2, i, j, k - 2, lo, hi, phi_in), _ghost(phi, 2, i, j, k - 1, lo, hi, phi_in),
+                                _ghost(phi, 2, i, j, k, lo, hi, phi_in), _ghost(phi, 2, i, j, k + 1, lo, hi, phi_in), vel, tvd)
+                if 0 < k < n2:
                     f = f - 0.5 * (D[i, j, k] + D[i, j, k - 1]) * (phi[i, j, k] - phi[i, j, k - 1]) / d[2]
+                if k == 0 and lo == WALL:
+                    f = 0.0
                 F2[i, j, k] = f
 
 
@@ -380,19 +395,30 @@ def _k_keps_update(k, eps, rk_div, re_div, P, nut, T_old, wall_cell, ypw, dz, dt
                 kn[i, j, z] = kv; en[i, j, z] = ev
 
 
+@njit(inline="always")
+def _bcv(m, inflow, inner):
+    """Normal velocity on a wall face: inflow at an inlet, the inner value at an outlet, 0 on a wall."""
+    if m == INLET:
+        return inflow
+    if m == OUTLET:
+        return inner
+    return 0.0
+
+
 @njit(parallel=True, cache=True)
-def _k_bc_rhs(u, v, w, bL, bR, bT, U_in, d, dt, rhs):
+def _k_bc_rhs(u, v, w, bw, U_in, d, dt, rhs):
     n0, n1, n2 = w.shape[0], w.shape[1], w.shape[2] - 1
     for j in range(n1):
         for k in range(n2):
-            u[0, j, k] = U_in if bL[j, k] == INLET else (u[1, j, k] if bL[j, k] == OUTLET else 0.0)
-            u[n0, j, k] = -U_in if bR[j, k] == INLET else (u[n0 - 1, j, k] if bR[j, k] == OUTLET else 0.0)
+            u[0, j, k] = _bcv(bw[0][j, k], U_in, u[1, j, k])
+            u[n0, j, k] = _bcv(bw[1][j, k], -U_in, u[n0 - 1, j, k])
     for i in range(n0):
         for k in range(n2):
-            v[i, 0, k] = 0.0; v[i, n1, k] = 0.0
+            v[i, 0, k] = _bcv(bw[2][i, k], U_in, v[i, 1, k])
+            v[i, n1, k] = _bcv(bw[3][i, k], -U_in, v[i, n1 - 1, k])
         for j in range(n1):
-            w[i, j, 0] = 0.0
-            w[i, j, n2] = w[i, j, n2 - 1] if bT[i, j] == OUTLET else 0.0
+            w[i, j, 0] = _bcv(bw[4][i, j], U_in, w[i, j, 1])
+            w[i, j, n2] = _bcv(bw[5][i, j], -U_in, w[i, j, n2 - 1])
     for i_ in prange(n0):
         i = np.int64(i_)            # prange gives an unsigned index
         for j in range(n1):
@@ -402,7 +428,7 @@ def _k_bc_rhs(u, v, w, bL, bR, bT, U_in, d, dt, rhs):
 
 
 @njit(parallel=True, cache=True)
-def _k_correct(u, v, w, p, bL, bR, bT, d, dt):
+def _k_correct(u, v, w, p, bw, d, dt):
     n0, n1, n2 = p.shape
     for i_ in prange(n0):
         i = np.int64(i_)            # prange gives an unsigned index
@@ -414,15 +440,23 @@ def _k_correct(u, v, w, p, bL, bR, bT, d, dt):
                     v[i, j, k] -= dt * (p[i, j, k] - p[i, j - 1, k]) / d[1]
                 if k > 0:
                     w[i, j, k] -= dt * (p[i, j, k] - p[i, j, k - 1]) / d[2]
+    # p = 0 just outside the outlets
     for j in range(n1):
         for k in range(n2):
-            if bL[j, k] == OUTLET:
+            if bw[0][j, k] == OUTLET:
                 u[0, j, k] -= dt * (p[0, j, k] - 0.0) / (d[0] / 2)
-            if bR[j, k] == OUTLET:
+            if bw[1][j, k] == OUTLET:
                 u[n0, j, k] -= dt * (0.0 - p[n0 - 1, j, k]) / (d[0] / 2)
     for i in range(n0):
+        for k in range(n2):
+            if bw[2][i, k] == OUTLET:
+                v[i, 0, k] -= dt * (p[i, 0, k] - 0.0) / (d[1] / 2)
+            if bw[3][i, k] == OUTLET:
+                v[i, n1, k] -= dt * (0.0 - p[i, n1 - 1, k]) / (d[1] / 2)
         for j in range(n1):
-            if bT[i, j] == OUTLET:
+            if bw[4][i, j] == OUTLET:
+                w[i, j, 0] -= dt * (p[i, j, 0] - 0.0) / (d[2] / 2)
+            if bw[5][i, j] == OUTLET:
                 w[i, j, n2] -= dt * (0.0 - p[i, j, n2 - 1]) / (d[2] / 2)
 
 
@@ -486,11 +520,14 @@ def run(case: Case, verbose=False, monitor_every=50):
     da = np.array(d)
     shp = [tuple(n[k] + (1 if k == c else 0) for k in range(3)) for c in range(3)]
     bnd = boundaries(case)
-    bL, bR, bT = bnd[(0, 0)], bnd[(0, 1)], bnd[(2, 1)]
-    inL, inR = bL == INLET, bR == INLET
-    A_in = (inL.sum() + inR.sum()) * dy * dz
+    bw = tuple(np.ascontiguousarray(bnd[(a, side)], dtype=np.int64) for a in range(3) for side in (0, 1))
+    area = (dy * dz, dx * dz, dx * dy)
+    A_in = sum((m == INLET).sum() * area[a] for (a, side), m in bnd.items())
     U_in = case.q / A_in
     h_in = A_in / case.W
+    ut = inlet_tangential(case)                       # inlets that blow at an angle
+    sw = ut is not None
+    UT = U_in * ut if sw else np.zeros((3, 3, 2, 1, 1))
 
     U = tuple(np.zeros(s) for s in shp)
     Q_tot = sum(b.power for b in case.heat) + sum(f.power for f in case.floor_flux)
@@ -559,9 +596,8 @@ def run(case: Case, verbose=False, monitor_every=50):
         Amat = (sp.kron(sp.kron(_lap1(nx, dx), I[1]), I[2]) + sp.kron(sp.kron(I[0], _lap1(ny, dy)), I[2])
                 + sp.kron(sp.kron(I[0], I[1]), _lap1(nz, dz))).tolil()
         extra = np.zeros(n)
-        extra[0][bL == OUTLET] -= 2.0 / dx ** 2
-        extra[-1][bR == OUTLET] -= 2.0 / dx ** 2
-        extra[:, :, -1][bT == OUTLET] -= 2.0 / dz ** 2
+        for (a, side), m in bnd.items():
+            _wall(extra, a, side, n[a] - 1)[m == OUTLET] -= 2.0 / d[a] ** 2
         Amat = (Amat.tocsr() + sp.diags(extra.ravel())).tocsc()
     if case.pressure == "multigrid":
         mgs = FastMultigrid(-Amat, n); p_last = np.zeros(Amat.shape[0])
@@ -574,7 +610,7 @@ def run(case: Case, verbose=False, monitor_every=50):
         solve = splu(Amat, permc_spec="MMD_AT_PLUS_A").solve
 
     rhs = np.zeros(nx * ny * nz)
-    _k_bc_rhs(U[0], U[1], U[2], bL, bR, bT, U_in, da, 1.0, rhs)
+    _k_bc_rhs(U[0], U[1], U[2], bw, U_in, da, 1.0, rhs)
     F = [np.zeros(s) for s in shp]; Fk = [np.zeros(s) for s in shp]
     div = np.zeros(n); div2 = np.zeros(n); P = np.zeros(n); spd = np.zeros(n)
     avg = dict(u=np.zeros(shp[0]), v=np.zeros(shp[1]), w=np.zeros(shp[2]), T=np.zeros(n), speed=np.zeros(n),
@@ -585,7 +621,8 @@ def run(case: Case, verbose=False, monitor_every=50):
     cfl = 0.25 if tvd else 0.4
     hist = {key: [] for key in ("t", "du", "dv", "dw", "dT", "div", "imb", "v_floor", "T_exh")}
     mon_pt = (min(int(1.0 / dx), nx - 1), ny // 2, min(int(0.1 / dz), nz - 1))
-    outR, outL, outT = bR == OUTLET, bL == OUTLET, bT == OUTLET
+    outs = [(a, side, m == OUTLET) for (a, side), m in bnd.items() if (m == OUTLET).any()]
+    exhaust_T = lambda T_: np.concatenate([_wall(T_, a, side, n[a] - 1)[o] for a, side, o in outs]).mean()
 
     while t < case.t_end:
         mon = step % monitor_every == 0
@@ -607,17 +644,17 @@ def run(case: Case, verbose=False, monitor_every=50):
 
         # ---- momentum ----
         Us = tuple(a.copy() for a in U)
-        _k_mom_u(U, Us[0], nu_c, ne[(0, 1)], ne[(0, 2)], da, dt, tvd, Mt, obs, k, ke)
-        _k_mom_v(U, Us[1], nu_c, ne[(0, 1)], ne[(1, 2)], da, dt, tvd, Mt, obs, k, ke)
-        _k_mom_w(U, Us[2], nu_c, ne[(0, 2)], ne[(1, 2)], T, da, dt, tvd, G * beta, Tref, Mt, obs, k, ke)
+        _k_mom_u(U, Us[0], nu_c, ne[(0, 1)], ne[(0, 2)], da, dt, tvd, Mt, obs, k, ke, UT, sw)
+        _k_mom_v(U, Us[1], nu_c, ne[(0, 1)], ne[(1, 2)], da, dt, tvd, Mt, obs, k, ke, UT, sw)
+        _k_mom_w(U, Us[2], nu_c, ne[(0, 2)], ne[(1, 2)], T, da, dt, tvd, G * beta, Tref, Mt, obs, k, ke, UT, sw)
         if obs:
             for c in range(3):
                 Us[c][...] *= Mk[c]                            # no flow through furniture
 
         # ---- projection ----
-        _k_bc_rhs(Us[0], Us[1], Us[2], bL, bR, bT, U_in, da, dt, rhs)
+        _k_bc_rhs(Us[0], Us[1], Us[2], bw, U_in, da, dt, rhs)
         p = solve(rhs).reshape(n)
-        _k_correct(Us[0], Us[1], Us[2], p, bL, bR, bT, da, dt)
+        _k_correct(Us[0], Us[1], Us[2], p, bw, da, dt)
         if obs:
             for c in range(3):
                 Us[c][...] *= Mk[c]
@@ -626,7 +663,7 @@ def run(case: Case, verbose=False, monitor_every=50):
             div_max = np.abs(sum(np.diff(U[c], axis=c) / d[c] for c in range(3))).max()
 
         # ---- energy ----
-        _k_fluxes(T, U, inL, inR, case.T_in, alpha_c, da, tvd, F[0], F[1], F[2])
+        _k_fluxes(T, U, bw, case.T_in, alpha_c, da, tvd, F[0], F[1], F[2])
         if obs:
             for c in range(3):
                 F[c] *= Mk[c]                             # furniture is adiabatic
@@ -639,12 +676,12 @@ def run(case: Case, verbose=False, monitor_every=50):
         if ke:
             nut = nu_c - NU_AIR
             _k_production(U, nut, k, wall_cell, ypw, da, P)
-            _k_fluxes(k, U, inL, inR, k_in, NU_AIR + nut / SK, da, False, Fk[0], Fk[1], Fk[2])
+            _k_fluxes(k, U, bw, k_in, NU_AIR + nut / SK, da, False, Fk[0], Fk[1], Fk[2])
             if obs:
                 for c in range(3):
                     Fk[c] *= Mk[c]
             _k_div(Fk[0], Fk[1], Fk[2], da, div)
-            _k_fluxes(eps, U, inL, inR, e_in, NU_AIR + nut / SE, da, False, Fk[0], Fk[1], Fk[2])
+            _k_fluxes(eps, U, bw, e_in, NU_AIR + nut / SE, da, False, Fk[0], Fk[1], Fk[2])
             if obs:
                 for c in range(3):
                     Fk[c] *= Mk[c]
@@ -655,8 +692,9 @@ def run(case: Case, verbose=False, monitor_every=50):
 
         if mon:
             rms = lambda a: float(np.sqrt(np.mean(a * a)))
-            q_open = ((F[0][-1].sum() - F[0][0].sum()) * dy * dz + F[2][:, :, -1].sum() * dx * dy)
-            T_exh = np.concatenate([T[-1][outR], T[0][outL], T[:, :, -1][outT]]).mean()
+            q_open = sum(((-1.0 if side == 0 else 1.0) * _wall(F[a], a, side, n[a]) * area[a]).sum() for (a, side) in bnd)
+            q_open += (qfloor / (RHO * CP)).sum() * dx * dy   # the floor flux is a source, not an opening
+            T_exh = exhaust_T(T)
             _k_speed(U[0], U[1], U[2], spd)
             for key, val in (("t", t + dt), ("du", rms(U[0] - U0[0]) / dt), ("dv", rms(U[1] - U0[1]) / dt),
                              ("dw", rms(U[2] - U0[2]) / dt), ("dT", rms(T - T0_) / dt), ("div", div_max),
@@ -675,8 +713,8 @@ def run(case: Case, verbose=False, monitor_every=50):
 
     for key in avg:
         avg[key] /= wa
-    q_out = (avg["u"][nx][outR].sum() - avg["u"][0][outL].sum()) * dy * dz + avg["w"][:, :, nz][outT].sum() * dx * dy
-    T_out = np.concatenate([avg["T"][-1][outR], avg["T"][0][outL], avg["T"][:, :, -1][outT]]).mean()
+    q_out = sum(((-1.0 if side == 0 else 1.0) * _wall(avg["uvw"[a]], a, side, n[a])[o] * area[a]).sum() for a, side, o in outs)
+    T_out = exhaust_T(avg["T"])
     res = dict(case=case, x=xc, y=yc, z=zc, dx=dx, dy=dy, dz=dz, U_in=U_in, h_in=h_in, steps=step, solid=solid,
                q_in=case.q, q_out=q_out, T_out=T_out, T_out_expected=T_mix,
                cg_iters=mgs.iters if case.pressure == "multigrid" else 0,

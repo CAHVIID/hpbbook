@@ -36,7 +36,10 @@ export function boundaries(c) {
   const xc = centres(nx, c.L / nx), yc = centres(ny, c.W / ny), zc = centres(nz, c.H / nz);
   const b = { L: new Int32Array(ny * nz), R: new Int32Array(ny * nz), B: new Int32Array(nx * nz),
               F: new Int32Array(nx * nz), D: new Int32Array(nx * ny), T: new Int32Array(nx * ny) };
+  const vents = c.vents || [];
+  const has = { inlet: vents.some((v) => v.kind === "inlet"), exhaust: vents.some((v) => v.kind === "exhaust") };
   for (const [op, kind] of [[c.inlet, INLET], [c.outlet, OUTLET]]) {
+    if (has[kind === INLET ? "inlet" : "exhaust"]) continue;          // replaced by the vents
     const y0 = op.y0 ?? 0.0, y1 = op.y1 ?? c.W;
     let any = false;
     if (op.side === "left" || op.side === "right") {
@@ -44,18 +47,32 @@ export function boundaries(c) {
       for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++)
         if (yc[j] > y0 && yc[j] < y1 && zc[k] > op.start && zc[k] < op.end) { m[j * nz + k] = kind; any = true; }
     } else if (op.side === "top") {
-      if (kind === INLET) throw new Error("inlets must be in the facade (left) or the back wall (right)");
       for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++)
         if (xc[i] > op.start && xc[i] < op.end && yc[j] > y0 && yc[j] < y1) { b.T[i * ny + j] = kind; any = true; }
     } else throw new Error(`unknown side ${op.side}`);
     if (!any) throw new Error(`the ${op.side} opening covers no cell faces: refine the mesh`);
   }
+  // vents (as room_cfd_3d.boundaries): a rectangle on any wall, zero size along the axis normal to it
+  const size = [c.L, c.W, c.H], cen = [xc, yc, zc], key = [["L", "R"], ["B", "F"], ["D", "T"]];
+  vents.forEach((v, no) => {
+    const { a, side, o1, o2, ins } = ventFaces(v, no, size, cen), m = b[key[a][side]], n2 = cen[o2].length;
+    let any = false;
+    for (let i = 0; i < cen[o1].length; i++) for (let j = 0; j < n2; j++) {
+      if (!ins(i, j)) continue;
+      if (m[i * n2 + j] !== WALL) throw new Error(`${v.kind} ${no + 1} overlaps another opening`);
+      m[i * n2 + j] = v.kind === "inlet" ? INLET : OUTLET; any = true;
+    }
+    if (!any) throw new Error(`${v.kind} ${no + 1} covers no cell faces: make it larger or refine the mesh`);
+  });
+  const all = Object.values(b);
+  if (!all.some((m) => m.includes(INLET))) throw new Error("the room has no inlet");
+  if (!all.some((m) => m.includes(OUTLET))) throw new Error("the room has no exhaust");
   return b;
 }
 
 // room layout (as room_cfd_3d.read_layout): one box per line, type, x0, x1, y0, y1, z0, z1, power_W
 export function readLayout(text) {
-  const out = { heat: [], floor_flux: [], furniture: [] };
+  const out = { heat: [], floor_flux: [], furniture: [], vents: [] };
   text.split(/\r?\n/).forEach((line, no) => {
     const f = line.split("#")[0].replace(/;/g, ",").split(",").map((x) => x.trim());
     if (!f[0] || f[0].toLowerCase() === "type") return;
@@ -67,7 +84,12 @@ export function readLayout(text) {
     if (kind === "heat") out.heat.push({ x0, x1, y0, y1, z0, z1, power });
     else if (kind === "floor") out.floor_flux.push({ x0, x1, y0, y1, power });
     else if (kind === "furniture") out.furniture.push({ x0, x1, y0, y1, z0, z1 });
-    else throw new Error(`layout line ${no + 1}: unknown type "${f[0]}" (heat, floor or furniture)`);
+    else if (kind === "inlet" || kind === "exhaust") {
+      const ang = [8, 9].map((k) => (f.length > k && f[k] !== "" ? Number(f[k]) : 0));   // inlets: spread, swirl
+      if (ang.some((x) => !Number.isFinite(x))) throw new Error(`layout line ${no + 1}: spread and swirl must be numbers`);
+      out.vents.push({ kind, x0, x1, y0, y1, z0, z1, spread: kind === "inlet" ? ang[0] : 0, swirl: kind === "inlet" ? ang[1] : 0 });
+    }
+    else throw new Error(`layout line ${no + 1}: unknown type "${f[0]}" (heat, floor, furniture, inlet or exhaust)`);
   });
   return out;
 }
@@ -110,6 +132,46 @@ export function obstacles(c) {
   return { mk: blocked.map((b) => Float32Array.from(b, (x) => 1 - x)), solid };
 }
 
+// the wall of a vent (axis a, side) and which of its faces it covers (ins(i, j) over the other two axes o1 < o2)
+function ventFaces(v, no, size, cen) {
+  const lo = [v.x0, v.y0, v.z0], hi = [v.x1, v.y1, v.z1], thin = [0, 1, 2].filter((k) => Math.abs(hi[k] - lo[k]) < 1e-9);
+  let side = null; const a = thin[0];
+  if (thin.length === 1) side = Math.abs(lo[a]) < 1e-6 ? 0 : Math.abs(lo[a] - size[a]) < 1e-6 ? 1 : null;
+  if (side === null) throw new Error(`${v.kind} ${no + 1} is not on a wall: give it zero size along one axis, at 0 or at the room size`);
+  const [o1, o2] = [0, 1, 2].filter((k) => k !== a);
+  const inn = (k, i) => cen[k][i] > Math.min(lo[k], hi[k]) && cen[k][i] < Math.max(lo[k], hi[k]);
+  return { a, side, o1, o2, lo, hi, ins: (i, j) => inn(o1, i) && inn(o2, j) };
+}
+
+// tangential inlet velocity per unit normal speed (as room_cfd_3d.inlet_tangential): ut[c, a, side, p, q], or null
+export function inletTangential(c) {
+  const vents = (c.vents || []).filter((v) => v.kind === "inlet" && (v.spread || v.swirl));
+  if (!vents.length) return null;
+  const n = [c.nx, c.ny, c.nz], size = [c.L, c.W, c.H], cen = n.map((m, k) => centres(m, size[k] / m)), NM = Math.max(...n) + 1;
+  const ut = new Float64Array(3 * 3 * 2 * NM * NM);
+  vents.forEach((v, no) => {
+    const { a, side, o1, o2, lo, hi, ins } = ventFaces(v, no, size, cen), N1 = n[o1], N2 = n[o2];
+    const c1 = 0.5 * (lo[o1] + hi[o1]), c2 = 0.5 * (lo[o2] + hi[o2]);
+    const sgn = (side === 0 ? 1 : -1) * ((o1 - a + 3) % 3 === 1 ? 1 : -1);
+    const ts = Math.tan(v.spread * Math.PI / 180), tw = Math.tan(v.swirl * Math.PI / 180);
+    const vt = [new Float64Array(N1 * N2), new Float64Array(N1 * N2)];
+    for (let i = 0; i < N1; i++) for (let j = 0; j < N2; j++) {
+      if (!ins(i, j)) continue;
+      const r1 = cen[o1][i] - c1, r2 = cen[o2][j] - c2, rr = Math.hypot(r1, r2), e1 = rr > 0 ? r1 / rr : 0, e2 = rr > 0 ? r2 / rr : 0;
+      vt[0][i * N2 + j] = ts * e1 + tw * (-sgn * e2); vt[1][i * N2 + j] = ts * e2 + tw * (sgn * e1);
+    }
+    for (const [cc, f] of [[o1, vt[0]], [o2, vt[1]]]) {
+      const P = N1 + (cc === o1 ? 1 : 0), Q = N2 + (cc === o2 ? 1 : 0);
+      const fv = (i, j) => (i >= 0 && i < N1 && j >= 0 && j < N2 ? f[i * N2 + j] : 0);
+      for (let i = 0; i < P; i++) for (let j = 0; j < Q; j++) {
+        const avg = cc === o1 ? 0.5 * (fv(i - 1, j) + fv(i, j)) : 0.5 * (fv(i, j - 1) + fv(i, j));
+        ut[(((cc * 3 + a) * 2 + side) * NM + i) * NM + j] += avg;
+      }
+    }
+  });
+  return { ut, NM };
+}
+
 // pressure operator M = -A (SPD) as face coefficients and diagonal; coarse levels by aggregation.
 // With furniture, blocked faces carry no coefficient and a solid cell keeps a lone diagonal.
 function fineOperator(n, d, b, mk = null) {
@@ -125,6 +187,9 @@ function fineOperator(n, d, b, mk = null) {
           + cy[(i * (bb + 1) + j + 1) * c + k] + cz[(i * bb + j) * (c + 1) + k] + cz[(i * bb + j) * (c + 1) + k + 1];
     if (i === 0 && b.L[j * c + k] === OUTLET) s += 2 / dx ** 2;
     if (i === a - 1 && b.R[j * c + k] === OUTLET) s += 2 / dx ** 2;
+    if (j === 0 && b.B[i * c + k] === OUTLET) s += 2 / dy ** 2;
+    if (j === bb - 1 && b.F[i * c + k] === OUTLET) s += 2 / dy ** 2;
+    if (k === 0 && b.D[i * bb + j] === OUTLET) s += 2 / dz ** 2;
     if (k === c - 1 && b.T[i * bb + j] === OUTLET) s += 2 / dz ** 2;
     dg[(i * bb + j) * c + k] = s > 0 ? s : 1 / Math.min(dx, dy, dz) ** 2;
   }
@@ -204,8 +269,8 @@ export async function createSim(device, c) {
   const N = nx * ny * nz, Nu = (nx + 1) * ny * nz, Nv = nx * (ny + 1) * nz, Nw = nx * ny * (nz + 1);
   const bnd = boundaries(c);
   const q = c.ach * c.L * c.H * c.W / 3600.0;
-  let nIn = 0; for (const m of [bnd.L, bnd.R]) for (const v of m) if (v === INLET) nIn++;
-  const A_in = nIn * dy * dz, U_in = q / A_in, h_in = A_in / c.W;
+  const cnt = (m) => m.reduce((s, v) => s + (v === INLET ? 1 : 0), 0);
+  const A_in = (cnt(bnd.L) + cnt(bnd.R)) * dy * dz + (cnt(bnd.B) + cnt(bnd.F)) * dx * dz + (cnt(bnd.D) + cnt(bnd.T)) * dx * dy, U_in = q / A_in, h_in = A_in / c.W;
   const Q_tot = c.heat.reduce((s, b) => s + b.power, 0) + c.floor_flux.reduce((s, f) => s + f.power, 0);
   const T_mix = c.T_in + Q_tot / (RHO * CP * q);
   const T0 = c.T_room0 ?? T_mix;
@@ -214,6 +279,7 @@ export async function createSim(device, c) {
   const k_in = 1.5 * (c.Tu_in * U_in) ** 2, e_in = k_in ** 1.5 / (0.1 * h_in);
   const xc = centres(nx, dx), yc = centres(ny, dy), zc = centres(nz, dz);
   const obs = (c.furniture || []).length > 0;
+  const tg = inletTangential(c), swl = tg !== null;           // inlets that blow at an angle
   const { mk, solid } = obstacles(c);
 
   // ---- memory layout: one f32 storage buffer, scalars first ----
@@ -231,10 +297,12 @@ export async function createSim(device, c) {
   alloc("ne01", (nx + 1) * (ny + 1) * nz); alloc("ne02", (nx + 1) * ny * (nz + 1)); alloc("ne12", nx * (ny + 1) * (nz + 1));
   alloc("wd01", (nx + 1) * (ny + 1) * nz); alloc("wd02", (nx + 1) * ny * (nz + 1)); alloc("wd12", nx * (ny + 1) * (nz + 1));
   alloc("qfl", nx * ny); alloc("bL", ny * nz); alloc("bR", ny * nz); alloc("bT", nx * ny);
+  alloc("bB", nx * nz); alloc("bF", nx * nz); alloc("bD", nx * ny);
   for (const f of ["F0", "Fk0", "Fe0"]) alloc(f, Nu); for (const f of ["F1", "Fk1", "Fe1"]) alloc(f, Nv);
   for (const f of ["F2", "Fk2", "Fe2"]) alloc(f, Nw);
   alloc("au", Nu + Nv + Nw); O.av = O.au + Nu; O.aw = O.av + Nv;           // contiguous like u, v, w
   for (const f of ["aT", "as", "anu", "ak"]) alloc(f, N);
+  if (swl) alloc("ut", tg.ut.length);
   if (obs) { alloc("mk", Nu + Nv + Nw); O.mv = O.mk + Nu; O.mw = O.mv + Nv; }    // open-face masks, ordered as u, v, w
 
   // multigrid levels
@@ -292,6 +360,7 @@ export async function createSim(device, c) {
   }
   put("ypw", ypw); put("lwall", lw); put("S", Sv); put("qfl", qf);
   put("bL", Float32Array.from(bnd.L)); put("bR", Float32Array.from(bnd.R)); put("bT", Float32Array.from(bnd.T));
+  put("bB", Float32Array.from(bnd.B)); put("bF", Float32Array.from(bnd.F)); put("bD", Float32Array.from(bnd.D));
   // wall distance on the edges that get the log-law viscosity (as room_cfd_3d_numba.run)
   const wall2 = { "0,0": [bnd.L, [ny, nz]], "0,1": [bnd.R, [ny, nz]], "1,0": [bnd.B, [nx, nz]], "1,1": [bnd.F, [nx, nz]],
                   "2,0": [bnd.D, [nx, ny]], "2,1": [bnd.T, [nx, ny]] };
@@ -318,8 +387,19 @@ export async function createSim(device, c) {
     if (bnd.L[j * nz + k] === INLET) init[O.u + (0 * ny + j) * nz + k] = U_in;
     if (bnd.R[j * nz + k] === INLET) init[O.u + (nx * ny + j) * nz + k] = -U_in;
   }
+  for (let i = 0; i < nx; i++) {
+    for (let k = 0; k < nz; k++) {
+      if (bnd.B[i * nz + k] === INLET) init[O.v + (i * (ny + 1) + 0) * nz + k] = U_in;
+      if (bnd.F[i * nz + k] === INLET) init[O.v + (i * (ny + 1) + ny) * nz + k] = -U_in;
+    }
+    for (let j = 0; j < ny; j++) {
+      if (bnd.D[i * ny + j] === INLET) init[O.w + (i * ny + j) * (nz + 1)] = U_in;
+      if (bnd.T[i * ny + j] === INLET) init[O.w + (i * ny + j) * (nz + 1) + nz] = -U_in;
+    }
+  }
   ops.forEach((op, l) => { put(`cx${l}`, op.cx); put(`cy${l}`, op.cy); put(`cz${l}`, op.cz); put(`dg${l}`, op.dg); });
   put("Minv", Minv);
+  if (swl) put("ut", tg.ut.map((x) => x * U_in));
   if (obs) { put("mk", mk[0]); put("mv", mk[1]); put("mw", mk[2]); }
 
   // ---- WGSL ----
@@ -381,7 +461,12 @@ fn gv(c: i32, a: i32, p: vec3<i32>, s: i32) -> f32 {
   let n = ushp(c); let q = p + sh(a, s);
   let qc = clamp(q, vec3<i32>(0), n - vec3<i32>(1));
   let v = at(uoff(c), n, qc);
-  if (a != c && any(q != qc)) { return -v; }
+  if (a != c && any(q != qc)) {
+    ${swl ? `// no slip at the tangential inlet speed on inlet faces
+    var pi = p.x; var qi = p.z; if (a == 0) { pi = p.y; } if (a == 2) { qi = p.y; }
+    let side = select(1, 0, any(q < vec3<i32>(0)));
+    return 2.0 * F[O_ut + (((c * 3 + a) * 2 + side) * ${tg.NM} + pi) * ${tg.NM} + qi] - v;` : "return -v;"}
+  }
   return v;
 }
 fn mterm(c: i32, a: i32, p: vec3<i32>, u0: f32, h: f32) -> f32 {
@@ -483,6 +568,8 @@ fn mterm(c: i32, a: i32, p: vec3<i32>, u0: f32, h: f32) -> f32 {
 }`;
   }
   code += `
+// normal velocity on a wall face: inflow at an inlet (1), the inner value at an outlet (2), 0 on a wall
+fn bcv(b: f32, inflow: f32, inner: f32) -> f32 { if (b == 1.0) { return inflow; } if (b == 2.0) { return inner; } return 0.0; }
 // boundary values of the predicted velocity
 @compute @workgroup_size(64) fn bc(@builtin(global_invocation_id) g: vec3<u32>) {
   if (stopped()) { return; }
@@ -497,12 +584,13 @@ fn mterm(c: i32, a: i32, p: vec3<i32>, u0: f32, h: f32) -> f32 {
   }
   if (m < NX * NZ) {
     let i = m / NZ; let k = m % NZ;
-    F[O_vs + (i * (NY + 1) + 0) * NZ + k] = 0.0; F[O_vs + (i * (NY + 1) + NY) * NZ + k] = 0.0;
+    F[O_vs + (i * (NY + 1) + 0) * NZ + k] = bcv(F[O_bB + m], UIN, F[O_vs + (i * (NY + 1) + 1) * NZ + k]);
+    F[O_vs + (i * (NY + 1) + NY) * NZ + k] = bcv(F[O_bF + m], -UIN, F[O_vs + (i * (NY + 1) + NY - 1) * NZ + k]);
   }
   if (m < NX * NY) {
     let i = m / NY; let j = m % NY;
-    F[O_ws + (i * NY + j) * (NZ + 1)] = 0.0;
-    F[O_ws + (i * NY + j) * (NZ + 1) + NZ] = select(0.0, F[O_ws + (i * NY + j) * (NZ + 1) + NZ - 1], F[O_bT + m] == 2.0);
+    F[O_ws + (i * NY + j) * (NZ + 1)] = bcv(F[O_bD + m], UIN, F[O_ws + (i * NY + j) * (NZ + 1) + 1]);
+    F[O_ws + (i * NY + j) * (NZ + 1) + NZ] = bcv(F[O_bT + m], -UIN, F[O_ws + (i * NY + j) * (NZ + 1) + NZ - 1]);
   }
 }
 // right-hand side of M p = b (M = -A): b = -div(U*) / dt
@@ -632,15 +720,24 @@ ${red2("cg_rz2", "F[S_BETA] = A / F[S_RZ]; F[S_RZ] = A;", true)}
   } else if (m < ${Nu + Nv}) {
     let mm = m - ${Nu}; let p = id3(u32(mm), ushp(1)); var v = F[O_vs + mm];
     if (p.y > 0 && p.y < NY) { v -= dt * (cell(O_p, p) - cell(O_p, p - sh(1, 1))) / DY; }
+    else if (p.y == 0 && F[O_bB + p.x * NZ + p.z] == 2.0) { v -= dt * cell(O_p, p) / (0.5 * DY); }
+    else if (p.y == NY && F[O_bF + p.x * NZ + p.z] == 2.0) { v -= dt * (-cell(O_p, p - sh(1, 1))) / (0.5 * DY); }
     F[O_v + mm] = v${obs ? ' * F[O_mk + m]' : ''};
   } else {
     let mm = m - ${Nu + Nv}; let p = id3(u32(mm), ushp(2)); var w = F[O_ws + mm];
     if (p.z > 0 && p.z < NZ) { w -= dt * (cell(O_p, p) - cell(O_p, p - sh(2, 1))) / DZ; }
+    else if (p.z == 0 && F[O_bD + p.x * NY + p.y] == 2.0) { w -= dt * cell(O_p, p) / (0.5 * DZ); }
     else if (p.z == NZ && F[O_bT + p.x * NY + p.y] == 2.0) { w -= dt * (-cell(O_p, p - sh(2, 1))) / (0.5 * DZ); }
     F[O_w + mm] = w${obs ? ' * F[O_mk + m]' : ''};
   }
 }
 
+// a cell value where the index along a may lie outside the room: the inlet value on an inlet face, else the end value
+fn gh(o: i32, a: i32, q: vec3<i32>, lo: f32, hi: f32, phin: f32) -> f32 {
+  if (q[a] < 0 && lo == 1.0) { return phin; }
+  if (q[a] > NC[a] - 1 && hi == 1.0) { return phin; }
+  return F[o + ix(NC, clamp(q, vec3<i32>(0), NC - vec3<i32>(1)))];
+}
 // face fluxes (advection + diffusion) of a cell-centred scalar
 fn flux(o: i32, m: i32, phin: f32, tv: bool, kind: i32) -> f32 {
   var f: f32;
@@ -659,18 +756,19 @@ fn flux(o: i32, m: i32, phin: f32, tv: bool, kind: i32) -> f32 {
   } else if (m < ${Nu + Nv}) {
     let p = id3(u32(m - ${Nu}), ushp(1));
     let vel = F[O_v + m - ${Nu}];
-    let a0 = F[o + ix(NC, vec3<i32>(p.x, clamp(p.y - 2, 0, NY - 1), p.z))]; let a1 = F[o + ix(NC, vec3<i32>(p.x, clamp(p.y - 1, 0, NY - 1), p.z))];
-    let a2 = F[o + ix(NC, vec3<i32>(p.x, min(p.y, NY - 1), p.z))]; let a3 = F[o + ix(NC, vec3<i32>(p.x, min(p.y + 1, NY - 1), p.z))];
-    f = vel * face(a0, a1, a2, a3, vel, tv);
+    let lo = F[O_bB + p.x * NZ + p.z]; let hi = F[O_bF + p.x * NZ + p.z];
+    f = vel * face(gh(o, 1, p + sh(1, -2), lo, hi, phin), gh(o, 1, p + sh(1, -1), lo, hi, phin), gh(o, 1, p, lo, hi, phin),
+                   gh(o, 1, p + sh(1, 1), lo, hi, phin), vel, tv);
     if (p.y > 0 && p.y < NY) { let pm = p - sh(1, 1); f -= 0.5 * (D(kind, p) + D(kind, pm)) * (F[o + ix(NC, p)] - F[o + ix(NC, pm)]) / DY; }
   } else {
     let p = id3(u32(m - ${Nu + Nv}), ushp(2));
-    if (p.z == 0) { return select(0.0, F[O_qfl + p.x * NY + p.y] / RCP, kind == 0); }   // heat flux up through the floor
+    let lo = F[O_bD + p.x * NY + p.y]; let hi = F[O_bT + p.x * NY + p.y];
+    let qf = select(0.0, F[O_qfl + p.x * NY + p.y] / RCP, kind == 0 && p.z == 0);   // heat flux up through the floor
+    if (p.z == 0 && lo == 0.0) { return qf; }
     let vel = F[O_w + m - ${Nu + Nv}];
-    let a0 = F[o + ix(NC, vec3<i32>(p.x, p.y, max(p.z - 2, 0)))]; let a1 = F[o + ix(NC, vec3<i32>(p.x, p.y, p.z - 1))];
-    let a2 = F[o + ix(NC, vec3<i32>(p.x, p.y, min(p.z, NZ - 1)))]; let a3 = F[o + ix(NC, vec3<i32>(p.x, p.y, min(p.z + 1, NZ - 1)))];
-    f = vel * face(a0, a1, a2, a3, vel, tv);
-    if (p.z < NZ) { let pm = p - sh(2, 1); f -= 0.5 * (D(kind, p) + D(kind, pm)) * (F[o + ix(NC, p)] - F[o + ix(NC, pm)]) / DZ; }
+    f = vel * face(gh(o, 2, p + sh(2, -2), lo, hi, phin), gh(o, 2, p + sh(2, -1), lo, hi, phin), gh(o, 2, p, lo, hi, phin),
+                   gh(o, 2, p + sh(2, 1), lo, hi, phin), vel, tv) + qf;
+    if (p.z > 0 && p.z < NZ) { let pm = p - sh(2, 1); f -= 0.5 * (D(kind, p) + D(kind, pm)) * (F[o + ix(NC, p)] - F[o + ix(NC, pm)]) / DZ; }
   }
   return f;
 }
