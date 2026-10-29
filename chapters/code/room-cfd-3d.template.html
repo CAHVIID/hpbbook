@@ -636,6 +636,9 @@ function preview() {
   done = false; lastProg = null; hist = null; draw();
 }
 let running = false;
+// the first run waits for the Run button; after that, a changed input restarts the run
+let armed = false;
+const restart = () => { if (armed) start(); };
 async function start() {
   const id = ++runId; stopReq = false; done = false; running = true;
   if (!device) {
@@ -1050,7 +1053,7 @@ function draw() {
 function setSeg(id, key) {
   $(id).querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
     $(id).querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
-    state[key] = b.dataset.v; if (key === "field") { syncIso(); draw(); } else start();
+    state[key] = b.dataset.v; if (key === "field") { syncIso(); draw(); } else restart();
   }));
 }
 setSeg("turb", "turb"); setSeg("adv", "adv"); setSeg("fieldSel", "field");
@@ -1064,7 +1067,7 @@ for (const id of ["width", "wy", "lo", "hi", "tin", "ach", "troom", "hx", "hy", 
     if (id === "hi" && state.lo > state.hi - 0.2) { state.lo = Math.max(state.hi - 0.2, 0); $("lo").value = state.lo; }
     syncLabels(); preview();
   });
-  $(id).addEventListener("change", start);
+  $(id).addEventListener("change", restart);
 }
 for (const id of ["ycut", "zcut", "xcut"]) $(id).addEventListener("input", (e) => { state[id] = +e.target.value; if (id === "xcut") state.xcutCentred = false; syncLabels(); draw(); });
 // click in the plan: move the heat source there
@@ -1073,22 +1076,22 @@ $("plan").addEventListener("click", (e) => {
   const x = (e.clientX - r.left - 40) / sc, y = W - (e.clientY - r.top - 8) / sc;
   if (x < 0 || x > L || y < 0 || y > W || layoutOn()) return;
   state.hx = Math.round(x * 10) / 10; state.hy = Math.round(y * 10) / 10; state.heatCentred = false;
-  $("hx").value = state.hx; $("hy").value = state.hy; syncLabels(); start();
+  $("hx").value = state.hx; $("hy").value = state.hy; syncLabels(); preview(); restart();
 });
-$("mesh").addEventListener("change", (e) => { state.mesh = e.target.value.split(",").map(Number); syncLabels(); preview(); start(); });
+$("mesh").addEventListener("change", (e) => { state.mesh = e.target.value.split(",").map(Number); syncLabels(); preview(); restart(); });
 for (const id of ["L", "W", "H"]) {
   $(id).addEventListener("input", (e) => { state[id] = +e.target.value; applyDims(); syncLabels(); preview(); });
-  $(id).addEventListener("change", start);
+  $(id).addEventListener("change", restart);
 }
-$("preset").addEventListener("change", (e) => { state.preset = e.target.value; applyPreset(); applyDims(); syncLabels(); preview(); start(); });
+$("preset").addEventListener("change", (e) => { state.preset = e.target.value; applyPreset(); applyDims(); syncLabels(); preview(); restart(); });
 $("iso").addEventListener("input", (e) => { state.iso[state.field] = +e.target.value; $("isoV").textContent = fieldRange().fmt(state.iso[state.field]); draw(); });
 for (const id of ["showCuts", "showOZ"]) $(id).addEventListener("change", (e) => { state[id] = e.target.checked; draw(); });
 // layout
-$("useLayout").addEventListener("change", (e) => { state.useLayout = e.target.checked; syncLabels(); preview(); start(); });
-$("example").addEventListener("change", (e) => { loadExample(e.target.value); state.useLayout = true; $("useLayout").checked = true; syncLabels(); preview(); start(); });
+$("useLayout").addEventListener("change", (e) => { state.useLayout = e.target.checked; syncLabels(); preview(); restart(); });
+$("example").addEventListener("change", (e) => { loadExample(e.target.value); state.useLayout = true; $("useLayout").checked = true; syncLabels(); preview(); restart(); });
 let layoutTimer = 0;
 $("layoutText").addEventListener("input", () => { clearTimeout(layoutTimer); layoutTimer = setTimeout(() => { parseLayout(); syncLabels(); preview(); }, 300); });
-$("layoutText").addEventListener("change", () => { parseLayout(); syncLabels(); preview(); if (layoutOn()) start(); });
+$("layoutText").addEventListener("change", () => { parseLayout(); syncLabels(); preview(); if (layoutOn()) restart(); });
 $("openFile").addEventListener("click", () => $("fileIn").click());
 $("copySpec").addEventListener("click", async () => {
   const b = $("copySpec");
@@ -1099,11 +1102,11 @@ $("copySpec").addEventListener("click", async () => {
 $("fileIn").addEventListener("change", async (e) => {
   const file = e.target.files[0]; if (!file) return;
   $("layoutText").value = await file.text(); e.target.value = "";
-  parseLayout(); state.useLayout = true; $("useLayout").checked = true; syncLabels(); preview(); if (layoutOn()) start();
+  parseLayout(); state.useLayout = true; $("useLayout").checked = true; syncLabels(); preview(); if (layoutOn()) restart();
 });
 $("showMesh").addEventListener("click", (e) => { state.showMesh = !state.showMesh; e.currentTarget.setAttribute("aria-pressed", String(state.showMesh)); draw(); });
 for (const id of ["ozF", "ozW", "ozH"]) $(id).addEventListener("input", (e) => { state[id] = +e.target.value; syncLabels(); draw(); });
-$("run").addEventListener("click", start);
+$("run").addEventListener("click", () => { armed = true; start(); });
 $("stop").addEventListener("click", () => { stopReq = true; });
 window.addEventListener("resize", draw);
 applyDims(); loadExample("single"); syncLabels(); preview();
