@@ -363,7 +363,7 @@ Part of the loss is useful in the heating season, because the pipes run inside t
 
 ## Product links
 
-The links below lead to products that students can use for data sheets and prices in the assignment. They are examples, not recommendations, and prices and data change over time.
+The links below lead to products with data sheets and prices. They are examples, not recommendations, and prices and data change over time.
 
 - **Electric water heater:** [Metro Therm model 110 type 211 ECO, 98 L](https://www.lavprisvvs.dk/metro-therm-elvandvarmer-model-110-type-211-eco-98-liter-1000027724)
 - **Heat pump for space heating and hot water:** [air-to-water heat pumps, including monoblocks](https://www.lavprisvvs.dk/VVS-installationer-Varmeventilation-Varmepumper.html?Type=Luft%2Fvand) and [indoor units with hot water tank](https://www.lavprisvvs.dk/VVS-installationer-Varmeventilation-Varmepumper-Luft-vand-varmepumper.html?Produkt=Varmepumpe+indedel)

@@ -28,7 +28,7 @@ Source: DMI Rapport 25-14, *Dansk Referenceår 2025*, data in EPW format from <h
 
 Source: Machard et al. (2024), *Typical and extreme weather datasets for studying the resilience of buildings to climate change and heatwaves*, Scientific Data 11, 531, doi:10.1038/s41597-024-03319-8. Data at <https://www.wdc-climate.de/ui/entry?acronym=WDTF_Annex80_build_v1.0>.
 
-The heat-wave files are the original ones. They hold a few corrupt radiation hours, and the "longest" file has no solar radiation from 1 to 14 August (see the note in chapter D1). The scripts remove the corrupt hours when they read the files. A cleaned copy of the "most severe" file for IDA ICE is in `assignments/cooling/weather/`.
+The heat-wave files are the original ones. They hold a few corrupt radiation hours, and the "longest" file has no solar radiation from 1 to 14 August (see the note in chapter D1). The scripts remove the corrupt hours when they read the files.
 
 ## DRY 2011–2023 with summer 2018
 

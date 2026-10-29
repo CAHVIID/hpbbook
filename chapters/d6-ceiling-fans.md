@@ -181,12 +181,25 @@ valid for downward flow with at least 0.2 D between blades and ceiling. In a typ
 
 | Fan | Motor | $S_F$ (m/s) | $S_{O,avg}$ (m/s) | Cooling effect (°C) | Power (W) | CFE (°C per W) |
 | --- | --- | --- | --- | --- | --- | --- |
-| Westinghouse Contractor's Choice | AC | 1.47 | 0.78 | 3.5 | 65 | 0.05 |
 | Minka Aire Light Wave | AC | 1.57 | 0.83 | 3.6 | 67.5 | 0.05 |
 | Fanco Breeze AC 132 | AC | 1.83 | 0.97 | 3.9 | 45 | 0.09 |
-| Hunter Erling 52850 | DC | 1.76 | 0.93 | 3.8 | 23.6 | 0.16 |
-| CasaFan Eco Genuino 152 | DC | 1.41 | 0.85 | 3.7 | 16.6 | 0.22 |
-| CasaFan Eco Genuino 122 | DC | 1.58 | 0.77 | 3.5 | 11.3 | 0.31 |
 :::
 
-All six fans give 3.5 to 3.9 °C, but their CFE differs by a factor of six. Because the cooling effect levels off, extra airflow buys little cooling, so choose a fan by its power at the speed you need, not by its maximum airflow.
+Because the cooling effect levels off, extra airflow buys little cooling, so choose a fan by its power at the speed you need, not by its maximum airflow.
+
+(d6-fans-in-simulation)=
+## D6.6 Fans in a building simulation
+
+IDA ICE and similar tools calculate air and operative temperatures but treat the occupants as sitting in still air, so a ceiling fan only shows up as extra internal gain. Its comfort benefit has to be added afterwards, hour by hour, from the simulated temperatures. {download}`fan_comfort.py <code/fan_comfort.py>` does this for every zone of an unpacked IDA ICE model:
+
+1. It reads the air temperature $t_a$ and operative temperature $t_{op}$ from `TEMPERATURES.prn` and the relative humidity from `IAQ.prn`, and finds the mean radiant temperature $t_r = 2\,t_{op} - t_a$. The fan does not change $t_r$.
+2. It turns each fan speed into a room-average air speed with equations {eq}`eq-sf` and {eq}`eq-so-avg`.
+3. In occupied hours where PMV in still air is above 0.5, it runs the fan at the lowest speed that brings PMV down to 0.5, and charges the fan power only in those hours.
+4. It calculates SET in still air and with the fan, the cooling effect and PMV by the ASHRAE 55 elevated air speed method, and the CFE (equation {eq}`eq-cfe`) for each hour the fan runs.
+5. It reports the equivalent operative temperature $t_{op} - CE$ against the adaptive category II limit of EN 16798-1, the fan hours and energy, and the mean CFE for each zone.
+
+As in the worked example, the SET values matter only as a pair. The difference between the run in still air and the run with the fan gives the cooling effect, and the cooling effect is what changes the comparison with the comfort limit.
+
+## D6.7 The ceiling fan comfort app
+
+The method in section D6.6 is also available as an app that runs in the browser. Load `TEMPERATURES.prn` and `IAQ.prn` for each zone, enter the fan datasheet and the EPW file used in the simulation, and the app shows the hours the fan runs, the operative temperature with and without the fan against the EN 16798-1 limits, SET in still air and with the fan, the PMV distribution and the cooling fan efficiency. All hourly results can be exported as CSV. The app and how to use it are described in [Appendix F](#app-fan-comfort).

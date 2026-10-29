@@ -59,8 +59,6 @@ project:
           title: "Ceiling fans (obsolete)"
         #- file: chapters/d7-improvements.md
         #  title: "Improvements (ideas)"
-        #- file: assignments/cooling/cooling-assignment.md
-        #  title: "Assignment: Passive cooling (draft)"
     - title: "Part E: Prefabrication of type houses"
       children:
         - file: parts/part-e-prefabrication.md
@@ -76,6 +74,8 @@ project:
           title: "CFD model 2D (under revision)"
         - file: chapters/appendix-room-cfd-3d.md
           title: "CFD model 3D (under revision)"
+        - file: chapters/appendix-fan-comfort.md
+          title: "Ceiling fan comfort app (under revision)"
     #- file: improvements.md
 site:
   template: book-theme

@@ -1,0 +1,683 @@
+<title>Ceiling Fan Comfort</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600&display=swap">
+<style>
+/* Layout: an instrument panel. Inputs in a narrow left column, results and charts on the right; one column on phones. */
+:root {
+  --bg: #f4f6f7; --panel: #ffffff; --ink: #14202b; --muted: #5a6872; --line: #d5dde2; --soft: #e9eef1;
+  --warm: #d4602a; --fan: #1f6fc9; --limit: #3b4650; --ok: #1f8a5b; --bad: #b8402c;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --cond: "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f151a; --panel: #172028; --ink: #e3eaef; --muted: #96a5b0; --line: #2b3842; --soft: #1e2a33;
+  --warm: #f0834f; --fan: #5aa2f0; --limit: #b9c6cf; --ok: #4cc08c; --bad: #f07a63; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f151a; --panel: #172028; --ink: #e3eaef; --muted: #96a5b0; --line: #2b3842; --soft: #1e2a33;
+  --warm: #f0834f; --fan: #5aa2f0; --limit: #b9c6cf; --ok: #4cc08c; --bad: #f07a63; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1440px; margin: 0 auto; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header h1 { font-family: var(--cond); font-weight: 600; font-size: 26px; letter-spacing: .01em; margin: 0; text-wrap: balance; }
+header p { margin: 4px 0 0; color: var(--muted); max-width: 75ch; }
+details.about { margin-top: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; max-width: 90ch; }
+details.about summary { cursor: pointer; padding: 9px 14px; font-weight: 600; }
+details.about .body { padding: 0 14px 12px; display: grid; gap: 4px; }
+details.about h3 { margin: 10px 0 2px; }
+details.about p, details.about li { margin: 0; color: var(--ink); max-width: 80ch; }
+details.about ol, details.about ul { margin: 0; padding-left: 20px; display: grid; gap: 3px; }
+.eq { font-family: var(--mono); font-size: 13px; }
+.grid { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 20px; margin-top: 18px; align-items: start; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px; min-width: 0; }
+.stack { display: grid; gap: 14px; min-width: 0; }
+h2 { font-family: var(--cond); font-weight: 600; font-size: 15px; text-transform: uppercase; letter-spacing: .06em; margin: 0 0 10px; color: var(--muted); }
+h3 { font-size: 14px; font-weight: 600; margin: 0 0 6px; }
+label { display: grid; gap: 3px; font-size: 12px; color: var(--muted); }
+input, select { font: 13px var(--mono); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 5px 6px; min-width: 0; width: 100%; box-sizing: border-box; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--fan); outline-offset: 1px; }
+.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; }
+.row + .row, .row + h3, .sub + .row { margin-top: 8px; }
+.sub { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--soft); }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 4px 6px; text-align: right; border-bottom: 1px solid var(--soft); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-weight: 500; color: var(--muted); font-size: 12px; }
+td { font-family: var(--mono); font-size: 13px; }
+#zoneTable td:first-child { font-family: var(--sans); }
+#zoneTable td.ind { padding-left: 20px; color: var(--muted); }
+.range select { width: auto; }
+.speeds td { padding: 2px 3px; } .speeds input { padding: 3px 4px; }
+.tablewrap { overflow-x: auto; }
+button { font: 500 13px var(--sans); border-radius: 4px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 6px 10px; cursor: pointer; }
+button.primary { background: var(--fan); border-color: var(--fan); color: #fff; }
+button.link { border: none; background: none; color: var(--fan); padding: 2px 0; }
+button:disabled { opacity: .5; cursor: default; }
+.zone { border: 1px solid var(--line); border-radius: 5px; padding: 10px; display: grid; gap: 8px; }
+.zone + .zone { margin-top: 10px; }
+.zone .head { display: flex; gap: 8px; align-items: end; }
+.zone .head label { flex: 1; }
+.drop { border: 1px dashed var(--line); border-radius: 4px; padding: 8px; font-size: 12px; color: var(--muted); text-align: center; cursor: pointer; }
+.drop.over { border-color: var(--fan); color: var(--fan); }
+.files { font: 12px var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.files b { color: var(--ink); font-weight: 500; }
+.note { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+.badge { display: inline-block; font: 600 11px var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; background: var(--soft); color: var(--muted); }
+.badge.example { background: color-mix(in srgb, var(--warm) 18%, transparent); color: var(--warm); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.toolbar .spacer { flex: 1; }
+.status { font-size: 12px; color: var(--muted); }
+.status.err { color: var(--bad); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.card { border: 1px solid var(--line); border-radius: 5px; padding: 10px; display: grid; gap: 2px; }
+.card .k { font-size: 12px; color: var(--muted); }
+.card .v { font: 500 22px var(--mono); }
+.card .v small { font-size: 13px; color: var(--muted); }
+.card .d { font-size: 12px; font-family: var(--mono); }
+.down { color: var(--ok); } .up { color: var(--bad); }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.chartbox { position: relative; height: 300px; }
+.chartbox.small { height: 240px; }
+.charts2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr)); gap: 14px; }
+.range { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.range input[type=range] { width: 220px; padding: 0; }
+textarea { width: 100%; box-sizing: border-box; height: 90px; font: 11px var(--mono); background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+<header>
+  <h1>Ceiling Fan Comfort</h1>
+  <p>Adds a ceiling fan to an IDA ICE simulation, hour by hour. Load the TEMPERATURES.prn and IAQ.prn files of each zone, enter the fan datasheet, and the app finds when the fan runs, the SET and cooling effect, PMV by the ASHRAE 55 elevated air speed method, the cooling fan efficiency and the fan energy. Method as in chapter D6 and <span style="font-family:var(--mono)">fan_comfort.py</span>.</p>
+  <details class="about" id="about">
+    <summary>About this app and the thermal comfort background</summary>
+    <div class="body">
+      <h3>What the app does</h3>
+      <p>IDA ICE treats occupants as sitting in still air, so a ceiling fan only appears as extra heat. The app adds the comfort benefit afterwards, for every hour and zone:</p>
+      <ol>
+        <li>It reads the air temperature t<sub>a</sub> and operative temperature t<sub>op</sub> from TEMPERATURES.prn and the relative humidity from IAQ.prn. The mean radiant temperature is <span class="eq">t<sub>r</sub> = 2 t<sub>op</sub> − t<sub>a</sub></span>; the fan does not change it.</li>
+        <li>It turns each fan speed into a room-average air speed for seated people: <span class="eq">S<sub>F</sub> = 4Q/(πD²)</span>, then S<sub>O,avg</sub> from the Raftery et al. (2019) regression on D, room width R and ceiling height C.</li>
+        <li>In occupied hours where PMV in still air is above the start value, it runs the fan at the slowest speed that brings PMV down to the target. Fan power is counted only in those hours.</li>
+        <li>For each hour it calculates SET with and without the fan, the cooling effect, PMV with the fan and the cooling fan efficiency, and compares the equivalent operative temperature <span class="eq">t<sub>op</sub> − CE</span> with the EN 16798-1 limits.</li>
+      </ol>
+      <h3>Thermal comfort background</h3>
+      <ul>
+        <li><b>PMV</b> (Fanger, ISO 7730) predicts the mean thermal vote on the scale −3 cold to +3 hot from air and radiant temperature, air speed, humidity, activity and clothing. It was fitted to still-air tests and underestimates the cooling from air speed above about 0.2 m/s.</li>
+        <li><b>SET</b> (standard effective temperature) comes from Gagge's two-node model of core and skin. It is the temperature of a standard still-air room where a person would have the same skin temperature and skin wettedness as in the real room. Only the difference between two SET values matters here.</li>
+        <li><b>Cooling effect</b> (ASHRAE 55) is how much the air and radiant temperature must drop in still air to give the same SET as the room with the fan. PMV with the fan is then calculated in still air at those lowered temperatures. At 28 °C, 0.5 m/s gives about 2.8 K.</li>
+        <li><b>Cooling fan efficiency</b> (ASHRAE 216): <span class="eq">CFE = CE / P<sub>fan</sub></span>, in K per W. Low speeds usually give the highest CFE.</li>
+        <li><b>Adaptive model</b> (EN 16798-1) applies to homes without mechanical cooling, where people open windows and adjust clothing. The comfort temperature is <span class="eq">θ<sub>c</sub> = 0.33 θ<sub>rm</sub> + 18.8</span>, where θ<sub>rm</sub> is the running mean outdoor temperature. The categories run I: −3/+2 K, II: −4/+3 K, III: −5/+4 K around θ<sub>c</sub>, for θ<sub>rm</sub> from 10 to 30 °C. Below 10 °C the ordinary limits for living spaces apply: I 21–25.5, II 20–26, III 18–27 °C. With a fan, the app compares the equivalent operative temperature with these limits.</li>
+      </ul>
+      <p class="note">Details and the worked example are in chapter D6 of the course book.</p>
+    </div>
+  </details>
+</header>
+
+<div class="grid">
+<!-- ============ INPUTS ============ -->
+<div class="stack">
+  <section class="panel">
+    <h2>Fan datasheet</h2>
+    <div class="row">
+      <label>Fan name<input id="fanName" value="Fanco Breeze AC 132"></label>
+      <label>Diameter D (m)<input id="fanD" type="number" step="0.01" value="1.32"></label>
+    </div>
+    <div class="tablewrap" style="margin-top:8px">
+      <table class="speeds"><thead><tr><th>Speed</th><th>Airflow (m³/h)</th><th>Power (W)</th><th></th></tr></thead>
+      <tbody id="speedRows"></tbody></table>
+    </div>
+    <button class="link" id="addSpeed">+ Add speed</button>
+    <p class="note">List the speeds from slowest to fastest. The app picks the slowest speed that is enough.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Occupant and control</h2>
+    <div class="row">
+      <label>Metabolic rate (met)<input id="met" type="number" step="0.1" value="1.2"></label>
+      <label>Still air (m/s)<input id="vStill" type="number" step="0.05" value="0.1" disabled></label>
+    </div>
+    <div class="row">
+      <label>Clothing, warm (clo)<input id="cloWarm" type="number" step="0.1" value="0.5"></label>
+      <label>Clothing, cool (clo)<input id="cloCool" type="number" step="0.1" value="0.7"></label>
+      <label>Clothing switch (°C)<input id="cloSwitch" type="number" step="0.5" value="24"></label>
+    </div>
+    <div class="row">
+      <label>Fan on above PMV<input id="pmvOn" type="number" step="0.1" value="0.5"></label>
+      <label>Target PMV<input id="pmvTarget" type="number" step="0.1" value="0.5"></label>
+    </div>
+    <div class="sub">
+      <h3>Period</h3>
+      <div class="row">
+        <label>From (day-month)<input id="pFrom" value="1-6"></label>
+        <label>To (day-month)<input id="pTo" value="31-8"></label>
+      </div>
+    </div>
+    <div class="sub">
+      <h3>Weather file for the adaptive limit</h3>
+      <div class="drop" id="epwDrop" tabindex="0">Drop the EPW file used in IDA ICE, or click to choose</div>
+      <input type="file" id="epwFile" accept=".epw" hidden>
+      <div class="files" id="epwName"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Zones</h2>
+    <div class="row">
+      <label>Air temperature column<input id="colTdb" type="number" min="1" value="1"></label>
+      <label>Operative temp. column<input id="colTop" type="number" min="1" value="2"></label>
+      <label>RH column in IAQ.prn<input id="colRh" type="number" min="1" value="2"></label>
+    </div>
+    <p class="note">Columns counted from 0, where column 0 is the time in hours. Check the header line of one .prn file in a text editor.</p>
+    <div id="zones" style="margin-top:10px"></div>
+    <div class="toolbar" style="margin-top:10px">
+      <button id="addZone">+ Add zone</button>
+      <button id="loadExample">Load example data</button>
+    </div>
+  </section>
+</div>
+
+<!-- ============ RESULTS ============ -->
+<div class="stack">
+  <section class="panel">
+    <div class="toolbar">
+      <button class="primary" id="run">Calculate</button>
+      <span class="status" id="status"></span>
+      <span class="spacer"></span>
+      <span id="dataBadge"></span>
+      <button id="dlCsv" disabled>Download CSV</button>
+      <button id="cpCsv" disabled>Copy CSV</button>
+    </div>
+    <p class="note" id="csvNote">The CSV holds every hourly series for all zones. If Download does nothing in this viewer, use Copy CSV and paste into a text file.</p>
+    <textarea id="csvFallback" hidden readonly></textarea>
+  </section>
+
+  <section class="panel">
+    <h2>Fan at the reference condition</h2>
+    <div class="tablewrap"><table id="fanTable"></table></div>
+    <p class="note" id="fanRef"></p>
+  </section>
+
+  <section class="panel">
+    <h2>Zones</h2>
+    <div class="tablewrap"><table id="zoneTable"></table></div>
+  </section>
+
+  <section class="panel">
+    <div class="toolbar" style="margin-bottom:10px">
+      <div class="tabs" id="zoneTabs"></div>
+    </div>
+    <div class="cards" id="cards"></div>
+    <div class="sub">
+      <div class="toolbar">
+        <h3 style="margin:0">Operative temperature, with and without the fan</h3>
+        <span class="spacer"></span>
+        <div class="range"><span id="winLabel"></span>
+          <select id="winLen"><option value="7">1 week</option><option value="14">2 weeks</option><option value="0">Whole period</option></select>
+          <input type="range" id="winStart" min="0" max="0" value="0" aria-label="Start of the shown period"></div>
+      </div>
+      <div class="chartbox"><canvas id="cTemp"></canvas></div>
+      <p class="note">Equivalent operative temperature = t<sub>op</sub> − cooling effect. Shaded: hours the fan runs.</p>
+    </div>
+    <div class="sub">
+      <h3>SET in still air and with the fan</h3>
+      <div class="chartbox small"><canvas id="cSet"></canvas></div>
+    </div>
+    <div class="sub charts2">
+      <div><h3>PMV in occupied hours</h3><div class="chartbox small"><canvas id="cPmv"></canvas></div></div>
+      <div><div class="toolbar"><h3 style="margin:0">Operative temperature in occupied hours</h3><span class="spacer"></span>
+        <select id="tMode" aria-label="Intervals" style="width:auto"><option value="cat">EN 16798-1 categories</option><option value="bins">1 K intervals</option></select></div>
+        <div class="chartbox small"><canvas id="cCat"></canvas></div>
+        <p class="note" id="catNote"></p></div>
+      <div><h3>Cooling effect and CFE against t<sub>op</sub></h3><div class="chartbox small"><canvas id="cCe"></canvas></div></div>
+    </div>
+  </section>
+</div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+/*MODEL*/
+
+// ---------------------------------------------------------------- state
+const $ = (id) => document.getElementById(id);
+const REF = { tdb: 28, tr: 28, rh: 50, met: 1.2, clo: 0.5 };
+const BEDROOM = [22, 23, 0, 1, 2, 3, 4, 5, 6];
+const LIVING = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+const OCC = { bedroom: BEDROOM, living: LIVING, always: [...Array(24).keys()] };
+let speeds = [{ name: "low", q: 5625, p: 15 }, { name: "high", q: 9030, p: 45 }];
+let zones = [];
+let outdoor = null, outdoorName = "", isExample = false;
+let results = null, current = 0, charts = {};
+
+// ---------------------------------------------------------------- fan speeds UI
+function drawSpeeds() {
+  $("speedRows").innerHTML = speeds.map((s, i) => `<tr>
+    <td><input id="sn${i}" value="${s.name}"></td>
+    <td><input id="sq${i}" type="number" value="${s.q}"></td>
+    <td><input id="sp${i}" type="number" step="0.1" value="${s.p}"></td>
+    <td>${speeds.length > 1 ? `<button class="link" data-del="${i}" aria-label="Remove speed">×</button>` : ""}</td></tr>`).join("");
+  speeds.forEach((s, i) => {
+    $("sn" + i).oninput = (e) => (s.name = e.target.value);
+    $("sq" + i).oninput = (e) => (s.q = +e.target.value);
+    $("sp" + i).oninput = (e) => (s.p = +e.target.value);
+  });
+  $("speedRows").querySelectorAll("[data-del]").forEach((b) => (b.onclick = () => { speeds.splice(+b.dataset.del, 1); drawSpeeds(); }));
+}
+$("addSpeed").onclick = () => { const l = speeds[speeds.length - 1]; speeds.push({ name: "speed " + (speeds.length + 1), q: Math.round(l.q * 1.3), p: Math.round(l.p * 2) }); drawSpeeds(); };
+
+// ---------------------------------------------------------------- zones UI
+let zoneId = 0;
+function newZone(name, R, C, occ) { return { id: zoneId++, name, R, C, occ, temp: null, iaq: null, tempName: "", iaqName: "" }; }
+function drawZones() {
+  $("zones").innerHTML = zones.map((z) => `<div class="zone">
+    <div class="head"><label>Zone<input id="zn${z.id}" value="${z.name}"></label>
+      <button class="link" data-rm="${z.id}">Remove</button></div>
+    <div class="row">
+      <label>Room width R (m)<input id="zr${z.id}" type="number" step="0.1" value="${z.R}"></label>
+      <label>Ceiling height C (m)<input id="zc${z.id}" type="number" step="0.1" value="${z.C}"></label>
+      <label>Occupied<select id="zo${z.id}">
+        <option value="bedroom"${z.occ === "bedroom" ? " selected" : ""}>Bedroom 22–07</option>
+        <option value="living"${z.occ === "living" ? " selected" : ""}>Living 07–22</option>
+        <option value="always"${z.occ === "always" ? " selected" : ""}>All hours</option></select></label>
+    </div>
+    <div class="drop" id="zd${z.id}" tabindex="0">Drop TEMPERATURES.prn and IAQ.prn, or click to choose</div>
+    <input type="file" id="zf${z.id}" accept=".prn,.txt,.csv" multiple hidden>
+    <div class="files">${z.tempName ? `<b>${z.tempName}</b> ${z.temp.length} rows` : "No TEMPERATURES.prn yet"} · ${z.iaqName ? `<b>${z.iaqName}</b>` : "no IAQ.prn (50 % RH used)"}</div>
+  </div>`).join("");
+  zones.forEach((z) => {
+    $("zn" + z.id).oninput = (e) => { z.name = e.target.value; };
+    $("zr" + z.id).oninput = (e) => { z.R = +e.target.value; };
+    $("zc" + z.id).oninput = (e) => { z.C = +e.target.value; };
+    $("zo" + z.id).onchange = (e) => { z.occ = e.target.value; };
+    bindDrop($("zd" + z.id), $("zf" + z.id), (files) => readZoneFiles(z, files));
+  });
+  $("zones").querySelectorAll("[data-rm]").forEach((b) => (b.onclick = () => { zones = zones.filter((z) => z.id !== +b.dataset.rm); drawZones(); }));
+}
+$("addZone").onclick = () => { zones.push(newZone("zone " + (zones.length + 1), 4, 2.5, "living")); drawZones(); };
+
+function bindDrop(el, input, cb) {
+  el.onclick = () => input.click();
+  el.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } };
+  input.onchange = () => cb([...input.files]);
+  el.ondragover = (e) => { e.preventDefault(); el.classList.add("over"); };
+  el.ondragleave = () => el.classList.remove("over");
+  el.ondrop = (e) => { e.preventDefault(); el.classList.remove("over"); cb([...e.dataTransfer.files]); };
+}
+
+// Read a .prn file: numeric rows only, header lines skipped.
+function parsePrn(text) {
+  const rows = [];
+  for (const line of text.split(/\r?\n/)) {
+    const parts = line.trim().split(/\s+/);
+    if (!parts[0]) continue;
+    const nums = parts.map(Number);
+    if (nums.some((x) => Number.isNaN(x))) continue;
+    rows.push(nums);
+  }
+  return rows;
+}
+async function readZoneFiles(z, files) {
+  for (const f of files) {
+    const rows = parsePrn(await f.text());
+    if (/iaq/i.test(f.name)) { z.iaq = rows; z.iaqName = f.name; }
+    else { z.temp = rows; z.tempName = f.name; }
+  }
+  isExample = false; drawBadge(); drawZones();
+}
+bindDrop($("epwDrop"), $("epwFile"), async (files) => {
+  const f = files[0]; if (!f) return;
+  const lines = (await f.text()).split(/\r?\n/).slice(8).filter((l) => l.trim());
+  outdoor = lines.slice(0, 8760).map((l) => +l.split(",")[6]);
+  outdoorName = f.name; $("epwName").innerHTML = `<b>${f.name}</b> ${outdoor.length} hours`;
+});
+
+// ---------------------------------------------------------------- example data (synthetic)
+function loadExample() {
+  // A made-up warm summer: outdoor daily mean with a heat wave in late July, and two zones
+  // that follow it with a lag. For trying the app only: these are not IDA ICE results.
+  let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  outdoor = []; let walk = 0;
+  for (let d = 0; d < 365; d++) {
+    walk = 0.8 * walk + (rnd() - 0.5) * 3;
+    const season = 8 + 9 * Math.sin(2 * Math.PI * (d - 105) / 365);
+    const wave = 7 * Math.exp(-(((d - 205) / 5) ** 2));
+    for (let h = 0; h < 24; h++) outdoor.push(season + wave + walk + 4 * Math.sin(2 * Math.PI * (h - 9) / 24));
+  }
+  outdoorName = "example weather (synthetic)";
+  $("epwName").innerHTML = `<b>${outdoorName}</b>`;
+  const daily = []; for (let d = 0; d < 365; d++) daily.push(outdoor.slice(d * 24, d * 24 + 24).reduce((a, b) => a + b) / 24);
+  const mk = (off, amp) => {
+    const temp = [], iaq = []; let lag = daily[0];
+    for (let i = 0; i < 8760; i++) {
+      const d = Math.floor(i / 24); if (i % 24 === 0) lag = 0.6 * lag + 0.4 * daily[d];
+      const tdb = 22 + 0.6 * Math.max(lag - 12, 0) + amp * Math.sin(2 * Math.PI * ((i % 24) - 15) / 24) + off;
+      const top = tdb + 0.4 + 0.3 * Math.max(Math.sin(2 * Math.PI * ((i % 24) - 9) / 24), 0);
+      temp.push([i + 1, +tdb.toFixed(2), +top.toFixed(2)]);
+      iaq.push([i + 1, 600, Math.min(Math.max(0.55 - 0.01 * (tdb - 24), 0.3), 0.7)]);
+    }
+    return { temp, iaq };
+  };
+  zones = [newZone("bedroom", 3.5, 2.5, "bedroom"), newZone("living room", 4.5, 2.7, "living")];
+  [[0.3, 1.0], [1.3, 1.6]].forEach(([o, a], k) => { const e = mk(o, a); zones[k].temp = e.temp; zones[k].iaq = e.iaq; zones[k].tempName = "example TEMPERATURES"; zones[k].iaqName = "example IAQ"; });
+  $("colTdb").value = 1; $("colTop").value = 2; $("colRh").value = 2;
+  isExample = true; drawBadge(); drawZones();
+}
+$("loadExample").onclick = () => { loadExample(); run(); };
+function drawBadge() { $("dataBadge").innerHTML = isExample ? `<span class="badge example">Example data, synthetic</span>` : ""; }
+
+// ---------------------------------------------------------------- calculation
+function parseDM(s) { const [d, m] = s.split(/[-./]/).map(Number); return m * 100 + d; }
+function hourDate(h) { return new Date(Date.UTC(2001, 0, 1) + (h - 1) * 3600e3); }   // start of the hour
+function inPeriod(h, a, b) { const t = hourDate(h); const md = (t.getUTCMonth() + 1) * 100 + t.getUTCDate(); return a <= b ? md >= a && md <= b : md >= a || md <= b; }
+function adaptiveUpper(out) {
+  const daily = []; for (let d = 0; d < 365; d++) daily.push(out.slice(d * 24, d * 24 + 24).reduce((a, b) => a + b) / 24);
+  const trm = [daily.slice(-7).reduce((a, b) => a + b) / 7];
+  for (let d = 1; d < 365; d++) trm.push(0.2 * daily[d - 1] + 0.8 * trm[d - 1]);
+  return trm.map(bands);
+}
+// EN 16798-1 category limits of the operative temperature for one day, from the running mean
+// outdoor temperature: adaptive from 10 to 30 °C, ordinary limits for living spaces below 10 °C.
+function bands(trm) {
+  if (trm < 10) return { I: [21, 25.5], II: [20, 26], III: [18, 27] };
+  const tc = 0.33 * Math.min(trm, 30) + 18.8;
+  return { I: [tc - 3, tc + 2], II: [tc - 4, tc + 3], III: [tc - 5, tc + 4] };
+}
+const CAT_LABELS = ["Below III", "III, cool", "II, cool", "I", "II, warm", "III, warm", "Above III"];
+function category(t, b) {
+  if (t < b.III[0]) return 0;
+  if (t < b.II[0]) return 1;
+  if (t < b.I[0]) return 2;
+  if (t <= b.I[1]) return 3;
+  if (t <= b.II[1]) return 4;
+  if (t <= b.III[1]) return 5;
+  return 6;
+}
+const r1 = (x, n = 1) => (x == null || Number.isNaN(x) ? null : Math.round(x * 10 ** n) / 10 ** n);
+
+function settings() {
+  return {
+    D: +$("fanD").value, name: $("fanName").value, met: +$("met").value,
+    cloWarm: +$("cloWarm").value, cloCool: +$("cloCool").value, cloSwitch: +$("cloSwitch").value,
+    pmvOn: +$("pmvOn").value, pmvTarget: +$("pmvTarget").value,
+    from: parseDM($("pFrom").value), to: parseDM($("pTo").value),
+    cT: +$("colTdb").value, cO: +$("colTop").value, cR: +$("colRh").value,
+    speeds: speeds.filter((s) => s.q > 0 && s.p > 0).map((s) => ({ ...s })),
+  };
+}
+
+function fanTable(S, R, C) {
+  return S.speeds.map((s) => {
+    const a = airSpeed(s.q, S.D, R, C);
+    const ce = coolingEffect(REF.tdb, REF.tr, a.sO, REF.rh, REF.met, REF.clo);
+    return { ...s, sF: a.sF, sO: a.sO, ce, cfe: ce / s.p };
+  });
+}
+
+function runZone(z, S, limit) {
+  const byHour = new Map();
+  for (const r of z.temp) {
+    const t = r[0];
+    if (t <= 0 || Math.abs(t - Math.round(t)) > 1e-6) continue;          // whole hours only
+    byHour.set(Math.round(t), { tdb: r[S.cT], top: r[S.cO], rh: 50 });
+  }
+  if (z.iaq) for (const r of z.iaq) {
+    const t = Math.round(r[0]); const row = byHour.get(t);
+    if (row && Math.abs(r[0] - t) < 1e-6) { const v = r[S.cR]; row.rh = v <= 1.5 ? v * 100 : v; }
+  }
+  const occ = OCC[z.occ];
+  const spd = S.speeds.map((s) => ({ ...s, v: airSpeed(s.q, S.D, z.R, z.C).sO }));
+  const rows = [];
+  for (const [h, x] of [...byHour.entries()].sort((a, b) => a[0] - b[0])) {
+    if (h < 1 || h > 8760 || !inPeriod(h, S.from, S.to)) continue;
+    if (!Number.isFinite(x.tdb) || !Number.isFinite(x.top)) continue;
+    const tr = 2 * x.top - x.tdb;
+    const clo = x.top > S.cloSwitch ? S.cloWarm : S.cloCool;
+    const occupied = occ.includes((h - 1) % 24);
+    const setStill = setCE(x.tdb, tr, 0.1, x.rh, S.met, clo);
+    const pmvStill = pmvFanger(x.tdb, tr, 0.1, x.rh, S.met, clo);
+    const o = { h, tdb: x.tdb, top: x.top, rh: x.rh, tr, clo, occupied, setStill, pmvStill,
+      speed: "off", v: 0.1, P: 0, pmvFan: pmvStill, setFan: setStill, ce: 0, topEq: x.top, cfe: null,
+      band: limit ? limit[Math.floor((h - 1) / 24)] : null, limit: null };
+    if (o.band) o.limit = o.band.II[1];
+    if (occupied && pmvStill > S.pmvOn) {
+      for (let k = 0; k < spd.length; k++) {
+        const r = pmvAshrae(x.tdb, tr, spd[k].v, x.rh, S.met, clo);
+        if (r.pmv <= S.pmvTarget || k === spd.length - 1) {
+          o.speed = spd[k].name; o.v = spd[k].v; o.P = spd[k].p; o.pmvFan = r.pmv;
+          o.ce = coolingEffect(x.tdb, tr, spd[k].v, x.rh, S.met, clo);
+          o.setFan = setCE(x.tdb, tr, spd[k].v, x.rh, S.met, clo);
+          o.topEq = x.top - o.ce; o.cfe = o.ce / o.P;
+          break;
+        }
+      }
+    }
+    rows.push(o);
+  }
+  const on = rows.filter((r) => r.speed !== "off"), oc = rows.filter((r) => r.occupied);
+  const mean = (a) => (a.length ? a.reduce((s, x) => s + x, 0) / a.length : null);
+  const max = (a) => (a.length ? Math.max(...a) : null);
+  const sum = {
+    zone: z.name, hours: rows.length, occupied: oc.length, fanH: on.length,
+    perSpeed: Object.fromEntries(S.speeds.map((s) => [s.name, on.filter((r) => r.speed === s.name).length])),
+    kWh: on.reduce((s, r) => s + r.P, 0) / 1000, meanCE: mean(on.map((r) => r.ce)), meanCFE: mean(on.map((r) => r.cfe)),
+    maxSetStill: max(oc.map((r) => r.setStill)), maxSetFan: max(oc.map((r) => r.setFan)),
+    maxTop: max(oc.map((r) => r.top)), maxTopEq: max(oc.map((r) => r.topEq)),
+    aboveNo: limit ? oc.filter((r) => r.top > r.limit).length : null,
+    aboveFan: limit ? oc.filter((r) => r.topEq > r.limit).length : null,
+  };
+  return { rows, sum };
+}
+
+async function run() {
+  const S = settings();
+  const ready = zones.filter((z) => z.temp && z.temp.length);
+  if (!S.speeds.length) return status("Enter at least one fan speed with airflow and power.", true);
+  if (!ready.length) return status("Load TEMPERATURES.prn for at least one zone, or load the example data.", true);
+  const width = Math.max(...ready.map((z) => z.temp[0]?.length || 0));
+  if (Math.max(S.cT, S.cO) >= width) return status(`The TEMPERATURES.prn file has ${width} columns (0 to ${width - 1}). Check the column numbers.`, true);
+  $("run").disabled = true;
+  const limit = outdoor && outdoor.length >= 8760 ? adaptiveUpper(outdoor) : null;
+  const out = [];
+  for (const z of ready) {
+    status(`Calculating ${z.name} …`);
+    await new Promise((r) => setTimeout(r, 15));
+    try { out.push(runZone(z, S, limit)); }
+    catch (e) { $("run").disabled = false; return status(`${z.name}: ${e.message}`, true); }
+  }
+  const empty = out.find((o) => !o.rows.length);
+  $("run").disabled = false;
+  if (empty) return status(`${empty.sum.zone}: no hours inside the period. Check the period and the file.`, true);
+  results = { S, zones: out, fan: fanTable(S, ready[0].R, ready[0].C), fanRoom: ready[0], limit: !!limit };
+  current = Math.min(current, out.length - 1);
+  status(`Done: ${out.length} zone${out.length > 1 ? "s" : ""}, ${out[0].rows.length} hours each.`);
+  $("dlCsv").disabled = $("cpCsv").disabled = false;
+  drawResults();
+}
+$("run").onclick = run;
+function status(msg, err) { $("status").textContent = msg; $("status").className = "status" + (err ? " err" : ""); }
+
+// ---------------------------------------------------------------- results
+const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function fmt(x, n = 1) { return x == null ? "–" : x.toFixed(n); }
+
+function drawResults() {
+  const R = results, S = R.S;
+  $("fanTable").innerHTML = `<thead><tr><th>Speed</th><th>Airflow m³/h</th><th>Power W</th><th>S<sub>F</sub> m/s</th><th>S<sub>O,avg</sub> m/s</th><th>Cooling effect K</th><th>CFE K/W</th></tr></thead><tbody>` +
+    R.fan.map((f) => `<tr><td>${f.name}</td><td>${f.q}</td><td>${fmt(f.p, 1)}</td><td>${fmt(f.sF, 2)}</td><td>${fmt(f.sO, 2)}</td><td>${fmt(f.ce, 2)}</td><td>${fmt(f.cfe, 3)}</td></tr>`).join("") + "</tbody>";
+  $("fanRef").textContent = `${S.name}, D = ${S.D} m, in ${R.fanRoom.name} (R = ${R.fanRoom.R} m, C = ${R.fanRoom.C} m), at ${REF.tdb} °C, ${REF.rh} % RH, ${REF.met} met, ${REF.clo} clo.`;
+
+  const sp = S.speeds.map((s) => s.name);
+  const rowsDef = [
+    ["Hours in period", (s) => s.hours, 0], ["Occupied hours", (s) => s.occupied, 0], ["Fan hours", (s) => s.fanH, 0],
+    ...sp.map((n) => [`  at ${n}`, (s) => s.perSpeed[n], 0]),
+    ["Fan energy, kWh", (s) => s.kWh, 2], ["Mean cooling effect, K", (s) => s.meanCE, 2], ["Mean CFE, K/W", (s) => s.meanCFE, 3],
+    ["Max SET, still air, °C", (s) => s.maxSetStill, 1], ["Max SET, with fan, °C", (s) => s.maxSetFan, 1],
+    ["Max t<sub>op</sub>, °C", (s) => s.maxTop, 1], ["Max equivalent t<sub>op</sub>, °C", (s) => s.maxTopEq, 1],
+    ...(R.limit ? [["Hours above cat. II, no fan", (s) => s.aboveNo, 0], ["Hours above cat. II, with fan", (s) => s.aboveFan, 0]] : []),
+  ];
+  $("zoneTable").innerHTML = `<thead><tr><th></th>${R.zones.map((z) => `<th>${z.sum.zone}</th>`).join("")}</tr></thead><tbody>` +
+    rowsDef.map(([lab, f, n]) => `<tr><td${lab.startsWith("  ") ? ' class="ind"' : ""}>${lab.trim()}</td>${R.zones.map((z) => `<td>${fmt(f(z.sum), n)}</td>`).join("")}</tr>`).join("") + "</tbody>";
+
+  $("zoneTabs").innerHTML = R.zones.map((z, i) => `<button aria-pressed="${i === current}" data-z="${i}">${z.sum.zone}</button>`).join("");
+  $("zoneTabs").querySelectorAll("button").forEach((b) => (b.onclick = () => { current = +b.dataset.z; drawResults(); }));
+  drawZone();
+}
+
+function drawZone() {
+  const R = results, z = R.zones[current], s = z.sum;
+  const cards = [
+    ["Fan hours", `${s.fanH} <small>h</small>`, `of ${s.occupied} occupied`, ""],
+    ["Fan energy", `${fmt(s.kWh, 1)} <small>kWh</small>`, `${sumTxt(s.perSpeed)}`, ""],
+    ["Mean cooling effect", `${fmt(s.meanCE, 1)} <small>K</small>`, `CFE ${fmt(s.meanCFE, 2)} K/W`, ""],
+    ["Max SET", `${fmt(s.maxSetFan, 1)} <small>°C</small>`, `${fmt(s.maxSetStill, 1)} °C without fan`, "down"],
+  ];
+  if (R.limit) cards.push(["Hours above cat. II", `${s.aboveFan} <small>h</small>`, `${s.aboveNo} h without fan`, s.aboveFan < s.aboveNo ? "down" : ""]);
+  $("cards").innerHTML = cards.map(([k, v, d, c]) => `<div class="card"><span class="k">${k}</span><span class="v">${v}</span><span class="d ${c}">${d}</span></div>`).join("");
+  const n = z.rows.length;
+  $("winStart").max = Math.max(0, Math.ceil(n / 24) - 1);
+  let iMax = 0; z.rows.forEach((r, i) => { if (r.top > z.rows[iMax].top) iMax = i; });
+  $("winStart").value = Math.max(0, Math.floor(iMax / 24) - 3);
+  drawCharts();
+}
+function sumTxt(o) { return Object.entries(o).map(([k, v]) => `${v} h ${k}`).join(", "); }
+
+function window_() {
+  const z = results.zones[current], days = +$("winLen").value;
+  if (!days) return z.rows;
+  const nd = Math.ceil(z.rows.length / 24);
+  const start = Math.min(+$("winStart").value, Math.max(0, nd - days));
+  return z.rows.slice(start * 24, (start + days) * 24);
+}
+const dLab = (h) => { const t = hourDate(h); return `${t.getUTCDate()}/${t.getUTCMonth() + 1} ${String(t.getUTCHours()).padStart(2, "0")}h`; };
+
+function baseOpts(yTitle) {
+  const ink = css("--muted"), grid = css("--soft");
+  return {
+    responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: "index", intersect: false },
+    plugins: { legend: { labels: { color: ink, boxWidth: 14, font: { family: "IBM Plex Sans" } } },
+      tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${typeof c.parsed.y === "number" ? c.parsed.y.toFixed(2) : c.parsed.y}` } } },
+    scales: {
+      x: { ticks: { color: ink, maxTicksLimit: 8, maxRotation: 0, font: { family: "IBM Plex Mono", size: 11 } }, grid: { color: grid } },
+      y: { title: { display: true, text: yTitle, color: ink }, ticks: { color: ink, font: { family: "IBM Plex Mono", size: 11 } }, grid: { color: grid } },
+    },
+  };
+}
+function mkChart(id, cfg) {
+  Chart.defaults.font.family = css("--sans"); if (charts[id]) charts[id].destroy(); charts[id] = new Chart($(id), cfg); }
+
+function drawCharts() {
+  if (typeof Chart === "undefined") return status("The chart library could not load (no internet?). The tables above are complete.", true);
+  const rows = window_(), labels = rows.map((r) => dLab(r.h));
+  const warm = css("--warm"), fan = css("--fan"), lim = css("--limit"), soft = css("--soft");
+  const days = +$("winLen").value;
+  $("winStart").disabled = !days;
+  $("winLabel").textContent = rows.length ? `${dLab(rows[0].h).split(" ")[0]} to ${dLab(rows[rows.length - 1].h).split(" ")[0]}` : "";
+  const thin = rows.length > 1000;
+  const fanBand = rows.map((r) => (r.speed !== "off" ? 1 : null));
+  const ds = [
+    { label: "t_op, no fan", data: rows.map((r) => r.top), borderColor: warm, backgroundColor: warm, borderWidth: thin ? 1 : 1.6, pointRadius: 0 },
+    { label: "Equivalent t_op, with fan", data: rows.map((r) => r.topEq), borderColor: fan, backgroundColor: fan, borderWidth: thin ? 1 : 1.6, pointRadius: 0 },
+  ];
+  if (results.limit) ds.push({ label: "Adaptive cat. II upper limit", data: rows.map((r) => r.limit), borderColor: lim, backgroundColor: lim, borderDash: [5, 4], borderWidth: 1.2, pointRadius: 0 });
+  ds.push({ label: "Fan running", data: fanBand, yAxisID: "y2", type: "bar", backgroundColor: soft, borderWidth: 0, barPercentage: 1, categoryPercentage: 1, order: 10 });
+  const o1 = baseOpts("°C");
+  o1.scales.y2 = { display: false, min: 0, max: 1 };
+  o1.plugins.tooltip.filter = (c) => c.dataset.yAxisID !== "y2";
+  mkChart("cTemp", { type: "line", data: { labels, datasets: ds }, options: o1 });
+
+  mkChart("cSet", { type: "line", data: { labels, datasets: [
+    { label: "SET, still air", data: rows.map((r) => r.setStill), borderColor: warm, backgroundColor: warm, borderWidth: thin ? 1 : 1.6, pointRadius: 0 },
+    { label: "SET, with fan", data: rows.map((r) => r.setFan), borderColor: fan, backgroundColor: fan, borderWidth: thin ? 1 : 1.6, pointRadius: 0 },
+  ] }, options: baseOpts("SET, °C") });
+
+  // PMV histogram, occupied hours of the whole period
+  const all = results.zones[current].rows.filter((r) => r.occupied);
+  const bins = [-Infinity, -1.5, -1, -0.5, 0.5, 1, 1.5, Infinity];
+  const labs = ["< −1.5", "−1.5…−1", "−1…−0.5", "−0.5…0.5", "0.5…1", "1…1.5", "> 1.5"];
+  const hist = (k) => labs.map((_, i) => all.filter((r) => r[k] > bins[i] && r[k] <= bins[i + 1]).length);
+  const o3 = baseOpts("hours"); o3.interaction = { mode: "index", intersect: false };
+  o3.scales.x.ticks.autoSkip = false;
+  mkChart("cPmv", { type: "bar", data: { labels: labs, datasets: [
+    { label: "No fan", data: hist("pmvStill"), backgroundColor: warm },
+    { label: "With fan", data: hist("pmvFan"), backgroundColor: fan },
+  ] }, options: o3 });
+
+  // Share of occupied hours in comfort categories or 1 K intervals: t_op without fan, equivalent t_op with fan
+  const useCat = $("tMode").value === "cat" && results.limit;
+  $("tMode").querySelector('[value="cat"]').disabled = !results.limit;
+  if (!results.limit) $("tMode").value = "bins";
+  let tl, tc;
+  if (useCat) {
+    tl = CAT_LABELS;
+    tc = (k) => { const n = Array(7).fill(0); all.forEach((r) => n[category(r[k], r.band)]++); return n; };
+    $("catNote").textContent = "Adaptive limits from the running mean outdoor temperature (EN 16798-1); below 10 °C the ordinary limits for living spaces. With fan: equivalent t_op.";
+  } else {
+    const ts = all.flatMap((r) => [r.top, r.topEq]);
+    const lo = Math.floor(Math.min(...ts)), hi = Math.ceil(Math.max(...ts));
+    const a = Math.max(lo, 20), b = Math.min(Math.max(hi, a + 2), 34);
+    const edges = []; for (let t = a; t <= b; t++) edges.push(t);
+    tl = [`< ${a}`, ...edges.slice(0, -1).map((t) => `${t}–${t + 1}`), `≥ ${b}`];
+    tc = (k) => tl.map((_, i) => all.filter((r) => (i === 0 ? r[k] < a : i === tl.length - 1 ? r[k] >= b : r[k] >= edges[i - 1] && r[k] < edges[i])).length);
+    $("catNote").textContent = results.limit ? "With fan: equivalent t_op = t_op − cooling effect." : "Load the EPW file to see the EN 16798-1 categories. With fan: equivalent t_op.";
+  }
+  const pct = (a) => a.map((n) => (all.length ? (100 * n) / all.length : 0));
+  const o5 = baseOpts("% of occupied hours");
+  o5.scales.x.ticks.autoSkip = false; o5.scales.x.ticks.maxRotation = 40;
+  o5.plugins.tooltip.callbacks.label = (c) => `${c.dataset.label}: ${c.parsed.y.toFixed(1)} % (${Math.round((c.parsed.y * all.length) / 100)} h)`;
+  mkChart("cCat", { type: "bar", data: { labels: tl, datasets: [
+    { label: "No fan (t_op)", data: pct(tc("top")), backgroundColor: warm },
+    { label: "With fan (equivalent t_op)", data: pct(tc("topEq")), backgroundColor: fan },
+  ] }, options: o5 });
+
+  const on = results.zones[current].rows.filter((r) => r.speed !== "off");
+  const o4 = baseOpts("Cooling effect, K");
+  o4.scales.x = { type: "linear", title: { display: true, text: "t_op, °C", color: css("--muted") }, ticks: { color: css("--muted") }, grid: { color: soft } };
+  o4.scales.y2 = { position: "right", title: { display: true, text: "CFE, K/W", color: css("--muted") }, ticks: { color: css("--muted") }, grid: { display: false } };
+  o4.interaction = { mode: "nearest", intersect: true };
+  o4.plugins.tooltip.callbacks.label = (c) => `${c.dataset.label}: ${c.parsed.y.toFixed(2)} at t_op ${c.parsed.x.toFixed(1)} °C`;
+  mkChart("cCe", { type: "scatter", data: { datasets: [
+    { label: "Cooling effect", data: on.map((r) => ({ x: r.top, y: r.ce })), backgroundColor: fan, pointRadius: 2 },
+    { label: "CFE", data: on.map((r) => ({ x: r.top, y: r.cfe })), backgroundColor: warm, pointRadius: 2, yAxisID: "y2" },
+  ] }, options: o4 });
+}
+$("winLen").onchange = () => results && drawCharts();
+$("tMode").onchange = () => results && drawCharts();
+$("winStart").oninput = () => results && drawCharts();
+
+// ---------------------------------------------------------------- CSV
+function csv() {
+  const head = ["zone", "hour_of_year", "date", "hour_start", "tdb", "top", "rh", "tr", "clo", "occupied", "SET_still", "pmv_still", "speed", "v", "P_W", "pmv_fan", "SET_fan", "CE", "top_eq", "CFE", "adaptive_cat2_upper"];
+  const lines = [head.join(",")];
+  for (const z of results.zones) for (const r of z.rows) {
+    const t = hourDate(r.h);
+    lines.push([`"${z.sum.zone}"`, r.h, `${t.getUTCFullYear()}-${String(t.getUTCMonth() + 1).padStart(2, "0")}-${String(t.getUTCDate()).padStart(2, "0")}`, t.getUTCHours(),
+      r1(r.tdb, 3), r1(r.top, 3), r1(r.rh, 2), r1(r.tr, 3), r.clo, r.occupied ? 1 : 0, r1(r.setStill, 2), r1(r.pmvStill, 3),
+      r.speed, r1(r.v, 3), r.P, r1(r.pmvFan, 3), r1(r.setFan, 2), r1(r.ce, 3), r1(r.topEq, 3), r.cfe == null ? "" : r1(r.cfe, 4), r.limit == null ? "" : r1(r.limit, 2)].join(","));
+  }
+  return lines.join("\n");
+}
+let downloadsCap = null;
+if (window.claude?.use) window.claude.use("downloads").then((d) => { downloadsCap = d; }).catch(() => {});
+$("dlCsv").onclick = async () => {
+  if (downloadsCap) {
+    try { await downloadsCap.save({ filename: "fan_comfort_hourly.csv", data: csv() }); return; }
+    catch (e) { if (e?.code === "declined" || e?.code === "rate_limited") return; }
+  }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv()], { type: "text/csv" }));
+  a.download = "fan_comfort_hourly.csv"; document.body.appendChild(a); a.click(); a.remove();
+};
+$("cpCsv").onclick = async () => {
+  const text = csv();
+  try { await navigator.clipboard.writeText(text); status("CSV copied. Paste it into a text file and save it as .csv."); }
+  catch { const t = $("csvFallback"); t.hidden = false; t.value = text; t.focus(); t.select(); status("Select all in the box below and copy it."); }
+};
+
+// ---------------------------------------------------------------- start
+drawSpeeds();
+loadExample();
+run();
+</script>
