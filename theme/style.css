@@ -11,7 +11,7 @@
   --hpb-b: #43aa8b; /* Part B  Ventilation     sea green */
   --hpb-c: #f3722c; /* Part C  Heating + DHW   orange */
   --hpb-d: #277da1; /* Part D  Cooling         blue */
-  --hpb-e: #90be6d; /* Part E  Prefabrication  leaf green */
+  --hpb-e: #f6d04d; /* Part E  Prefabrication  DTU yellow */
   --hpb-x: #8a9aa5; /* Appendices              grey */
   --hpb-part: var(--hpb-ink);
   --hpb-part-name: '';
@@ -65,6 +65,10 @@
   --myst-color-warning-bg: color-mix(in srgb, #f6d04d 10%, transparent);
   --myst-color-warning-text: #f6d04d;
 }
+
+/* Yellow is too light for text, so Part E uses more ink in its text shade */
+:root:has(.myst-toc-item-exact[href*='/e']),
+:root:has(.myst-toc-item-exact[href*='/part-e']) { --hpb-text: color-mix(in srgb, var(--hpb-part) 40%, var(--hpb-ink)); }
 
 body { font-family: 'Source Sans 3', Arial, sans-serif; }
 
