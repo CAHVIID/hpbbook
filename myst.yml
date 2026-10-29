@@ -59,8 +59,6 @@ project:
           title: "Ceiling fans (obsolete)"
         #- file: chapters/d7-improvements.md
         #  title: "Improvements (ideas)"
-        #- file: assignments/cooling/cooling-assignment.md
-        #  title: "Assignment: Passive cooling (draft)"
     - title: "Part E: Prefabrication of type houses"
       children:
         - file: parts/part-e-prefabrication.md

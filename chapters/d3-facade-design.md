@@ -105,7 +105,7 @@ $$ (eq-d3-selectivity)
 
 increases. Clear triple glazing has $S \approx 1.4$–$1.5$. Solar-control coatings reach $S \approx 2$, which is close to the theoretical limit: a glazing that transmits all visible light and blocks all infrared radiation still transmits about half of the solar energy.
 
-```{list-table} Triple glazings for the assignment (centre-of-glass values).
+```{list-table} Triple glazings (centre-of-glass values).
 :header-rows: 1
 :name: tab-d3-glazing
 
