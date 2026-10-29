@@ -24,7 +24,7 @@ The model exists in three versions that give the same results:
 The 3D room CFD app with a window 1.2 m wide, 0.9–2.1 m high, 16 °C supply air and 6 air changes per hour, on the coarse mesh a few seconds into a run. The heat source stands in the middle of the room.
 :::
 
-A run simulates 30 minutes and averages the last 10. Before a run the section and the plan show the empty room with the window, the exhaust and the heat source. During a run they show the instantaneous field while the simulation runs and the time-averaged field when it finishes. Two sliders move the section across the width and the plan up through the room; a dashed line in each view shows where the other one cuts, and two checkboxes hide these lines and the occupied zone. The slider beside the colour bar draws one isoline on both the section and the plan, for example the 0.15 m/s air speed or the 20 % draught rate; each of the three views keeps its own value. As in the 2D app, a chart shows the air speed, the ISO 7730 draught rate and the ASHRAE 55 ankle draught along the floor, here in the chosen section, and a second chart shows the convergence: the rates of change of velocity and temperature and the floor speed 1 m from the facade at the centre of the window.
+A run simulates 30 minutes and averages the last 10. Before a run the section and the plan show the empty room with the window, the exhaust and the heat source. During a run they show the instantaneous field while the simulation runs and the time-averaged field when it finishes. Three sliders move the long section across the width, the plan up through the room and the cross section (parallel to the facade) back through the room; a dashed line in each view shows where the other two cut, and two checkboxes hide these lines and the occupied zone. The slider beside the colour bar draws one isoline on all three views, for example the 0.15 m/s air speed or the 20 % draught rate; each of the three views keeps its own value. The draught panel shows the key results with three charts of the air speed and the ISO 7730 draught rate: along x at ankle height in the long section, along y at ankle height in the cross section (both also with the ASHRAE 55 ankle draught), and from floor to ceiling where the two sections cross. The occupied zone (by default 0.6 m from all walls and 1.8 m high) can be resized, and a button draws the mesh on the three views. A convergence chart at the bottom, next to the exhaust temperature and the energy imbalance, shows the rates of change of velocity and temperature and the floor speed 1 m from the facade at the centre of the window.
 
 The app is a single HTML file, {download}`room-cfd-3d.html <code/room-cfd-3d.html>`, with the solver inlined. Save it anywhere and double-click it to use it offline.
 
@@ -35,6 +35,22 @@ The room is by default 5 m deep (x), 4 m wide (y) and 2.5 m high (z), with the f
 $$
 \Phi = \rho \, c_p \, q_v \, (T_{room} - T_{supply})
 $$
+
+## Layout file: several heat sources and furniture
+
+Instead of the single heat source, a room can be furnished from a layout file, a plain text file with one box per line (see {download}`room-layout-office.csv <code/room-layout-office.csv>`):
+
+```text
+type, x0, x1, y0, y1, z0, z1, power_W
+furniture, 1.0, 1.8, 0.4, 1.8, 0.72, 0.72, 0   # desk (thin table top)
+heat, 2.0, 2.4, 0.9, 1.3, 0, 1.2, 100          # person, seated
+furniture, 4.4, 4.8, 0.0, 1.2, 0, 2.0, 0       # bookshelf (solid box)
+floor, 0.2, 1.6, 0.8, 3.2, 0, 0, 300           # sun patch on the floor
+```
+
+The type is `heat` (a `HeatBlock`), `floor` (a `FloorFlux`; z is ignored) or `furniture`. Lines starting with `#` and the header are skipped. The same file is read by `read_layout` in Python and by the app, under Layout, which also has three examples: one heat source, a two-person office and a classroom. With a layout the heat gains are the sum of the powers in the file, and the well-mixed room temperature follows from them.
+
+Furniture is solid and adiabatic. A box takes the cells whose centres lie inside it: the faces of those cells are closed, so no air or heat passes, and the cells stay at the start temperature (grey in the app). A box must therefore be at least one cell thick. Furniture with zero size along one axis is a thin plate, such as a table top or a partition. It sits on the grid plane nearest to it and closes the cell faces in that plane, so it blocks the flow without taking up cells. On both sides of a plate, and on the faces of a box, the velocity parallel to the surface has no slip, with the log-law wall shear when k-ε is used.
 
 ## Equations and turbulence
 
@@ -64,12 +80,13 @@ $$
 | Walls, side walls, floor, ceiling | No slip, wall functions with k-ε | Zero gradient | Adiabatic | Zero flux for $k$, $\varepsilon$ from the wall function |
 | Supply opening (facade or back wall) | Velocity inlet, $U = q_v / A_{open}$ | Zero gradient | $T_{supply}$ | $Tu_{in} = 4$ %, length scale $0.1 \, h_{open}$ |
 | Exhaust (facade, back wall or ceiling) | Zero gradient | $p = 0$ | Zero gradient | Zero gradient |
+| Furniture (boxes and thin plates) | No slip, log-law shear with k-ε | Zero gradient | Adiabatic | Zero flux |
 
 The opening area $A_{open}$ counts the cell faces whose centres lie inside the opening, so an opening must cover at least one cell face in both directions.
 
 ## Verification
 
-**Python, Numba and WebGPU.** On the same case room_cfd_3d.py and room_cfd_3d_numba.py agree to about $10^{-13}$. The WebGPU version agrees with the Numba version to about $10^{-6}$ of the range of each field after 30 s of simulated time, which is the precision of single-precision arithmetic.
+**Python, Numba and WebGPU.** On the same case room_cfd_3d.py and room_cfd_3d_numba.py agree to about $10^{-13}$. The WebGPU version agrees with the Numba version to about $10^{-6}$ of the range of each field after 30 s of simulated time, which is the precision of single-precision arithmetic. The same holds with furniture: on a case with two heat sources, two thin plates and a box, Numba agrees with Python to $10^{-13}$ and WebGPU to about $10^{-5}$ of the range.
 
 **2D and 3D.** With a window across the full width the 3D flow is close to two-dimensional, and the 3D model gives the same highest floor speed as the 2D model on the same x-z grid (0.235 m/s for both).
 
@@ -124,6 +141,10 @@ c.heat = [HeatBlock(2.3, 2.7, 0.0, c.W, 0.0, 1.2, 1.2 * 1005 * c.q * (26 - c.T_i
 res = run(c, verbose=True)
 print(occupied_zone(res))        # floor speed and where, DR, TS, PPD_AD and the ankle speed limit
 plot_slices(res, y=2.0, z=0.1, path="slices.png")
+
+from room_cfd_3d import read_layout
+lay = read_layout("room-layout-office.csv")   # dict with heat, floor_flux and furniture
+c.heat, c.floor_flux, c.furniture = lay["heat"], lay["floor_flux"], lay["furniture"]
 ```
 
 | `Case` field | Default | Meaning |
@@ -135,6 +156,7 @@ plot_slices(res, y=2.0, z=0.1, path="slices.png")
 | `inlet`, `outlet` | 0.1–0.3 m left, 2.2–2.4 m right | `Opening(side, start, end, y0, y1)`, side `"left"`, `"right"` or `"top"`; `y0`, `y1` = None for the full width |
 | `heat` | none | List of `HeatBlock(x0, x1, y0, y1, z0, z1, power)`, power in W |
 | `floor_flux` | none | List of `FloorFlux(x0, x1, y0, y1, power)`, power in W |
+| `furniture` | none | List of `Furniture(x0, x1, y0, y1, z0, z1)`; zero size along one axis = a thin plate |
 | `turbulence` | `"k-epsilon"` | or `"chen-xu"`, or `"constant"` with `nu_t` |
 | `advection` | `"tvd"` | or `"upwind"` |
 | `pressure`, `p_tol` | `"multigrid"`, $10^{-6}$ | or `"direct"` (small grids only) |
@@ -146,6 +168,7 @@ plot_slices(res, y=2.0, z=0.1, path="slices.png")
 
 - **Grid.** The default grid has 10 cm cells, twice the 2D default, and grids fine enough for grid-independent jets are out of reach on a laptop.
 - **Inlet only, no radiation, adiabatic walls, fixed $Tu$ in the comfort indices**, as in the 2D model.
+- **Furniture.** Boxes are made of whole cells and plates snap to the nearest grid plane, so furniture is only as accurate as the mesh. The k-ε wall functions for $k$ and $\varepsilon$ are applied at the room walls only, not at the furniture, and furniture neither stores nor conducts heat.
 - **Single precision on the GPU.** Enough for the flow, but the time-averaged fields from the app and from Python differ in the last digits, and more where the flow is unsteady.
 
 Use the model to compare openings, temperatures and airflows in a room, and to see where the 2D section is and is not enough. For design values, use a validated CFD code or measurements.
