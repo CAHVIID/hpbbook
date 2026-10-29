@@ -21,6 +21,13 @@ body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-
 .wrap { max-width: 1440px; margin: 0 auto; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 header h1 { font-family: var(--cond); font-weight: 600; font-size: 26px; letter-spacing: .01em; margin: 0; text-wrap: balance; }
 header p { margin: 4px 0 0; color: var(--muted); max-width: 75ch; }
+details.about { margin-top: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; max-width: 90ch; }
+details.about summary { cursor: pointer; padding: 9px 14px; font-weight: 600; }
+details.about .body { padding: 0 14px 12px; display: grid; gap: 4px; }
+details.about h3 { margin: 10px 0 2px; }
+details.about p, details.about li { margin: 0; color: var(--ink); max-width: 80ch; }
+details.about ol, details.about ul { margin: 0; padding-left: 20px; display: grid; gap: 3px; }
+.eq { font-family: var(--mono); font-size: 13px; }
 .grid { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 20px; margin-top: 18px; align-items: start; }
 @media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px; min-width: 0; }
@@ -84,6 +91,28 @@ textarea { width: 100%; box-sizing: border-box; height: 90px; font: 11px var(--m
 <header>
   <h1>Ceiling Fan Comfort</h1>
   <p>Adds a ceiling fan to an IDA ICE simulation, hour by hour. Load the TEMPERATURES.prn and IAQ.prn files of each zone, enter the fan datasheet, and the app finds when the fan runs, the SET and cooling effect, PMV by the ASHRAE 55 elevated air speed method, the cooling fan efficiency and the fan energy. Method as in chapter D6 and <span style="font-family:var(--mono)">fan_comfort.py</span>.</p>
+  <details class="about" id="about">
+    <summary>About this app and the thermal comfort background</summary>
+    <div class="body">
+      <h3>What the app does</h3>
+      <p>IDA ICE treats occupants as sitting in still air, so a ceiling fan only appears as extra heat. The app adds the comfort benefit afterwards, for every hour and zone:</p>
+      <ol>
+        <li>It reads the air temperature t<sub>a</sub> and operative temperature t<sub>op</sub> from TEMPERATURES.prn and the relative humidity from IAQ.prn. The mean radiant temperature is <span class="eq">t<sub>r</sub> = 2 t<sub>op</sub> − t<sub>a</sub></span>; the fan does not change it.</li>
+        <li>It turns each fan speed into a room-average air speed for seated people: <span class="eq">S<sub>F</sub> = 4Q/(πD²)</span>, then S<sub>O,avg</sub> from the Raftery et al. (2019) regression on D, room width R and ceiling height C.</li>
+        <li>In occupied hours where PMV in still air is above the start value, it runs the fan at the slowest speed that brings PMV down to the target. Fan power is counted only in those hours.</li>
+        <li>For each hour it calculates SET with and without the fan, the cooling effect, PMV with the fan and the cooling fan efficiency, and compares the equivalent operative temperature <span class="eq">t<sub>op</sub> − CE</span> with the EN 16798-1 limits.</li>
+      </ol>
+      <h3>Thermal comfort background</h3>
+      <ul>
+        <li><b>PMV</b> (Fanger, ISO 7730) predicts the mean thermal vote on the scale −3 cold to +3 hot from air and radiant temperature, air speed, humidity, activity and clothing. It was fitted to still-air tests and underestimates the cooling from air speed above about 0.2 m/s.</li>
+        <li><b>SET</b> (standard effective temperature) comes from Gagge's two-node model of core and skin. It is the temperature of a standard still-air room where a person would have the same skin temperature and skin wettedness as in the real room. Only the difference between two SET values matters here.</li>
+        <li><b>Cooling effect</b> (ASHRAE 55) is how much the air and radiant temperature must drop in still air to give the same SET as the room with the fan. PMV with the fan is then calculated in still air at those lowered temperatures. At 28 °C, 0.5 m/s gives about 2.8 K.</li>
+        <li><b>Cooling fan efficiency</b> (ASHRAE 216): <span class="eq">CFE = CE / P<sub>fan</sub></span>, in K per W. Low speeds usually give the highest CFE.</li>
+        <li><b>Adaptive model</b> (EN 16798-1) applies to homes without mechanical cooling, where people open windows and adjust clothing. The comfort temperature is <span class="eq">θ<sub>c</sub> = 0.33 θ<sub>rm</sub> + 18.8</span>, where θ<sub>rm</sub> is the running mean outdoor temperature. The categories run I: −3/+2 K, II: −4/+3 K, III: −5/+4 K around θ<sub>c</sub>, for θ<sub>rm</sub> from 10 to 30 °C. Below 10 °C the ordinary limits for living spaces apply: I 21–25.5, II 20–26, III 18–27 °C. With a fan, the app compares the equivalent operative temperature with these limits.</li>
+      </ul>
+      <p class="note">Details and the worked example are in chapter D6 of the course book.</p>
+    </div>
+  </details>
 </header>
 
 <div class="grid">
