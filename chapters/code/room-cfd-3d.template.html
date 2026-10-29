@@ -60,7 +60,7 @@ canvas { display: block; width: 100%; }
 .warn { border-left: 4px solid var(--bad); }
 .charts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
 @container app (max-width: 820px) { .charts { grid-template-columns: minmax(0, 1fr); } }
-.charts3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 12px; }
+.charts3 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 12px; }
 @container app (max-width: 820px) { .charts3 { grid-template-columns: minmax(0, 1fr); } }
 .charts3 h3, .conv h3 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
 .panel > h2 { margin: 0 0 10px; font-size: 15px; font-weight: 600; }
@@ -242,13 +242,12 @@ details { color: var(--muted); font-size: 13px; } details p { max-width: 80ch; }
       <div class="charts3">
         <div><h3 id="floorXTitle"></h3><canvas id="floorX" height="210" aria-label="Air speed and draught along x at ankle height"></canvas></div>
         <div><h3 id="floorYTitle"></h3><canvas id="floorY" height="210" aria-label="Air speed and draught along y at ankle height"></canvas></div>
-        <div><h3 id="floorZTitle"></h3><canvas id="floorZ" height="210" aria-label="Air speed and draught up through the room"></canvas></div>
       </div>
       <div class="legend">
         <span><i style="background:#2f7fd0"></i>Air speed (m/s, left)</span>
         <span><i style="background:#d9622b"></i>ISO 7730 DR (%, right)</span>
         <span><i style="background:#7b4bb7"></i>ASHRAE 55 ankle PPD<sub>AD</sub> (%, right)</span>
-        <span>Grey: outside the occupied zone. The two horizontal lines are at ankle height; the third runs from the floor to the ceiling where the x and y sections cross.</span>
+        <span>Grey: outside the occupied zone.</span>
       </div>
     </div>
     <div class="panel conv">
@@ -662,7 +661,7 @@ function chart(cv, xr, yl, yr, series, opts = {}) {
   g.strokeStyle = muted; g.strokeRect(pl, pt, w, h);
   g.fillStyle = muted; g.textAlign = "center"; g.fillText(opts.xlabel, pl + w / 2, Hc - 2);
 }
-// air speed and draught along a line of cells: along x (at y), along y (at x), or up through the room (at x, y)
+// air speed and draught at ankle height along a line of cells: along x (at y) or along y (at x)
 function drawFloor(oz) {
   const { nx, ny, nz, dx, dy, dz } = geo, Z = OZ();
   const i = Math.min(Math.floor(state.xcut / dx), nx - 1), j = Math.min(Math.floor(state.ycut / dy), ny - 1), k = Math.min(Math.floor(0.1 / dz), nz - 1);
@@ -685,8 +684,6 @@ function drawFloor(oz) {
       "x from the facade (m)", [[0, Z.x0], [Z.x1, L]], true);
   one("floorY", ny, dy, (a) => (i * ny + a) * nz + k, W, `Along y, at x = ${xc.toFixed(2)} m` + (outX ? " (outside the zone)" : ""),
       "y across the room (m)", [[0, Z.y0], [Z.y1, W]], true);
-  one("floorZ", nz, dz, (a) => (i * ny + j) * nz + a, H, `Up through the room, at x = ${xc.toFixed(2)}, y = ${yc.toFixed(2)} m`,
-      "z, height above the floor (m)", [[Z.z1, H]], false);
 }
 function drawConv() {
   if (!hist || hist.t.length < 2) return;
@@ -782,7 +779,7 @@ function draw() {
   if (f.preview) {
     $("readouts").innerHTML = ""; $("status").textContent = "Ready. Press Run to start.";
     $("readouts2").innerHTML = "";
-    for (const id of ["floorX", "floorY", "floorZ", "conv"]) { const [g, w, h] = sizeCanvas($(id), () => 1e9); g.clearRect(0, 0, w, h); }
+    for (const id of ["floorX", "floorY", "conv"]) { const [g, w, h] = sizeCanvas($(id), () => 1e9); g.clearRect(0, 0, w, h); }
     return;
   }
   const oz = occupied();
