@@ -629,7 +629,7 @@ function makeGeo(c) {
 }
 // before a run: the empty room with the window, the exhaust and the heat source at the well-mixed temperature
 function preview() {
-  if (running) return;
+  if (running) { runId++; running = false; }      // a changed input ends the current run; restart() begins a new one
   try { geo = makeGeo(makeCase()); } catch (e) { $("status").textContent = e.message; running = false; return; }
   const N = geo.nx * geo.ny * geo.nz, z = new Float32Array(N);
   f = { T: new Float32Array(N).fill(geo.Tmix), speed: z, uc: z, vc: z, wc: z, preview: true };
@@ -1090,7 +1090,7 @@ for (const id of ["showCuts", "showOZ"]) $(id).addEventListener("change", (e) =>
 $("useLayout").addEventListener("change", (e) => { state.useLayout = e.target.checked; syncLabels(); preview(); restart(); });
 $("example").addEventListener("change", (e) => { loadExample(e.target.value); state.useLayout = true; $("useLayout").checked = true; syncLabels(); preview(); restart(); });
 let layoutTimer = 0;
-$("layoutText").addEventListener("input", () => { clearTimeout(layoutTimer); layoutTimer = setTimeout(() => { parseLayout(); syncLabels(); preview(); }, 300); });
+$("layoutText").addEventListener("input", () => { clearTimeout(layoutTimer); layoutTimer = setTimeout(() => { parseLayout(); syncLabels(); preview(); if (layoutOn()) restart(); }, 600); });
 $("layoutText").addEventListener("change", () => { parseLayout(); syncLabels(); preview(); if (layoutOn()) restart(); });
 $("openFile").addEventListener("click", () => $("fileIn").click());
 $("copySpec").addEventListener("click", async () => {
