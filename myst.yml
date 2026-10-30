@@ -11,6 +11,9 @@ project:
     - file: index.md
     - file: chapters/01-intro.md
       title: "Intro (under revision)"
+      children:
+        - file: assignments/intro/training-exercise.md
+          title: "Training exercise: Energy analysis using IDA ICE"
     - title: "Part A: Compactness and envelope"
       children:
         #- file: parts/part-a-envelope.md
@@ -22,6 +25,8 @@ project:
         #  title: "Glazing (under revision)"
         #- file: chapters/a4-cost-of-conserved-energy.md
         #  title: "Cost of conserved energy (under revision)"
+        - file: assignments/envelope/envelope-assignment.md
+          title: "Assignment 1: Compactness and building envelope"
     - title: "Part B: Ventilation"
       children:
         - file: parts/part-b-ventilation.md
