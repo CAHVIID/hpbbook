@@ -67,6 +67,8 @@ project:
     - title: "Part E: Prefabrication of type houses"
       children:
         - file: parts/part-e-prefabrication.md
+        - file: chapters/e1-bathroom-pods.md
+          title: "Prefabricated bathroom pods (draft)"
     - title: "Appendices"
       children:
         #- file: chapters/appendix-heat-pumps.md
