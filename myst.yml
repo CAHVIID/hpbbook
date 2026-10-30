@@ -22,6 +22,8 @@ project:
         #  title: "Glazing (under revision)"
         #- file: chapters/a4-cost-of-conserved-energy.md
         #  title: "Cost of conserved energy (under revision)"
+        - file: assignments/envelope/envelope-assignment.md
+          title: "Assignment 1: Compactness and building envelope"
     - title: "Part B: Ventilation"
       children:
         - file: parts/part-b-ventilation.md
