@@ -12,7 +12,7 @@ On a sunny day in April or September, solar and internal gains can lift the temp
 
 A simulation study of new Finnish apartments in timber blocks completed in 2015–2018 found window opening to be the most effective single passive measure {cite:p}`sukanen2023`. Daytime or temperature-controlled opening kept the degree-hours above 27 °C within the Finnish limit in most climates, and together with external blinds it met the limit in every climate up to the 2050s. A lower g-value or a fixed overhang alone cut the degree-hours by only 26–36 %.
 
-> The solution is *not* to reduce insulation, as we need it to solve the winter situation, but to apply a sound cooling strategy for the summer situation and the shoulder seasons, where heating and cooling demand alternate within the same 24 h cycle.
+> The solution to overheating is *not* to reduce insulation, as we need it to reduce heating demand, but to apply a sensible cooling strategy for the peak summer situation and the shoulder seasons, where heating and cooling demand often alternate within the same 24 h cycle.
 
 ## D2.2 Overheating in residences
 
