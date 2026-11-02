@@ -78,19 +78,19 @@ project:
           title: "CFD model 3D (under revision)"
         - file: chapters/appendix-fan-comfort.md
           title: "Ceiling fan comfort app (under revision)"
-        - file: assignments/index.md
-          title: "Assignments"
-          children:
-            - file: assignments/intro/training-exercise.md
-              title: "Training exercise: Energy analysis using IDA ICE"
-            - file: assignments/envelope/envelope-assignment.md
-              title: "Assignment 1: Compactness and building envelope"
-            - file: assignments/heating/heating-part-a.md
-              title: "Assignment 3, Part A: Heating"
-            - file: assignments/heating/heating-part-b.md
-              title: "Assignment 3, Part B: Heating"
-            - file: assignments/cooling/cooling-assignment.md
-              title: "Assignment 4: Passive cooling"
+    - file: assignments/index.md
+      title: "Assignments (coming)"
+      children:
+        - file: assignments/intro/training-exercise.md
+          title: "Training exercise: Energy analysis using IDA ICE"
+        - file: assignments/envelope/envelope-assignment.md
+          title: "Assignment 1: Compactness and building envelope"
+        - file: assignments/heating/heating-part-a.md
+          title: "Assignment 3, Part A: Heating"
+        - file: assignments/heating/heating-part-b.md
+          title: "Assignment 3, Part B: Heating"
+        - file: assignments/cooling/cooling-assignment.md
+          title: "Assignment 4: Passive cooling"
     #- file: improvements.md
 site:
   template: book-theme
