@@ -30,6 +30,8 @@ Source: Machard et al. (2024), *Typical and extreme weather datasets for studyin
 
 The heat-wave files are the original ones. They hold a few corrupt radiation hours, and the "longest" file has no solar radiation from 1 to 14 August (see the note in chapter D1). The scripts remove the corrupt hours when they read the files.
 
+The `*_clean.epw` copies of the three heat-wave files are made by `../clean_annex80_hw.py`. It repairs the corrupt radiation hours (direct beam kept, diffuse = mean of the neighbouring hours) and, in the "most severe" file, the hour of 27 July 18:00 (20.8 °C with a dew point of −23.1 °C). The 1–14 August gap in the "longest" file is not repaired. The figure scripts still read the originals.
+
 ## DRY 2011–2023 with summer 2018
 
 | File | Content |
