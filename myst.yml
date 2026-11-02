@@ -11,12 +11,9 @@ project:
     - file: index.md
     - file: chapters/01-intro.md
       title: "Intro (under revision)"
-      children:
-        - file: assignments/intro/training-exercise.md
-          title: "Training exercise: Energy analysis using IDA ICE"
     - title: "Part A: Compactness and envelope"
       children:
-        #- file: parts/part-a-envelope.md
+        - file: parts/part-a-envelope.md
         #- file: chapters/a1-envelope.md
         #  title: "The building envelope (under revision)"
         #- file: chapters/a2-windows.md
@@ -25,8 +22,6 @@ project:
         #  title: "Glazing (under revision)"
         #- file: chapters/a4-cost-of-conserved-energy.md
         #  title: "Cost of conserved energy (under revision)"
-        - file: assignments/envelope/envelope-assignment.md
-          title: "Assignment 1: Compactness and building envelope"
     - title: "Part B: Ventilation"
       children:
         - file: parts/part-b-ventilation.md
@@ -83,6 +78,19 @@ project:
           title: "CFD model 3D (under revision)"
         - file: chapters/appendix-fan-comfort.md
           title: "Ceiling fan comfort app (under revision)"
+        - file: assignments/index.md
+          title: "Assignments"
+          children:
+            - file: assignments/intro/training-exercise.md
+              title: "Training exercise: Energy analysis using IDA ICE"
+            - file: assignments/envelope/envelope-assignment.md
+              title: "Assignment 1: Compactness and building envelope"
+            - file: assignments/heating/heating-part-a.md
+              title: "Assignment 3, Part A: Heating"
+            - file: assignments/heating/heating-part-b.md
+              title: "Assignment 3, Part B: Heating"
+            - file: assignments/cooling/cooling-assignment.md
+              title: "Assignment 4: Passive cooling"
     #- file: improvements.md
 site:
   template: book-theme
