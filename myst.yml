@@ -79,7 +79,7 @@ project:
         - file: chapters/appendix-fan-comfort.md
           title: "Ceiling fan comfort app (under revision)"
         - file: assignments/index.md
-          title: "Assignments"
+          title: "Assignments (coming soon)"
           children:
             - file: assignments/intro/training-exercise.md
               title: "Training exercise: Energy analysis using IDA ICE"
