@@ -98,3 +98,18 @@ figure figcaption { border-left: 2px solid var(--hpb-wash); padding-left: 0.8rem
 
 /* Table of contents: active page in the part colour */
 .myst-toc-item-exact { color: var(--hpb-text); font-weight: 600; }
+
+/* Text column: about 10 % wider than the theme default. Copies the theme's
+   grid for the large breakpoints with a wider body column (--hpb-col, theme
+   default 10ch) and shrinks the right margin by the same amount, so the text
+   stays clear of the menu and the Contents list. */
+:root { --hpb-col: 11.1ch; }
+@media (min-width: 1024px) {
+  .article-grid { grid-template-columns:[screen-start] .25rem [screen-inset-start page-start] 1rem [page-inset-start body-outset-start] 1fr [body-start gutter-left-start] 1rem [body-inset-start] minmax(8ch,var(--hpb-col)) [middle-start] minmax(8ch,var(--hpb-col)) [gutter-left-end] minmax(8ch,var(--hpb-col)) minmax(8ch,var(--hpb-col)) [gutter-right-start] minmax(8ch,var(--hpb-col)) [middle-end] minmax(8ch,var(--hpb-col)) [body-inset-end] 1rem [body-end gutter-right-end] 3rem [body-outset-end] minmax(4rem,calc(13rem - 6 * (var(--hpb-col) - 10ch))) [page-inset-end] 3rem [page-end] 1fr [screen-inset-end] .25rem [screen-end]; }
+}
+@media (min-width: 1280px) {
+  .article-grid { grid-template-columns:[screen-start] .25rem [screen-inset-start] 1fr [page-start] 3rem [page-inset-start] minmax(4rem,9rem) [body-outset-start] 3rem [body-start gutter-left-start] 1rem [body-inset-start] minmax(8ch,var(--hpb-col)) [middle-start] minmax(8ch,var(--hpb-col)) [gutter-left-end] minmax(8ch,var(--hpb-col)) minmax(8ch,var(--hpb-col)) [gutter-right-start] minmax(8ch,var(--hpb-col)) [middle-end] minmax(8ch,var(--hpb-col)) [body-inset-end] 1rem [body-end gutter-right-end] 3rem [body-outset-end] minmax(4rem,calc(13rem - 6 * (var(--hpb-col) - 10ch))) [page-inset-end] 3rem [page-end] 1fr [screen-inset-end] .25rem [screen-end]; }
+}
+@media (min-width: 1536px) {
+  .article-grid { grid-template-columns:[screen-start] .5rem [screen-inset-start] 1fr [page-start] 3rem [page-inset-start] minmax(4rem,9rem) [body-outset-start] 3rem [body-start gutter-left-start] 1rem [body-inset-start] minmax(8ch,var(--hpb-col)) [middle-start] minmax(8ch,var(--hpb-col)) [gutter-left-end] minmax(8ch,var(--hpb-col)) minmax(8ch,var(--hpb-col)) [gutter-right-start] minmax(8ch,var(--hpb-col)) [middle-end] minmax(8ch,var(--hpb-col)) [body-inset-end] 1rem [body-end gutter-right-end] 3rem [body-outset-end] minmax(4rem,calc(13rem - 6 * (var(--hpb-col) - 10ch))) [page-inset-end] 3rem [page-end] 1fr [screen-inset-end] .5rem [screen-end]; }
+}
