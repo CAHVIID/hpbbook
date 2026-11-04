@@ -198,7 +198,7 @@ where $A_\mathrm{sol}$ is the effective solar aperture of the house (m²), $I_\m
 
 $$T_\mathrm{bal,h} = T_\mathrm{heat} - \frac{\Phi_\mathrm{int}}{H}, \qquad T_\mathrm{bal,c} = T_\mathrm{cool} - \frac{\Phi_\mathrm{int}}{H}$$
 
-The annual heating need is $Q_\mathrm{h} = 24\, H \sum (T_\mathrm{bal,h} - T_\mathrm{eq})^+$ and the heat to remove $Q_\mathrm{c} = 24\, H \sum (T_\mathrm{eq} - T_\mathrm{bal,c})^+$, summed over daily mean values. {numref}`tab-teq-house` gives the reference low-energy house. Daily mean temperature and global radiation are taken from DMI's 10 km climate grid {cite:p}`dmi_climatedata`.
+The annual heating need is $Q_\mathrm{h} = 24\, H \sum (T_\mathrm{bal,h} - T_\mathrm{eq})^+$ and the heat to remove $Q_\mathrm{c} = 24\, H \sum (T_\mathrm{eq} - T_\mathrm{bal,c})^+$, summed over daily mean values. {numref}`tab-teq-house` gives the reference low-energy house. The climate data are measured daily values, not a reference year: daily mean air temperature and daily global radiation on DMI's 10 km climate grid {cite:p}`dmi_climatedata`, which DMI interpolates from its station measurements to 609 grid cells covering Denmark. The years used are 2011 and 2014–2023, the same period as the DRY 2011–2023; the grid has no radiation values for 2012 and 2013. Each cell is the mean of these eleven years.
 
 ```{list-table} Reference low-energy house for the equivalent temperature maps.
 :name: tab-teq-house
