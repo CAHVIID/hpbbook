@@ -188,6 +188,50 @@ Two alternatives are common:
 - **PET**, the Physiological Equivalent Temperature {cite:p}`hoppe1999`, is built on the same idea as UTCI and uses the same inputs, but with an indoor reference environment and a simpler body model. Moderate heat stress starts at about 29 °C {cite:p}`matzarakis1999`.
 - **WBGT**, the wet-bulb globe temperature, is a weighted mean of the natural wet-bulb, globe and air temperatures. It is the index of occupational and sports heat limits. It needs measured wet-bulb and globe temperatures, so from a weather file it can only be estimated {cite:p}`bom_wbgt`.
 
+### Regional differences in heating and cooling need
+
+The DRY represents one station, Sjælsmark. Across Denmark the outdoor climate differs, and so does the energy balance of a building. In a well-insulated house the solar gains are the main cause of overheating, so they are added to the outdoor temperature as an equivalent outdoor temperature:
+
+$$T_\mathrm{eq} = T_\mathrm{out} + \frac{A_\mathrm{sol}\, I_\mathrm{glob}}{H}$$
+
+where $A_\mathrm{sol}$ is the effective solar aperture of the house (m²), $I_\mathrm{glob}$ the global horizontal radiation (W/m²) and $H$ the heat loss coefficient (W/K). The house needs heating when $T_\mathrm{eq}$ is below the heating balance temperature, and heat must be removed when $T_\mathrm{eq}$ is above the cooling balance temperature:
+
+$$T_\mathrm{bal,h} = T_\mathrm{heat} - \frac{\Phi_\mathrm{int}}{H}, \qquad T_\mathrm{bal,c} = T_\mathrm{cool} - \frac{\Phi_\mathrm{int}}{H}$$
+
+The annual heating need is $Q_\mathrm{h} = 24\, H \sum (T_\mathrm{bal,h} - T_\mathrm{eq})^+$ and the heat to remove $Q_\mathrm{c} = 24\, H \sum (T_\mathrm{eq} - T_\mathrm{bal,c})^+$, summed over daily mean values. {numref}`tab-teq-house` gives the reference low-energy house. The climate data are measured daily values, not a reference year: daily mean air temperature and daily global radiation on DMI's 10 km climate grid {cite:p}`dmi_climatedata`, 609 grid cells covering Denmark. The years used are 2011 and 2014–2023, the same period as the DRY 2011–2023; the grid has no radiation values for 2012 and 2013. Each cell is the mean of these eleven years.
+
+```{list-table} Reference low-energy house for the equivalent temperature maps.
+:name: tab-teq-house
+:header-rows: 1
+* - Parameter
+  - Value
+* - Heated floor area
+  - 150 m²
+* - Heat loss coefficient $H$
+  - 100 W/K
+* - Solar aperture $A_\mathrm{sol}$
+  - 6 m² (windows 22 % of floor area, g = 0.5)
+* - Internal gains $\Phi_\mathrm{int}$
+  - 5 W/m²
+* - Set points $T_\mathrm{heat}$ / $T_\mathrm{cool}$
+  - 20 °C / 26 °C
+* - Balance temperatures $T_\mathrm{bal,h}$ / $T_\mathrm{bal,c}$
+  - 12.5 °C / 18.5 °C
+```
+
+```{figure} figures/d1/regional-teq.*
+:name: fig-regional-teq
+:width: 100%
+
+(a) Heating need and (b) heat to remove for the reference low-energy house, from daily equivalent outdoor temperatures on DMI's 10 km climate grid, 2011 and 2014–2023 (the grid has no radiation for 2012–2013). Fixed $H$ all year, no solar shading and no venting. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/d1_regional_teq.py)
+```
+
+:::{admonition} Take-aways
+:class: dropdown
+1. **Heating need varies by about ±15 %** across the country, from 14 to 18 kWh/m² per year for the same house.
+2. **The heat to remove exceeds the heating need** in a low-energy house without shading and venting: 19 to 27 kWh/m² per year.
+:::
+
 <!-- :::{admonition} Rules of thumb
 :class: tip
 - Use the current DRY for energy-frame compliance and for sizing heating.
