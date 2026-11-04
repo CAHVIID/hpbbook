@@ -370,6 +370,8 @@ The summer of 2026 gave similar numbers in western Europe. All three are provisi
 
 % REVIEW: the three 2026 figures above are provisional agency estimates, not journal publications. France (Santé publique France, 22 July 2026) is all-cause excess mortality; England (UKHSA interim report, 30 July 2026) is modelled heat-associated deaths; Spain is the MoMo estimate of Instituto de Salud Carlos III as reported by Meteored, a secondary source. Final figures are expected late 2026 (France, Spain) and early 2027 (England).
 
+DMI counts a heat wave (hedebølge) when the maximum temperature, averaged over three consecutive days, exceeds 28 °C, and a warm spell (varmebølge) when it exceeds 25 °C. For RCP8.5 at the end of the century (2071–2100), DMI expects the heat-wave days in Denmark to rise from about 2 to 9 per year, and the warm-spell days from about 9 to 30 per year, compared with 1981–2010 {cite:p}`dmi_klimaatlas2021`.
+
 A reference year is assembled from typical months, so it contains no real heat wave. The Annex 80 project therefore produced separate heat-wave years.
 
 They are the three years of 2041–2060 with the longest, the most intense (hottest) and the most severe (longest and hottest combined) heat wave. {numref}`tab-heat-waves` compares them with the typical years.
