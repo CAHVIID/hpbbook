@@ -9,6 +9,15 @@ This page collects loose ideas for future versions of the course and the book. T
 Next year the façade design part may include circadian light. Melanopic EDI (equivalent daylight illuminance, CIE S 026:2018) weights light by its effect on the body clock and is measured vertically at eye level. The consensus target is at least 250 lx in the daytime {cite:p}`brown2022`. Students would size windows and choose glazing so the occupied zone reaches this target, alongside sDA300 and cooling demand. Solar-control glazing that shifts the colour of the light lowers melanopic EDI more than its light transmittance suggests.
 
 
+## Danish heat-wave years with the Annex 80 method
+
+Chapter D1 uses the Annex 80 heat-wave years for Copenhagen, which are RCP8.5, and DMI publishes no heat-wave years. DMI Rapport 25-14 says its reference years are not suited for extreme events and recommends long time series instead. Next year it could be interesting to create heat-wave years for RCP4.5, the scenario of the DMI reference years, with the published Annex 80 code (github.com/LBNL-ETA/annex80-heat-wave-epw, BSD-3). The steps:
+- EURO-CORDEX MPI-ESM-LR/REMO data for Copenhagen, bias-adjusted against DMI observations 2001–2020.
+- Typical years by the Finkelstein–Schafer method.
+- Heat waves by the Ouzeau et al. (2016) thresholds.
+
+The model data must come from ESGF or the Copernicus Climate Data Store, which need an account.
+
 
 # D7 Improvements: ideas for cooling
 
