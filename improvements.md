@@ -22,7 +22,7 @@ The model data must come from ESGF or the Copernicus Climate Data Store, which n
 
 The figure of the heat island against urban area in D1.5 (fig-uhi-map, panel b) is fitted to four Danish cities only, with the intensities of Sørup et al. (2026): the mean night-time heat island on the 3 % warmest days. Two improvements for next year:
 
-**Check the Oke relation against the original paper.** The reference is Oke (1973), "City size and the urban heat island", Atmospheric Environment 7, 769–779 (not 1970). Under calm, clear skies, Oke found the maximum heat island to grow with the logarithm of the population, with separate lines for North American and European settlements. He also gave a form with wind speed, ΔT ∝ P^0.25 / u^0.5. Secondary sources quote different coefficients for the log lines, and none of these is checked against the paper yet:
+**Check the Oke relation against the original paper.** The reference is Oke (1973), "City size and the urban heat island", Atmospheric Environment 7, 769–779 (not 1970). Under calm, clear skies, Oke found the maximum heat island to grow with the logarithm of the population, with separate lines for North American and European settlements. He also gave a form with wind speed, ΔT = P^0.25 / (4.04 u^0.56), from settlements in Quebec. Secondary sources quote different coefficients for the log lines, and none of these is checked against the paper yet:
 - North America: 2.96 log P − 6.41, or 3.06 log P − 6.79 (attributed to Oke 1976)
 - Europe: 2.01 log P − 4.06 (attributed to Oke 1973 and to Landsberg 1981)
 
