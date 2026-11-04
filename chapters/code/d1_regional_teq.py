@@ -24,7 +24,7 @@ YEARS = [2011] + list(range(2014, 2024))
 
 # Reference low-energy house (single-family)
 A_FLOOR = 150.0          # m2 heated floor area
-H = 100.0                # W/K, transmission ~85 + ventilation with heat recovery and infiltration ~15
+H = 50.0                 # W/K, about 10 kWh/m2 space heating
 A_SOL = 6.0              # m2, effective solar aperture relative to global horizontal radiation:
                          # 33 m2 windows (22 % of floor) x 0.7 glass x 0.5 g x 0.9 shading/dirt x 0.6 vertical/horizontal
 PHI_INT = 5.0 * A_FLOOR  # W, internal gains 5 W/m2

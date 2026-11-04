@@ -190,7 +190,7 @@ Two alternatives are common:
 
 ### Regional differences in heating and cooling need
 
-The DRY represents one station, Sjælsmark. Across Denmark the outdoor climate differs, and so does the energy balance of a building. Heating and cooling degree days based on air temperature alone miss the solar gains, which in a well-insulated house are the main cause of overheating. The solar gains are therefore added to the outdoor temperature as an equivalent outdoor temperature:
+The DRY represents one station, Sjælsmark. Across Denmark the outdoor climate differs, and so does the energy balance of a building. In a well-insulated house the solar gains are the main cause of overheating, so they are added to the outdoor temperature as an equivalent outdoor temperature:
 
 $$T_\mathrm{eq} = T_\mathrm{out} + \frac{A_\mathrm{sol}\, I_\mathrm{glob}}{H}$$
 
@@ -198,7 +198,7 @@ where $A_\mathrm{sol}$ is the effective solar aperture of the house (m²), $I_\m
 
 $$T_\mathrm{bal,h} = T_\mathrm{heat} - \frac{\Phi_\mathrm{int}}{H}, \qquad T_\mathrm{bal,c} = T_\mathrm{cool} - \frac{\Phi_\mathrm{int}}{H}$$
 
-The annual need follows from the degree days on $T_\mathrm{eq}$, for example $Q_\mathrm{h} = 24\, H \sum (T_\mathrm{bal,h} - T_\mathrm{eq})^+$ with daily values. {numref}`tab-teq-house` gives the reference low-energy house. Daily mean temperature and global radiation are taken from DMI's 10 km climate grid {cite:p}`dmi_climatedata`.
+The annual heating need is $Q_\mathrm{h} = 24\, H \sum (T_\mathrm{bal,h} - T_\mathrm{eq})^+$ and the heat to remove $Q_\mathrm{c} = 24\, H \sum (T_\mathrm{eq} - T_\mathrm{bal,c})^+$, summed over daily mean values. {numref}`tab-teq-house` gives the reference low-energy house. Daily mean temperature and global radiation are taken from DMI's 10 km climate grid {cite:p}`dmi_climatedata`.
 
 ```{list-table} Reference low-energy house for the equivalent temperature maps.
 :name: tab-teq-house
@@ -230,7 +230,6 @@ The annual need follows from the degree days on $T_\mathrm{eq}$, for example $Q_
 :class: dropdown
 1. **Heating need varies by about ±15 %** across the country, from 14 to 18 kWh/m² per year for the same house.
 2. **The heat to remove exceeds the heating need** in a low-energy house without shading and venting: 19 to 27 kWh/m² per year.
-3. **The sun drives the cooling need.** On air temperature alone the cooling degree days (base 18.5 °C) are about 35 Kd per year; on $T_\mathrm{eq}$ they are about 1,400 Kd.
 :::
 
 <!-- :::{admonition} Rules of thumb
