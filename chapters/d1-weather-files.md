@@ -534,6 +534,15 @@ Urban heat island intensity (°C) over the day in Copenhagen, Odense, Aarhus and
 ```
 
 
+Measured intensities exist only for the four largest cities. {numref}`fig-uhi-map` extends them to the rest of the country with the relation of {cite:t}`oke1973`, who found the heat island to grow with the logarithm of city size. Fitted to the four cities, it gives $\Delta T_\mathrm{UHI} \approx -1.67 + 1.14 \log_{10} A$, with $A$ the urban area in km². Towns smaller than about 30 km² then have no significant heat island, and the largest provincial towns 0.3–0.5 K.
+
+```{figure} figures/d1/uhi-map.*
+:name: fig-uhi-map
+:width: 100%
+
+(a) Night-time urban heat island on warm summer nights. Copenhagen, Aarhus, Odense and Aalborg are measured values {cite:p}`sorup2026`; the other towns are estimated from their urban area with the fit in (b). Urban areas from Natural Earth {cite:p}`naturalearth`, based on satellite land cover around 2002. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/d1_uhi_map.py)
+```
+
 %Wang et al. (2023), Urban Climate 49, 101531 (Stockholm) is a model sensitivity study and adds little here.
 
 The heat island acts exactly when night ventilation works. {numref}`fig-vc-uhi` colours every hour by the temperature difference available for ventilative cooling, $\Delta T = T_\mathrm{in} - T_\mathrm{out}$, with $T_\mathrm{in} = 24$ °C. The heat island is set to 2 K at night, the upper end of the Copenhagen averages.
