@@ -227,7 +227,7 @@ The annual heating need is $Q_\mathrm{h} = 24\, H \sum (T_\mathrm{bal,h} - T_\ma
 ```
 
 :::{admonition} Take-aways
-:class: dropdown
+%:class: dropdown
 1. **Heating need varies by about ±15 %** across the country, from 14 to 18 kWh/m² per year for the same house.
 2. **The heat to remove exceeds the heating need** in a low-energy house without shading and venting: 19 to 27 kWh/m² per year.
 :::
@@ -421,6 +421,43 @@ Simulations of Finnish apartment buildings without cooling show the result {cite
 
 The same heat wave moved to the climate of 2050 has 15 tropical nights and gives about 14,000 degree-hours above 27 °C, and the degree-hours above 32 °C, a health risk threshold, triple from about 1,000 to 3,000. Openable windows were the most effective passive measure, but only a cooling unit removed the overheating completely.
 
+
+### Urban heat islands
+
+The urban heat island intensity is the air temperature difference $\Delta T_\mathrm{UHI} = T_\mathrm{urban} - T_\mathrm{rural}$. It is mainly a night-time effect and peaks a few hours before sunrise on calm, clear summer nights. The causes:
+
+- **Heat storage:** brick, concrete and asphalt store solar heat during the day and release it at night.
+- **Low sky view factor:** street canyons see little of the cold night sky, so long-wave cooling is reduced.
+- **Little evaporation:** sealed surfaces drain rain away instead of evaporating it.
+- **Low wind speed:** buildings reduce convective cooling and mixing.
+- **Waste heat:** traffic, buildings and air-conditioning condensers.
+
+In Denmark the effect is modest but not negligible. {numref}`fig-uhi-denmark` shows it for the four largest Danish cities. On the 3 % warmest days of the year, Copenhagen is on average 1.5–2 K warmer than its rural surroundings at night, and on some nights close to 3 K. The difference almost disappears around 09:00. The other three cities stay at about 1 K {cite:p}`sorup2026`. In four Finnish cities the mean intensity is 0.5–1.2 K, peaking at about 1.5 K around 05:00 in Helsinki {cite:p}`taylor2025`.
+
+For comparison, a model study of 100 European cities at 100 m resolution for 2008–2017 finds an average heat island indicator of 1.43 °C. Green areas and unsealed soil already lower it by 0.45 °C on average, and more of both could lower it by about another 0.5 °C {cite:p}`lauwaet2024`.
+
+```{figure} figures/d1/urbansci-10-00171-g003.png
+:name: fig-uhi-denmark
+:width: 100%
+
+Urban heat island intensity (°C) over the day in Copenhagen, Odense, Aarhus and Aalborg, for the 3 % warmest days, summer, winter and the 3 % coldest days. Lines are the average and bands the spread, for a machine-learning downscaled temperature product (C4C, blue) and the DANRA reanalysis (orange). Reproduced unchanged from Figure 3 of Sørup et al. {cite:p}`sorup2026`, © the authors, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+```
+
+
+%Wang et al. (2023), Urban Climate 49, 101531 (Stockholm) is a model sensitivity study and adds little here.
+
+The heat island acts exactly when night ventilation works. {numref}`fig-vc-uhi` colours every hour by the temperature difference available for ventilative cooling, $\Delta T = T_\mathrm{in} - T_\mathrm{out}$, with $T_\mathrm{in} = 24$ °C. The heat island is set to 2 K at night, the upper end of the Copenhagen averages.
+
+The effect of urban heat islands is more pronounced with future climate, but the magnitude will probably remain the same or even decrease a little as global radiation drops, and mitigating actions are implemented like more green areas in the built environment. Cities are projected to warm by about 1.9 K by 2100 under an intermediate emission scenario {cite:p}`zhao2021`, while in Brussels the summer night-time heat island stays at about 3.1–3.2 K up to the 2060s under both RCP4.5 and RCP8.5 {cite:p}`lauwaet2016`.
+
+```{figure} figures/d1/vc-potential-uhi.*
+:name: fig-vc-uhi
+:width: 100%
+
+Hourly ventilative cooling potential $\Delta T = T_\mathrm{in} - T_\mathrm{out}$ for the present reference year and RCP4.5 2080–2099 at Sjælsmark, each without and with a 2 K night-time urban heat island (tapering to 0 K in the afternoon). Grey: heating days, with a daily mean below 12 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/vc_potential_uhi.py)
+```
+
+
 ### The heat wave of 2018
 
 The summer of 2018 was a Nordic heat-wave summer. To see how it compares, July and August of DRY 2011–2023 were replaced by DMI observations from Sjælsmark (station 06188), 1 July to 31 August 2018.
@@ -511,38 +548,3 @@ The summer of 2018 was a Nordic heat-wave summer. To see how it compares, July a
 ```
 
 The 2018 heat wave was on par with the Annex 80 "most intense" year 2055. Their summers have almost the same mean (18.2 and 18.0 °C), the same 99th percentile (29.2 and 29.1 °C) and about the same degree-hours above 26 °C (217 and 194 Kh). It was far from the "most severe" year 2054, which has nearly twice the degree-hours (399 Kh), 192 instead of 125 hours above 26 °C and 42 instead of 29 days above 25 °C. The summer of 2018 is therefore a realistic heat wave for the 2050s, but not the worst case.
-
-### Urban heat island
-
-The urban heat island intensity is the air temperature difference $\Delta T_\mathrm{UHI} = T_\mathrm{urban} - T_\mathrm{rural}$. It is mainly a night-time effect and peaks a few hours before sunrise on calm, clear summer nights. The causes:
-
-- **Heat storage:** brick, concrete and asphalt store solar heat during the day and release it at night.
-- **Low sky view factor:** street canyons see little of the cold night sky, so long-wave cooling is reduced.
-- **Little evaporation:** sealed surfaces drain rain away instead of evaporating it.
-- **Low wind speed:** buildings reduce convective cooling and mixing.
-- **Waste heat:** traffic, buildings and air-conditioning condensers.
-
-In Denmark the effect is modest but not negligible. {numref}`fig-uhi-denmark` shows it for the four largest Danish cities. On the 3 % warmest days of the year, Copenhagen is on average 1.5–2 K warmer than its rural surroundings at night, and on some nights close to 3 K. The difference almost disappears around 09:00. The other three cities stay at about 1 K {cite:p}`sorup2026`. In four Finnish cities the mean intensity is 0.5–1.2 K, peaking at about 1.5 K around 05:00 in Helsinki {cite:p}`taylor2025`.
-
-For comparison, a model study of 100 European cities at 100 m resolution for 2008–2017 finds an average heat island indicator of 1.43 °C. Green areas and unsealed soil already lower it by 0.45 °C on average, and more of both could lower it by about another 0.5 °C {cite:p}`lauwaet2024`.
-
-```{figure} figures/d1/urbansci-10-00171-g003.png
-:name: fig-uhi-denmark
-:width: 100%
-
-Urban heat island intensity (°C) over the day in Copenhagen, Odense, Aarhus and Aalborg, for the 3 % warmest days, summer, winter and the 3 % coldest days. Lines are the average and bands the spread, for a machine-learning downscaled temperature product (C4C, blue) and the DANRA reanalysis (orange). Reproduced unchanged from Figure 3 of Sørup et al. {cite:p}`sorup2026`, © the authors, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-```
-
-
-%Wang et al. (2023), Urban Climate 49, 101531 (Stockholm) is a model sensitivity study and adds little here.
-
-The heat island acts exactly when night ventilation works. {numref}`fig-vc-uhi` colours every hour by the temperature difference available for ventilative cooling, $\Delta T = T_\mathrm{in} - T_\mathrm{out}$, with $T_\mathrm{in} = 24$ °C. The heat island is set to 2 K at night, the upper end of the Copenhagen averages.
-
-The effect of urban heat islands is more pronounced with future climate, but the magnitude will probably remain the same or even decrease a little as global radiation drops, and mitigating actions are implemented like more green areas in the built environment. Cities are projected to warm by about 1.9 K by 2100 under an intermediate emission scenario {cite:p}`zhao2021`, while in Brussels the summer night-time heat island stays at about 3.1–3.2 K up to the 2060s under both RCP4.5 and RCP8.5 {cite:p}`lauwaet2016`.
-
-```{figure} figures/d1/vc-potential-uhi.*
-:name: fig-vc-uhi
-:width: 100%
-
-Hourly ventilative cooling potential $\Delta T = T_\mathrm{in} - T_\mathrm{out}$ for the present reference year and RCP4.5 2080–2099 at Sjælsmark, each without and with a 2 K night-time urban heat island (tapering to 0 K in the afternoon). Grey: heating days, with a daily mean below 12 °C. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/vc_potential_uhi.py)
-```
