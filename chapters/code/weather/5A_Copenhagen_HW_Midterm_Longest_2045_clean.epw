@@ -1,11 +1,11 @@
-LOCATION, Copenhagen,-, DEN,Custom--,-,55.88,12.41,1.0,75.0
+LOCATION,Copenhagen,-,DNK,Annex80-MPI-REMO,999999,55.88,12.41,1,75
 DESIGN CONDITIONS,0
 TYPICAL/EXTREME PERIODS,6,Summer - Week Nearest Max Temperature For Period,Extreme,8/12,8/18,Summer - Week Nearest Average Temperature For Period,Typical,7/ 8,7/14,Winter - Week Nearest Min Temperature For Period,Extreme,1/ 1,1/ 7,Winter - Week Nearest Average Temperature For Period,Typical,1/22,1/28,Autumn - Week Nearest Average Temperature For Period,Typical,11/ 5,11/11,Spring - Week Nearest Average Temperature For Period,Typical,4/22,4/28
 GROUND TEMPERATURES,3,.5,,,,2.28,3.83,6.85,9.70,15.10,17.95,18.73,17.29,13.96,9.81,5.72,3.02,2,,,,4.42,4.80,6.51,8.43,12.58,15.23,16.55,16.26,14.36,11.49,8.27,5.73,4,,,,6.63,6.36,7.11,8.20,10.94,13.00,14.33,14.65,13.82,12.13,9.95,7.97
 HOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0
 COMMENTS 1,Custom/User Format -- WMO#-; 15/07/2045-20/08/2045 Longest heatwave over 2041-2060  Data are from MPI - REMO RCP8.5. Donwload from the EURO-CORDEX project. The climate data in 2001-2019 were used as observations to bias-adjusted using MBC and QDM methods. Weather file created by Bin Qian (qianbin@my.swjtu.edu.cn) the 04-10-2021.;
 COMMENTS 2, -- Ground temps produced with a standard soil diffusivity of 2.3225760E-03 {m**2/day} Cleaned: 4 corrupt hours repaired with clean_annex80_hw.py.
-DATA PERIODS,1,1,Data,Sunday, 1/ 1,12/31
+DATA PERIODS,1,1,Data,Sunday,1/1,12/31
 2002,1,1,1,0,?9?9?9?9E0?9?9?9*9*9?9*9?9?9?9?9?9?9*9*_*9*9*9*9*9,-3.9,-5.0,91,101060,9999,9999,244,0,0,0,999900,999900,999900,99990,26,0.6,5,5,999.0,999,9,999999999,0,0.0000,0,88,999.000,999.0,99.0
 2002,1,1,2,0,?9?9?9?9E0?9?9?9*9*9?9*9?9?9?9?9?9?9*9*_*9*9*9*9*9,-4.4,-5.3,92,100924,9999,9999,242,0,0,0,999900,999900,999900,99990,33,0.4,5,5,999.0,999,9,999999999,0,0.0000,0,88,999.000,999.0,99.0
 2002,1,1,3,0,?9?9?9?9E0?9?9?9*9*9?9*9?9?9?9?9?9?9*9*_*9*9*9*9*9,-5.1,-5.5,97,100862,9999,9999,239,0,0,0,999900,999900,999900,99990,33,0.2,5,5,999.0,999,9,999999999,0,0.0000,0,88,999.000,999.0,99.0
