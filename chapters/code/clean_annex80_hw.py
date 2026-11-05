@@ -9,6 +9,9 @@
    RH 3 % between 29.9 C and 27.2 C. Dry-bulb, dew point and horizontal infrared
    radiation are interpolated from the hours before and after, and RH is recomputed.
 
+3. Header: LOCATION and DATA PERIODS rewritten without blanks and with a numeric WMO number
+   (999999 = unknown), because IDA ICE read the original latitude and longitude wrongly.
+
 The missing solar radiation of 1-14 August in Longest_2045 cannot be repaired.
 
 Usage: python clean_annex80_hw.py [weather folder]
@@ -38,6 +41,10 @@ def mean(a, b, col, nd=1):
 def clean(src, dst):
     lines = src.read_text(encoding="latin-1").splitlines()
     head, data = lines[:8], [line.split(",") for line in lines[8:]]
+    # Header the original writes with blanks (" Copenhagen", " DEN", "1/ 1") and a "-" as WMO number;
+    # IDA ICE then reads latitude and longitude wrongly. Same fields, standard layout.
+    head[0] = "LOCATION,Copenhagen,-,DNK,Annex80-MPI-REMO,999999,55.88,12.41,1,75"
+    head[7] = "DATA PERIODS,1,1,Data,Sunday,1/1,12/31"
     log = []
     for i, r in enumerate(data):
         ghi, dhi = float(r[GHI]), float(r[DHI])
