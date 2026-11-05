@@ -173,7 +173,7 @@ and the room-average air speed for seated occupants is
 S_{O,avg} = S_F \left(0.25 + 0.99\,\frac{D}{R} - 0.06\,\frac{C}{D} + 0.11\,\frac{D}{1.7} + 0.024\right)
 ```
 
-valid for downward flow with at least 0.2 D between blades and ceiling. In a typical residential room the bracket is about 0.5. {numref}`tab-cfe` applies the model to a 4.5 m × 4.5 m living room with a 2.7 m ceiling and the blades at 2.4 m.
+valid for downward flow with at least 0.2 D between blades and ceiling. In a typical residential room the parenthesis is about 0.5. {numref}`tab-cfe` applies the model to a 4.5 m × 4.5 m living room with a 2.7 m ceiling and the blades at 2.4 m.
 
 :::{table} Estimated room-average air speed, cooling effect and CFE at maximum speed for a seated occupant in a 4.5 m × 4.5 m room (C = 2.7 m, H = 2.4 m). Cooling effect at 28 °C, 50% RH, 1.2 met, 0.5 clo.
 :label: tab-cfe
