@@ -31,3 +31,5 @@ where $I$ is the investment and $\Delta E$ the energy saved per year, compared w
 A measure is profitable when its CCE is lower than the price of the energy it saves. Measures can be ranked by their CCE, and the cheapest saving is taken first. The CCE does not depend on the energy price, so the ranking holds when the price changes. It does not include savings other than energy, such as water, and it does not include maintenance unless that is added to $I$ as a present value.
 
 % REVIEW LATER (Christian, 2026-10-15): check the choice of r = 2.5 % and add a source for it, and decide whether maintenance should be part of the definition.
+
+% REVIEW LATER (Christian, 2026-11-07): rework which energy the CCE is compared with. The saved kWh can be district heating, heat pump (electricity / COP), direct electricity or primary energy, and the CCE limit differs for each. If primary energy, decide which energy price to compare with.
