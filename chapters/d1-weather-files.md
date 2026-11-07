@@ -370,6 +370,8 @@ The summer of 2026 gave similar numbers in western Europe. All three are provisi
 
 % REVIEW: the three 2026 figures above are provisional agency estimates, not journal publications. France (Santé publique France, 22 July 2026) is all-cause excess mortality; England (UKHSA interim report, 30 July 2026) is modelled heat-associated deaths; Spain is the MoMo estimate of Instituto de Salud Carlos III as reported by Meteored, a secondary source. Final figures are expected late 2026 (France, Spain) and early 2027 (England).
 
+DMI counts a heat wave (hedebølge) when the maximum temperature, averaged over three consecutive days, exceeds 28 °C, and a warm spell (varmebølge) when it exceeds 25 °C. For RCP8.5 at the end of the century (2071–2100), DMI expects the heat-wave days in Denmark to rise from about 2 to 9 per year, and the warm-spell days from about 9 to 30 per year, compared with 1981–2010 {cite:p}`dmi_klimaatlas2021`.
+
 A reference year is assembled from typical months, so it contains no real heat wave. The Annex 80 project therefore produced separate heat-wave years.
 
 They are the three years of 2041–2060 with the longest, the most intense (hottest) and the most severe (longest and hottest combined) heat wave. {numref}`tab-heat-waves` compares them with the typical years.
@@ -443,6 +445,15 @@ For comparison, a model study of 100 European cities at 100 m resolution for 200
 Urban heat island intensity (°C) over the day in Copenhagen, Odense, Aarhus and Aalborg, for the 3 % warmest days, summer, winter and the 3 % coldest days. Lines are the average and bands the spread, for a machine-learning downscaled temperature product (C4C, blue) and the DANRA reanalysis (orange). Reproduced unchanged from Figure 3 of Sørup et al. {cite:p}`sorup2026`, © the authors, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 ```
 
+
+Measured intensities exist only for the four largest cities. {numref}`fig-uhi-map` extends them to the rest of the country with the relation of {cite:t}`oke1973`, who found the heat island to grow with the logarithm of city size. Fitted to the four cities, it gives $\Delta T_\mathrm{UHI} \approx -1.67 + 1.14 \log_{10} A$, with $A$ the urban area in km². Towns smaller than about 30 km² then have no significant heat island, and the largest provincial towns 0.3–0.5 K.
+
+```{figure} figures/d1/uhi-map.*
+:name: fig-uhi-map
+:width: 100%
+
+(a) Night-time urban heat island on warm summer nights. Copenhagen, Aarhus, Odense and Aalborg are measured values {cite:p}`sorup2026`; the other towns are estimated from their urban area with the fit in (b). Urban areas from Natural Earth {cite:p}`naturalearth`, based on satellite land cover around 2002. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/d1_uhi_map.py)
+```
 
 %Wang et al. (2023), Urban Climate 49, 101531 (Stockholm) is a model sensitivity study and adds little here.
 

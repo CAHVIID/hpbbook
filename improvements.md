@@ -9,6 +9,29 @@ This page collects loose ideas for future versions of the course and the book. T
 Next year the façade design part may include circadian light. Melanopic EDI (equivalent daylight illuminance, CIE S 026:2018) weights light by its effect on the body clock and is measured vertically at eye level. The consensus target is at least 250 lx in the daytime {cite:p}`brown2022`. Students would size windows and choose glazing so the occupied zone reaches this target, alongside sDA300 and cooling demand. Solar-control glazing that shifts the colour of the light lowers melanopic EDI more than its light transmittance suggests.
 
 
+## Danish heat-wave years with the Annex 80 method
+
+Chapter D1 uses the Annex 80 heat-wave years for Copenhagen, which are RCP8.5, and DMI publishes no heat-wave years. DMI Rapport 25-14 says its reference years are not suited for extreme events and recommends long time series instead. Next year it could be interesting to create heat-wave years for RCP4.5, the scenario of the DMI reference years, with the published Annex 80 code (github.com/LBNL-ETA/annex80-heat-wave-epw, BSD-3). The steps:
+- EURO-CORDEX MPI-ESM-LR/REMO data for Copenhagen, bias-adjusted against DMI observations 2001–2020.
+- Typical years by the Finkelstein–Schafer method.
+- Heat waves by the Ouzeau et al. (2016) thresholds.
+
+The model data must come from ESGF or the Copernicus Climate Data Store, which need an account.
+
+## Heat island against city size: more European cities and a check of Oke
+
+The figure of the heat island against urban area in D1.5 (fig-uhi-map, panel b) is fitted to four Danish cities only, with the intensities of Sørup et al. (2026): the mean night-time heat island on the 3 % warmest days. Two improvements for next year:
+
+**Check the Oke relation against the original paper.** The reference is Oke (1973), "City size and the urban heat island", Atmospheric Environment 7, 769–779 (not 1970). Under calm, clear skies, Oke found the maximum heat island to grow with the logarithm of the population, with separate lines for North American and European settlements. He also gave a form with wind speed, ΔT = P^0.25 / (4.04 u^0.56), from settlements in Quebec. Secondary sources quote different coefficients for the log lines, and none of these is checked against the paper yet:
+- North America: 2.96 log P − 6.41, or 3.06 log P − 6.79 (attributed to Oke 1976)
+- Europe: 2.01 log P − 4.06 (attributed to Oke 1973 and to Landsberg 1981)
+
+Oke's values are maxima on ideal nights. The European line gives about 8 K for Copenhagen, against 1.5–2 K for the warm-night mean. The D1 fit therefore borrows only the log form of Oke's relation, and it uses urban area instead of population. The text and caption should say this clearly.
+
+**Add more European cities from one consistent dataset.** Candidates are Stockholm, Oslo, Helsinki, Hamburg, Amsterdam, Berlin, Paris and London. The most consistent source is the UrbClim model run for 100 European cities, 2008–2017, at 100 m resolution (Lauwaet et al. 2024, Urban Climate 54, 101850). It finds heat island indicators of 0.57–2.54 K, with a mean of 1.43 K. City values are in the Copernicus Climate Data Store dataset "Climate variables for cities in Europe" and in the EEA Urban Adaptation Map Viewer. The Data Store needs an account.
+
+The UrbClim metric (the spatial 90th percentile of the summer mean, minus the rural 10th percentile) differs from that of Sørup et al., so the Danish cities should be taken from UrbClim too. ΔT could then be plotted against both population (Eurostat functional urban areas) and urban area, with Oke's European line for comparison.
+
 
 # D7 Improvements: ideas for cooling
 
