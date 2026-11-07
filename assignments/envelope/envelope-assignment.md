@@ -195,7 +195,7 @@ Use the IDA ICE model "Model B. Realistic energy use" with all of the building e
 
 ### Reducing the cost of the building envelope
 
-In the real row house the insulation of the floor construction is placed below the box, and no insulation is placed inside the floor construction. This keeps the floor construction warm and dry. The insulation is typically 30 cm of expanded polystyrene, EPS. But as the insulation is not exposed to any load from the floor of the box, it may be replaced with low-density insulation.
+In the real row house the insulation of the floor construction is placed below the box, and no insulation is placed inside the floor construction. This keeps the floor construction warm and dry. The insulation is typically 30 cm of expanded polystyrene, EPS (Sundolitt C60 Climate, λ = 0.033 W/mK). But as the insulation is not exposed to any load from the floor of the box, it may be replaced with low-density insulation.
 
 Find prices of EPS and mineral wool insulation online and calculate the initial cost saving for one row house when the 30 cm EPS is replaced with 30 cm standard low-density mineral wool insulation (λ = 0.037 W/mK).
 
