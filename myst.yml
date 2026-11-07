@@ -62,7 +62,9 @@ project:
     - title: "Part E: Prefabrication of type houses"
       children:
         - file: parts/part-e-prefabrication.md
-        - file: chapters/e1-bathroom-pods.md
+        - file: chapters/e1-box-buildings.md
+          title: "Box building systems for type houses (draft)"
+        - file: chapters/e2-bathroom-pods.md
           title: "Prefabricated bathroom pods (draft)"
     - title: "Appendices"
       children:
