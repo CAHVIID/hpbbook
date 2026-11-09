@@ -8,7 +8,7 @@ Per square metre, the bathroom is the most expensive room in a dwelling and the 
 
 In a prefabricated bathroom pod, this work is done in a factory. The pod is delivered complete, lifted into position and connected to the building at a small number of interfaces. The chapter first describes a bathroom built on site as a reference. It then describes how pods are produced and what the building must provide for them.
 
-## E1.1 On-site construction of bathrooms
+## E2.1 On-site construction of bathrooms
 
 {numref}`fig-site-sequence` shows the construction of a bathroom in a timber-frame house built in 2023. The materials and products are current: a profiled steel deck, hydronic floor heating, a water-tight membrane and wall-hung sanitary ware. The method is traditional. The bathroom is built in place, layer by layer, and each trade starts when the previous one has finished.
 
@@ -17,27 +17,27 @@ In a prefabricated bathroom pod, this work is done in a factory. The pod is deli
 
 :::::{grid} 2 2 3 3
 
-```{image} figures/e1/site-1-joists.jpg
+```{image} figures/e2/site-1-joists.jpg
 :alt: Photo of an attic bathroom under construction. Timber floor joists are exposed, with black drain pipes, water pipes and cables running between and through them. A dusty plank lies across the joists. The walls show green vapour barrier, insulation and battens; a frosted window is in the far wall.
 ```
 
-```{image} figures/e1/site-2-lewis-deck.jpg
+```{image} figures/e2/site-2-lewis-deck.jpg
 :alt: Photo of the same bathroom with corrugated galvanised steel sheets (Lewis deck) laid over the joists as the floor base. A black drain pipe rises from the floor at the back wall. The walls are partly boarded.
 ```
 
-```{image} figures/e1/site-2-lewis-deck-below.jpg
+```{image} figures/e2/site-2-lewis-deck-below.jpg
 :alt: Photo looking up at the underside of the corrugated steel floor sheets from the room below. Black drain pipes and cables run between the timber joists under the sheets.
 ```
 
-```{image} figures/e1/site-3-screed.jpg
+```{image} figures/e2/site-3-screed.jpg
 :alt: Photo of the bathroom floor after the concrete has been cast over the steel sheets. The floor is grey and smooth. White floor heating pipe ends stick out of the concrete at the left. The walls are partly boarded and the window is in place.
 ```
 
-```{image} figures/e1/site-4-membrane.jpg
+```{image} figures/e2/site-4-membrane.jpg
 :alt: Photo of the bathroom with a dark grey water-tight membrane painted on the floor and up the lower walls and the shower wall.
 ```
 
-```{image} figures/e1/site-5-finished.jpg
+```{image} figures/e2/site-5-finished.jpg
 :alt: Photo of the finished bathroom with light grey tiles on floor and walls, a wall-hung WC, a bathtub with a tiled side, a glass shower area with a thermostatic mixer, and a wooden shelf along the wall.
 ```
 
@@ -54,7 +54,7 @@ Three features of this process are relevant for the comparison with pods:
 
 The extent of the membrane follows the zones in {numref}`fig-wet-zones`. The wet zone is the whole floor and the walls near the shower; the other walls are the moist zone. The zones are defined in the Danish wet-room requirements, which apply to pods and site-built bathrooms alike.
 
-:::{figure} figures/e1/wet-zones.jpg
+:::{figure} figures/e2/wet-zones.jpg
 :label: fig-wet-zones
 :alt: Isometric drawing of a bathroom corner with a shower. The whole floor, labelled vådzone, and the two walls around the shower to a width of 500 mm on each side of the shower, also labelled vådzone, are shaded. The rest of the walls are labelled fugtig zone. A 100 mm upstand along the bottom of the walls is dimensioned. Text: Mål i mm.
 :width: 55%
@@ -64,7 +64,7 @@ Wet zone (*vådzone*) and moist zone (*fugtig zone*) in a Danish bathroom. The w
 
 The following sections describe how the same work is done in a factory, and what this means for the design of the building.
 
-## E1.2 Off-site production of bathroom pods
+## E2.2 Off-site production of bathroom pods
 
 A pod is a bathroom built as one unit with its own floor, walls and ceiling. The membrane, tiles, sanitary fittings, mixers, pipes, cables, lights and, if specified, floor heating are installed in the factory. Kitchens are also produced as pods ({numref}`fig-pod-types`).
 
@@ -73,19 +73,19 @@ A pod is a bathroom built as one unit with its own floor, walls and ceiling. The
 
 :::::{grid} 2 2 4 4
 
-```{image} figures/e1/pod-light-steel.jpg
+```{image} figures/e2/pod-light-steel.jpg
 :alt: Photo of a light bathroom pod standing alone, seen from outside. The outer walls are grey boards on a galvanised steel frame. Through the door opening a towel radiator and a bathrobe are visible. Grey cable conduits run down the outside of one wall to a junction box.
 ```
 
-```{image} figures/e1/pod-bathroom.jpg
+```{image} figures/e2/pod-bathroom.jpg
 :alt: Photo of a bathroom pod with a steel frame and grey boards, seen from outside, with a finished bathroom inside: dark tiles, a washbasin with a mirror and a wall-hung WC.
 ```
 
-```{image} figures/e1/pod-kitchen.jpg
+```{image} figures/e2/pod-kitchen.jpg
 :alt: Photo of a kitchen pod with a steel frame and grey boards, open on one side, showing wooden kitchen cabinets, a built-in oven and a microwave.
 ```
 
-```{image} figures/e1/pod-installation-wall.jpg
+```{image} figures/e2/pod-installation-wall.jpg
 :alt: Photo of the outside of one pod wall with the boards removed. A white WC cistern is mounted in the frame. Grey cable conduits run from a junction box at the top. Black insulated water pipes run down to the cistern and to the floor. Yellow caps cover the pipe openings.
 ```
 
@@ -107,11 +107,11 @@ The weight of the pod determines the required crane capacity and the load on the
 
 :::::{grid} 2 2 2 2
 
-```{image} figures/e1/pod-wall-floor-detail.png
+```{image} figures/e2/pod-wall-floor-detail.png
 :alt: Section drawing of the bottom of a pod wall and floor. From outside in, the wall has a 1 mm aluminium-zinc sheet, 9 mm plasterboard with a sealing strip over the cassette seams, a sealing layer, assembly adhesive and tiles. The ceiling is 0.7 mm polyester-coated steel sheet on a 40 mm profile. The floor is reinforced concrete with tiles on a 5 mm Egoferm layer, with fall towards a floor drain. Two details at 1:50 show the floor edge.
 ```
 
-```{image} figures/e1/pod-factory-inspection.jpg
+```{image} figures/e2/pod-factory-inspection.jpg
 :alt: Photo of three men inspecting a pod in a factory hall. The pod walls are open on the outside, showing the steel frame, blue and red water pipes, blue electrical boxes and conduits. The inside has white tiles. One man holds a clipboard.
 ```
 
@@ -126,7 +126,7 @@ The pod is wrapped in plastic for transport and storage on site. One manufacture
 
 {numref}`fig-pod-cutaway` shows a pod as delivered from the factory, with floor heating, drains, water pipes in the walls and a distribution cabinet on the roof. The connections to the building are collected at a few points on the outside of the pod.
 
-:::{figure} figures/e1/pod-cutaway.jpg
+:::{figure} figures/e2/pod-cutaway.jpg
 :label: fig-pod-cutaway
 :alt: Cut-away 3D drawing of a pod on a blue base frame. Inside are a bathtub, a washbasin on a black worktop, a WC and white tiles. A red floor heating loop is visible under the green floor membrane. Red and blue water pipes run across the roof and down inside the walls to the fittings. Distribution boxes sit on the roof.
 :width: 65%
@@ -134,16 +134,16 @@ The pod is wrapped in plastic for transport and storage on site. One manufacture
 A pod cut open, showing floor heating, the water pipes in the walls and the distribution on the roof. Source unknown.
 :::
 
-## E1.3 Interfaces between pod and building
+## E2.3 Interfaces between pod and building
 
 A pod is connected to the building at five points: drain, water, exhaust, electricity and, with water-borne floor heating, the heating supply. {numref}`fig-pod-section` shows these connections for a concrete pod placed in a recess in the floor slab next to the installation shaft. The dimensions are taken from the interface document of a Norwegian manufacturer {cite:p}`probad2021`. Other manufacturers use similar values.
 
-:::{figure} figures/e1/pod-section.*
+:::{figure} figures/e2/pod-section.*
 :label: fig-pod-section
 :alt: Section drawing of a bathroom pod standing in a recess in the floor slab, with the installation shaft to the right. The pod has a 100 mm floor, walls and a roof, and 2220 mm free height inside. The recess is 110 to 200 mm deep and at least 30 mm wider than the pod all round; the pod rests on neoprene pads and shims, so its floor is level with the dwelling floor. A 75 mm drain runs from the floor drain under the pod into the drain stack in the shaft, and the WC drain of 110 mm enters the stack 260 mm above the floor. Hot and cold water in 20 mm PEX run from a distribution cabinet on the pod roof to the risers in the shaft. An exhaust duct runs from a valve and sleeve in the pod roof, with a bend 170 mm high, to the exhaust duct in the shaft. Cables run from the pod roof to the consumer unit. The slab above is drawn over the pod.
 :width: 100%
 
-Section through a concrete bathroom pod and the building around it. The pod floor sits in a recess, so the finished floor is level with the dwelling. Drain, water and exhaust go to the installation shaft, cables to the consumer unit. Dimensions from {cite:t}`probad2021`; pipes not to scale. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/e1_pod_section.py)
+Section through a concrete bathroom pod and the building around it. The pod floor sits in a recess, so the finished floor is level with the dwelling. Drain, water and exhaust go to the installation shaft, cables to the consumer unit. Dimensions from {cite:t}`probad2021`; pipes not to scale. [View script](https://github.com/CAHVIID/hpbbook/blob/main/chapters/code/e2_pod_section.py)
 :::
 
 **Floor recess.** The pod floor is 100 mm thick including tiles, and the floor inside must be level with the floor outside for step-free access. The slab therefore needs a recess of at least 110 mm, and 200 mm if a 75 mm drain runs under the pod to the shaft. The recess is at least 30 mm larger than the pod on all sides. The pod rests on 100 × 100 × 6 mm neoprene pads for impact sound, on shims that take up the unevenness of the slab. The shims are levelled against reference points on the corners of the pod, because an error in level becomes an error in the fall of the floor towards the drain {cite:p}`probad2021`. In a hollow-core or timber deck the recess must be designed together with the structure, so the decision to use pods must be made early.
@@ -163,15 +163,15 @@ Section through a concrete bathroom pod and the building around it. The pod floo
 
 :::::{grid} 1 1 3 3
 
-```{image} figures/e1/badelement-plan.png
+```{image} figures/e2/badelement-plan.png
 :alt: Plan drawing of a bathroom pod, 3020 by 1920 mm outside, with 60 mm walls. Left: a shower with a channel drain along the wall. Middle top: a washbasin cabinet. Right top: a cabinet for a washing machine and tumble dryer. Bottom: a WC on the left and the door on the right. Floor level marks of 83, 93, 103, 113 and 118 mm with dashed fall lines towards the drains. A dashed line along the walls marks the membrane.
 ```
 
-```{image} figures/e1/probad-pod.jpg
+```{image} figures/e2/probad-pod.jpg
 :alt: 3D rendering of a pod wrapped in grey plastic, seen from above, with steel lifting points at the four corners of the roof and coils of cable and pipe on the roof.
 ```
 
-```{image} figures/e1/probad-plan.png
+```{image} figures/e2/probad-plan.png
 :alt: Plan sketch of a pod 2580 by 2090 mm outside, with 45 mm walls. A shower with floor drain is top left, a washbasin bottom left and a WC on the right wall with a cistern 175 mm deep and 500 mm wide outside the wall. Numbered circles 1 to 12 mark the connections, among them the drain, the water and the electrical points. The pipe zone at the top left is hatched.
 ```
 
@@ -182,7 +182,7 @@ Interface drawings. a) Plan of a light pod with floor levels and falls, from Bad
 
 **Installation.** The pods are lifted in by crane with the building, floor by floor, before the slab or roof above closes the space ({numref}`fig-pod-lift`). The installation shaft can be built on site next to the pod, or delivered as part of it. Some pods come with the shaft attached and are lifted in as one piece {cite:p}`badelement-let`. On site, the contractor sets the levels, places the pads and shims, lifts in the pod, checks it for transport damage and water in the drains, and connects it. Until then the pod stays wrapped and closed, and it must not be used as a store room {cite:p}`probad2021`.
 
-:::{figure} figures/e1/pod-crane-lift.jpg
+:::{figure} figures/e2/pod-crane-lift.jpg
 :label: fig-pod-lift
 :alt: Photo of a pod wrapped in blue plastic hanging from a crane hook above an open timber floor deck of a building under construction. Three workers in high-visibility clothing guide it into place. Trees and houses are in the background.
 :width: 80%
@@ -197,15 +197,15 @@ A wrapped pod lifted onto an open floor deck. The pod goes in before the floor a
 
 :::::{grid} 3 3 3 3
 
-```{image} figures/e1/lundtoftevej-bathroom.jpg
+```{image} figures/e2/lundtoftevej-bathroom.jpg
 :alt: Photo of a small finished bathroom with white wall tiles, dark floor tiles, a washbasin, a mirror and a wall-hung WC. Two people in hard hats and high-visibility vests are reflected in the mirror.
 ```
 
-```{image} figures/e1/lundtoftevej-shaft-1.jpg
+```{image} figures/e2/lundtoftevej-shaft-1.jpg
 :alt: Photo through an open door into a narrow installation shaft. A grey plastic drain stack runs vertically, held by timber battens. To the right, water pipes with two meters, valves and red handles, and red insulated pipes. Silver ventilation ducts are at the top left, a galvanised steel wall of the pod at the back, and a white WC cistern at the bottom.
 ```
 
-```{image} figures/e1/lundtoftevej-shaft-2.jpg
+```{image} figures/e2/lundtoftevej-shaft-2.jpg
 :alt: Photo of the lower part of the shaft. The grey drain stack has a double branch near the floor where the drains from the pod connect. The white WC cistern is behind the stack. To the right, water pipes with valves come down to the pod, and red and white plastic pipes enter the pod at floor level. A grey ventilation duct runs diagonally on the left.
 ```
 
@@ -214,11 +214,11 @@ A wrapped pod lifted onto an open floor deck. The pod goes in before the floor a
 DTU's prefabricated student homes at Lundtoftevej. a) The bathroom pod. b) and c) The shaft next to the pod, where drain, water, exhaust and cables from the pod are connected. Photos: source unknown.
 ::::::
 
-## E1.4 Floor heating and energy use in bathrooms
+## E2.4 Floor heating and energy use in bathrooms
 
 Ceramic tiles and stone draw heat quickly from bare feet. A tiled floor must therefore be kept at about 27 °C to be perceived as comfortable. Bathroom floor heating is often operated as a comfort floor all year, and is often electric. The pod in {numref}`fig-pod-section` can have 120 W/m² of electric floor heating {cite:p}`probad2021`.
 
-:::{figure} figures/e1/tile-diffusivity.jpg
+:::{figure} figures/e2/tile-diffusivity.jpg
 :label: fig-tile-diffusivity
 :alt: Line chart of thermal diffusivity in cm²/s, 0.005 to 0.020, against temperature from 20 to 160 °C. Granite has the highest values, falling from about 0.019 to 0.014. Marble and terrazzo start at about 0.010 to 0.011. Several porcelain stoneware tiles (PS, red-S and white-S) lie between about 0.005 and 0.010, all falling slightly with temperature. Vinyl is marked at the bottom left at about 0.002.
 :width: 65%
@@ -251,7 +251,7 @@ A 70 m² apartment built to the passive house level of 15 kWh/m² needs 1050 kWh
 
 The calculation assumes a constant air temperature of 22 °C. In reality the bathroom air warms up when the door is closed, which reduces the heat from the floor but sends warmer air to the exhaust. A floor that feels warm at 24 °C instead of 27 °C cuts the temperature difference from 5 to 2 K, and the energy use by 60 %.
 
-## E1.5 Time, cost and waste
+## E2.5 Time, cost and waste
 
 This section is based on a white paper from the Modular Building Institute, the US trade association for modular construction, written together with five pod manufacturers {cite:p}`mbi2017`. The paper promotes pods, and its figures come from the manufacturers' own projects. They may not be representative of pod projects in general.
 

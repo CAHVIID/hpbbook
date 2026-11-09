@@ -5,7 +5,7 @@ import matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle, FancyArrowPatch
 from pathlib import Path
-OUT = Path(__file__).resolve().parent.parent / "figures" / "e1"
+OUT = Path(__file__).resolve().parent.parent / "figures" / "e2"
 
 INK, MUTED, WARM, COLD, GREY, CONC = "#1f1f1e", "#6b6a63", "#eb6834", "#2a78d6", "#d9d7cf", "#bdbab0"
 DRAIN, AIR, POWER = "#7a5c3e", "#3a9a6a", "#b8a200"
