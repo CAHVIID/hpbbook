@@ -66,6 +66,8 @@ project:
           title: "Box building systems for type houses (draft)"
         - file: chapters/e2-bathroom-pods.md
           title: "Prefabricated bathroom pods (draft)"
+        - file: chapters/e3-construction-design.md
+          title: "Construction design (draft)"
     - title: "Appendices"
       children:
         #- file: chapters/appendix-heat-pumps.md

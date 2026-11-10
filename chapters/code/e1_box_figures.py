@@ -1,6 +1,6 @@
 """Figures for chapter E1 Box building systems for type houses. Dimensions from lecture 19.1 (C. A. Hviid, 2025) and
 the box layouts in lecture 21.3. Drawn to scale in metres unless noted. Writes SVG + PNG to figures/e1/:
-build-methods, double-walls, bedroom-dimensions, box-width, box-height, floor-roof-solutions, pods-tech-room, box-layouts."""
+build-methods, double-walls, bedroom-dimensions, box-width, box-height, floor-roof-solutions, pods-tech-room, box-layouts; wind-torsion and wall-racking go to figures/e3."""
 import matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle, Polygon, FancyArrowPatch, Circle
@@ -633,3 +633,100 @@ ax.plot([], [], color=HCOL, lw=4.5, label="venting hatch")
 ax.add_patch(Rectangle((0, 0), 0, 0, fc="#cfe1f5", ec=WCOL, label="roof window or sun tunnel"))
 ax.legend(loc="lower center", bbox_to_anchor=(0.5, 0.0), ncol=3, frameon=False, fontsize=10)
 save(fig, "box-layouts-windows")
+
+
+# ---------------------------------------------------------------- figures 13-14 belong to chapter E3 Construction design (figures/e3)
+OUT_E3 = OUT.parent / "e3"; OUT_E3.mkdir(parents=True, exist_ok=True)
+
+
+def save_e3(fig, name):
+    for ext in ("svg", "png"):
+        fig.savefig(OUT_E3 / f"{name}.{ext}", dpi=200, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+
+
+# ---------------------------------------------------------------- 13. wind along the box: long walls as shear walls, torsion when one long side is removed (plan)
+from matplotlib.patches import FancyArrowPatch as FAP, Arc, Polygon as Poly
+import numpy as np
+L_, B_ = 12.0, 4.0
+fig, axs = plt.subplots(3, 1, figsize=(9.6, 10.6))
+cases = [("(a) Both long walls closed", [(0, L_)], None),
+         ("(b) One long side removed: the wind twists the box", [], None),
+         ("(c) Partial opening in one long side", [(0, 3.5), (8.5, L_)], (3.5, 8.5))]
+for ax, (title, lower, opening) in zip(axs, cases):
+    ax.set_aspect("equal"); ax.axis("off"); ax.set_xlim(-3.2, 14.6); ax.set_ylim(-1.8, 5.6)
+    ax.set_title(title, fontsize=11, loc="left")
+    rect(ax, 0, 0, L_, B_, "#efece4", lw=0)
+    wall = dict(color=INK, lw=5, solid_capstyle="butt")
+    ax.plot([0, L_], [B_, B_], **wall)                                    # upper long wall
+    ax.plot([0, 0], [0, B_], **wall); ax.plot([L_, L_], [0, B_], **wall)  # gables
+    for (x0, x1) in lower: ax.plot([x0, x1], [0, 0], **wall)
+    if opening:
+        ax.plot([opening[0], opening[1]], [0, 0], color=MUTED, lw=1, ls="--")
+        ax.text(sum(opening) / 2, -0.35, f"opening {opening[1] - opening[0]:.0f} m", ha="center", va="top", fontsize=9, color=MUTED)
+    elif not lower:
+        ax.plot([0, L_], [0, 0], color=MUTED, lw=1, ls="--")
+        ax.text(L_ / 2, 0.35, "long side removed", ha="center", va="bottom", fontsize=9, color=MUTED)
+    for yy in np.linspace(0.5, B_ - 0.5, 4):                              # wind pressure on the gable
+        ax.add_patch(FAP((-2.4, yy), (-0.15, yy), arrowstyle="-|>", mutation_scale=12, lw=1.4, color=COLD))
+    ax.text(-2.5, B_ + 0.3, "wind", color=COLD, fontsize=10)
+    # reactions in the long walls (shear), drawn as arrows opposing the wind
+    def react(y, f, lab):
+        ax.add_patch(FAP((L_ + 0.4 + 1.6 * f, y), (L_ + 0.4, y), arrowstyle="-|>", mutation_scale=12, lw=2, color=RED))
+        ax.text(L_ + 0.5 + 1.6 * f, y, lab, va="center", fontsize=9, color=RED)
+    if lower and not opening:
+        react(B_, 0.5, " F/2"); react(0, 0.5, " F/2")
+        ax.text(L_ / 2, B_ / 2, "no twist", ha="center", va="center", fontsize=10, color=MUTED)
+    elif opening:
+        react(B_, 0.62, " > F/2"); react(0, 0.38, " < F/2")
+        ax.text(L_ / 2, B_ / 2, "small twist", ha="center", va="center", fontsize=10, color=MUTED)
+    else:
+        react(B_, 1.0, " F")
+        ax.annotate("", xy=(L_ / 2 + 1.3, B_ / 2 - 0.9), xytext=(L_ / 2 - 1.3, B_ / 2 - 0.9),
+                    arrowprops=dict(arrowstyle="-|>", color=RED, lw=1.8, connectionstyle="arc3,rad=-0.6"))
+        ax.text(L_ / 2, B_ / 2 + 0.2, "torsion", ha="center", va="center", fontsize=10, color=RED)
+        th = np.radians(4)                                                # exaggerated deformed shape, rotating about the upper wall
+        c, s = np.cos(th), np.sin(th)
+        pts = [(0, B_), (0, 0), (L_, 0), (L_, B_)]
+        rot = [((x - L_) * c - (y - B_) * s + L_, (x - L_) * s + (y - B_) * c + B_) for (x, y) in pts]
+        ax.add_patch(Poly(rot, closed=False, fill=False, ec=RED, lw=1, ls=(0, (4, 3))))
+        ax.text(L_ + 0.4, -0.6, "deformed\n(exaggerated)", fontsize=8.5, color=RED, va="top")
+    dim_h(ax, 0, L_, B_ + 0.55, "12 m", fs=9)
+    ax.text(L_ / 2, B_ - 0.45, "B = 4 m", ha="center", va="center", fontsize=9, color=MUTED)
+fig.subplots_adjust(hspace=0.25)
+save_e3(fig, "wind-torsion")
+
+
+# ---------------------------------------------------------------- 14. racking of stud walls, with and without gypsum boards (elevations)
+fig = plt.figure(figsize=(11, 4.2))
+gs = fig.add_gridspec(1, 2, wspace=0.15)
+GYPF, FULL, PART, NONE = "#e9e6de", "#cfe3c4", "#f6e3a8", "#e6e4de"
+def frame(ax, x0, w, h, shear, board):
+    xs = np.arange(x0, x0 + w + 1e-6, 0.6)
+    top = [(x + shear, h) for x in xs]
+    if board:
+        rect(ax, x0, 0, w, h, GYPF, lw=0.8)
+        for x in xs:
+            for y in np.arange(0.15, h, 0.3): ax.plot(x, y, ".", color=INK, ms=2.5)
+        for y in (0.04, h - 0.04):
+            for x in np.arange(x0 + 0.1, x0 + w, 0.2): ax.plot(x, y, ".", color=INK, ms=2.5)
+    for x, (xt, yt) in zip(xs, top): ax.plot([x, xt], [0, yt], color=WOOD, lw=3, solid_capstyle="butt")
+    ax.plot([x0, x0 + w], [0, 0], color=WOOD, lw=4); ax.plot([x0 + shear, x0 + w + shear], [h, h], color=WOOD, lw=4)
+for k, (title, board) in enumerate([("(a) Stud frame without boards", False), ("(b) Gypsum boards screwed to the studs", True)]):
+    ax = fig.add_subplot(gs[0, k]); ax.set_aspect("equal"); ax.axis("off"); ax.set_xlim(-0.9, 3.4); ax.set_ylim(-0.6, 3.1)
+    ax.set_title(title, fontsize=10.5, loc="left")
+    ax.add_patch(Rectangle((-0.3, -0.25), 3.0, 0.25, fc=CONC, ec="none"))
+    if board:
+        frame(ax, 0, 2.4, 2.5, 0.0, True)
+        ax.text(1.2, 1.25, "board acts\nas a shear panel", ha="center", va="center", fontsize=9, bbox=dict(fc="white", ec="none", pad=1))
+        ax.add_patch(FAP((0.0, -0.05), (0.0, -0.5), arrowstyle="-|>", mutation_scale=10, color=RED, lw=1.4))
+        ax.text(0.08, -0.45, "tension", fontsize=8, color=RED)
+        ax.add_patch(FAP((2.4, -0.5), (2.4, -0.05), arrowstyle="-|>", mutation_scale=10, color=RED, lw=1.4))
+        ax.text(2.48, -0.45, "compression", fontsize=8, color=RED)
+    else:
+        ax.add_patch(Rectangle((0, 0), 2.4, 2.5, fill=False, ec=MUTED, lw=0.8, ls="--"))
+        frame(ax, 0, 2.4, 2.5, 0.45, False)
+        ax.text(1.45, 1.25, "frame racks", ha="center", fontsize=10, color=RED, bbox=dict(fc="white", ec="none", pad=1))
+    ax.add_patch(FAP((-0.85, 2.5), (-0.05, 2.5), arrowstyle="-|>", mutation_scale=14, color=COLD, lw=2))
+    ax.text(-0.85, 2.62, "wind H", color=COLD, fontsize=9.5)
+save_e3(fig, "wall-racking")
