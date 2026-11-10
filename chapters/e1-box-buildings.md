@@ -171,7 +171,7 @@ Wood floor on battens with a resilient strip, laid on a concrete deck, as used u
 
 A bathroom has a heavy floor with fall to the drain, more installations than any other room and a lower ceiling than the living rooms. In a box-built house each bathroom is made as a separate pod and placed between the boxes ([Prefabricated bathroom pods](e2-bathroom-pods.md)). One wall of the pod carries all connections and must stay accessible during mounting and for service. The lower ceiling leaves space above the pod for ducts.
 
-Two pods with their connection walls facing each other form a technical room for drains, water, the ventilation unit and the hot water tank ({numref}`fig-pods-tech-room`, {numref}`fig-tech-room-photos`). With the unit in the centre of the house, the ducts are short and the pressure loss is low ({numref}`fig-manifold`). In Solution 2, where the box roof is thin, ducts can run through holes in I-joists ({numref}`fig-ducts-i-joists`).
+Two pods with their connection walls facing each other form a technical room for drains, water, the ventilation unit and the hot water tank ({numref}`fig-pods-tech-room`, {numref}`fig-tech-room-photos`). With the unit in the centre of the house, the ducts are short and the pressure loss is low ({numref}`fig-manifold`). In Solution 2, where the box roof is thin, ducts can run through holes in I-joists ({numref}`fig-ducts-i-joists`); the effect of such holes on the joists is treated in [Construction design](e3-construction-design.md).
 
 :::{figure} figures/e1/pods-tech-room.*
 :label: fig-pods-tech-room
