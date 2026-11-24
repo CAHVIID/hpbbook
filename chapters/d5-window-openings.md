@@ -1,4 +1,4 @@
-# D5 Openings for ventilative cooling
+# D5 Openings and draught
 
 :::{warning} Under revision
 This chapter is being reworked and may change substantially.
