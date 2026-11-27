@@ -82,6 +82,8 @@ project:
           title: "CFD model 3D (under revision)"
         - file: chapters/appendix-fan-comfort.md
           title: "Ceiling fan comfort app (under revision)"
+        - file: chapters/appendix-thermal-bridge-lab.md
+          title: "Thermal Bridge Lab (under revision)"
         - file: assignments/index.md
           title: "Assignments (coming soon)"
           children:
