@@ -154,3 +154,7 @@ The air is at about 24–25 °C after mixing, and the occupants are warm, so in 
 
 
 # Use your own heatpump operation as a case for DHW and SH and SCOP
+
+
+
+Under envelope there should be a section about sDA, where the impact of window layouts on sDA is quantified (curves). Using the same glazing percentage with three different light transmittances to get a nice design guideline, choose these options: A very square window, making corners dark; a more wide window; a very wide window with significantly reduced height; split into two windows. Also show impact on daylight factor as its agood indicated for overcast days
